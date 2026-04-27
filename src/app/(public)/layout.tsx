@@ -1,4 +1,5 @@
 import Header from "@/components/shared/Header"
+import SectionsBar from "@/components/public/SectionsBar"
 import Footer from "@/components/shared/Footer"
 
 export default function PublicLayout({
@@ -9,6 +10,7 @@ export default function PublicLayout({
   return (
     <div className="min-h-screen flex flex-col">
       <Header />
+      <SectionsBar />
       <main className="flex-1">
         {children}
       </main>

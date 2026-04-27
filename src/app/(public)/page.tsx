@@ -1,22 +1,26 @@
-export default function HomePage() {
+import HeroSection from "@/components/public/HeroSection"
+import SectionsBar from "@/components/public/SectionsBar"
+import CategoriesGrid from "@/components/public/CategoriesGrid"
+import BusinessesGrid from "@/components/public/BusinessesGrid"
+import CtaBusiness from "@/components/public/CtaBusiness"
+import { SectionKey } from "@/lib/sections"
+
+interface Props {
+  searchParams: Promise<{ seccion?: string }>
+}
+
+export default async function HomePage({ searchParams }: Props) {
+  const params = await searchParams
+  const section = (params.seccion as SectionKey) || "gastronomy"
+
   return (
     <div>
-      <section className="bg-sand-100 py-20 px-4">
-        <div className="max-w-3xl mx-auto text-center">
-          <h1 className="text-5xl text-stone-900 mb-4">
-            El valle en tu bolsillo
-          </h1>
-          <p className="text-lg text-stone-500 mb-8">
-            Explorá los mejores restaurantes, cafés y viandas del Valle de Calamuchita. Pedí, reservá y disfrutá.
-          </p>
-          <a
-            href="/negocios"
-            className="inline-block bg-primary-500 hover:bg-primary-400 text-primary-100 px-8 py-3 rounded-xl text-base font-medium transition-colors"
-    >
-            Explorar comercios
-          </a>
-        </div>
-      </section>
+      <HeroSection />
+       <div className="bg-sand-100 px-4 py-12 max-w-6xl mx-auto">
+        <CategoriesGrid section={section} />
+        <BusinessesGrid />
+        <CtaBusiness />
+      </div>
     </div>
   )
 }
