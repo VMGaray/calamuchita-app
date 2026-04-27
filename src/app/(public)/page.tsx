@@ -1,5 +1,4 @@
 import HeroSection from "@/components/public/HeroSection"
-import SectionsBar from "@/components/public/SectionsBar"
 import CategoriesGrid from "@/components/public/CategoriesGrid"
 import BusinessesGrid from "@/components/public/BusinessesGrid"
 import CtaBusiness from "@/components/public/CtaBusiness"
