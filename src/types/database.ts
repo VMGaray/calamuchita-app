@@ -1,6 +1,15 @@
 export type Role = 'customer' | 'business' | 'admin'
 export type BusinessCategory = 'restaurant' | 'cafe' | 'viandas' | 'bar' | 'other'
 export type BusinessStatus = 'pending' | 'active' | 'suspended'
+export type BusinessType = 'gastronomy' | 'directory'
+export type BusinessSection =
+  | 'gastronomy'
+  | 'health'
+  | 'services'
+  | 'tourism'
+  | 'commerce'
+  | 'events'
+  | 'info'
 export type OrderType = 'takeaway' | 'delivery'
 export type OrderStatus = 'pending' | 'confirmed' | 'ready' | 'completed' | 'cancelled'
 export type ReservationStatus = 'pending' | 'confirmed' | 'rejected' | 'completed' | 'no_show'
@@ -18,11 +27,14 @@ export interface Profile {
 
 export interface Business {
   id: string
-  owner_id: string
+  owner_id: string | null
   name: string
   slug: string
   description: string | null
-  category: BusinessCategory
+  section: BusinessSection
+  type: BusinessType
+  category: BusinessCategory | null
+  subcategory: string | null
   address: string | null
   phone: string | null
   instagram: string | null
@@ -126,4 +138,18 @@ export interface Subscription {
   current_period_start: string
   current_period_end: string
   notes: string | null
+}
+
+export interface UsefulContact {
+  id: string
+  title: string
+  description: string | null
+  phone: string | null
+  address: string | null
+  schedule: string | null
+  category: string
+  sort_order: number
+  is_active: boolean
+  created_at: string
+  updated_at: string
 }
