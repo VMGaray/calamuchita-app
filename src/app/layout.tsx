@@ -2,6 +2,8 @@ import type { Metadata } from "next"
 import "./globals.css"
 import CustomCursor from "@/components/ui/CustomCursor"
 import ScrollProgress from "@/components/ui/ScrollProgress"
+import PageTransition from "@/components/ui/PageTransition"
+import SmoothScroll from "@/components/ui/SmoothScroll"
 
 export const metadata: Metadata = {
   title: "Calamuchita App",
@@ -18,7 +20,10 @@ export default function RootLayout({
       <body className="cursor-none">
         <CustomCursor />
         <ScrollProgress />
-        {children}
+        <SmoothScroll />
+        <PageTransition>
+          {children}
+        </PageTransition>
       </body>
     </html>
   )

@@ -1,7 +1,7 @@
 "use client"
 
-import { motion } from "framer-motion"
 import AnimateIn from "@/components/ui/AnimateIn"
+import MagneticButton from "@/components/ui/MagneticButton"
 
 export default function CtaBusiness() {
   return (
@@ -13,15 +13,12 @@ export default function CtaBusiness() {
         <p className="text-primary-200 text-sm mb-6 leading-relaxed max-w-sm mx-auto">
           Sumate a Calamuchita App y llegá a miles de vecinos y turistas todos los días.
         </p>
-        <motion.a
+        <MagneticButton
           href="/registro"
-          className="inline-block bg-accent-400 text-accent-50 px-6 py-3 rounded-xl text-sm font-medium"
-          whileHover={{ scale: 1.05, backgroundColor: "#E09356" }}
-          whileTap={{ scale: 0.97 }}
-          transition={{ type: "spring", stiffness: 400, damping: 15 }}
+          className="inline-block bg-accent-400 text-accent-50 px-6 py-3 rounded-xl text-sm font-medium cursor-pointer"
         >
           Quiero sumar mi local
-        </motion.a>
+        </MagneticButton>
       </div>
     </AnimateIn>
   )

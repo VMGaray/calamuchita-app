@@ -3,6 +3,7 @@
 import { motion } from "framer-motion"
 import TextScramble from "@/components/ui/TextScramble"
 import FloatingShapes from "@/components/ui/FloatingShapes"
+import MagneticButton from "@/components/ui/MagneticButton"
 
 export default function HeroSection() {
   return (
@@ -61,13 +62,12 @@ export default function HeroSection() {
           placeholder="Buscar restaurantes, servicios..."
           className="flex-1 bg-transparent border-none outline-none px-5 py-3.5 text-stone-700 placeholder:text-stone-400 text-sm"
         />
-        <motion.button
-          className="bg-accent-400 text-accent-50 px-5 py-3.5 text-sm font-medium"
-          whileHover={{ backgroundColor: "#E09356" }}
-          whileTap={{ scale: 0.97 }}
-        >
-          Buscar
-        </motion.button>
+        <MagneticButton
+  className="bg-accent-400 text-accent-50 px-5 py-3.5 text-sm font-medium cursor-pointer"
+  onClick={() => {}}
+>
+  Buscar
+</MagneticButton>
       </motion.div>
 
     </section>
