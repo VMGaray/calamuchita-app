@@ -1,46 +1,19 @@
 "use client"
 
 import { motion } from "framer-motion"
-
-const words = ["Todo", "el", "valle,", "en", "un", "solo", "lugar"]
+import TextScramble from "@/components/ui/TextScramble"
+import FloatingShapes from "@/components/ui/FloatingShapes"
 
 export default function HeroSection() {
   return (
     <section className="bg-primary-500 px-4 py-16 text-center relative overflow-hidden">
 
-      {/* Floating elements */}
-      <motion.div
-        className="absolute top-12 left-16 text-primary-300 text-4xl opacity-30"
-        animate={{ y: [0, -12, 0], rotate: [0, 8, 0] }}
-        transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
-      >
-        🌿
-      </motion.div>
-      <motion.div
-        className="absolute top-20 right-20 text-primary-300 text-3xl opacity-20"
-        animate={{ y: [0, 10, 0], rotate: [0, -10, 0] }}
-        transition={{ duration: 5, repeat: Infinity, ease: "easeInOut", delay: 1 }}
-      >
-        ⛰️
-      </motion.div>
-      <motion.div
-        className="absolute bottom-16 left-24 text-primary-300 text-2xl opacity-20"
-        animate={{ y: [0, -8, 0], rotate: [0, 12, 0] }}
-        transition={{ duration: 6, repeat: Infinity, ease: "easeInOut", delay: 2 }}
-      >
-        🍽️
-      </motion.div>
-      <motion.div
-        className="absolute bottom-12 right-16 text-primary-300 text-3xl opacity-20"
-        animate={{ y: [0, 8, 0], rotate: [0, -8, 0] }}
-        transition={{ duration: 4.5, repeat: Infinity, ease: "easeInOut", delay: 0.5 }}
-      >
-        🌄
-      </motion.div>
+      {/* Shapes 3D flotantes */}
+      <FloatingShapes />
 
       {/* Eyebrow */}
       <motion.span
-        className="inline-block bg-primary-400 text-primary-100 text-xs font-medium tracking-widest uppercase px-4 py-1.5 rounded-full mb-5"
+        className="relative z-10 inline-block bg-primary-400 text-primary-100 text-xs font-medium tracking-widest uppercase px-4 py-1.5 rounded-full mb-5"
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6 }}
@@ -48,32 +21,27 @@ export default function HeroSection() {
         Valle de Calamuchita · Córdoba
       </motion.span>
 
-      {/* Title word by word */}
-      <h1 className="font-serif text-5xl md:text-6xl text-sand-100 leading-tight mb-4">
-        <span className="flex flex-wrap justify-center gap-x-4">
-          {words.map((word, i) => (
-            <motion.span
-              key={i}
-              initial={{ opacity: 0, y: 60, rotateX: -40 }}
-              animate={{ opacity: 1, y: 0, rotateX: 0 }}
-              transition={{
-                duration: 0.6,
-                delay: 0.3 + i * 0.1,
-                type: "spring",
-                stiffness: 200,
-                damping: 20,
-              }}
-              style={{ display: "inline-block" }}
-            >
-              {word}
-            </motion.span>
-          ))}
-        </span>
+      {/* Title con scramble */}
+      <h1 className="relative z-10 font-serif text-5xl md:text-6xl text-sand-100 leading-tight mb-4">
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.3, delay: 0.3 }}
+        >
+          <TextScramble text="Todo el valle," className="block" delay={0.4} />
+        </motion.div>
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.3, delay: 0.6 }}
+        >
+          <TextScramble text="en un solo lugar" className="block" delay={0.7} />
+        </motion.div>
       </h1>
 
       {/* Subtitle */}
       <motion.p
-        className="text-primary-200 text-base max-w-md mx-auto mb-8 leading-relaxed"
+        className="relative z-10 text-primary-200 text-base max-w-md mx-auto mb-8 leading-relaxed"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 0.8, delay: 1.1 }}
@@ -83,7 +51,7 @@ export default function HeroSection() {
 
       {/* Search */}
       <motion.div
-        className="flex max-w-md mx-auto bg-sand-100 rounded-2xl overflow-hidden"
+        className="relative z-10 flex max-w-md mx-auto bg-sand-100 rounded-2xl overflow-hidden"
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6, delay: 1.3 }}

@@ -1,7 +1,7 @@
 "use client"
 
-import { motion } from "framer-motion"
 import AnimateIn from "@/components/ui/AnimateIn"
+import Card3D from "@/components/ui/Card3D"
 
 const businesses = [
   { name: "La Casona del Valle", type: "Restaurante", location: "VGB", open: true, hasMenu: true, bg: "bg-primary-100" },
@@ -24,32 +24,27 @@ export default function BusinessesGrid() {
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
         {businesses.map(({ name, type, location, open, hasMenu, bg }, i) => (
           <AnimateIn key={name} direction="up" delay={i * 0.1}>
-            <motion.div
-              className="bg-white rounded-2xl overflow-hidden border border-stone-200 cursor-pointer h-full"
-              whileHover={{ y: -4, borderColor: "#52B788" }}
-              transition={{ type: "spring", stiffness: 400, damping: 20 }}
-            >
-              <div className={`${bg} h-24 flex items-center justify-center`}>
-                <motion.div
-                  className="w-12 h-12 bg-white/60 rounded-full"
-                  whileHover={{ scale: 1.1 }}
-                />
-              </div>
-              <div className="p-3">
-                <h3 className="text-sm font-medium text-stone-800 mb-0.5 truncate">{name}</h3>
-                <p className="text-xs text-stone-400 mb-2">{type} · {location}</p>
-                <div className="flex items-center gap-1.5 flex-wrap">
-                  <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${open ? "bg-primary-100 text-primary-600" : "bg-stone-100 text-stone-500"}`}>
-                    {open ? "Abierto" : "Cerrado"}
-                  </span>
-                  {hasMenu && (
-                    <span className="text-xs font-medium px-2 py-0.5 rounded-full bg-accent-100 text-accent-500">
-                      Menú del día
+            <Card3D className="h-full">
+              <div className="bg-white rounded-2xl overflow-hidden border border-stone-200 h-full">
+                <div className={`${bg} h-24 flex items-center justify-center`}>
+                  <div className="w-12 h-12 bg-white/60 rounded-full" />
+                </div>
+                <div className="p-3">
+                  <h3 className="text-sm font-medium text-stone-800 mb-0.5 truncate">{name}</h3>
+                  <p className="text-xs text-stone-400 mb-2">{type} · {location}</p>
+                  <div className="flex items-center gap-1.5 flex-wrap">
+                    <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${open ? "bg-primary-100 text-primary-600" : "bg-stone-100 text-stone-500"}`}>
+                      {open ? "Abierto" : "Cerrado"}
                     </span>
-                  )}
+                    {hasMenu && (
+                      <span className="text-xs font-medium px-2 py-0.5 rounded-full bg-accent-100 text-accent-500">
+                        Menú del día
+                      </span>
+                    )}
+                  </div>
                 </div>
               </div>
-            </motion.div>
+            </Card3D>
           </AnimateIn>
         ))}
       </div>
