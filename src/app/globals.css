@@ -1,30 +1,24 @@
 @import "tailwindcss";
 
 @theme {
-  /* Verde sierra — primario */
-  --color-primary-50: #F0FAF4;
-  --color-primary-100: #B7E4C7;
-  --color-primary-200: #74C69D;
-  --color-primary-300: #52B788;
-  --color-primary-400: #40916C;
-  --color-primary-500: #2D6A4F;
-  --color-primary-600: #1B4332;
-  --color-primary-700: #143327;
+  /* Azul cielo — primario */
+  --color-primary-50: #EEF3FA;
+  --color-primary-100: #D4E2F4;
+  --color-primary-200: #A3BDED;
+  --color-primary-300: #85A8DF;
+  --color-primary-400: #6991C7;
+  --color-primary-500: #537895;
+  --color-primary-600: #3D5A72;
+  --color-primary-700: #2A3F52;
 
-  /* Tierra — acento cálido */
-  --color-accent-50: #FFF8F0;
-  --color-accent-100: #FEE2C8;
-  --color-accent-200: #F9BA8F;
-  --color-accent-300: #E09356;
-  --color-accent-400: #C9854A;
-  --color-accent-500: #9A4F1A;
-  --color-accent-600: #7C3A10;
-
-  /* Arena — fondos cálidos */
-  --color-sand-50: #FDFAF7;
-  --color-sand-100: #F5EFE6;
-  --color-sand-200: #EAE0D5;
-  --color-sand-300: #D4C4B0;
+ /* Verde salvia — acento */
+--color-accent-50: #F0F7F3;
+--color-accent-100: #D4EAD9;
+--color-accent-200: #A8D4B3;
+--color-accent-300: #7CAE8D;
+--color-accent-400: #5A9470;
+--color-accent-500: #3D7A55;
+--color-accent-600: #2A5C3D;
 
   /* Neutros cálidos */
   --color-stone-50: #FAFAF9;
@@ -42,7 +36,6 @@
   --font-sans: Inter, system-ui, sans-serif;
   --font-serif: Georgia, serif;
 
-  /* Border radius extra */
   --radius-xl: 12px;
   --radius-2xl: 16px;
 }

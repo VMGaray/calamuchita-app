@@ -18,9 +18,9 @@ import {
 const categoryIcons: Record<string, any> = {
   "Restaurantes": Utensils, "Cafés": Coffee, "Viandas": ShoppingBag, "Bares": Beer,
   "Delivery": Bike, "Abierto ahora": Clock, "Plomería": Wrench, "Electricidad": Zap,
-  "Gasista": Flame, "Mecánica": Car, "Construcción": Building, "Pintor": Paintbrush,
-  "Herrero": Hammer, "Cerrajero": KeyRound, "Jardinero": Leaf, "Piletero": Waves,
-  "Zinguero": Home, "Desinfecciones": Bug, "Perforaciones": Droplets, "Limpieza": Sparkles,
+  "Gasista": Flame, "Mecánica": Car, "Construcción": Building, "Perforaciones": Droplets,
+  "Pintor": Paintbrush, "Herrero": Hammer, "Cerrajero": KeyRound, "Jardinero": Leaf, "Piletero": Waves,
+  "Zinguero": Home, "Desinfecciones": Bug, "Limpieza": Sparkles,
   "Clínicas y consultorios": Stethoscope, "Farmacias": Pill, "Psicología": Brain,
   "Odontología": Smile, "Oftalmología": Eye, "Veterinarias": PawPrint, "Emergencias": AlertCircle,
   "Colegios": GraduationCap, "Institutos": BookOpen, "Idiomas": Languages,
@@ -85,36 +85,37 @@ export default function SectionModal({ section, onClose }: Props) {
                 </button>
               </div>
 
-              {/* Grid de categorías */}
-              <div className="p-6 grid grid-cols-3 gap-3">
-                {categories.map(({ label, desc, href, bg, color }, i) => {
-                  const Icon = categoryIcons[label] || ShoppingBag
-                  return (
-                    <motion.div
-                      key={label}
-                      initial={{ opacity: 0, y: 20 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: i * 0.05, type: "spring", stiffness: 300, damping: 20 }}
-                    >
-                      <Link
-                        href={href}
-                        onClick={onClose}
-                        className="flex flex-col items-center text-center p-4 rounded-2xl border border-stone-100 hover:border-primary-300 hover:bg-stone-50 transition-all group"
-                      >
-                        <motion.div
-                          className={`w-12 h-12 ${bg} rounded-xl flex items-center justify-center mb-3`}
-                          whileHover={{ y: -6, scale: 1.15 }}
-                          transition={{ type: "spring", stiffness: 400, damping: 15 }}
-                        >
-                          <Icon size={22} className={color} />
-                        </motion.div>
-                        <p className="text-sm font-medium text-stone-700 mb-0.5">{label}</p>
-                        <p className="text-xs text-stone-400 leading-tight">{desc}</p>
-                      </Link>
-                    </motion.div>
-                  )
-                })}
-              </div>
+             {/* Grid de categorías con scroll */}
+<div className="p-4 overflow-y-auto max-h-96">
+  <div className="grid grid-cols-3 gap-2">
+    {categories.map(({ label, desc, href, bg, color }, i) => {
+      const Icon = categoryIcons[label] || ShoppingBag
+      return (
+        <motion.div
+          key={label}
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: i * 0.03, type: "spring", stiffness: 300, damping: 20 }}
+        >
+          <Link
+            href={href}
+            onClick={onClose}
+            className="flex flex-col items-center text-center p-3 rounded-2xl border border-stone-100 hover:border-primary-300 hover:bg-stone-50 transition-all group"
+          >
+            <motion.div
+              className={`w-10 h-10 ${bg} rounded-xl flex items-center justify-center mb-2`}
+              whileHover={{ y: -6, scale: 1.15 }}
+              transition={{ type: "spring", stiffness: 400, damping: 15 }}
+            >
+              <Icon size={18} className={color} />
+            </motion.div>
+            <p className="text-xs font-medium text-stone-700 leading-tight">{label}</p>
+          </Link>
+        </motion.div>
+      )
+    })}
+  </div>
+</div>
             </div>
           </motion.div>
         </>
