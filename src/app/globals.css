@@ -41,7 +41,8 @@
 }
 
 body {
-  background-color: var(--color-sand-100);
+  background: linear-gradient(to bottom, #a3bded 0%, #d4e2f4 30%, #f0f4fa 60%, #ffffff 100%);
+  background-attachment: fixed;
   color: var(--color-stone-700);
   font-family: var(--font-sans);
 }

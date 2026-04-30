@@ -20,12 +20,12 @@ const sections = [
 
 export default function SectionsBar() {
   const searchParams = useSearchParams()
-  const activeSection = searchParams.get("seccion") || "gastronomy"
+  const activeSection = searchParams.get("seccion") || ""
   const [modalSection, setModalSection] = useState<SectionKey | null>(null)
 
   return (
     <>
-      <nav className="bg-primary-600 px-4 flex justify-center gap-1 overflow-x-auto sticky top-14 z-30">
+      <nav className="bg-primary-700/80 backdrop-blur-md px-4 flex justify-center gap-1 overflow-x-auto sticky top-14 z-30">
         {sections.map(({ key, label, icon: Icon }) => {
           const isActive = activeSection === key
           return (
@@ -37,8 +37,10 @@ export default function SectionsBar() {
               whileHover="hover"
               initial="rest"
             >
+              {/* Fondo hover/activo */}
               <motion.div
-                className="absolute inset-0 rounded-xl bg-primary-500"
+                className="absolute inset-0 rounded-xl"
+                style={{ backgroundColor: "rgba(255,255,255,0.15)" }}
                 variants={{
                   rest:   { opacity: 0, scale: 0.9 },
                   hover:  { opacity: 1, scale: 1 },
@@ -47,6 +49,7 @@ export default function SectionsBar() {
                 transition={{ duration: 0.2 }}
               />
 
+              {/* Ícono */}
               <motion.div
                 className="relative z-10"
                 variants={{
@@ -56,24 +59,30 @@ export default function SectionsBar() {
                 }}
                 transition={{ type: "spring", stiffness: 400, damping: 15 }}
               >
-                <Icon size={18} className={isActive ? "text-accent-300" : "text-primary-200"} />
+                <Icon
+                  size={18}
+                  style={{ color: isActive ? "#ffffff" : "rgba(255,255,255,0.6)" }}
+                />
               </motion.div>
 
+              {/* Label */}
               <motion.span
                 className="relative z-10 text-xs font-medium whitespace-nowrap"
                 variants={{
-                  rest:   { color: "#74C69D", opacity: 0.7 },
-                  hover:  { color: "#F5EFE6", opacity: 1 },
-                  active: { color: "#F5EFE6", opacity: 1 },
+                  rest:   { color: "rgba(255,255,255,0.6)", opacity: 1 },
+                  hover:  { color: "rgba(255,255,255,1)", opacity: 1 },
+                  active: { color: "rgba(255,255,255,1)", opacity: 1 },
                 }}
                 transition={{ duration: 0.2 }}
               >
                 {label}
               </motion.span>
 
+              {/* Línea activa */}
               {isActive && (
                 <motion.div
-                  className="absolute bottom-0 left-1/2 -translate-x-1/2 h-0.5 bg-accent-400 rounded-full"
+                  className="absolute bottom-0 left-1/2 -translate-x-1/2 h-0.5 rounded-full"
+                  style={{ backgroundColor: "#D4E2F4" }}
                   layoutId="activeBar"
                   initial={{ width: 0 }}
                   animate={{ width: "60%" }}

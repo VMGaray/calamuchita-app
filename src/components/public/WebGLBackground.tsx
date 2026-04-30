@@ -60,12 +60,12 @@ export default function WebGLBackground() {
         vec2 m = mouse / res; m.y = 1.0 - m.y;
 
         float d = length(uv - m);
-        float strength = 0.1 * exp(-d * 2.5);
-        vec2 distort = uv + normalize(uv - m + 0.001) * strength * sin(time * 2.0 + d * 10.0);
+        float strength = 0.35 * exp(-d * 1.8);
+       vec2 distort = uv + normalize(uv - m + 0.001) * strength * sin(time * 2.5 + d * 8.0);
 
-        float n1 = fbm(distort * 2.2 + time * 0.1);
-        float n2 = fbm(distort * 1.6 - time * 0.07 + vec2(4.1, 2.3));
-        float n3 = fbm(distort * 3.0 + time * 0.04 + vec2(1.5, 7.2));
+        float n1 = fbm(distort * 2.2 + time * 0.18);
+        float n2 = fbm(distort * 1.6 - time * 0.13 + vec2(4.1, 2.3));
+        float n3 = fbm(distort * 3.0 + time * 0.08 + vec2(1.5, 7.2));
 
         float combined = n1 * 0.5 + n2 * 0.3 + n3 * 0.2;
         combined += 0.1 * sin(distort.x * 5.0 + time * 0.4) * cos(distort.y * 4.0 - time * 0.3);
@@ -123,8 +123,8 @@ export default function WebGLBackground() {
     window.addEventListener("mousemove", handleMouseMove)
 
     function render(t: number) {
-      tmx += (mx - tmx) * 0.05
-      tmy += (my - tmy) * 0.05
+      tmx += (mx - tmx) * 0.12
+      tmy += (my - tmy) * 0.12
       gl!.uniform1f(timeLoc, t * 0.001)
       gl!.uniform2f(resLoc, canvas!.width, canvas!.height)
       gl!.uniform2f(mouseLoc, tmx, tmy)

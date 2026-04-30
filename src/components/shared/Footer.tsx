@@ -23,7 +23,7 @@ const sections = [
 
 export default function Footer() {
   return (
-    <footer className="bg-primary-600 mt-auto">
+    <footer className="bg-primary-700/90 backdrop-blur-md mt-auto">
 
       {/* Marquee de pueblos */}
       <div className="border-b border-primary-500 py-3 overflow-hidden">

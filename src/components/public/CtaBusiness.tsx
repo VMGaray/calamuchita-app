@@ -6,8 +6,8 @@ import MagneticButton from "@/components/ui/MagneticButton"
 export default function CtaBusiness() {
   return (
     <AnimateIn direction="up">
-      <div className="bg-primary-600 rounded-2xl px-8 py-10 text-center">
-        <h2 className="font-serif text-2xl text-sand-100 mb-2">
+      <div className="bg-primary-600/90 backdrop-blur-sm rounded-2xl px-8 py-10 text-center border border-primary-500/30">
+        <h2 className="font-serif text-2xl text-white mb-2">
           ¿Tenés un negocio en el valle?
         </h2>
         <p className="text-primary-200 text-sm mb-6 leading-relaxed max-w-sm mx-auto">
@@ -15,7 +15,7 @@ export default function CtaBusiness() {
         </p>
         <MagneticButton
           href="/registro"
-          className="inline-block bg-accent-400 text-accent-50 px-6 py-3 rounded-xl text-sm font-medium cursor-pointer"
+          className="inline-block bg-white text-primary-600 px-6 py-3 rounded-xl text-sm font-medium cursor-pointer hover:bg-primary-50 transition-colors"
         >
           Quiero sumar mi local
         </MagneticButton>

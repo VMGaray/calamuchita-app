@@ -10,12 +10,12 @@ const stats = [
 
 export default function StatsSection() {
   return (
-    <div className="bg-primary-600 py-16 px-4 my-12 rounded-3xl">
+    <div className="bg-white/60 backdrop-blur-sm border border-white/80 py-16 px-4 my-12 rounded-3xl">
       <AnimateIn direction="up">
-        <h2 className="font-serif text-3xl text-sand-100 text-center mb-2">
+        <h2 className="font-serif text-3xl text-primary-700 text-center mb-2">
           El valle en números
         </h2>
-        <p className="text-primary-300 text-sm text-center mb-10">
+        <p className="text-primary-500 text-sm text-center mb-10">
           Una plataforma que crece con la comunidad
         </p>
       </AnimateIn>
@@ -23,11 +23,11 @@ export default function StatsSection() {
         {stats.map(({ value, suffix, label, desc }, i) => (
           <AnimateIn key={label} direction="up" delay={i * 0.1}>
             <div className="text-center">
-              <p className="font-serif text-5xl text-sand-100 mb-1">
+              <p className="font-serif text-5xl text-primary-600 mb-1">
                 <AnimatedCounter to={value} suffix={suffix} />
               </p>
-              <p className="text-sm font-medium text-primary-100 mb-1">{label}</p>
-              <p className="text-xs text-primary-300 leading-relaxed">{desc}</p>
+              <p className="text-sm font-medium text-primary-700 mb-1">{label}</p>
+              <p className="text-xs text-primary-400 leading-relaxed">{desc}</p>
             </div>
           </AnimateIn>
         ))}
