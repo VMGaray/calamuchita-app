@@ -84,9 +84,9 @@ export default function WebGLBackground() {
     `
 
     function compile(src: string, type: number) {
-      const s = gl.createShader(type)!
-      gl.shaderSource(s, src)
-      gl.compileShader(s)
+      const s = gl!.createShader(type)!
+      gl!.shaderSource(s, src)
+      gl!.compileShader(s)
       return s
     }
 

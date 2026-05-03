@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation"
 import { createClient } from "@/lib/supabase/client"
 import { BusinessSection, BusinessCategory } from "@/types/database"
 import ImageUpload from "@/components/ui/ImageUpload"
+import PdfUpload from "@/components/ui/PdfUpload"
 
 const sections: { value: BusinessSection; label: string }[] = [
   { value: "gastronomy", label: "Gastronomía" },
@@ -58,6 +59,7 @@ export default function AdminNegocioForm() {
     offers_dine_in: false,
     logo_url: null as string | null,
     cover_url: null as string | null,
+    menu_pdf_url: null as string | null,
   })
 
   const handleChange = (field: string, value: any) => {
@@ -106,6 +108,7 @@ export default function AdminNegocioForm() {
       owner_id: null,
       logo_url: form.logo_url,
       cover_url: form.cover_url,
+      menu_pdf_url: form.menu_pdf_url,
     })
 
     if (error) {
@@ -322,6 +325,39 @@ export default function AdminNegocioForm() {
     />
   </div>
 </div>
+
+        {/* PDF de la carta */}
+        {form.section === "gastronomy" && (
+          <div className="bg-white rounded-2xl border border-stone-200 p-6 space-y-4">
+            <h2 className="text-sm font-medium text-stone-700">Carta en PDF</h2>
+            <p className="text-xs text-stone-400">Subí la carta completa en formato PDF para que los clientes puedan verla.</p>
+            {form.menu_pdf_url ? (
+              <div className="flex items-center justify-between p-4 bg-stone-50 rounded-xl border border-stone-200">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 bg-primary-100 rounded-xl flex items-center justify-center">
+                    <span className="text-primary-600 text-xs font-bold">PDF</span>
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium text-stone-700">Carta subida</p>
+                    <a href={form.menu_pdf_url} target="_blank" rel="noopener noreferrer" className="text-xs text-primary-500 hover:text-primary-600">
+                      Ver PDF
+                    </a>
+                  </div>
+                </div>
+                <button
+                  onClick={() => handleChange("menu_pdf_url", null)}
+                  className="text-red-400 hover:text-red-500 text-sm"
+                >
+                  Eliminar
+                </button>
+              </div>
+            ) : (
+              <PdfUpload
+                onChange={(url) => handleChange("menu_pdf_url", url)}
+              />
+            )}
+          </div>
+        )}
 
         {/* Botones */}
         <div className="flex gap-3">

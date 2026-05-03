@@ -1,8 +1,9 @@
 "use client"
 
 import Link from "next/link"
-import { usePathname } from "next/navigation"
-import { MapPin, LayoutDashboard, BookOpen, CalendarDays, ShoppingBag, Settings } from "lucide-react"
+import { usePathname, useRouter } from "next/navigation"
+import { MapPin, LayoutDashboard, BookOpen, CalendarDays, ShoppingBag, Settings, LogOut } from "lucide-react"
+import { createClient } from "@/lib/supabase/client"
 
 const links = [
   { href: "/dashboard", label: "Inicio", icon: LayoutDashboard },
@@ -15,11 +16,17 @@ const links = [
 
 export default function Sidebar() {
   const pathname = usePathname()
+  const router = useRouter()
+
+  const handleLogout = async () => {
+    const supabase = createClient()
+    await supabase.auth.signOut()
+    router.push("/")
+    router.refresh()
+  }
 
   return (
     <aside className="w-64 bg-white border-r border-stone-200 min-h-screen flex flex-col">
-
-      {/* Logo */}
       <div className="p-6 border-b border-stone-100">
         <Link href="/" className="flex items-center gap-2">
           <div className="w-7 h-7 bg-primary-500 rounded-lg flex items-center justify-center">
@@ -29,7 +36,6 @@ export default function Sidebar() {
         </Link>
       </div>
 
-      {/* Nav */}
       <nav className="flex-1 p-4 space-y-1">
         {links.map(({ href, label, icon: Icon }) => {
           const isActive = pathname === href
@@ -50,14 +56,21 @@ export default function Sidebar() {
         })}
       </nav>
 
-      {/* Footer del sidebar */}
-      <div className="p-4 border-t border-stone-100">
-        <button className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-stone-500 hover:bg-stone-100 hover:text-stone-700 transition-colors w-full">
-          <Settings size={16} />
+      <div className="p-4 border-t border-stone-100 space-y-1">
+        <Link
+          href="/"
+          className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-stone-500 hover:bg-stone-100 transition-colors"
+        >
+          Ver sitio público
+        </Link>
+        <button
+          onClick={handleLogout}
+          className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-red-400 hover:bg-red-50 hover:text-red-500 transition-colors"
+        >
+          <LogOut size={16} />
           Cerrar sesión
         </button>
       </div>
-
     </aside>
   )
 }

@@ -35,12 +35,17 @@ export interface Business {
   section: BusinessSection
   type: BusinessType
   category: BusinessCategory | null
+  categories: string[]          // ← nuevo
   subcategory: string | null
   address: string | null
   phone: string | null
+  whatsapp: string | null       // ← nuevo
   instagram: string | null
   logo_url: string | null
   cover_url: string | null
+  menu_pdf_url: string | null
+  menu_link: string | null      // ← nuevo
+  accepts_reservations: boolean // ← nuevo
   is_open: boolean
   offers_delivery: boolean
   offers_takeaway: boolean
@@ -153,4 +158,12 @@ export interface UsefulContact {
   is_active: boolean
   created_at: string
   updated_at: string
+}
+
+export interface BusinessPhoto {
+  id: string
+  business_id: string
+  url: string
+  sort_order: number
+  created_at: string
 }

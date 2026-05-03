@@ -43,6 +43,13 @@ useEffect(() => {
     fetchBusinesses()
   }
 
+  const handleToggleStatus = async (id: string, currentStatus: string) => {
+    const newStatus = currentStatus === "active" ? "suspended" : "active"
+    const supabase = createClient()
+    await supabase.from("businesses").update({ status: newStatus }).eq("id", id)
+    fetchBusinesses()
+  }
+
   const filtered = filter
     ? businesses.filter(b => b.section === filter)
     : businesses
@@ -147,13 +154,19 @@ useEffect(() => {
               </div>
 
               {/* Status */}
-              <span className={`text-xs font-medium px-2.5 py-1 rounded-full ${
-                business.status === "active" ? "bg-primary-100 text-primary-600" :
-                business.status === "pending" ? "bg-yellow-100 text-yellow-700" :
-                "bg-red-100 text-red-600"
-              }`}>
+              <button
+                onClick={() => handleToggleStatus(business.id, business.status)}
+                className={`text-xs font-medium px-2.5 py-1 rounded-full transition-colors ${
+                  business.status === "active"
+                    ? "bg-primary-100 text-primary-600 hover:bg-red-100 hover:text-red-500"
+                    : business.status === "pending"
+                    ? "bg-yellow-100 text-yellow-700 hover:bg-primary-100 hover:text-primary-600"
+                    : "bg-red-100 text-red-600 hover:bg-primary-100 hover:text-primary-600"
+                }`}
+                title={business.status === "active" ? "Click para suspender" : "Click para activar"}
+              >
                 {business.status === "active" ? "Activo" : business.status === "pending" ? "Pendiente" : "Suspendido"}
-              </span>
+              </button>
 
               {/* Acciones */}
               <div className="flex items-center gap-2">

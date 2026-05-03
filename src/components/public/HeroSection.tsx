@@ -66,7 +66,7 @@ export default function HeroSection() {
         animate={{ opacity: 1 }}
         transition={{ duration: 0.8, delay: 1.1 }}
       >
-        Gastronomía, salud, servicios, turismo y más. Explorá lo mejor de los pueblos serranos.
+        Gastronomía, salud, servicios, turismo y más. Explorá lo mejor del Valle de Calamuchita.
       </motion.p>
 
       {/* Search */}
