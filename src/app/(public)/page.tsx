@@ -1,7 +1,7 @@
 import HeroSection from "@/components/public/HeroSection"
 import MarqueeBand from "@/components/public/MarqueeBand"
-import CategoriesGrid from "@/components/public/CategoriesGrid"
 import MenusDelDiaCarousel from "@/components/public/MenusDelDiaCarousel"
+import ContactosUtilesGrid from "@/components/public/ContactosUtilesGrid"
 import StatsSection from "@/components/public/StatsSection"
 import BusinessesGrid from "@/components/public/BusinessesGrid"
 import CtaBusiness from "@/components/public/CtaBusiness"
@@ -21,7 +21,7 @@ export default async function HomePage({ searchParams }: Props) {
       <MarqueeBand />
       <div className="px-4 py-12 max-w-6xl mx-auto">
         <MenusDelDiaCarousel />
-        <CategoriesGrid section={section} />
+        <ContactosUtilesGrid />
         <StatsSection />
         <BusinessesGrid />
         <CtaBusiness />
