@@ -5,6 +5,9 @@ import AnimateIn from "@/components/ui/AnimateIn"
 import { Phone, AtSign, MapPin, Clock, Truck, ShoppingBag, UtensilsCrossed, ArrowLeft } from "lucide-react"
 import Link from "next/link"
 import Image from "next/image"
+import ReservaWhatsApp from "@/components/public/ReservaWhatsApp"
+import PedidoWhatsApp from "@/components/public/PedidoWhatsApp"
+
 
 const dayNames = ["Domingo", "Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado"]
 
@@ -235,6 +238,56 @@ export default function NegocioDetalle({ business }: Props) {
                 </div>
               </div>
             </AnimateIn>
+
+            {/* Reserva */}
+            {business.accepts_reservations && business.whatsapp && (
+              <AnimateIn direction="right" delay={0.15}>
+                <ReservaWhatsApp
+                  whatsapp={business.whatsapp}
+                  businessName={business.name}
+                />
+              </AnimateIn>
+            )}
+            {/* Pedidos */}
+{business.whatsapp && (business.offers_delivery || business.offers_takeaway) && (
+  <AnimateIn direction="right" delay={0.25}>
+    <div className="bg-white rounded-2xl border border-stone-200 p-5 space-y-3">
+      <h3 className="text-sm font-medium text-stone-700">Hacer un pedido</h3>
+      {business.offers_delivery && (
+        <PedidoWhatsApp
+          whatsapp={business.whatsapp}
+          businessName={business.name}
+          items={[
+            ...(business.menu_categories?.flatMap((cat: any) =>
+              cat.menu_items?.filter((i: any) => i.is_available) || []
+            ) || []),
+            ...(business.daily_menus?.find((m: any) => {
+              const today = new Date().toISOString().split("T")[0]
+              return m.date === today && m.is_published
+            })?.daily_menu_items || []),
+          ]}
+          type="delivery"
+        />
+      )}
+      {business.offers_takeaway && (
+        <PedidoWhatsApp
+          whatsapp={business.whatsapp}
+          businessName={business.name}
+          items={[
+            ...(business.menu_categories?.flatMap((cat: any) =>
+              cat.menu_items?.filter((i: any) => i.is_available) || []
+            ) || []),
+            ...(business.daily_menus?.find((m: any) => {
+              const today = new Date().toISOString().split("T")[0]
+              return m.date === today && m.is_published
+            })?.daily_menu_items || []),
+          ]}
+          type="takeaway"
+        />
+      )}
+    </div>
+  </AnimateIn>
+)}
 
             {/* Servicios */}
             {(business.offers_delivery || business.offers_takeaway || business.offers_dine_in) && (

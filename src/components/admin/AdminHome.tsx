@@ -43,7 +43,7 @@ export default function AdminHome() {
       ])
 
       const sections: Record<string, number> = {}
-      businesses?.forEach((b: any) => {
+      businesses?.forEach((b: { section: string }) => {
         sections[b.section] = (sections[b.section] || 0) + 1
       })
 

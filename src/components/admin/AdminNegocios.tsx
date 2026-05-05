@@ -33,7 +33,15 @@ const fetchBusinesses = async () => {
 }
 
 useEffect(() => {
-  fetchBusinesses()
+  const supabase = createClient()
+  supabase
+    .from("businesses")
+    .select("*")
+    .order("created_at", { ascending: false })
+    .then(({ data }) => {
+      setBusinesses(data || [])
+      setLoading(false)
+    })
 }, [])
 
   const handleDelete = async (id: string) => {

@@ -6,6 +6,7 @@ import { createClient } from "@/lib/supabase/client"
 import { BusinessSection, BusinessCategory } from "@/types/database"
 import ImageUpload from "@/components/ui/ImageUpload"
 import PdfUpload from "@/components/ui/PdfUpload"
+import HorariosEditor, { HorarioDay } from "@/components/ui/HorariosEditor"
 
 const sections: { value: BusinessSection; label: string }[] = [
   { value: "gastronomy", label: "Gastronomía" },
@@ -42,6 +43,7 @@ export default function AdminNegocioForm() {
   const router = useRouter()
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [horarios, setHorarios] = useState<HorarioDay[]>([])
 
   const [form, setForm] = useState({
     name: "",
@@ -89,9 +91,11 @@ export default function AdminNegocioForm() {
 
     const supabase = createClient()
 
-    const { error } = await supabase.from("businesses").insert({
+    const slug = form.slug || form.name.toLowerCase().replace(/\s+/g, "-")
+
+    const { error: insertError } = await supabase.from("businesses").insert({
       name: form.name,
-      slug: form.slug || form.name.toLowerCase().replace(/\s+/g, "-"),
+      slug,
       description: form.description || null,
       section: form.section,
       type: "directory",
@@ -111,10 +115,25 @@ export default function AdminNegocioForm() {
       menu_pdf_url: form.menu_pdf_url,
     })
 
-    if (error) {
-      setError(error.message)
+    if (insertError) {
+      setError(insertError.message)
       setLoading(false)
       return
+    }
+
+    // Guardar horarios
+    if (horarios.length > 0) {
+      const { data: savedBusiness } = await supabase
+        .from("businesses")
+        .select("id")
+        .eq("slug", slug)
+        .single()
+
+      if (savedBusiness) {
+        await supabase.from("business_hours").insert(
+          horarios.map(h => ({ ...h, business_id: savedBusiness.id }))
+        )
+      }
     }
 
     router.push("/admin/negocios")
@@ -145,7 +164,7 @@ export default function AdminNegocioForm() {
                 onClick={() => handleChange("section", value)}
                 className={`py-2 px-3 rounded-xl text-sm font-medium border transition-colors ${
                   form.section === value
-                    ? "bg-primary-500 text-primary-100 border-primary-500"
+                    ? "bg-primary-500 text-white border-primary-500"
                     : "bg-white text-stone-600 border-stone-200 hover:border-primary-300"
                 }`}
               >
@@ -164,7 +183,7 @@ export default function AdminNegocioForm() {
                     onClick={() => handleChange("category", value)}
                     className={`py-1.5 px-3 rounded-xl text-xs font-medium border transition-colors ${
                       form.category === value
-                        ? "bg-primary-500 text-primary-100 border-primary-500"
+                        ? "bg-primary-500 text-white border-primary-500"
                         : "bg-white text-stone-600 border-stone-200 hover:border-primary-300"
                     }`}
                   >
@@ -194,7 +213,6 @@ export default function AdminNegocioForm() {
         {/* Información básica */}
         <div className="bg-white rounded-2xl border border-stone-200 p-6 space-y-4">
           <h2 className="text-sm font-medium text-stone-700">Información básica</h2>
-
           <div>
             <label className="block text-sm font-medium text-stone-700 mb-1">Nombre *</label>
             <input
@@ -205,7 +223,6 @@ export default function AdminNegocioForm() {
               className="w-full px-4 py-2.5 rounded-xl border border-stone-200 text-stone-800 text-sm outline-none focus:ring-2 focus:ring-primary-300"
             />
           </div>
-
           <div>
             <label className="block text-sm font-medium text-stone-700 mb-1">
               Slug <span className="text-stone-400 font-normal">(URL)</span>
@@ -218,7 +235,6 @@ export default function AdminNegocioForm() {
               className="w-full px-4 py-2.5 rounded-xl border border-stone-200 text-stone-700 text-sm outline-none focus:ring-2 focus:ring-primary-300 bg-stone-50"
             />
           </div>
-
           <div>
             <label className="block text-sm font-medium text-stone-700 mb-1">Descripción</label>
             <textarea
@@ -234,7 +250,6 @@ export default function AdminNegocioForm() {
         {/* Contacto y ubicación */}
         <div className="bg-white rounded-2xl border border-stone-200 p-6 space-y-4">
           <h2 className="text-sm font-medium text-stone-700">Contacto y ubicación</h2>
-
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-medium text-stone-700 mb-1">Teléfono</label>
@@ -257,7 +272,6 @@ export default function AdminNegocioForm() {
               />
             </div>
           </div>
-
           <div>
             <label className="block text-sm font-medium text-stone-700 mb-1">Pueblo</label>
             <select
@@ -266,12 +280,9 @@ export default function AdminNegocioForm() {
               className="w-full px-4 py-2.5 rounded-xl border border-stone-200 text-stone-800 text-sm outline-none focus:ring-2 focus:ring-primary-300 bg-white"
             >
               <option value="">Seleccioná un pueblo</option>
-              {pueblos.map(p => (
-                <option key={p} value={p}>{p}</option>
-              ))}
+              {pueblos.map(p => <option key={p} value={p}>{p}</option>)}
             </select>
           </div>
-
           <div>
             <label className="block text-sm font-medium text-stone-700 mb-1">Dirección</label>
             <input
@@ -307,30 +318,37 @@ export default function AdminNegocioForm() {
             </div>
           </div>
         )}
+
+        {/* Horarios */}
+        <div className="bg-white rounded-2xl border border-stone-200 p-6">
+          <h2 className="text-sm font-medium text-stone-700 mb-4">Horarios de atención</h2>
+          <HorariosEditor value={horarios} onChange={setHorarios} />
+        </div>
+
         {/* Fotos */}
-<div className="bg-white rounded-2xl border border-stone-200 p-6 space-y-4">
-  <h2 className="text-sm font-medium text-stone-700">Fotos</h2>
-  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-    <ImageUpload
-      value={form.logo_url}
-      onChange={(url) => handleChange("logo_url", url)}
-      folder="logos"
-      label="Logo"
-    />
-    <ImageUpload
-      value={form.cover_url}
-      onChange={(url) => handleChange("cover_url", url)}
-      folder="covers"
-      label="Foto de portada"
-    />
-  </div>
-</div>
+        <div className="bg-white rounded-2xl border border-stone-200 p-6 space-y-4">
+          <h2 className="text-sm font-medium text-stone-700">Fotos</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <ImageUpload
+              value={form.logo_url}
+              onChange={(url) => handleChange("logo_url", url)}
+              folder="logos"
+              label="Logo"
+            />
+            <ImageUpload
+              value={form.cover_url}
+              onChange={(url) => handleChange("cover_url", url)}
+              folder="covers"
+              label="Foto de portada"
+            />
+          </div>
+        </div>
 
         {/* PDF de la carta */}
         {form.section === "gastronomy" && (
           <div className="bg-white rounded-2xl border border-stone-200 p-6 space-y-4">
             <h2 className="text-sm font-medium text-stone-700">Carta en PDF</h2>
-            <p className="text-xs text-stone-400">Subí la carta completa en formato PDF para que los clientes puedan verla.</p>
+            <p className="text-xs text-stone-400">Subí la carta completa en formato PDF.</p>
             {form.menu_pdf_url ? (
               <div className="flex items-center justify-between p-4 bg-stone-50 rounded-xl border border-stone-200">
                 <div className="flex items-center gap-3">
@@ -339,22 +357,15 @@ export default function AdminNegocioForm() {
                   </div>
                   <div>
                     <p className="text-sm font-medium text-stone-700">Carta subida</p>
-                    <a href={form.menu_pdf_url} target="_blank" rel="noopener noreferrer" className="text-xs text-primary-500 hover:text-primary-600">
-                      Ver PDF
-                    </a>
+                    <a href={form.menu_pdf_url} target="_blank" rel="noopener noreferrer" className="text-xs text-primary-500">Ver PDF</a>
                   </div>
                 </div>
-                <button
-                  onClick={() => handleChange("menu_pdf_url", null)}
-                  className="text-red-400 hover:text-red-500 text-sm"
-                >
+                <button onClick={() => handleChange("menu_pdf_url", null)} className="text-red-400 hover:text-red-500 text-sm">
                   Eliminar
                 </button>
               </div>
             ) : (
-              <PdfUpload
-                onChange={(url) => handleChange("menu_pdf_url", url)}
-              />
+              <PdfUpload onChange={(url) => handleChange("menu_pdf_url", url)} />
             )}
           </div>
         )}
@@ -370,7 +381,7 @@ export default function AdminNegocioForm() {
           <button
             onClick={handleSubmit}
             disabled={loading}
-            className="flex-1 py-3 rounded-xl bg-primary-500 hover:bg-primary-400 text-primary-100 text-sm font-medium transition-colors disabled:opacity-50"
+            className="flex-1 py-3 rounded-xl bg-primary-500 hover:bg-primary-400 text-white text-sm font-medium transition-colors disabled:opacity-50"
           >
             {loading ? "Guardando..." : "Guardar negocio"}
           </button>

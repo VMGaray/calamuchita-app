@@ -4,6 +4,7 @@ import { useState, useEffect } from "react"
 import { createClient } from "@/lib/supabase/client"
 import ImageUpload from "@/components/ui/ImageUpload"
 import PdfUpload from "@/components/ui/PdfUpload"
+import HorariosEditor, { HorarioDay } from "@/components/ui/HorariosEditor"
 
 const categoryOptions = [
   { value: "restaurant", label: "Restaurante" },
@@ -32,7 +33,7 @@ export default function ConfiguracionLocal() {
   const [success, setSuccess] = useState(false)
   const [businessId, setBusinessId] = useState<string | null>(null)
   const [photos, setPhotos] = useState<string[]>([])
-  const [uploadingPhoto, setUploadingPhoto] = useState(false)
+  const [horarios, setHorarios] = useState<HorarioDay[]>([])
 
   const [form, setForm] = useState({
     name: "",
@@ -70,7 +71,7 @@ export default function ConfiguracionLocal() {
 
       if (business) {
         setBusinessId(business.id)
-        setPhotos(business.business_photos?.map((p: any) => p.url) || [])
+        setPhotos(business.business_photos?.map((p: { url: string }) => p.url) || [])
         setForm({
           name: business.name || "",
           slug: business.slug || "",
@@ -92,17 +93,25 @@ export default function ConfiguracionLocal() {
           pet_friendly: business.pet_friendly || false,
           payment_methods: business.payment_methods || [],
         })
+
+        const { data: horariosData } = await supabase
+          .from("business_hours")
+          .select("*")
+          .eq("business_id", business.id)
+          .order("day_of_week")
+
+        if (horariosData) setHorarios(horariosData)
       }
       setLoading(false)
     }
     fetchBusiness()
   }, [])
 
-  const handleChange = (field: string, value: any) => {
+  const handleChange = (field: string, value: string | boolean | string[] | null) => {
     setForm(prev => {
       const updated = { ...prev, [field]: value }
       if (field === "name" && !businessId) {
-        updated.slug = value
+        updated.slug = (value as string)
           .toLowerCase()
           .normalize("NFD")
           .replace(/[\u0300-\u036f]/g, "")
@@ -182,6 +191,13 @@ export default function ConfiguracionLocal() {
     } else {
       const { error } = await supabase.from("businesses").insert(data)
       if (error) { setError(error.message); setSaving(false); return }
+    }
+
+    if (businessId && horarios.length > 0) {
+      await supabase.from("business_hours").delete().eq("business_id", businessId)
+      await supabase.from("business_hours").insert(
+        horarios.map(h => ({ ...h, business_id: businessId }))
+      )
     }
 
     setSuccess(true)
@@ -473,6 +489,12 @@ export default function ConfiguracionLocal() {
             </div>
             <p className="text-xs text-stone-400">{photos.length}/8 fotos</p>
           </div>
+        </div>
+
+        {/* Horarios */}
+        <div className="bg-white rounded-2xl border border-stone-200 p-6">
+          <h2 className="text-sm font-medium text-stone-700 mb-4">Horarios de atención</h2>
+          <HorariosEditor value={horarios} onChange={setHorarios} />
         </div>
 
         {/* Guardar */}
