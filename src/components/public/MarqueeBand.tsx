@@ -1,17 +1,13 @@
-"use client"
-
-import { motion } from "framer-motion"
-
 const items = [
   "Villa General Belgrano",
   "Los Reartes",
   "Santa Rosa de Calamuchita",
   "La Cumbrecita",
-  //"Yacanto",
-  //"Amboy",
-  //"Villa Ciudad de América",
-  //"Embalse",
-  //"Villa del Dique",
+  "Yacanto",
+  "Amboy",
+  "Villa Ciudad de América",
+  "Embalse",
+  "Villa del Dique",
 ]
 
 export default function MarqueeBand() {
@@ -24,19 +20,30 @@ export default function MarqueeBand() {
         borderBottom: "1px solid rgba(200,96,58,0.1)",
       }}
     >
-      <motion.div
-        className="flex gap-8 whitespace-nowrap"
-        animate={{ x: ["0%", "-50%"] }}
-        transition={{ duration: 25, repeat: Infinity, ease: "linear" }}
+      <div
+        className="flex whitespace-nowrap"
+        style={{
+          animation: "marquee-scroll 25s linear infinite",
+          willChange: "transform",
+        }}
       >
         {[...items, ...items].map((item, i) => (
-          <span key={i} className="text-xs font-medium tracking-widest uppercase flex items-center gap-8"
-            style={{ color: "rgba(26,18,8,0.35)" }}>
+          <span
+            key={i}
+            className="text-xs font-medium tracking-widest uppercase inline-flex items-center"
+            style={{ color: "rgba(26,18,8,0.35)", marginRight: "2rem" }}
+          >
             {item}
-            <span style={{ color: "rgba(26,18,8,0.15)" }}>✦</span>
+            <span style={{ color: "rgba(26,18,8,0.15)", marginLeft: "2rem" }}>✦</span>
           </span>
         ))}
-      </motion.div>
+      </div>
+      <style>{`
+        @keyframes marquee-scroll {
+          from { transform: translateX(0); }
+          to   { transform: translateX(-50%); }
+        }
+      `}</style>
     </div>
   )
 }

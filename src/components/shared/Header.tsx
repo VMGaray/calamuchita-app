@@ -47,7 +47,7 @@ export default function Header() {
         <div className="h-16 flex items-center justify-between">
 
           {/* Logo */}
-          <Link href="/" className="flex items-center gap-2">
+          <Link href="/" className="flex items-center gap-2 -ml-3">
             <div className="w-8 h-8 rounded-xl flex items-center justify-center"
               style={{ background: "rgba(255,255,255,0.2)", border: "1px solid rgba(255,255,255,0.35)" }}>
               <MapPin size={15} style={{ color: "rgba(255,255,255,0.9)" }} />

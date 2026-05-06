@@ -1,4 +1,5 @@
-import DirectorioList from "@/components/public/DirectorioList";
+import type { Metadata } from "next"
+import DirectorioList from "@/components/public/DirectorioList"
 import { SectionKey } from "@/lib/sections"
 
 interface Props {
@@ -24,6 +25,28 @@ const sectionDescs: Record<string, string> = {
   commerce: "Almacenes, dietéticas, artesanías y más",
   events: "Festivales, recitales, ferias y más",
   info: "Emergencias, farmacias de turno, municipalidad y más",
+}
+
+export async function generateMetadata({ params }: Pick<Props, "params">): Promise<Metadata> {
+  const { section } = await params
+  const title = sectionTitles[section] || section
+  const description = sectionDescs[section] || "Encontrá lo que necesitás en el Valle de Calamuchita"
+
+  return {
+    title,
+    description,
+    openGraph: {
+      title: `${title} en el Valle de Calamuchita`,
+      description,
+      images: [{ url: "/valle.jpg", width: 1200, height: 630, alt: "Valle de Calamuchita" }],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: `${title} | Calamuchita App`,
+      description,
+      images: ["/valle.jpg"],
+    },
+  }
 }
 
 export default async function DirectorioPage({ params, searchParams }: Props) {

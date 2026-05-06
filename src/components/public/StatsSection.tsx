@@ -29,7 +29,7 @@ export default function StatsSection() {
         {stats.map(({ value, suffix, label, desc }, i) => (
           <AnimateIn key={label} direction="up" delay={i * 0.1}>
             <div className="text-center">
-              <p className="font-serif text-5xl text-primary-600 mb-1">
+              <p className="font-serif text-4xl md:text-5xl text-primary-600 mb-1">
                 <AnimatedCounter to={value} suffix={suffix} />
               </p>
               <p className="text-sm font-medium text-stone-700 mb-1">{label}</p>

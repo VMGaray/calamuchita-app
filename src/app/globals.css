@@ -46,6 +46,14 @@ body {
   font-family: var(--font-sans);
 }
 
+.scrollbar-none {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.scrollbar-none::-webkit-scrollbar {
+  display: none;
+}
+
 h1, h2, h3 {
   font-family: var(--font-serif);
   font-weight: 500;

@@ -87,7 +87,7 @@ export default function SectionModal({ section, onClose }: Props) {
 
              {/* Grid de categorías con scroll */}
 <div className="p-4 overflow-y-auto max-h-96">
-  <div className="grid grid-cols-3 gap-2">
+  <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
     {categories.map(({ label, desc, href, bg, color }, i) => {
       const Icon = categoryIcons[label] || ShoppingBag
       return (

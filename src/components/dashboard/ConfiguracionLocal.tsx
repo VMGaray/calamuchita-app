@@ -274,7 +274,7 @@ export default function ConfiguracionLocal() {
         {/* Contacto */}
         <div className="bg-white rounded-2xl border border-stone-200 p-6 space-y-4">
           <h2 className="text-sm font-medium text-stone-700">Contacto y ubicación</h2>
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-medium text-stone-700 mb-1">Teléfono</label>
               <input

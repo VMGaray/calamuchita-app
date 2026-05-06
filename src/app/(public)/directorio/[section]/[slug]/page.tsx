@@ -1,19 +1,20 @@
 import type { Metadata } from "next"
-import NegocioDetalle from "@/components/public/NegocioDetalle"
+import DirectorioDetalle from "@/components/public/DirectorioDetalle"
 import { createClient } from "@/lib/supabase/server"
 import { notFound } from "next/navigation"
 
 interface Props {
-  params: Promise<{ slug: string }>
+  params: Promise<{ section: string; slug: string }>
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const { slug } = await params
+  const { slug, section } = await params
   const supabase = await createClient()
   const { data: business } = await supabase
     .from("businesses")
     .select("name, description, cover_url")
     .eq("slug", slug)
+    .eq("section", section)
     .eq("status", "active")
     .single()
 
@@ -39,8 +40,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   }
 }
 
-export default async function NegocioDetallePage({ params }: Props) {
-  const { slug } = await params
+export default async function DirectorioDetallePage({ params }: Props) {
+  const { slug, section } = await params
   const supabase = await createClient()
 
   const { data: business } = await supabase
@@ -48,20 +49,14 @@ export default async function NegocioDetallePage({ params }: Props) {
     .select(`
       *,
       business_hours (*),
-      menu_categories (
-        *,
-        menu_items (*)
-      ),
-      daily_menus (
-        *,
-        daily_menu_items (*)
-      )
+      business_photos (*)
     `)
     .eq("slug", slug)
+    .eq("section", section)
     .eq("status", "active")
     .single()
 
   if (!business) notFound()
 
-  return <NegocioDetalle business={business} />
+  return <DirectorioDetalle business={business} section={section} />
 }

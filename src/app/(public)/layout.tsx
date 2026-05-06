@@ -66,9 +66,11 @@ export default function PublicLayout({
       <SectionsBar />
 
       <main className="flex-1 md:pr-20">
-      {children}
+        {children}
       </main>
-      <Footer />
+      <div className="pb-20 md:pb-0">
+        <Footer />
+      </div>
     </div>
   )
 }

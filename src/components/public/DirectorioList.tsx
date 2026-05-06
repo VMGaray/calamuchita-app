@@ -8,6 +8,7 @@ import { SkeletonBusinessGrid } from "@/components/ui/Skeleton"
 import { createClient } from "@/lib/supabase/client"
 import { sectionCategories, SectionKey } from "@/lib/sections"
 import { Phone, AtSign, MapPin } from "lucide-react"
+import Link from "next/link"
 
 interface Business {
   id: string
@@ -37,6 +38,15 @@ const pueblos = [
   "Villa Ciudad de América",
   "Embalse",
   "Villa del Dique",
+  "Villa Rumipal",
+  "San Agustín",
+  "Intiyaco",
+  "El Durazno",
+  "Potrero de Garay",
+  "Villa Alpina",
+  "Villa Berna",
+  "Villa Ciudad Parque",
+  "La Cruz",
 ]
 
 export default function DirectorioList({ section, filters }: Props) {
@@ -168,58 +178,65 @@ export default function DirectorioList({ section, filters }: Props) {
               <AnimateIn key={business.id} direction="up" delay={i * 0.05}>
                 <Card3D className="h-full">
                   <div className="bg-white rounded-2xl overflow-hidden border border-stone-200 h-full">
-                    <div className="h-32 relative bg-primary-100">
-                      {business.cover_url ? (
-                        <img src={business.cover_url} alt={business.name} className="w-full h-full object-cover" />
-                      ) : (
-                        <div className="w-full h-full flex items-center justify-center">
-                          <div className="w-12 h-12 bg-white/60 rounded-full flex items-center justify-center font-serif text-xl text-primary-400">
-                            {business.name[0]}
+
+                    {/* Parte clickeable → va al detalle */}
+                    <Link href={`/directorio/${section}/${business.slug}`} className="block">
+                      <div className="h-32 relative bg-primary-100">
+                        {business.cover_url ? (
+                          <img src={business.cover_url} alt={business.name} className="w-full h-full object-cover" />
+                        ) : (
+                          <div className="w-full h-full flex items-center justify-center">
+                            <div className="w-12 h-12 bg-white/60 rounded-full flex items-center justify-center font-serif text-xl text-primary-400">
+                              {business.name[0]}
+                            </div>
                           </div>
-                        </div>
-                      )}
-                    </div>
-                    <div className="p-4">
-                      <h3 className="text-base font-medium text-stone-800 mb-0.5">{business.name}</h3>
-                      {business.subcategory && (
-                        <span className="inline-block text-xs font-medium px-2 py-0.5 rounded-full bg-primary-100 text-primary-600 mb-2">
-                          {business.subcategory}
-                        </span>
-                      )}
-                      {business.description && (
-                        <p className="text-sm text-stone-500 mb-3 leading-relaxed line-clamp-2">
-                          {business.description}
-                        </p>
-                      )}
-                      <div className="space-y-1.5 mt-2">
+                        )}
+                      </div>
+                      <div className="px-4 pt-4 pb-2">
+                        <h3 className="text-base font-medium text-stone-800 mb-0.5">{business.name}</h3>
+                        {business.subcategory && (
+                          <span className="inline-block text-xs font-medium px-2 py-0.5 rounded-full bg-primary-100 text-primary-600 mb-2">
+                            {business.subcategory}
+                          </span>
+                        )}
+                        {business.description && (
+                          <p className="text-sm text-stone-500 mb-3 leading-relaxed line-clamp-2">
+                            {business.description}
+                          </p>
+                        )}
                         {business.address && (
-                          <div className="flex items-center gap-2 text-xs text-stone-400">
+                          <div className="flex items-center gap-2 text-xs text-stone-400 mb-1">
                             <MapPin size={12} />
                             <span>{business.address}</span>
                           </div>
                         )}
-                        {business.phone && (
-                          <a
-                            href={`tel:${business.phone}`}
-                            className="flex items-center gap-2 text-xs text-primary-500 hover:text-primary-600"
-                          >
-                            <Phone size={12} />
-                            <span>{business.phone}</span>
-                          </a>
-                        )}
-                        {business.instagram && (
-                          <a
-                            href={`https://instagram.com/${business.instagram.replace("@", "")}`}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="flex items-center gap-2 text-xs text-primary-500 hover:text-primary-600"
-                          >
-                            <AtSign size={12} />
-                            <span>{business.instagram}</span>
-                          </a>
-                        )}
                       </div>
+                    </Link>
+
+                    {/* Links de contacto — fuera del Link principal */}
+                    <div className="px-4 pb-4 space-y-1">
+                      {business.phone && (
+                        <a
+                          href={`tel:${business.phone}`}
+                          className="flex items-center gap-2 text-xs text-primary-500 hover:text-primary-600"
+                        >
+                          <Phone size={12} />
+                          <span>{business.phone}</span>
+                        </a>
+                      )}
+                      {business.instagram && (
+                        <a
+                          href={`https://instagram.com/${business.instagram.replace("@", "")}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="flex items-center gap-2 text-xs text-primary-500 hover:text-primary-600"
+                        >
+                          <AtSign size={12} />
+                          <span>{business.instagram}</span>
+                        </a>
+                      )}
                     </div>
+
                   </div>
                 </Card3D>
               </AnimateIn>

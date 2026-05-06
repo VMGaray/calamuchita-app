@@ -6,7 +6,7 @@ import MagneticButton from "@/components/ui/MagneticButton"
 
 export default function HeroSection() {
   return (
-    <section className="relative px-4 pt-8 pb-20 text-center overflow-hidden" style={{ minHeight: "480px" }}>
+    <section className="relative px-4 pt-8 pb-20 text-center overflow-hidden min-h-[340px] md:min-h-[480px]">
 
       {/* Eyebrow */}
       <motion.span
@@ -26,7 +26,7 @@ export default function HeroSection() {
 
       {/* Title */}
       <h1
-        className="relative z-10 font-serif text-6xl md:text-7xl leading-tight mb-6"
+        className="relative z-10 font-serif text-4xl md:text-6xl lg:text-7xl leading-tight mb-6"
         style={{ color: "rgba(255,255,255,0.97)", textShadow: "0 2px 16px rgba(0,0,0,0.5), 0 1px 4px rgba(0,0,0,0.3)" }}
       >
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.3, delay: 0.3 }}>
@@ -39,13 +39,19 @@ export default function HeroSection() {
 
       {/* Subtitle */}
       <motion.p
-        className="relative z-10 text-base max-w-lg mx-auto mb-10 leading-relaxed"
-        style={{ color: "rgba(255,255,255,0.88)", textShadow: "0 1px 8px rgba(0,0,0,0.4)" }}
+        className="relative z-10 text-base max-w-lg mx-auto mb-10 leading-relaxed px-5 py-3 rounded-2xl"
+        style={{
+          color: "rgba(255,255,255,0.95)",
+          background: "rgba(0,0,0,0.25)",
+          backdropFilter: "blur(8px)",
+          WebkitBackdropFilter: "blur(8px)",
+          border: "1px solid rgba(255,255,255,0.15)",
+        }}
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 0.8, delay: 1.1 }}
       >
-        Gastronomía, salud, servicios, turismo y más. Explorá lo mejor de los pueblos serranos.
+        Gastronomía, salud, servicios, turismo y más. Explorá lo mejor del Valle de Calamuchita.
       </motion.p>
 
       {/* Search — glassmorphism */}

@@ -41,13 +41,13 @@ const categoryIcons: Record<string, any> = {
 }
 
 const bentoSizes = [
-  "col-span-2 row-span-2",
+  "col-span-1 row-span-1 md:col-span-2 md:row-span-2",
   "col-span-1 row-span-1",
   "col-span-1 row-span-1",
-  "col-span-1 row-span-2",
+  "col-span-1 row-span-1 md:col-span-1 md:row-span-2",
   "col-span-1 row-span-1",
   "col-span-1 row-span-1",
-  "col-span-2 row-span-1",
+  "col-span-2 row-span-1 md:col-span-2 md:row-span-1",
   "col-span-1 row-span-1",
 ]
 
@@ -65,16 +65,14 @@ export default function CategoriesGrid({ section }: Props) {
         <h2 className="font-serif text-2xl text-stone-900 mb-6">Categorías</h2>
       </AnimateIn>
 
-      <div
-        className="grid gap-3"
-        style={{ gridTemplateColumns: "repeat(4, 1fr)", gridAutoRows: "120px" }}
-      >
+      <div className="grid gap-3 grid-cols-2 md:grid-cols-4 auto-rows-[100px] md:auto-rows-[120px]">
         {displayed.map(({ label, desc, href, bg, color }, i) => {
           const Icon = categoryIcons[label] || ShoppingBag
           const size = bentoSizes[i] || "col-span-1 row-span-1"
-          const isBig = size.includes("col-span-2") && size.includes("row-span-2")
-          const isWide = size.includes("col-span-2") && !size.includes("row-span-2")
-          const isTall = size.includes("row-span-2") && !size.includes("col-span-2")
+          const mobileFirst = size.split(" ").filter(c => !c.includes(":"))
+          const isBig = mobileFirst.includes("col-span-2") && mobileFirst.includes("row-span-2")
+          const isWide = mobileFirst.includes("col-span-2") && !mobileFirst.includes("row-span-2")
+          const isTall = mobileFirst.includes("row-span-2") && !mobileFirst.includes("col-span-2")
 
           return (
             <AnimateIn key={label} direction="up" delay={i * 0.06} className={size}>
@@ -120,32 +118,28 @@ export default function CategoriesGrid({ section }: Props) {
 
                   {/* Content */}
                   <div className={`relative z-10 flex h-full ${
-                    isBig ? "flex-col justify-between p-6"
-                    : isWide ? "flex-row items-center gap-4 px-6"
-                    : isTall ? "flex-col justify-between p-5"
+                    isWide ? "flex-row items-center gap-4 px-5"
                     : "flex-col justify-between p-4"
                   }`}>
 
                     {/* Icon */}
                     <motion.div
                       className={`flex items-center justify-center rounded-2xl ${bg} ${
-                        isBig ? "w-16 h-16" : isWide ? "w-12 h-12 flex-shrink-0" : "w-11 h-11"
+                        isWide ? "w-11 h-11 flex-shrink-0" : "w-11 h-11"
                       }`}
                       variants={{
                         rest: { y: 0, scale: 1, rotate: 0 },
-                        hover: { y: isBig ? -6 : -4, scale: 1.12, rotate: 3 },
+                        hover: { y: -4, scale: 1.12, rotate: 3 },
                       }}
                       transition={{ type: "spring", stiffness: 400, damping: 15 }}
                     >
-                      <Icon size={isBig ? 28 : isWide ? 22 : 20} className={color} />
+                      <Icon size={20} className={color} />
                     </motion.div>
 
                     {/* Text */}
                     <div className={isWide ? "flex-1 min-w-0" : ""}>
                       <motion.p
-                        className={`font-medium text-stone-800 leading-tight ${
-                          isBig ? "text-lg mb-1" : "text-sm mb-0.5"
-                        }`}
+                        className="text-sm font-medium text-stone-800 leading-tight"
                         variants={{
                           rest: { opacity: 0.85 },
                           hover: { opacity: 1 },
@@ -153,26 +147,10 @@ export default function CategoriesGrid({ section }: Props) {
                       >
                         {label}
                       </motion.p>
-                      {(isBig || isWide || isTall) && (
-                        <p className={`text-stone-400 leading-relaxed ${isBig ? "text-sm" : "text-xs"}`}>
-                          {desc}
-                        </p>
+                      {isWide && desc && (
+                        <p className="text-xs text-stone-400 leading-relaxed mt-0.5">{desc}</p>
                       )}
                     </div>
-
-                    {/* Arrow on hover */}
-                    {isBig && (
-                      <motion.span
-                        className="text-primary-400 text-sm font-medium"
-                        variants={{
-                          rest: { opacity: 0, x: -8 },
-                          hover: { opacity: 1, x: 0 },
-                        }}
-                        transition={{ duration: 0.2 }}
-                      >
-                        Ver todos →
-                      </motion.span>
-                    )}
                   </div>
                 </motion.div>
               </Link>

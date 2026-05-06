@@ -6,7 +6,7 @@ import { Phone, AtSign, MapPin, Clock, Truck, ShoppingBag, UtensilsCrossed, Arro
 import Link from "next/link"
 import Image from "next/image"
 import ReservaWhatsApp from "@/components/public/ReservaWhatsApp"
-import PedidoWhatsApp from "@/components/public/PedidoWhatsApp"
+import CartaInteractiva from "@/components/public/CartaInteractiva"
 
 
 const dayNames = ["Domingo", "Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado"]
@@ -158,40 +158,16 @@ export default function NegocioDetalle({ business }: Props) {
             {/* Carta */}
             {business.menu_categories?.length > 0 && (
               <AnimateIn direction="up" delay={0.3}>
-                <div className="bg-white rounded-2xl border border-stone-200 p-6">
-                  <h2 className="font-serif text-xl text-stone-800 mb-4">Carta</h2>
-                  {business.menu_categories.map((cat: any) => (
-                    cat.menu_items?.length > 0 && (
-                      <div key={cat.id} className="mb-6 last:mb-0">
-                        <h3 className="text-sm font-medium text-stone-500 uppercase tracking-wider mb-3">
-                          {cat.name}
-                        </h3>
-                        <div className="space-y-3">
-                          {cat.menu_items.map((item: any) => (
-                            <div key={item.id} className="flex items-start justify-between gap-4">
-                              <div className="flex gap-3">
-                                {item.image_url && (
-                                  <div className="w-14 h-14 rounded-xl overflow-hidden flex-shrink-0">
-                                    <Image src={item.image_url} alt={item.name} width={56} height={56} className="object-cover w-full h-full" />
-                                  </div>
-                                )}
-                                <div>
-                                  <p className="text-sm font-medium text-stone-700">{item.name}</p>
-                                  {item.description && (
-                                    <p className="text-xs text-stone-400 mt-0.5 leading-relaxed">{item.description}</p>
-                                  )}
-                                </div>
-                              </div>
-                              <p className="text-sm font-medium text-stone-800 flex-shrink-0">
-                                ${item.price.toLocaleString("es-AR")}
-                              </p>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    )
-                  ))}
-                </div>
+                <CartaInteractiva
+                  categories={business.menu_categories}
+                  business={{
+                    id: business.id,
+                    name: business.name,
+                    whatsapp: business.whatsapp,
+                    offers_delivery: business.offers_delivery,
+                    offers_takeaway: business.offers_takeaway,
+                  }}
+                />
               </AnimateIn>
             )}
           </div>
@@ -248,46 +224,6 @@ export default function NegocioDetalle({ business }: Props) {
                 />
               </AnimateIn>
             )}
-            {/* Pedidos */}
-{business.whatsapp && (business.offers_delivery || business.offers_takeaway) && (
-  <AnimateIn direction="right" delay={0.25}>
-    <div className="bg-white rounded-2xl border border-stone-200 p-5 space-y-3">
-      <h3 className="text-sm font-medium text-stone-700">Hacer un pedido</h3>
-      {business.offers_delivery && (
-        <PedidoWhatsApp
-          whatsapp={business.whatsapp}
-          businessName={business.name}
-          items={[
-            ...(business.menu_categories?.flatMap((cat: any) =>
-              cat.menu_items?.filter((i: any) => i.is_available) || []
-            ) || []),
-            ...(business.daily_menus?.find((m: any) => {
-              const today = new Date().toISOString().split("T")[0]
-              return m.date === today && m.is_published
-            })?.daily_menu_items || []),
-          ]}
-          type="delivery"
-        />
-      )}
-      {business.offers_takeaway && (
-        <PedidoWhatsApp
-          whatsapp={business.whatsapp}
-          businessName={business.name}
-          items={[
-            ...(business.menu_categories?.flatMap((cat: any) =>
-              cat.menu_items?.filter((i: any) => i.is_available) || []
-            ) || []),
-            ...(business.daily_menus?.find((m: any) => {
-              const today = new Date().toISOString().split("T")[0]
-              return m.date === today && m.is_published
-            })?.daily_menu_items || []),
-          ]}
-          type="takeaway"
-        />
-      )}
-    </div>
-  </AnimateIn>
-)}
 
             {/* Servicios */}
             {(business.offers_delivery || business.offers_takeaway || business.offers_dine_in) && (
