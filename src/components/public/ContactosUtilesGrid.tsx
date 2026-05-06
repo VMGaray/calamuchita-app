@@ -4,9 +4,10 @@ import { useState, useEffect } from "react"
 import { motion } from "framer-motion"
 import { createClient } from "@/lib/supabase/client"
 import AnimateIn from "@/components/ui/AnimateIn"
+import Link from "next/link"
 import {
   Flame, Shield, Ambulance, Hospital, Pill, PawPrint,
-  Droplets, Zap, Phone, Clock, MapPin, Info
+  Droplets, Zap, Phone, Clock, Info
 } from "lucide-react"
 
 interface Contact {
@@ -32,10 +33,26 @@ const contactIcons: Record<string, any> = {
 }
 
 const contactColors: Record<string, { bg: string; icon: string; grad: string }> = {
-  "emergencias": { bg: "bg-red-50", icon: "text-red-500", grad: "from-red-500 to-red-600" },
-  "salud": { bg: "bg-blue-50", icon: "text-blue-500", grad: "from-blue-500 to-blue-600" },
-  "servicios": { bg: "bg-amber-50", icon: "text-amber-500", grad: "from-amber-500 to-amber-600" },
-  "general": { bg: "bg-primary-50", icon: "text-primary-500", grad: "from-primary-500 to-primary-600" },
+  "emergencias": {
+    bg: "bg-rose-50",
+    icon: "text-rose-400",
+    grad: "from-[#fde8e8] to-[#fbd0d0]"
+  },
+  "salud": {
+    bg: "bg-sky-50",
+    icon: "text-sky-400",
+    grad: "from-[#e0f2fe] to-[#bae6fd]"
+  },
+  "servicios": {
+    bg: "bg-amber-50",
+    icon: "text-amber-400",
+    grad: "from-[#fef9c3] to-[#fde68a]"
+  },
+  "general": {
+    bg: "bg-slate-50",
+    icon: "text-slate-400",
+    grad: "from-[#f1f5f9] to-[#e2e8f0]"
+  },
 }
 
 function FlipCard({ contact }: { contact: Contact }) {
@@ -64,8 +81,8 @@ function FlipCard({ contact }: { contact: Contact }) {
             WebkitBackfaceVisibility: "hidden",
             background: "rgba(255,255,255,0.7)",
             backdropFilter: "blur(12px)",
-            border: "1px solid rgba(255,255,255,0.8)",
-            boxShadow: "0 4px 20px rgba(83,120,149,0.08)",
+            border: "1px solid rgba(255,255,255,0.9)",
+            boxShadow: "0 4px 20px rgba(0,0,0,0.06)",
           }}
         >
           <div className={`w-14 h-14 ${colors.bg} rounded-2xl flex items-center justify-center`}>
@@ -86,9 +103,9 @@ function FlipCard({ contact }: { contact: Contact }) {
           }}
         >
           <div>
-            <p className="text-sm font-semibold text-white mb-1">{contact.title}</p>
+            <p className="text-sm font-semibold text-stone-700 mb-1">{contact.title}</p>
             {contact.description && (
-              <p className="text-xs text-white/70 leading-tight">{contact.description}</p>
+              <p className="text-xs text-stone-500 leading-tight">{contact.description}</p>
             )}
           </div>
 
@@ -97,28 +114,28 @@ function FlipCard({ contact }: { contact: Contact }) {
               <a
                 href={`tel:${contact.phone}`}
                 onClick={(e) => e.stopPropagation()}
-                className="flex items-center gap-2 text-white hover:text-white/80 transition-colors"
+                className="flex items-center gap-2 hover:opacity-70 transition-opacity"
               >
-                <div className="w-6 h-6 bg-white/20 rounded-lg flex items-center justify-center flex-shrink-0">
-                  <Phone size={11} className="text-white" />
+                <div className="w-6 h-6 bg-black/10 rounded-lg flex items-center justify-center flex-shrink-0">
+                  <Phone size={11} className="text-stone-600" />
                 </div>
-                <span className="text-sm font-medium">{contact.phone}</span>
+                <span className="text-sm font-medium text-stone-700">{contact.phone}</span>
               </a>
             )}
             {!contact.phone && (
               <div className="flex items-center gap-2">
-                <div className="w-6 h-6 bg-white/20 rounded-lg flex items-center justify-center">
-                  <Phone size={11} className="text-white" />
+                <div className="w-6 h-6 bg-black/10 rounded-lg flex items-center justify-center">
+                  <Phone size={11} className="text-stone-600" />
                 </div>
-                <span className="text-xs text-white/60">Consultar número</span>
+                <span className="text-xs text-stone-400">Consultar número</span>
               </div>
             )}
             {contact.schedule && (
               <div className="flex items-center gap-2">
-                <div className="w-6 h-6 bg-white/20 rounded-lg flex items-center justify-center flex-shrink-0">
-                  <Clock size={11} className="text-white" />
+                <div className="w-6 h-6 bg-black/10 rounded-lg flex items-center justify-center flex-shrink-0">
+                  <Clock size={11} className="text-stone-600" />
                 </div>
-                <span className="text-xs text-white/80">{contact.schedule}</span>
+                <span className="text-xs text-stone-500">{contact.schedule}</span>
               </div>
             )}
           </div>
@@ -161,8 +178,8 @@ export default function ContactosUtilesGrid() {
     <div className="mb-12">
       <AnimateIn direction="left">
         <div className="flex items-center gap-2 mb-6">
-          <Phone size={18} className="text-primary-500" />
-          <h2 className="font-serif text-2xl text-stone-900">Contactos de emergencia</h2>
+          <Phone size={18} className="text-primary-300" />
+          <h2 className="font-serif text-2xl text-white">Contactos de emergencia</h2>
         </div>
       </AnimateIn>
 
@@ -176,12 +193,12 @@ export default function ContactosUtilesGrid() {
 
       <AnimateIn direction="up" delay={0.3}>
         <div className="mt-4 text-center">
-          <a
+          <Link
             href="/?seccion=info"
             className="text-xs text-primary-400 hover:text-primary-600 transition-colors"
           >
             Ver toda la información útil →
-          </a>
+          </Link>
         </div>
       </AnimateIn>
     </div>

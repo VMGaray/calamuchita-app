@@ -1,4 +1,3 @@
-import HeroSection from "@/components/public/HeroSection"
 import MarqueeBand from "@/components/public/MarqueeBand"
 import MenusDelDiaCarousel from "@/components/public/MenusDelDiaCarousel"
 import ContactosUtilesGrid from "@/components/public/ContactosUtilesGrid"
@@ -17,7 +16,7 @@ export default async function HomePage({ searchParams }: Props) {
 
   return (
     <div>
-      <HeroSection />
+      
       <MarqueeBand />
       <div className="px-4 py-12 max-w-6xl mx-auto">
         <MenusDelDiaCarousel />

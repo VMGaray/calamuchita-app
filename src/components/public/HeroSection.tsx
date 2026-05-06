@@ -1,34 +1,22 @@
 "use client"
 
 import { motion } from "framer-motion"
-import TextScramble from "@/components/ui/TextScramble"
-import MagneticButton from "@/components/ui/MagneticButton"
-import dynamic from "next/dynamic"
 import InteractiveText from "@/components/ui/InteractiveText"
-
-const WebGLBackground = dynamic(() => import("@/components/public/WebGLBackground"), { ssr: false })
+import MagneticButton from "@/components/ui/MagneticButton"
 
 export default function HeroSection() {
   return (
-    <section className="relative px-4 py-16 text-center overflow-hidden" style={{ minHeight: "520px" }}>
-
-      {/* WebGL background */}
-      <WebGLBackground />
-
-      {/* Grain overlay */}
-      <div className="absolute inset-0 pointer-events-none opacity-[0.03]">
-        <svg width="100%" height="100%">
-          <filter id="grain">
-            <feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="4" stitchTiles="stitch"/>
-            <feColorMatrix type="saturate" values="0"/>
-          </filter>
-          <rect width="100%" height="100%" filter="url(#grain)" opacity="1"/>
-        </svg>
-      </div>
+    <section className="relative px-4 pt-8 pb-20 text-center overflow-hidden" style={{ minHeight: "480px" }}>
 
       {/* Eyebrow */}
       <motion.span
-        className="relative z-10 inline-block bg-white/15 backdrop-blur-sm text-white border border-white/30 text-xs font-medium tracking-widest uppercase px-4 py-1.5 rounded-full mb-5"
+        className="relative z-10 inline-block text-xs font-medium tracking-widest uppercase px-4 py-1.5 rounded-full mb-8"
+        style={{
+          background: "rgba(0,0,0,0.22)",
+          border: "1px solid rgba(255,255,255,0.3)",
+          color: "rgba(255,255,255,0.95)",
+          textShadow: "0 1px 6px rgba(0,0,0,0.4)",
+        }}
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6 }}
@@ -37,41 +25,39 @@ export default function HeroSection() {
       </motion.span>
 
       {/* Title */}
-     <h1
-  className="relative z-10 font-serif text-5xl md:text-6xl text-white leading-tight mb-4"
-  style={{ textShadow: "0 2px 30px rgba(0,0,0,0.15)" }}
->
-  <motion.div
-    initial={{ opacity: 0 }}
-    animate={{ opacity: 1 }}
-    transition={{ duration: 0.3, delay: 0.3 }}
-    className="block"
-  >
-    <InteractiveText text="Todo el valle," />
-  </motion.div>
-  <motion.div
-    initial={{ opacity: 0 }}
-    animate={{ opacity: 1 }}
-    transition={{ duration: 0.3, delay: 0.6 }}
-    className="block"
-  >
-    <InteractiveText text="en un solo lugar" />
-  </motion.div>
-</h1>
+      <h1
+        className="relative z-10 font-serif text-6xl md:text-7xl leading-tight mb-6"
+        style={{ color: "rgba(255,255,255,0.97)", textShadow: "0 2px 16px rgba(0,0,0,0.5), 0 1px 4px rgba(0,0,0,0.3)" }}
+      >
+        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.3, delay: 0.3 }}>
+          <InteractiveText text="Todo el valle," />
+        </motion.div>
+        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.3, delay: 0.6 }}>
+          <InteractiveText text="en un solo lugar" />
+        </motion.div>
+      </h1>
 
       {/* Subtitle */}
       <motion.p
-        className="relative z-10 text-white/75 text-base max-w-md mx-auto mb-8 leading-relaxed"
+        className="relative z-10 text-base max-w-lg mx-auto mb-10 leading-relaxed"
+        style={{ color: "rgba(255,255,255,0.88)", textShadow: "0 1px 8px rgba(0,0,0,0.4)" }}
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 0.8, delay: 1.1 }}
       >
-        Gastronomía, salud, servicios, turismo y más. Explorá lo mejor del Valle de Calamuchita.
+        Gastronomía, salud, servicios, turismo y más. Explorá lo mejor de los pueblos serranos.
       </motion.p>
 
-      {/* Search */}
+      {/* Search — glassmorphism */}
       <motion.div
-        className="relative z-10 flex max-w-md mx-auto bg-white/90 backdrop-blur-sm rounded-2xl overflow-hidden"
+        className="relative z-10 flex max-w-lg mx-auto rounded-2xl overflow-hidden"
+        style={{
+          background: "rgba(255,255,255,0.7)",
+          backdropFilter: "blur(16px)",
+          WebkitBackdropFilter: "blur(16px)",
+          border: "1px solid rgba(255,255,255,0.8)",
+          boxShadow: "0 4px 24px rgba(0,0,0,0.2)",
+        }}
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6, delay: 1.3 }}
@@ -79,10 +65,12 @@ export default function HeroSection() {
         <input
           type="text"
           placeholder="Buscar restaurantes, servicios..."
-          className="flex-1 bg-transparent border-none outline-none px-5 py-3.5 text-stone-700 placeholder:text-stone-400 text-sm"
+          className="flex-1 bg-transparent border-none outline-none px-6 py-4 text-sm placeholder:text-stone-400"
+          style={{ color: "#2a1a08" }}
         />
         <MagneticButton
-          className="bg-accent-400 text-accent-50 px-5 py-3.5 text-sm font-medium cursor-pointer"
+          className="px-6 py-4 text-sm font-medium cursor-pointer"
+          style={{ background: "#c8603a", color: "white" }}
         >
           Buscar
         </MagneticButton>

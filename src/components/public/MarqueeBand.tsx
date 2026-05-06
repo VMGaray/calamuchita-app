@@ -16,16 +16,24 @@ const items = [
 
 export default function MarqueeBand() {
   return (
-    <div className="bg-accent-400 py-2.5 overflow-hidden">
+    <div
+      className="py-2.5 overflow-hidden"
+      style={{
+        background: "rgba(200,96,58,0.08)",
+        borderTop: "1px solid rgba(200,96,58,0.1)",
+        borderBottom: "1px solid rgba(200,96,58,0.1)",
+      }}
+    >
       <motion.div
         className="flex gap-8 whitespace-nowrap"
         animate={{ x: ["0%", "-50%"] }}
-        transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
+        transition={{ duration: 25, repeat: Infinity, ease: "linear" }}
       >
         {[...items, ...items].map((item, i) => (
-          <span key={i} className="text-accent-50 text-xs font-medium tracking-widest uppercase flex items-center gap-8">
+          <span key={i} className="text-xs font-medium tracking-widest uppercase flex items-center gap-8"
+            style={{ color: "rgba(26,18,8,0.35)" }}>
             {item}
-            <span className="text-accent-200">✦</span>
+            <span style={{ color: "rgba(26,18,8,0.15)" }}>✦</span>
           </span>
         ))}
       </motion.div>

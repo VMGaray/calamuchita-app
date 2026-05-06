@@ -4,148 +4,127 @@ import { useEffect, useRef } from "react"
 
 export default function WebGLBackground() {
   const canvasRef = useRef<HTMLCanvasElement>(null)
+  const particleRef = useRef<HTMLCanvasElement>(null)
 
   useEffect(() => {
-    const canvas = canvasRef.current
-    if (!canvas) return
-
-    const gl = canvas.getContext("webgl")
-    if (!gl) return
+    const bg = canvasRef.current
+    const pc = particleRef.current
+    if (!bg || !pc) return
+    const gl = bg.getContext("webgl")
+    const ctx = pc.getContext("2d")
+    if (!gl || !ctx) return
 
     const resize = () => {
-      canvas.width = canvas.offsetWidth * window.devicePixelRatio
-      canvas.height = canvas.offsetHeight * window.devicePixelRatio
-      gl.viewport(0, 0, canvas.width, canvas.height)
+      const w = bg.offsetWidth, h = bg.offsetHeight
+      bg.width = pc.width = w * devicePixelRatio
+      bg.height = pc.height = h * devicePixelRatio
+      gl.viewport(0, 0, bg.width, bg.height)
     }
     resize()
     window.addEventListener("resize", resize)
 
-    const vert = `attribute vec2 pos; void main() { gl_Position = vec4(pos, 0.0, 1.0); }`
-
+    const vert = `attribute vec2 p; void main(){gl_Position=vec4(p,0,1);}`
     const frag = `
       precision highp float;
-      uniform float time;
-      uniform vec2 res;
-      uniform vec2 mouse;
-
-      float noise(vec2 p) {
-        return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453);
+      uniform float t; uniform vec2 res; uniform vec2 mouse;
+      float noise(vec2 p){
+        vec2 i=floor(p),f=fract(p),u=f*f*(3.-2.*f);
+        return mix(
+          mix(fract(sin(dot(i,vec2(127.1,311.7)))*43758.5),fract(sin(dot(i+vec2(1,0),vec2(127.1,311.7)))*43758.5),u.x),
+          mix(fract(sin(dot(i+vec2(0,1),vec2(127.1,311.7)))*43758.5),fract(sin(dot(i+vec2(1,1),vec2(127.1,311.7)))*43758.5),u.x),u.y);
       }
-
-      float smoothNoise(vec2 p) {
-        vec2 i = floor(p); vec2 f = fract(p);
-        vec2 u = f * f * (3.0 - 2.0 * f);
-        return mix(mix(noise(i), noise(i+vec2(1,0)), u.x), mix(noise(i+vec2(0,1)), noise(i+vec2(1,1)), u.x), u.y);
-      }
-
-      float fbm(vec2 p) {
-        float v = 0.0, a = 0.5;
-        for (int i = 0; i < 6; i++) { v += a * smoothNoise(p); p = p * 2.1 + vec2(1.7, 9.2); a *= 0.5; }
-        return v;
-      }
-
-      vec3 bluepalette(float t) {
-        vec3 dark  = vec3(0.32, 0.48, 0.72);
-        vec3 mid   = vec3(0.42, 0.60, 0.85);
-        vec3 light = vec3(0.64, 0.74, 0.93);
-        vec3 col = mix(dark, mid, smoothstep(0.0, 0.5, t));
-        col = mix(col, light, smoothstep(0.5, 1.0, t));
-        col += 0.04 * sin(t * 12.0 + time * 0.5);
-        return col;
-      }
-
-      void main() {
-        vec2 uv = gl_FragCoord.xy / res;
-        uv.y = 1.0 - uv.y;
-        vec2 m = mouse / res; m.y = 1.0 - m.y;
-
-        float d = length(uv - m);
-        float strength = 0.35 * exp(-d * 1.8);
-       vec2 distort = uv + normalize(uv - m + 0.001) * strength * sin(time * 2.5 + d * 8.0);
-
-        float n1 = fbm(distort * 2.2 + time * 0.18);
-        float n2 = fbm(distort * 1.6 - time * 0.13 + vec2(4.1, 2.3));
-        float n3 = fbm(distort * 3.0 + time * 0.08 + vec2(1.5, 7.2));
-
-        float combined = n1 * 0.5 + n2 * 0.3 + n3 * 0.2;
-        combined += 0.1 * sin(distort.x * 5.0 + time * 0.4) * cos(distort.y * 4.0 - time * 0.3);
-
-        vec3 col = bluepalette(combined);
-
-        float aber = 0.003;
-        float r = fbm((distort + vec2(aber, 0.0)) * 2.2 + time * 0.1);
-        float b = fbm((distort - vec2(aber, 0.0)) * 2.2 + time * 0.1);
-        col.r = mix(col.r, bluepalette(r).r, 0.3);
-        col.b = mix(col.b, bluepalette(b).b, 0.3);
-        col = pow(col, vec3(0.92));
-
-        gl_FragColor = vec4(col, 1.0);
+      float fbm(vec2 p){float v=0.,a=0.5;for(int i=0;i<5;i++){v+=a*noise(p);p=p*2.1+vec2(1.7,9.2);a*=0.5;}return v;}
+      void main(){
+        vec2 uv=gl_FragCoord.xy/res; uv.y=1.-uv.y;
+        vec3 base=vec3(0.945,0.898,0.847);
+        vec3 warm=vec3(0.925,0.820,0.745);
+        vec3 accent=vec3(0.900,0.710,0.620);
+        vec3 deep=vec3(0.870,0.620,0.510);
+        float n1=fbm(uv*2.2+vec2(t*0.05,0.));
+        float n2=fbm(uv*1.6-vec2(0.,t*0.035)+vec2(2.3,1.1));
+        float n3=fbm(uv*3.0+vec2(t*0.025,t*0.04));
+        vec3 col=mix(base,warm,n1*0.7);
+        col=mix(col,accent,n2*0.5);
+        col=mix(col,deep,n3*0.25*(1.-uv.y*0.5));
+        float vig=1.-length((uv-0.5)*1.4);
+        col=mix(col*0.92,col,smoothstep(0.,1.,vig));
+        vec2 m=mouse/res; m.y=1.-m.y;
+        float d=length(uv-m);
+        col+=vec3(0.06,0.03,0.01)*exp(-d*2.5)*0.5;
+        gl_FragColor=vec4(clamp(col,0.,1.),1.);
       }
     `
 
-    function compile(src: string, type: number) {
+    function mkShader(type: number, src: string) {
       const s = gl!.createShader(type)!
-      gl!.shaderSource(s, src)
-      gl!.compileShader(s)
-      return s
+      gl!.shaderSource(s, src); gl!.compileShader(s); return s
     }
-
     const prog = gl.createProgram()!
-    gl.attachShader(prog, compile(vert, gl.VERTEX_SHADER))
-    gl.attachShader(prog, compile(frag, gl.FRAGMENT_SHADER))
-    gl.linkProgram(prog)
-    gl.useProgram(prog)
-
-    const buf = gl.createBuffer()
-    gl.bindBuffer(gl.ARRAY_BUFFER, buf)
+    gl.attachShader(prog, mkShader(gl.VERTEX_SHADER, vert))
+    gl.attachShader(prog, mkShader(gl.FRAGMENT_SHADER, frag))
+    gl.linkProgram(prog); gl.useProgram(prog)
+    const buf = gl.createBuffer(); gl.bindBuffer(gl.ARRAY_BUFFER, buf)
     gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1,-1,1,-1,-1,1,1,1]), gl.STATIC_DRAW)
+    const loc = gl.getAttribLocation(prog, 'p')
+    gl.enableVertexAttribArray(loc); gl.vertexAttribPointer(loc, 2, gl.FLOAT, false, 0, 0)
+    const tl = gl.getUniformLocation(prog, 't')
+    const rl = gl.getUniformLocation(prog, 'res')
+    const ml = gl.getUniformLocation(prog, 'mouse')
 
-    const posLoc = gl.getAttribLocation(prog, "pos")
-    gl.enableVertexAttribArray(posLoc)
-    gl.vertexAttribPointer(posLoc, 2, gl.FLOAT, false, 0, 0)
+    let mx = bg.width/2, my = bg.height/2, tmx = mx, tmy = my
 
-    const timeLoc = gl.getUniformLocation(prog, "time")
-    const resLoc = gl.getUniformLocation(prog, "res")
-    const mouseLoc = gl.getUniformLocation(prog, "mouse")
-
-    gl.uniform2f(resLoc, canvas.width, canvas.height)
-
-    let mx = canvas.width / 2, my = canvas.height / 2
-    let tmx = mx, tmy = my
-    let rafId: number
-
-    const handleMouseMove = (e: MouseEvent) => {
-      const r = canvas.getBoundingClientRect()
-      mx = (e.clientX - r.left) * window.devicePixelRatio
-      my = (e.clientY - r.top) * window.devicePixelRatio
+    const onMove = (e: MouseEvent) => {
+      const r = bg.getBoundingClientRect()
+      mx = (e.clientX - r.left) * devicePixelRatio
+      my = (e.clientY - r.top) * devicePixelRatio
     }
+    window.addEventListener("mousemove", onMove)
 
-    window.addEventListener("mousemove", handleMouseMove)
+    const pts = Array.from({ length: 120 }, () => ({
+      x: Math.random() * bg.width, y: Math.random() * bg.height,
+      r: Math.random() * 1.2 + 0.2,
+      vx: (Math.random() - .5) * 0.15, vy: (Math.random() - .5) * 0.15,
+      o: Math.random() * 0.4 + 0.05,
+      tw: Math.random() * Math.PI * 2
+    }))
 
-    function render(t: number) {
-      tmx += (mx - tmx) * 0.12
-      tmy += (my - tmy) * 0.12
-      gl!.uniform1f(timeLoc, t * 0.001)
-      gl!.uniform2f(resLoc, canvas!.width, canvas!.height)
-      gl!.uniform2f(mouseLoc, tmx, tmy)
+    let rafId: number
+    function render(ts: number) {
+      tmx += (mx - tmx) * 0.08; tmy += (my - tmy) * 0.08
+      gl!.uniform1f(tl, ts * 0.001)
+      gl!.uniform2f(rl, bg!.width, bg!.height)
+      gl!.uniform2f(ml, tmx, tmy)
       gl!.drawArrays(gl!.TRIANGLE_STRIP, 0, 4)
+
+      ctx!.clearRect(0, 0, pc!.width, pc!.height)
+      pts.forEach(p => {
+        p.x += p.vx; p.y += p.vy; p.tw += 0.015
+        if (p.x < 0) p.x = pc!.width; if (p.x > pc!.width) p.x = 0
+        if (p.y < 0) p.y = pc!.height; if (p.y > pc!.height) p.y = 0
+        const o = p.o * (0.4 + 0.6 * Math.sin(p.tw))
+        ctx!.beginPath(); ctx!.arc(p.x, p.y, p.r, 0, Math.PI * 2)
+        ctx!.fillStyle = `rgba(255,240,220,${o})`; ctx!.fill()
+        if (Math.sin(p.tw * 2) > 0.85) {
+          ctx!.beginPath(); ctx!.arc(p.x, p.y, p.r * 4, 0, Math.PI * 2)
+          ctx!.fillStyle = `rgba(255,220,190,${o * 0.15})`; ctx!.fill()
+        }
+      })
+
       rafId = requestAnimationFrame(render)
     }
-
     rafId = requestAnimationFrame(render)
 
     return () => {
       cancelAnimationFrame(rafId)
-      window.removeEventListener("mousemove", handleMouseMove)
+      window.removeEventListener("mousemove", onMove)
       window.removeEventListener("resize", resize)
     }
   }, [])
 
   return (
-    <canvas
-      ref={canvasRef}
-      className="absolute inset-0 w-full h-full"
-      style={{ display: "block" }}
-    />
+    <>
+      <canvas ref={canvasRef} className="absolute inset-0 w-full h-full" style={{ display: "block" }} />
+      <canvas ref={particleRef} className="absolute inset-0 w-full h-full pointer-events-none" style={{ display: "block" }} />
+    </>
   )
 }

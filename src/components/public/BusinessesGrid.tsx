@@ -55,8 +55,8 @@ export default function BusinessesGrid() {
     <div className="mb-12">
       <AnimateIn direction="left">
         <div className="flex items-baseline justify-between mb-6">
-          <h2 className="font-serif text-2xl text-stone-900">Abiertos ahora</h2>
-          <Link href="/negocios" className="text-sm text-primary-500 font-medium hover:text-primary-600">
+          <h2 className="font-serif text-2xl text-white">Abiertos ahora</h2>
+          <Link href="/negocios" className="text-sm text-primary-300 font-medium hover:text-primary-200">
             Ver todos
           </Link>
         </div>
@@ -65,7 +65,7 @@ export default function BusinessesGrid() {
       {loading ? (
         <SkeletonBusinessGrid count={4} />
       ) : businesses.length === 0 ? (
-        <div className="bg-white rounded-2xl border border-stone-200 p-10 text-center">
+        <div className="rounded-2xl p-10 text-center" style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)" }}>
           <p className="text-stone-400 text-sm">No hay comercios abiertos en este momento</p>
         </div>
       ) : (

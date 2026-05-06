@@ -1,26 +1,28 @@
 @import "tailwindcss";
 
 @theme {
-  /* Azul cielo — primario */
-  --color-primary-50: #EEF3FA;
-  --color-primary-100: #D4E2F4;
-  --color-primary-200: #A3BDED;
-  --color-primary-300: #85A8DF;
-  --color-primary-400: #6991C7;
-  --color-primary-500: #537895;
-  --color-primary-600: #3D5A72;
-  --color-primary-700: #2A3F52;
+  --color-primary-50: #fdf8f3;
+  --color-primary-100: #f8eede;
+  --color-primary-200: #f0d9be;
+  --color-primary-300: #e0b898;
+  --color-primary-400: #c8875a;
+  --color-primary-500: #b06a3a;
+  --color-primary-600: #8a4e28;
+  --color-primary-700: #5a3018;
 
- /* Verde salvia — acento */
---color-accent-50: #F0F7F3;
---color-accent-100: #D4EAD9;
---color-accent-200: #A8D4B3;
---color-accent-300: #7CAE8D;
---color-accent-400: #5A9470;
---color-accent-500: #3D7A55;
---color-accent-600: #2A5C3D;
+  --color-accent-50: #fdf5f0;
+  --color-accent-100: #fae0d0;
+  --color-accent-200: #f5bfa0;
+  --color-accent-300: #e8957a;
+  --color-accent-400: #c8603a;
+  --color-accent-500: #a84828;
+  --color-accent-600: #883018;
 
-  /* Neutros cálidos */
+  --color-sand-50: #fdfaf7;
+  --color-sand-100: #f5ede0;
+  --color-sand-200: #ead8c0;
+  --color-sand-300: #d4b898;
+
   --color-stone-50: #FAFAF9;
   --color-stone-100: #F5F5F4;
   --color-stone-200: #E7E5E4;
@@ -32,18 +34,15 @@
   --color-stone-800: #292524;
   --color-stone-900: #1C1917;
 
-  /* Tipografía */
   --font-sans: Inter, system-ui, sans-serif;
   --font-serif: Georgia, serif;
-
   --radius-xl: 12px;
   --radius-2xl: 16px;
 }
 
 body {
-  background: linear-gradient(to bottom, #a3bded 0%, #d4e2f4 30%, #f0f4fa 60%, #ffffff 100%);
-  background-attachment: fixed;
-  color: var(--color-stone-700);
+  background: #f5ede0;
+  color: #1a1208;
   font-family: var(--font-sans);
 }
 
