@@ -36,6 +36,9 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(new URL('/login', request.url))
   }
 
+  // Pasar el pathname al layout via header
+  supabaseResponse.headers.set("x-pathname", request.nextUrl.pathname)
+
   return supabaseResponse
 }
 

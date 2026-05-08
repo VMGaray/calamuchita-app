@@ -74,14 +74,14 @@ export default function CartaInteractiva({ categories, business }: Props) {
 
   return (
     <>
-      <div className="bg-white rounded-2xl border border-stone-200 p-6">
+      <div className="bg-white rounded-2xl p-6" style={{ border: "1px solid rgba(45,69,48,0.1)" }}>
         <div className="flex items-center justify-between mb-6">
-          <h2 className="font-serif text-xl text-stone-800">Carta</h2>
+          <h2 className="font-serif text-xl" style={{ color: "#2D4530" }}>Carta</h2>
           {totalItems > 0 && (
             <motion.button
               onClick={() => setDrawerOpen(true)}
               className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium"
-              style={{ background: "#c8603a", color: "white" }}
+              style={{ background: "#2D4530", color: "#E1DBC9" }}
               initial={{ scale: 0.9, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               whileTap={{ scale: 0.96 }}
@@ -95,7 +95,7 @@ export default function CartaInteractiva({ categories, business }: Props) {
         <div className="space-y-8">
           {activeCategories.map(cat => (
             <div key={cat.id}>
-              <h3 className="text-xs font-medium text-stone-400 uppercase tracking-wider mb-4">
+              <h3 className="text-xs font-medium uppercase tracking-wider mb-4" style={{ color: "rgba(45,69,48,0.45)" }}>
                 {cat.name}
               </h3>
               <div className="space-y-3">
@@ -106,7 +106,8 @@ export default function CartaInteractiva({ categories, business }: Props) {
                     return (
                       <div
                         key={item.id}
-                        className="flex items-center gap-4 py-3 border-b border-stone-100 last:border-0"
+                        className="flex items-center gap-4 py-3"
+                        style={{ borderBottom: "1px solid rgba(45,69,48,0.07)" }}
                       >
                         {item.image_url && (
                           <div className="w-16 h-16 rounded-xl overflow-hidden flex-shrink-0">
@@ -120,13 +121,13 @@ export default function CartaInteractiva({ categories, business }: Props) {
                           </div>
                         )}
                         <div className="flex-1 min-w-0">
-                          <p className="text-sm font-medium text-stone-700">{item.name}</p>
+                          <p className="text-sm font-medium" style={{ color: "#2D4530" }}>{item.name}</p>
                           {item.description && (
-                            <p className="text-xs text-stone-400 mt-0.5 leading-relaxed">
+                            <p className="text-xs mt-0.5 leading-relaxed" style={{ color: "rgba(45,69,48,0.5)" }}>
                               {item.description}
                             </p>
                           )}
-                          <p className="text-sm font-semibold mt-1" style={{ color: "#c8603a" }}>
+                          <p className="text-sm font-semibold mt-1" style={{ color: "#5E4B3B" }}>
                             ${item.price.toLocaleString("es-AR")}
                           </p>
                         </div>
@@ -142,8 +143,8 @@ export default function CartaInteractiva({ categories, business }: Props) {
                                 onClick={() => removeItem(item.id)}
                                 className="w-8 h-8 rounded-full flex items-center justify-center transition-colors"
                                 style={{
-                                  background: "rgba(200,96,58,0.1)",
-                                  color: "#c8603a",
+                                  background: "rgba(45,69,48,0.1)",
+                                  color: "#2D4530",
                                 }}
                               >
                                 <Minus size={14} />
@@ -157,7 +158,8 @@ export default function CartaInteractiva({ categories, business }: Props) {
                                 key={qty}
                                 initial={{ scale: 0.7, opacity: 0 }}
                                 animate={{ scale: 1, opacity: 1 }}
-                                className="w-6 text-center text-sm font-semibold text-stone-700"
+                                className="w-6 text-center text-sm font-semibold"
+                                style={{ color: "#2D4530" }}
                               >
                                 {qty}
                               </motion.span>
@@ -168,7 +170,7 @@ export default function CartaInteractiva({ categories, business }: Props) {
                             onClick={() => addItem(item)}
                             whileTap={{ scale: 0.9 }}
                             className="w-8 h-8 rounded-full flex items-center justify-center transition-colors"
-                            style={{ background: "#c8603a", color: "white" }}
+                            style={{ background: "#2D4530", color: "#E1DBC9" }}
                           >
                             <Plus size={14} />
                           </motion.button>
@@ -192,12 +194,12 @@ export default function CartaInteractiva({ categories, business }: Props) {
             onClick={() => setDrawerOpen(true)}
             className="fixed bottom-20 left-1/2 -translate-x-1/2 md:hidden z-40 flex items-center gap-3 px-6 py-3.5 rounded-2xl shadow-lg"
             style={{
-              background: "#c8603a",
-              color: "white",
-              boxShadow: "0 8px 24px rgba(200,96,58,0.4)",
+              background: "#2D4530",
+              color: "#E1DBC9",
+              boxShadow: "0 8px 24px rgba(45,69,48,0.35)",
             }}
           >
-            <div className="w-5 h-5 rounded-full bg-white/20 flex items-center justify-center text-xs font-bold">
+            <div className="w-5 h-5 rounded-full flex items-center justify-center text-xs font-bold" style={{ background: "rgba(225,219,201,0.2)" }}>
               {totalItems}
             </div>
             <span className="text-sm font-medium">Ver pedido</span>

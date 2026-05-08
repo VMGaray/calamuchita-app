@@ -8,7 +8,7 @@ import HorariosEditor, { HorarioDay } from "@/components/ui/HorariosEditor"
 
 const categoryOptions = [
   { value: "restaurant", label: "Restaurante" },
-  { value: "cafe_bar", label: "Café / Bar" },
+  { value: "cafe_bar", label: "Bar/Café" },
   { value: "viandas", label: "Viandas" },
   { value: "hamburguesas", label: "Hamburgueserías" },
   { value: "other", label: "Otro" },
@@ -150,6 +150,21 @@ export default function ConfiguracionLocal() {
     setPhotos(prev => prev.filter(p => p !== url))
   }
 
+  const generateUniqueSlug = async (baseSlug: string, supabase: any): Promise<string> => {
+    let slug = baseSlug
+    let counter = 1
+    while (true) {
+      const { data } = await supabase
+        .from("businesses")
+        .select("id")
+        .eq("slug", slug)
+        .maybeSingle()
+      if (!data) return slug
+      slug = `${baseSlug}-${counter}`
+      counter++
+    }
+  }
+
   const handleSave = async () => {
     if (!form.name) { setError("El nombre es obligatorio"); return }
     setSaving(true)
@@ -159,9 +174,10 @@ export default function ConfiguracionLocal() {
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) return
 
+    const uniqueSlug = businessId ? form.slug : await generateUniqueSlug(form.slug, supabase)
     const data = {
       name: form.name,
-      slug: form.slug,
+      slug: uniqueSlug,
       description: form.description || null,
       section: "gastronomy",
       type: "gastronomy",
@@ -190,7 +206,11 @@ export default function ConfiguracionLocal() {
       if (error) { setError(error.message); setSaving(false); return }
     } else {
       const { error } = await supabase.from("businesses").insert(data)
-      if (error) { setError(error.message); setSaving(false); return }
+      if (error) {
+        setError("Hubo un error al guardar. Intentá con un nombre diferente.")
+        setSaving(false)
+        return
+      }
     }
 
     if (businessId && horarios.length > 0) {

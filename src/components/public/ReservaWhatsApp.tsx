@@ -44,7 +44,7 @@ export default function ReservaWhatsApp({ whatsapp, businessName }: Props) {
     <>
       <button
         onClick={() => setOpen(true)}
-        className="w-full bg-primary-500 hover:bg-primary-400 text-white py-3 rounded-xl text-sm font-medium transition-colors flex items-center justify-center gap-2"
+        className="w-full bg-brand-pine text-brand-sand hover:opacity-90 py-3 rounded-xl text-sm font-medium transition-colors flex items-center justify-center gap-2"
       >
         <Calendar size={16} />
         Reservar mesa
@@ -68,9 +68,9 @@ export default function ReservaWhatsApp({ whatsapp, businessName }: Props) {
               transition={{ type: "spring", stiffness: 350, damping: 25 }}
             >
               <div className="bg-white rounded-3xl overflow-hidden">
-                <div className="bg-primary-500 px-6 py-4 flex items-center justify-between">
-                  <h2 className="font-serif text-xl text-white">Reservar mesa</h2>
-                  <button onClick={() => setOpen(false)} className="text-primary-200 hover:text-white text-2xl leading-none">×</button>
+                <div className="bg-brand-pine px-6 py-4 flex items-center justify-between">
+                  <h2 className="font-serif text-xl text-brand-sand">Reservar mesa</h2>
+                  <button onClick={() => setOpen(false)} className="text-brand-sand/60 hover:text-brand-sand text-2xl leading-none">×</button>
                 </div>
 
                 <div className="p-6 space-y-4">
@@ -81,7 +81,7 @@ export default function ReservaWhatsApp({ whatsapp, businessName }: Props) {
                       value={form.name}
                       onChange={(e) => setForm(p => ({ ...p, name: e.target.value }))}
                       placeholder="María García"
-                      className="w-full px-4 py-2.5 rounded-xl border border-stone-200 text-stone-800 text-sm outline-none focus:ring-2 focus:ring-primary-300"
+                      className="w-full px-4 py-2.5 rounded-xl border border-stone-200 text-stone-800 text-sm outline-none focus:ring-2 focus:ring-brand-pine/20"
                     />
                   </div>
 
@@ -96,7 +96,7 @@ export default function ReservaWhatsApp({ whatsapp, businessName }: Props) {
                         value={form.date}
                         min={new Date().toISOString().split("T")[0]}
                         onChange={(e) => setForm(p => ({ ...p, date: e.target.value }))}
-                        className="w-full px-4 py-2.5 rounded-xl border border-stone-200 text-stone-800 text-sm outline-none focus:ring-2 focus:ring-primary-300"
+                        className="w-full px-4 py-2.5 rounded-xl border border-stone-200 text-stone-800 text-sm outline-none focus:ring-2 focus:ring-brand-pine/20"
                       />
                     </div>
                     <div>
@@ -108,7 +108,7 @@ export default function ReservaWhatsApp({ whatsapp, businessName }: Props) {
                         type="time"
                         value={form.time}
                         onChange={(e) => setForm(p => ({ ...p, time: e.target.value }))}
-                        className="w-full px-4 py-2.5 rounded-xl border border-stone-200 text-stone-800 text-sm outline-none focus:ring-2 focus:ring-primary-300"
+                        className="w-full px-4 py-2.5 rounded-xl border border-stone-200 text-stone-800 text-sm outline-none focus:ring-2 focus:ring-brand-pine/20"
                       />
                     </div>
                   </div>
@@ -121,7 +121,7 @@ export default function ReservaWhatsApp({ whatsapp, businessName }: Props) {
                     <select
                       value={form.people}
                       onChange={(e) => setForm(p => ({ ...p, people: e.target.value }))}
-                      className="w-full px-4 py-2.5 rounded-xl border border-stone-200 text-stone-800 text-sm outline-none focus:ring-2 focus:ring-primary-300 bg-white"
+                      className="w-full px-4 py-2.5 rounded-xl border border-stone-200 text-stone-800 text-sm outline-none focus:ring-2 focus:ring-brand-pine/20 bg-white"
                     >
                       {[1,2,3,4,5,6,7,8,9,10].map(n => (
                         <option key={n} value={n}>{n} {n === 1 ? "persona" : "personas"}</option>
@@ -139,7 +139,7 @@ export default function ReservaWhatsApp({ whatsapp, businessName }: Props) {
                       onChange={(e) => setForm(p => ({ ...p, notes: e.target.value }))}
                       placeholder="Ej: cumpleaños, alergias, silla para bebé..."
                       rows={2}
-                      className="w-full px-4 py-2.5 rounded-xl border border-stone-200 text-stone-800 text-sm outline-none focus:ring-2 focus:ring-primary-300 resize-none"
+                      className="w-full px-4 py-2.5 rounded-xl border border-stone-200 text-stone-800 text-sm outline-none focus:ring-2 focus:ring-brand-pine/20 resize-none"
                     />
                   </div>
 

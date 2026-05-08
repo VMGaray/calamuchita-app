@@ -25,7 +25,7 @@ export default function NegocioDetalle({ business }: Props) {
     <div className="min-h-screen">
 
       {/* Cover */}
-      <div className="relative h-72 md:h-96 bg-primary-200">
+      <div className="relative h-72 md:h-96" style={{ background: "rgba(45,69,48,0.15)" }}>
         {business.cover_url ? (
           <Image
             src={business.cover_url}
@@ -34,7 +34,7 @@ export default function NegocioDetalle({ business }: Props) {
             className="object-cover"
           />
         ) : (
-          <div className="w-full h-full bg-gradient-to-br from-primary-300 to-primary-500" />
+          <div className="w-full h-full" style={{ background: "linear-gradient(135deg, rgba(45,69,48,0.3), rgba(45,69,48,0.1))" }} />
         )}
         <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
 
@@ -65,17 +65,17 @@ export default function NegocioDetalle({ business }: Props) {
               <h1 className="font-serif text-3xl text-stone-800 mb-1">{business.name}</h1>
               <div className="flex items-center gap-2 flex-wrap">
                 {business.subcategory && (
-                  <span className="text-xs font-medium px-3 py-1 rounded-full bg-primary-100 text-primary-600">
+                  <span className="text-xs font-medium px-3 py-1 rounded-full bg-brand-pine/10 text-brand-pine">
                     {business.subcategory}
                   </span>
                 )}
                 {business.category && (
-                  <span className="text-xs font-medium px-3 py-1 rounded-full bg-primary-100 text-primary-600">
+                  <span className="text-xs font-medium px-3 py-1 rounded-full bg-brand-pine/10 text-brand-pine">
                     {business.category}
                   </span>
                 )}
                 <span className={`text-xs font-medium px-3 py-1 rounded-full ${
-                  business.is_open ? "bg-green-100 text-green-600" : "bg-stone-100 text-stone-500"
+                  business.is_open ? "bg-brand-pine/10 text-brand-pine" : "bg-brand-slate/10 text-brand-slate"
                 }`}>
                   {business.is_open ? "Abierto ahora" : "Cerrado"}
                 </span>
@@ -104,8 +104,8 @@ export default function NegocioDetalle({ business }: Props) {
                 <div className="bg-white rounded-2xl border border-stone-200 p-6">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 bg-primary-100 rounded-xl flex items-center justify-center">
-                        <span className="text-primary-600 text-xs font-bold">PDF</span>
+                      <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ background: "rgba(45,69,48,0.1)" }}>
+                        <span className="text-xs font-bold" style={{ color: "#2D4530" }}>PDF</span>
                       </div>
                       <div>
                         <p className="text-sm font-medium text-stone-700">Carta completa</p>
@@ -116,7 +116,7 @@ export default function NegocioDetalle({ business }: Props) {
                       href={business.menu_pdf_url}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="bg-primary-500 text-white px-4 py-2 rounded-xl text-sm font-medium hover:bg-primary-400 transition-colors"
+                      className="px-4 py-2 rounded-xl text-sm font-medium transition-colors bg-brand-pine text-brand-sand"
                     >
                       Ver carta
                     </a>
@@ -142,7 +142,7 @@ export default function NegocioDetalle({ business }: Props) {
                             <p className="text-xs text-stone-400 mt-0.5">{item.description}</p>
                           )}
                           {item.includes_drink && (
-                            <span className="text-xs text-primary-500">Incluye bebida</span>
+                            <span className="text-xs text-brand-pine">Incluye bebida</span>
                           )}
                         </div>
                         <p className="text-sm font-medium text-stone-800 ml-4">
@@ -181,9 +181,9 @@ export default function NegocioDetalle({ business }: Props) {
                 <h3 className="text-sm font-medium text-stone-700 mb-4">Contacto</h3>
                 <div className="space-y-3">
                   {business.phone && (
-                    <a href={`tel:${business.phone}`} className="flex items-center gap-3 text-sm text-primary-600 hover:text-primary-700">
-                      <div className="w-8 h-8 bg-primary-50 rounded-xl flex items-center justify-center">
-                        <Phone size={14} className="text-primary-500" />
+                    <a href={`tel:${business.phone}`} className="flex items-center gap-3 text-sm text-brand-pine hover:text-brand-earth">
+                      <div className="w-8 h-8 rounded-xl flex items-center justify-center" style={{ background: "rgba(45,69,48,0.08)" }}>
+                        <Phone size={14} style={{ color: "#2D4530" }} />
                       </div>
                       {business.phone}
                     </a>
@@ -193,10 +193,10 @@ export default function NegocioDetalle({ business }: Props) {
                       href={`https://instagram.com/${business.instagram.replace("@", "").replace("https://www.instagram.com/", "").replace("/", "")}`}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="flex items-center gap-3 text-sm text-primary-600 hover:text-primary-700"
+                      className="flex items-center gap-3 text-sm text-brand-pine hover:text-brand-earth"
                     >
-                      <div className="w-8 h-8 bg-primary-50 rounded-xl flex items-center justify-center flex-shrink-0">
-                        <AtSign size={14} className="text-primary-500" />
+                      <div className="w-8 h-8 rounded-xl flex items-center justify-center flex-shrink-0" style={{ background: "rgba(45,69,48,0.08)" }}>
+                        <AtSign size={14} style={{ color: "#2D4530" }} />
                       </div>
                       <span className="truncate">
                         @{business.instagram.replace("https://www.instagram.com/", "").replace("@", "").replace("/", "")}
@@ -233,19 +233,19 @@ export default function NegocioDetalle({ business }: Props) {
                   <div className="space-y-2">
                     {business.offers_delivery && (
                       <div className="flex items-center gap-2 text-sm text-stone-600">
-                        <Truck size={14} className="text-primary-500" />
+                        <Truck size={14} className="text-brand-pine" />
                         Delivery
                       </div>
                     )}
                     {business.offers_takeaway && (
                       <div className="flex items-center gap-2 text-sm text-stone-600">
-                        <ShoppingBag size={14} className="text-primary-500" />
+                        <ShoppingBag size={14} className="text-brand-pine" />
                         Take away
                       </div>
                     )}
                     {business.offers_dine_in && (
                       <div className="flex items-center gap-2 text-sm text-stone-600">
-                        <UtensilsCrossed size={14} className="text-primary-500" />
+                        <UtensilsCrossed size={14} className="text-brand-pine" />
                         Comer en el lugar
                       </div>
                     )}

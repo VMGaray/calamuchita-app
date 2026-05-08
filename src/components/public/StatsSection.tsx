@@ -12,16 +12,16 @@ export default function StatsSection() {
   return (
     <div className="py-16 px-4 my-12 rounded-3xl"
       style={{
-        background: "rgba(255,255,255,0.7)",
+        background: "rgba(255,255,255,0.55)",
         backdropFilter: "blur(12px)",
-        border: "1px solid rgba(255,255,255,0.9)",
+        border: "1px solid rgba(45,69,48,0.1)",
       }}
     >
       <AnimateIn direction="up">
-        <h2 className="font-serif text-3xl text-stone-800 text-center mb-2">
+        <h2 className="font-serif text-3xl text-center mb-2" style={{ color: "#2D4530" }}>
           El valle en números
         </h2>
-        <p className="text-stone-400 text-sm text-center mb-10">
+        <p className="text-sm text-center mb-10" style={{ color: "rgba(45,69,48,0.5)" }}>
           Una plataforma que crece con la comunidad
         </p>
       </AnimateIn>
@@ -29,11 +29,11 @@ export default function StatsSection() {
         {stats.map(({ value, suffix, label, desc }, i) => (
           <AnimateIn key={label} direction="up" delay={i * 0.1}>
             <div className="text-center">
-              <p className="font-serif text-4xl md:text-5xl text-primary-600 mb-1">
+              <p className="font-serif text-4xl md:text-5xl mb-1" style={{ color: "#2D4530" }}>
                 <AnimatedCounter to={value} suffix={suffix} />
               </p>
-              <p className="text-sm font-medium text-stone-700 mb-1">{label}</p>
-              <p className="text-xs text-stone-400 leading-relaxed">{desc}</p>
+              <p className="text-sm font-medium mb-1" style={{ color: "#3C3C3C" }}>{label}</p>
+              <p className="text-xs leading-relaxed" style={{ color: "rgba(45,69,48,0.5)" }}>{desc}</p>
             </div>
           </AnimateIn>
         ))}

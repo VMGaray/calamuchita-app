@@ -44,7 +44,7 @@ export default function CtaBusiness() {
         ctx.beginPath()
         ctx.moveTo(W / 2 - scaleX, y)
         ctx.lineTo(W / 2 + scaleX, y)
-        ctx.strokeStyle = `rgba(200,96,58,${alpha})`
+        ctx.strokeStyle = `rgba(225,219,201,${alpha})`
         ctx.lineWidth = z * 1.2
         ctx.stroke()
       }
@@ -55,8 +55,8 @@ export default function CtaBusiness() {
         ctx.beginPath()
         ctx.moveTo(W / 2 + xRatio * fov * 0.08, horizon)
         ctx.lineTo(W / 2 + xRatio * fov, H + 20)
-        const alpha = 0.12 + Math.abs(xRatio) * 0.08
-        ctx.strokeStyle = `rgba(200,96,58,${alpha})`
+        const alpha = 0.1 + Math.abs(xRatio) * 0.07
+        ctx.strokeStyle = `rgba(225,219,201,${alpha})`
         ctx.lineWidth = 0.8
         ctx.stroke()
       }
@@ -73,10 +73,10 @@ export default function CtaBusiness() {
       pulseOffset: Math.random() * Math.PI * 2,
       isStar: Math.random() > 0.7,
       color: [
-        { r: 212, g: 160, b: 60 },
-        { r: 230, g: 185, b: 90 },
-        { r: 245, g: 210, b: 120 },
-        { r: 200, g: 96, b: 58 },
+        { r: 225, g: 219, b: 201 },
+        { r: 107, g: 123, b: 132 },
+        { r: 94,  g: 75,  b: 59  },
+        { r: 200, g: 192, b: 170 },
       ][Math.floor(Math.random() * 4)]
     }))
 
@@ -103,12 +103,12 @@ export default function CtaBusiness() {
 
           ctx.beginPath()
           ctx.arc(p.x, p.y, r, 0, Math.PI * 2)
-          ctx.fillStyle = `rgba(255,240,180,${a})`
+          ctx.fillStyle = `rgba(225,219,201,${a})`
           ctx.fill()
 
           ctx.save()
           ctx.globalAlpha = a * 0.5
-          ctx.strokeStyle = `rgba(255,230,150,0.8)`
+          ctx.strokeStyle = `rgba(200,192,170,0.8)`
           ctx.lineWidth = 0.5
           const ray = r * 8
           ctx.beginPath()
@@ -118,7 +118,7 @@ export default function CtaBusiness() {
           ctx.restore()
         } else {
           const grad = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, r * 3)
-          grad.addColorStop(0, `rgba(255,240,180,${a})`)
+          grad.addColorStop(0, `rgba(225,219,201,${a})`)
           grad.addColorStop(0.4, `rgba(${cr},${g},${b},${a * 0.7})`)
           grad.addColorStop(1, `rgba(${cr},${g},${b},0)`)
           ctx.beginPath()
@@ -155,7 +155,7 @@ export default function CtaBusiness() {
     <div
       className="relative rounded-3xl overflow-hidden"
       style={{
-        background: "linear-gradient(135deg, #1a0d05 0%, #2d1508 50%, #1a0d05 100%)",
+        background: "linear-gradient(135deg, #0e1a10 0%, #1a2d1c 50%, #0e1a10 100%)",
         minHeight: 340,
       }}
     >
@@ -175,11 +175,11 @@ export default function CtaBusiness() {
         }}
       />
 
-      {/* Borde brillante coral */}
+      {/* Borde sand sutil */}
       <div
         className="absolute inset-0 rounded-3xl"
         style={{
-          border: "1px solid rgba(200,96,58,0.3)",
+          border: "1px solid rgba(225,219,201,0.18)",
           zIndex: 2,
           pointerEvents: "none",
         }}
@@ -197,9 +197,9 @@ export default function CtaBusiness() {
           transition={{ duration: 0.5 }}
           className="flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-medium tracking-widest uppercase"
           style={{
-            background: "rgba(200,96,58,0.15)",
-            border: "1px solid rgba(200,96,58,0.3)",
-            color: "#e8a882",
+            background: "rgba(225,219,201,0.12)",
+            border: "1px solid rgba(225,219,201,0.25)",
+            color: "#E1DBC9",
           }}
         >
           <span>🏔</span> Valle de Calamuchita
@@ -247,7 +247,7 @@ export default function CtaBusiness() {
             <div key={stat.label} className="flex flex-col items-center gap-0.5">
               <span
                 className="font-serif text-2xl"
-                style={{ color: "#e8a882" }}
+                style={{ color: "#E1DBC9" }}
               >
                 {stat.value}
               </span>
@@ -273,13 +273,14 @@ export default function CtaBusiness() {
               rel="noopener noreferrer"
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
-              className="relative group px-12 py-5 bg-[#d4af37] rounded-2xl flex items-center gap-3 shadow-[0_20px_40px_-10px_rgba(212,175,55,0.3)] transition-all overflow-hidden"
+              className="relative group px-12 py-5 rounded-2xl flex items-center gap-3 transition-all overflow-hidden"
+                  style={{ background: "#E1DBC9", boxShadow: "0 20px 40px -10px rgba(225,219,201,0.25)" }}
             >
               <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:animate-shimmer" />
-              <span className="relative z-10 text-black font-black uppercase tracking-tighter">
+              <span className="relative z-10 font-black uppercase tracking-tighter" style={{ color: "#2D4530" }}>
                 Escribime ahora
               </span>
-              <Send size={18} className="relative z-10 text-black group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />
+              <Send size={18} className="relative z-10 group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" style={{ color: "#2D4530" }} />
             </motion.a>
           </div>
         </motion.div>

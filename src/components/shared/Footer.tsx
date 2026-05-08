@@ -24,10 +24,10 @@ const sections = [
 
 export default function Footer() {
   return (
-    <footer style={{ background: "rgba(8,14,26,0.95)", borderTop: "1px solid rgba(255,255,255,0.06)" }}>
+    <footer style={{ background: "#0e1a10", borderTop: "1px solid rgba(225,219,201,0.08)" }}>
 
       {/* Marquee pueblos */}
-      <div className="py-3 overflow-hidden" style={{ borderBottom: "1px solid rgba(255,255,255,0.04)" }}>
+      <div className="py-3 overflow-hidden" style={{ borderBottom: "1px solid rgba(225,219,201,0.06)" }}>
         <motion.div
           className="flex gap-8 whitespace-nowrap"
           animate={{ x: ["0%", "-50%"] }}
@@ -35,9 +35,9 @@ export default function Footer() {
         >
           {[...pueblos, ...pueblos].map((pueblo, i) => (
             <span key={i} className="text-xs font-medium tracking-widest uppercase flex items-center gap-8"
-              style={{ color: "rgba(255,255,255,0.2)" }}>
+              style={{ color: "rgba(225,219,201,0.22)" }}>
               {pueblo}
-              <span style={{ color: "rgba(255,255,255,0.08)" }}>✦</span>
+              <span style={{ color: "rgba(225,219,201,0.1)" }}>✦</span>
             </span>
           ))}
         </motion.div>
@@ -51,28 +51,30 @@ export default function Footer() {
             <div>
               <Link href="/" className="flex items-center gap-2 mb-4">
                 <div className="w-8 h-8 rounded-lg flex items-center justify-center"
-                  style={{ background: "rgba(74,144,217,0.2)", border: "1px solid rgba(74,144,217,0.3)" }}>
-                  <MapPin size={15} style={{ color: "#4A90D9" }} />
+                  style={{ background: "rgba(225,219,201,0.1)", border: "1px solid rgba(225,219,201,0.2)" }}>
+                  <MapPin size={15} style={{ color: "#E1DBC9" }} />
                 </div>
-                <span className="font-serif text-white">Calamuchita App</span>
+                <span className="font-serif" style={{ color: "#E1DBC9" }}>Calamuchita App</span>
               </Link>
-              <p className="text-sm leading-relaxed mb-4" style={{ color: "rgba(255,255,255,0.35)" }}>
+              <p className="text-sm leading-relaxed mb-4" style={{ color: "rgba(225,219,201,0.45)" }}>
                 La plataforma del Valle de Calamuchita. Gastronomía, servicios, salud, turismo y más.
               </p>
-              <p className="text-xs" style={{ color: "rgba(255,255,255,0.2)" }}>Córdoba, Argentina</p>
+              <p className="text-xs" style={{ color: "rgba(225,219,201,0.25)" }}>Córdoba, Argentina</p>
             </div>
           </AnimateIn>
 
           <AnimateIn direction="up" delay={0.1}>
             <div>
-              <p className="text-xs font-medium uppercase tracking-wider mb-4" style={{ color: "rgba(255,255,255,0.25)" }}>
+              <p className="text-xs font-medium uppercase tracking-wider mb-4" style={{ color: "rgba(225,219,201,0.35)" }}>
                 Explorar
               </p>
               <div className="grid grid-cols-2 gap-y-2">
                 {sections.map(({ label, href }) => (
                   <Link key={label} href={href}
-                    className="text-sm transition-colors hover:text-white"
-                    style={{ color: "rgba(255,255,255,0.4)" }}>
+                    className="text-sm transition-colors"
+                    style={{ color: "rgba(225,219,201,0.45)" }}
+                    onMouseEnter={e => (e.currentTarget.style.color = "#E1DBC9")}
+                    onMouseLeave={e => (e.currentTarget.style.color = "rgba(225,219,201,0.45)")}>
                     {label}
                   </Link>
                 ))}
@@ -82,28 +84,32 @@ export default function Footer() {
 
           <AnimateIn direction="up" delay={0.2}>
             <div>
-              <p className="text-xs font-medium uppercase tracking-wider mb-4" style={{ color: "rgba(255,255,255,0.25)" }}>
+              <p className="text-xs font-medium uppercase tracking-wider mb-4" style={{ color: "rgba(225,219,201,0.35)" }}>
                 Para comercios
               </p>
               <ul className="space-y-2 mb-6">
                 <li>
-                  <Link href="/registro" className="text-sm transition-colors hover:text-white"
-                    style={{ color: "rgba(255,255,255,0.4)" }}>
+                  <Link href="/registro" className="text-sm transition-colors"
+                    style={{ color: "rgba(225,219,201,0.45)" }}
+                    onMouseEnter={e => (e.currentTarget.style.color = "#E1DBC9")}
+                    onMouseLeave={e => (e.currentTarget.style.color = "rgba(225,219,201,0.45)")}>
                     Sumá tu local
                   </Link>
                 </li>
                 <li>
-                  <Link href="/login" className="text-sm transition-colors hover:text-white"
-                    style={{ color: "rgba(255,255,255,0.4)" }}>
+                  <Link href="/login" className="text-sm transition-colors"
+                    style={{ color: "rgba(225,219,201,0.45)" }}
+                    onMouseEnter={e => (e.currentTarget.style.color = "#E1DBC9")}
+                    onMouseLeave={e => (e.currentTarget.style.color = "rgba(225,219,201,0.45)")}>
                     Acceder al panel
                   </Link>
                 </li>
               </ul>
               <motion.a
                 href="/registro"
-                className="inline-block px-5 py-2.5 rounded-xl text-sm font-medium text-white"
-                style={{ background: "rgba(74,144,217,0.2)", border: "1px solid rgba(74,144,217,0.3)" }}
-                whileHover={{ background: "rgba(74,144,217,0.35)" }}
+                className="inline-block px-5 py-2.5 rounded-xl text-sm font-medium"
+                style={{ background: "rgba(225,219,201,0.1)", border: "1px solid rgba(225,219,201,0.2)", color: "#E1DBC9" }}
+                whileHover={{ background: "rgba(225,219,201,0.18)" }}
               >
                 Quiero sumarme
               </motion.a>
@@ -112,11 +118,11 @@ export default function Footer() {
         </div>
 
         <div className="mt-10 pt-6 flex flex-col md:flex-row justify-between items-center gap-2"
-          style={{ borderTop: "1px solid rgba(255,255,255,0.06)" }}>
-          <p className="text-xs" style={{ color: "rgba(255,255,255,0.2)" }}>
+          style={{ borderTop: "1px solid rgba(225,219,201,0.07)" }}>
+          <p className="text-xs" style={{ color: "rgba(225,219,201,0.25)" }}>
             © 2025 Calamuchita App · Valle de Calamuchita, Córdoba
           </p>
-          <p className="text-xs" style={{ color: "rgba(255,255,255,0.2)" }}>
+          <p className="text-xs" style={{ color: "rgba(225,219,201,0.25)" }}>
             Hecho con amor en las sierras 🌿
           </p>
         </div>

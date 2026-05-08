@@ -43,7 +43,7 @@ export default function DirectorioDetalle({ business, section }: Props) {
     <div className="min-h-screen">
 
       {/* Cover */}
-      <div className="relative h-56 md:h-80 bg-primary-200">
+      <div className="relative h-56 md:h-80" style={{ background: "rgba(45,69,48,0.15)" }}>
         {business.cover_url ? (
           <Image
             src={business.cover_url}
@@ -53,7 +53,7 @@ export default function DirectorioDetalle({ business, section }: Props) {
           />
         ) : (
           <div className="w-full h-full"
-            style={{ background: "linear-gradient(135deg, rgba(200,96,58,0.3), rgba(200,96,58,0.1))" }}
+            style={{ background: "linear-gradient(135deg, rgba(45,69,48,0.3), rgba(45,69,48,0.1))" }}
           />
         )}
         <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
@@ -81,17 +81,19 @@ export default function DirectorioDetalle({ business, section }: Props) {
         {/* Header */}
         <AnimateIn direction="up">
           <div className="mb-6">
-            <h1 className="font-serif text-3xl text-stone-800 mb-2">{business.name}</h1>
+            <h1 className="font-serif text-3xl mb-2" style={{ color: "#2D4530" }}>{business.name}</h1>
             <div className="flex items-center gap-2 flex-wrap">
               {business.subcategory && (
-                <span className="text-xs font-medium px-3 py-1 rounded-full bg-primary-100 text-primary-600">
+                <span className="text-xs font-medium px-3 py-1 rounded-full" style={{ background: "rgba(45,69,48,0.1)", color: "#2D4530" }}>
                   {business.subcategory}
                 </span>
               )}
               {business.is_open !== null && (
-                <span className={`text-xs font-medium px-3 py-1 rounded-full ${
-                  business.is_open ? "bg-green-100 text-green-600" : "bg-stone-100 text-stone-500"
-                }`}>
+                <span className="text-xs font-medium px-3 py-1 rounded-full" style={
+                  business.is_open
+                    ? { background: "rgba(45,69,48,0.1)", color: "#2D4530" }
+                    : { background: "rgba(107,123,132,0.1)", color: "#6B7B84" }
+                }>
                   {business.is_open ? "Abierto ahora" : "Cerrado"}
                 </span>
               )}
@@ -107,8 +109,8 @@ export default function DirectorioDetalle({ business, section }: Props) {
             {/* Descripción */}
             {business.description && (
               <AnimateIn direction="up" delay={0.1}>
-                <div className="bg-white rounded-2xl border border-stone-200 p-6">
-                  <p className="text-stone-600 leading-relaxed">{business.description}</p>
+                <div className="bg-white rounded-2xl p-6" style={{ border: "1px solid rgba(45,69,48,0.1)" }}>
+                  <p className="leading-relaxed" style={{ color: "rgba(45,69,48,0.7)" }}>{business.description}</p>
                 </div>
               </AnimateIn>
             )}
@@ -116,8 +118,8 @@ export default function DirectorioDetalle({ business, section }: Props) {
             {/* Fotos adicionales */}
             {photos.length > 0 && (
               <AnimateIn direction="up" delay={0.2}>
-                <div className="bg-white rounded-2xl border border-stone-200 p-6">
-                  <h2 className="font-serif text-xl text-stone-800 mb-4">Fotos</h2>
+                <div className="bg-white rounded-2xl p-6" style={{ border: "1px solid rgba(45,69,48,0.1)" }}>
+                  <h2 className="font-serif text-xl mb-4" style={{ color: "#2D4530" }}>Fotos</h2>
                   <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
                     {photos.map((photo: any) => (
                       <div key={photo.id} className="aspect-square rounded-xl overflow-hidden">
@@ -139,37 +141,37 @@ export default function DirectorioDetalle({ business, section }: Props) {
             {(business.offers_delivery || business.offers_takeaway ||
               business.offers_dine_in || business.accepts_reservations) && (
               <AnimateIn direction="up" delay={0.25}>
-                <div className="bg-white rounded-2xl border border-stone-200 p-6">
-                  <h2 className="font-serif text-xl text-stone-800 mb-4">Servicios</h2>
+                <div className="bg-white rounded-2xl p-6" style={{ border: "1px solid rgba(45,69,48,0.1)" }}>
+                  <h2 className="font-serif text-xl mb-4" style={{ color: "#2D4530" }}>Servicios</h2>
                   <div className="grid grid-cols-2 gap-3">
                     {business.offers_delivery && (
-                      <div className="flex items-center gap-3 p-3 rounded-xl bg-stone-50">
-                        <Truck size={16} style={{ color: "#c8603a" }} />
-                        <span className="text-sm text-stone-600">Delivery</span>
+                      <div className="flex items-center gap-3 p-3 rounded-xl" style={{ background: "rgba(45,69,48,0.05)" }}>
+                        <Truck size={16} style={{ color: "#2D4530" }} />
+                        <span className="text-sm" style={{ color: "rgba(45,69,48,0.7)" }}>Delivery</span>
                       </div>
                     )}
                     {business.offers_takeaway && (
-                      <div className="flex items-center gap-3 p-3 rounded-xl bg-stone-50">
-                        <ShoppingBag size={16} style={{ color: "#c8603a" }} />
-                        <span className="text-sm text-stone-600">Take away</span>
+                      <div className="flex items-center gap-3 p-3 rounded-xl" style={{ background: "rgba(45,69,48,0.05)" }}>
+                        <ShoppingBag size={16} style={{ color: "#2D4530" }} />
+                        <span className="text-sm" style={{ color: "rgba(45,69,48,0.7)" }}>Take away</span>
                       </div>
                     )}
                     {business.offers_dine_in && (
-                      <div className="flex items-center gap-3 p-3 rounded-xl bg-stone-50">
-                        <UtensilsCrossed size={16} style={{ color: "#c8603a" }} />
-                        <span className="text-sm text-stone-600">En el lugar</span>
+                      <div className="flex items-center gap-3 p-3 rounded-xl" style={{ background: "rgba(45,69,48,0.05)" }}>
+                        <UtensilsCrossed size={16} style={{ color: "#2D4530" }} />
+                        <span className="text-sm" style={{ color: "rgba(45,69,48,0.7)" }}>En el lugar</span>
                       </div>
                     )}
                     {business.accepts_reservations && (
-                      <div className="flex items-center gap-3 p-3 rounded-xl bg-stone-50">
-                        <Star size={16} style={{ color: "#c8603a" }} />
-                        <span className="text-sm text-stone-600">Reservas</span>
+                      <div className="flex items-center gap-3 p-3 rounded-xl" style={{ background: "rgba(45,69,48,0.05)" }}>
+                        <Star size={16} style={{ color: "#2D4530" }} />
+                        <span className="text-sm" style={{ color: "rgba(45,69,48,0.7)" }}>Reservas</span>
                       </div>
                     )}
                     {business.pet_friendly && (
-                      <div className="flex items-center gap-3 p-3 rounded-xl bg-stone-50">
-                        <PawPrint size={16} style={{ color: "#c8603a" }} />
-                        <span className="text-sm text-stone-600">Pet friendly</span>
+                      <div className="flex items-center gap-3 p-3 rounded-xl" style={{ background: "rgba(45,69,48,0.05)" }}>
+                        <PawPrint size={16} style={{ color: "#2D4530" }} />
+                        <span className="text-sm" style={{ color: "rgba(45,69,48,0.7)" }}>Pet friendly</span>
                       </div>
                     )}
                   </div>
@@ -180,10 +182,10 @@ export default function DirectorioDetalle({ business, section }: Props) {
             {/* Formas de pago */}
             {business.payment_methods?.length > 0 && (
               <AnimateIn direction="up" delay={0.3}>
-                <div className="bg-white rounded-2xl border border-stone-200 p-6">
+                <div className="bg-white rounded-2xl p-6" style={{ border: "1px solid rgba(45,69,48,0.1)" }}>
                   <div className="flex items-center gap-2 mb-4">
-                    <CreditCard size={18} style={{ color: "#c8603a" }} />
-                    <h2 className="font-serif text-xl text-stone-800">Formas de pago</h2>
+                    <CreditCard size={18} style={{ color: "#2D4530" }} />
+                    <h2 className="font-serif text-xl" style={{ color: "#2D4530" }}>Formas de pago</h2>
                   </div>
                   <div className="flex flex-wrap gap-2">
                     {business.payment_methods.map((method: string) => (
@@ -191,9 +193,9 @@ export default function DirectorioDetalle({ business, section }: Props) {
                         key={method}
                         className="px-3 py-1.5 rounded-xl text-xs font-medium"
                         style={{
-                          background: "rgba(200,96,58,0.08)",
-                          color: "#c8603a",
-                          border: "1px solid rgba(200,96,58,0.15)"
+                          background: "rgba(45,69,48,0.08)",
+                          color: "#2D4530",
+                          border: "1px solid rgba(45,69,48,0.12)"
                         }}
                       >
                         {paymentLabels[method] || method}
@@ -210,18 +212,18 @@ export default function DirectorioDetalle({ business, section }: Props) {
 
             {/* Contacto */}
             <AnimateIn direction="right" delay={0.1}>
-              <div className="bg-white rounded-2xl border border-stone-200 p-5">
-                <h3 className="text-sm font-medium text-stone-700 mb-4">Contacto</h3>
+              <div className="bg-white rounded-2xl p-5" style={{ border: "1px solid rgba(45,69,48,0.1)" }}>
+                <h3 className="text-sm font-medium mb-4" style={{ color: "#2D4530" }}>Contacto</h3>
                 <div className="space-y-3">
                   {business.phone && (
                     <a
                       href={`tel:${business.phone}`}
                       className="flex items-center gap-3 text-sm hover:opacity-70 transition-opacity"
-                      style={{ color: "#c8603a" }}
+                      style={{ color: "#2D4530" }}
                     >
                       <div className="w-8 h-8 rounded-xl flex items-center justify-center flex-shrink-0"
-                        style={{ background: "rgba(200,96,58,0.1)" }}>
-                        <Phone size={14} style={{ color: "#c8603a" }} />
+                        style={{ background: "rgba(45,69,48,0.08)" }}>
+                        <Phone size={14} style={{ color: "#2D4530" }} />
                       </div>
                       {business.phone}
                     </a>
@@ -250,11 +252,11 @@ export default function DirectorioDetalle({ business, section }: Props) {
                       target="_blank"
                       rel="noopener noreferrer"
                       className="flex items-center gap-3 text-sm"
-                      style={{ color: "#c8603a" }}
+                      style={{ color: "#2D4530" }}
                     >
                       <div className="w-8 h-8 rounded-xl flex items-center justify-center flex-shrink-0"
-                        style={{ background: "rgba(200,96,58,0.1)" }}>
-                        <AtSign size={14} style={{ color: "#c8603a" }} />
+                        style={{ background: "rgba(45,69,48,0.08)" }}>
+                        <AtSign size={14} style={{ color: "#2D4530" }} />
                       </div>
                       <span className="truncate">
                         @{business.instagram.replace("https://www.instagram.com/", "").replace("@", "").replace("/", "")}
@@ -267,19 +269,19 @@ export default function DirectorioDetalle({ business, section }: Props) {
                       target="_blank"
                       rel="noopener noreferrer"
                       className="flex items-center gap-3 text-sm"
-                      style={{ color: "#c8603a" }}
+                      style={{ color: "#2D4530" }}
                     >
                       <div className="w-8 h-8 rounded-xl flex items-center justify-center flex-shrink-0"
-                        style={{ background: "rgba(200,96,58,0.1)" }}>
-                        <Globe size={14} style={{ color: "#c8603a" }} />
+                        style={{ background: "rgba(45,69,48,0.08)" }}>
+                        <Globe size={14} style={{ color: "#2D4530" }} />
                       </div>
                       Sitio web
                     </a>
                   )}
                   {business.address && (
-                    <div className="flex items-center gap-3 text-sm text-stone-500">
-                      <div className="w-8 h-8 rounded-xl flex items-center justify-center flex-shrink-0 bg-stone-50">
-                        <MapPin size={14} className="text-stone-400" />
+                    <div className="flex items-center gap-3 text-sm" style={{ color: "rgba(45,69,48,0.55)" }}>
+                      <div className="w-8 h-8 rounded-xl flex items-center justify-center flex-shrink-0" style={{ background: "rgba(45,69,48,0.06)" }}>
+                        <MapPin size={14} style={{ color: "rgba(45,69,48,0.45)" }} />
                       </div>
                       {business.address}
                     </div>
@@ -291,18 +293,18 @@ export default function DirectorioDetalle({ business, section }: Props) {
             {/* Horarios */}
             {business.business_hours?.length > 0 && (
               <AnimateIn direction="right" delay={0.2}>
-                <div className="bg-white rounded-2xl border border-stone-200 p-5">
+                <div className="bg-white rounded-2xl p-5" style={{ border: "1px solid rgba(45,69,48,0.1)" }}>
                   <div className="flex items-center gap-2 mb-3">
-                    <Clock size={14} className="text-stone-400" />
-                    <h3 className="text-sm font-medium text-stone-700">Horarios</h3>
+                    <Clock size={14} style={{ color: "rgba(45,69,48,0.45)" }} />
+                    <h3 className="text-sm font-medium" style={{ color: "#2D4530" }}>Horarios</h3>
                   </div>
                   <div className="space-y-1.5">
                     {business.business_hours
                       .sort((a: any, b: any) => a.day_of_week - b.day_of_week)
                       .map((h: any) => (
                         <div key={h.id} className="flex justify-between text-xs">
-                          <span className="text-stone-500">{dayNames[h.day_of_week]}</span>
-                          <span className="text-stone-700 font-medium">
+                          <span style={{ color: "rgba(45,69,48,0.5)" }}>{dayNames[h.day_of_week]}</span>
+                          <span className="font-medium" style={{ color: "#2D4530" }}>
                             {h.is_closed ? "Cerrado" : `${h.opens_at.slice(0, 5)} - ${h.closes_at.slice(0, 5)}`}
                           </span>
                         </div>

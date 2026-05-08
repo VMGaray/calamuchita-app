@@ -80,7 +80,7 @@ export default function NegociosList({ params }: Props) {
           <Card3D className="h-full">
             <Link href={`/negocios/${slug}`} className="block h-full">
               <div className="bg-white rounded-2xl overflow-hidden border border-stone-200 h-full">
-                <div className="h-36 relative bg-primary-100">
+                <div className="h-36 relative bg-brand-pine/10">
                   {cover_url ? (
                     <Image src={cover_url} alt={name} fill className="object-cover" />
                   ) : (
@@ -89,7 +89,7 @@ export default function NegociosList({ params }: Props) {
                     </div>
                   )}
                   {is_open && (
-                    <span className="absolute top-3 right-3 text-xs font-medium px-2 py-1 rounded-full bg-primary-100 text-primary-600">
+                    <span className="absolute top-3 right-3 text-xs font-medium px-2 py-1 rounded-full bg-brand-pine/10 text-brand-pine">
                       Abierto
                     </span>
                   )}
@@ -110,7 +110,7 @@ export default function NegociosList({ params }: Props) {
                       </span>
                     )}
                     {offers_delivery && (
-                      <span className="text-xs font-medium px-2 py-0.5 rounded-full bg-blue-100 text-blue-600">
+                      <span className="text-xs font-medium px-2 py-0.5 rounded-full bg-brand-slate/10 text-brand-slate">
                         Delivery
                       </span>
                     )}

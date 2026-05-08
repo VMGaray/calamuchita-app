@@ -1,5 +1,6 @@
 "use client"
 
+import { useEffect } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import Link from "next/link"
 import { sectionCategories, SectionKey } from "@/lib/sections"
@@ -9,29 +10,40 @@ import {
   Wrench, Zap, Flame, Car, Building, Paintbrush, Hammer, KeyRound, Leaf, Waves, Home, Bug, Droplets, Sparkles,
   Stethoscope, Pill, Brain, Smile, Eye, PawPrint, AlertCircle,
   GraduationCap, BookOpen, Languages, Users, Music, Trophy,
-  Hotel, Map, Tent, Activity, Compass,
+  Hotel, Map, Tent, Activity, Compass, Plane,
   PartyPopper, ChefHat, Mic, Medal, Palette, Baby,
   Store, Salad, Shirt, Gem, HardHat, MoreHorizontal,
-  Clock3, Landmark, Lightbulb, Bus, Info
+  Clock3, Landmark, Lightbulb, Bus, Info,
+  Armchair, Dog, HeartPulse, Smartphone
 } from "lucide-react"
 
 const categoryIcons: Record<string, any> = {
-  "Restaurantes": Utensils, "Cafés": Coffee, "Viandas": ShoppingBag, "Bares": Beer,
-  "Delivery": Bike, "Abierto ahora": Clock, "Plomería": Wrench, "Electricidad": Zap,
-  "Gasista": Flame, "Mecánica": Car, "Construcción": Building, "Perforaciones": Droplets,
-  "Pintor": Paintbrush, "Herrero": Hammer, "Cerrajero": KeyRound, "Jardinero": Leaf, "Piletero": Waves,
-  "Zinguero": Home, "Desinfecciones": Bug, "Limpieza": Sparkles,
-  "Clínicas y consultorios": Stethoscope, "Farmacias": Pill, "Psicología": Brain,
-  "Odontología": Smile, "Oftalmología": Eye, "Veterinarias": PawPrint, "Emergencias": AlertCircle,
-  "Colegios": GraduationCap, "Institutos": BookOpen, "Idiomas": Languages,
-  "Maestras particulares": Users, "Arte y música": Music, "Deportes": Trophy,
-  "Alojamiento": Hotel, "Excursiones": Map, "Camping": Tent, "Actividades": Activity,
-  "Alquiler": Car, "Guías": Compass, "Festivales": PartyPopper, "Gastronomía": ChefHat,
-  "Música": Mic, "Deportivos": Medal, "Culturales": Palette, "Infantiles": Baby,
-  "Almacenes": Store, "Dietéticas": Salad, "Ropa": Shirt, "Artesanías": Gem,
-  "Ferreterías": HardHat, "Otros": MoreHorizontal, "Farmacias de turno": Clock3,
-  "Municipalidad": Landmark, "Cooperativas": Lightbulb, "Transporte": Bus,
-  "Turismo oficial": Info,
+  // Gastronomía
+  "Restaurantes": Utensils, "Bar/Café": Coffee, "Viandas": ShoppingBag,
+  "Delivery": Bike, "Abierto ahora": Clock,
+  // Servicios
+  "Cerrajero": KeyRound, "Construcción": Building, "Desinfecciones": Bug,
+  "Electricidad": Zap, "Gasista": Flame, "Herrero": Hammer, "Jardinero": Leaf,
+  "Limpieza": Sparkles, "Mecánica": Car, "Perforaciones": Droplets, "Piletero": Waves,
+  "Pintor": Paintbrush, "Plomería": Wrench, "Zinguero": Home,
+  // Salud
+  "Clínicas": Building, "Consultorios Médicos": Stethoscope, "Especialidades": Brain,
+  "Farmacias": Pill, "Hospitales y Dispensarios": AlertCircle,
+  // Educación
+  "Arte y Música": Music, "Colegios": GraduationCap, "Deporte": Trophy,
+  "Idiomas": Languages, "Maestras/os Particulares": Users,
+  // Turismo
+  "Actividades y Paseos": Activity, "Agencia de Viajes": Plane,
+  "Alojamiento": Hotel, "Alquiler": Compass, "Excursiones": Map,
+  // Comercios
+  "Hogar": Armchair, "Indumentaria": Shirt, "Mascotas": Dog, "Niños": Baby,
+  "Salud": HeartPulse, "Tecnología": Smartphone, "Vehículos": Car,
+  // Eventos
+  "Culturales": Palette, "Deportivos": Medal, "Festivales": PartyPopper,
+  "Gastronomía": ChefHat, "Infantiles": Baby, "Música": Mic,
+  // Info
+  "Cooperativas": Lightbulb, "Emergencias": AlertCircle, "Farmacias de turno": Clock3,
+  "Municipalidad": Landmark, "Transporte": Bus, "Turismo oficial": Info,
 }
 
 interface Props {
@@ -41,6 +53,15 @@ interface Props {
 
 export default function SectionModal({ section, onClose }: Props) {
   const categories = section ? sectionCategories[section] : []
+
+  useEffect(() => {
+    if (section) {
+      document.body.style.overflow = "hidden"
+    }
+    return () => {
+      document.body.style.overflow = ""
+    }
+  }, [section])
 
   return (
     <AnimatePresence>
@@ -63,11 +84,11 @@ export default function SectionModal({ section, onClose }: Props) {
             exit={{ opacity: 0, scale: 0.8, y: -20 }}
             transition={{ type: "spring", stiffness: 350, damping: 25 }}
           >
-            <div className="bg-white rounded-3xl overflow-hidden border border-stone-200">
+            <div className="bg-white rounded-3xl overflow-hidden border border-brand-slate/20">
 
               {/* Header del modal */}
-              <div className="bg-primary-500 px-6 py-4 flex items-center justify-between">
-                <h2 className="font-serif text-xl text-sand-100 capitalize">
+              <div className="bg-brand-pine px-6 py-4 flex items-center justify-between">
+                <h2 className="font-serif text-xl text-brand-sand capitalize">
                   {section === "gastronomy" ? "Gastronomía"
                     : section === "services" ? "Servicios"
                     : section === "health" ? "Salud"
@@ -79,14 +100,14 @@ export default function SectionModal({ section, onClose }: Props) {
                 </h2>
                 <button
                   onClick={onClose}
-                  className="text-primary-200 hover:text-primary-100 text-2xl leading-none"
+                  className="text-brand-sand/60 hover:text-brand-sand text-2xl leading-none"
                 >
                   ×
                 </button>
               </div>
 
              {/* Grid de categorías con scroll */}
-<div className="p-4 overflow-y-auto max-h-96">
+<div className="p-4 overflow-y-auto max-h-[calc(100vh-14rem)]">
   <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
     {categories.map(({ label, desc, href, bg, color }, i) => {
       const Icon = categoryIcons[label] || ShoppingBag
@@ -100,7 +121,7 @@ export default function SectionModal({ section, onClose }: Props) {
           <Link
             href={href}
             onClick={onClose}
-            className="flex flex-col items-center text-center p-3 rounded-2xl border border-stone-100 hover:border-primary-300 hover:bg-stone-50 transition-all group"
+            className="flex flex-col items-center text-center p-3 rounded-2xl border border-brand-slate/15 hover:border-brand-pine/30 hover:bg-brand-pine/5 transition-all group"
           >
             <motion.div
               className={`w-10 h-10 ${bg} rounded-xl flex items-center justify-center mb-2`}
@@ -109,7 +130,7 @@ export default function SectionModal({ section, onClose }: Props) {
             >
               <Icon size={18} className={color} />
             </motion.div>
-            <p className="text-xs font-medium text-stone-700 leading-tight">{label}</p>
+            <p className="text-xs font-medium text-brand-charcoal leading-tight">{label}</p>
           </Link>
         </motion.div>
       )

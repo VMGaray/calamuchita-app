@@ -1,6 +1,14 @@
 @import "tailwindcss";
 
 @theme {
+  /* Brand palette – Calamuchita orgánico y premium */
+  --color-brand-sand: #E1DBC9;
+  --color-brand-pine: #2D4530;
+  --color-brand-slate: #6B7B84;
+  --color-brand-earth: #5E4B3B;
+  --color-brand-charcoal: #3C3C3C;
+
+  /* Legado – conservados para compatibilidad con dashboard/admin */
   --color-primary-50: #fdf8f3;
   --color-primary-100: #f8eede;
   --color-primary-200: #f0d9be;
@@ -41,8 +49,8 @@
 }
 
 body {
-  background: #f5ede0;
-  color: #1a1208;
+  background: #E1DBC9;
+  color: #2D4530;
   font-family: var(--font-sans);
 }
 

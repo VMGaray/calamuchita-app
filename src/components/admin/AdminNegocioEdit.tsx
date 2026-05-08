@@ -4,6 +4,7 @@ import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { createClient } from "@/lib/supabase/client"
 import { BusinessSection, BusinessCategory } from "@/types/database"
+import { MASTER_CATEGORIES } from "@/lib/constants/categories"
 import ImageUpload from "@/components/ui/ImageUpload"
 import PdfUpload from "@/components/ui/PdfUpload"
 import HorariosEditor, { HorarioDay } from "@/components/ui/HorariosEditor"
@@ -22,11 +23,17 @@ const sections: { value: BusinessSection; label: string }[] = [
 
 const gastronomyCategories: { value: BusinessCategory; label: string }[] = [
   { value: "restaurant", label: "Restaurante" },
-  { value: "cafe",       label: "Café" },
+  { value: "cafe_bar",   label: "Bar/Café" },
   { value: "viandas",    label: "Viandas" },
-  { value: "bar",        label: "Bar" },
   { value: "other",      label: "Otro" },
 ]
+const subcategoryOptions: Record<string, string[]> = {
+  services: MASTER_CATEGORIES.services.subcategories.map(s => s.label),
+  commerce: MASTER_CATEGORIES.commerce.subcategories.map(s => s.label),
+  health: MASTER_CATEGORIES.health.subcategories.map(s => s.label),
+  education: MASTER_CATEGORIES.education.subcategories.map(s => s.label),
+  tourism: MASTER_CATEGORIES.tourism.subcategories.map(s => s.label),
+}
 
 const pueblos = [
   "Villa General Belgrano", "Los Reartes", "Santa Rosa de Calamuchita",
@@ -64,6 +71,9 @@ export default function AdminNegocioEdit({ id }: Props) {
     cover_url: null as string | null,
     menu_pdf_url: null as string | null,
     status: "active",
+    menu_link: "",
+    pet_friendly: false,
+    payment_methods: [] as string[],
   })
 
   useEffect(() => {
@@ -98,6 +108,9 @@ export default function AdminNegocioEdit({ id }: Props) {
           cover_url: business.cover_url || null,
           menu_pdf_url: business.menu_pdf_url || null,
           status: business.status || "active",
+          menu_link: business.menu_link || "",
+          pet_friendly: business.pet_friendly || false,
+          payment_methods: business.payment_methods || [],
         })
       }
 
@@ -145,6 +158,9 @@ export default function AdminNegocioEdit({ id }: Props) {
         cover_url: form.cover_url,
         menu_pdf_url: form.menu_pdf_url || null,
         status: form.status,
+        menu_link: form.menu_link || null,
+        pet_friendly: form.pet_friendly,
+        payment_methods: form.payment_methods,
       })
       .eq("id", id)
 
@@ -248,16 +264,30 @@ export default function AdminNegocioEdit({ id }: Props) {
             </div>
           )}
           {form.section !== "gastronomy" && (
-            <div className="mt-4">
-              <label className="block text-sm font-medium text-stone-700 mb-1">Subcategoría</label>
-              <input
-                type="text"
-                value={form.subcategory}
-                onChange={(e) => handleChange("subcategory", e.target.value)}
-                className="w-full px-4 py-2.5 rounded-xl border border-stone-200 text-stone-800 text-sm outline-none focus:ring-2 focus:ring-primary-300"
-              />
-            </div>
-          )}
+  <div className="mt-4">
+    <label className="block text-sm font-medium text-stone-700 mb-2">
+      Subcategoría <span className="text-stone-400 font-normal">(rubro)</span>
+    </label>
+    {subcategoryOptions[form.section] && (
+      <div className="flex gap-2 flex-wrap mb-3">
+        {subcategoryOptions[form.section].map(opt => (
+          <button key={opt} onClick={() => handleChange("subcategory", opt)}
+            className={`py-1.5 px-3 rounded-xl text-xs font-medium border transition-colors ${
+              form.subcategory === opt
+                ? "bg-primary-500 text-white border-primary-500"
+                : "bg-white text-stone-600 border-stone-200 hover:border-primary-300"
+            }`}>
+            {opt}
+          </button>
+        ))}
+      </div>
+    )}
+    <input type="text" value={form.subcategory}
+      onChange={e => handleChange("subcategory", e.target.value)}
+      placeholder="O escribí una subcategoría personalizada..."
+      className="w-full px-4 py-2.5 rounded-xl border border-stone-200 text-stone-800 text-sm outline-none focus:ring-2 focus:ring-primary-300" />
+  </div>
+)}
         </div>
 
         {/* Info básica */}
@@ -309,6 +339,12 @@ export default function AdminNegocioEdit({ id }: Props) {
               className="w-full px-4 py-2.5 rounded-xl border border-stone-200 text-stone-800 text-sm outline-none focus:ring-2 focus:ring-primary-300" />
           </div>
         </div>
+        <div>
+         <label className="block text-sm font-medium text-stone-700 mb-1">Sitio web</label>
+          <input type="url" value={form.menu_link} onChange={e => handleChange("menu_link", e.target.value)}
+           placeholder="https://..."
+           className="w-full px-4 py-2.5 rounded-xl border border-stone-200 text-stone-800 text-sm outline-none focus:ring-2 focus:ring-primary-300" />
+        </div>
 
         {/* Servicios */}
         <div className="bg-white rounded-2xl border border-stone-200 p-6">
@@ -345,24 +381,70 @@ export default function AdminNegocioEdit({ id }: Props) {
         </div>
 
         {/* PDF */}
-        {form.section === "gastronomy" && (
-          <div className="bg-white rounded-2xl border border-stone-200 p-6 space-y-4">
-            <h2 className="text-sm font-medium text-stone-700">Carta en PDF</h2>
-            {form.menu_pdf_url ? (
-              <div className="flex items-center justify-between p-4 bg-stone-50 rounded-xl border border-stone-200">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 bg-primary-100 rounded-xl flex items-center justify-center">
-                    <span className="text-primary-600 text-xs font-bold">PDF</span>
-                  </div>
-                  <a href={form.menu_pdf_url} target="_blank" rel="noopener noreferrer" className="text-xs text-primary-500">Ver PDF</a>
-                </div>
-                <button onClick={() => handleChange("menu_pdf_url", null)} className="text-red-400 text-sm">Eliminar</button>
-              </div>
-            ) : (
-              <PdfUpload onChange={(url) => handleChange("menu_pdf_url", url)} />
-            )}
-          </div>
-        )}
+       {form.section === "gastronomy" && (
+  <div className="bg-white rounded-2xl border border-stone-200 p-6">
+    <h2 className="text-sm font-medium text-stone-700 mb-4">Servicios</h2>
+    <div className="space-y-3">
+      {[
+        { key: "offers_delivery", label: "Delivery" },
+        { key: "offers_takeaway", label: "Take away" },
+        { key: "offers_dine_in", label: "Comer en el lugar" },
+        { key: "accepts_reservations", label: "Reserva de mesa" },
+      ].map(({ key, label }) => (
+        <label key={key} className="flex items-center gap-3 cursor-pointer">
+          <input type="checkbox" checked={form[key as keyof typeof form] as boolean}
+            onChange={e => handleChange(key, e.target.checked)} className="w-4 h-4 accent-primary-500" />
+          <span className="text-sm text-stone-700">{label}</span>
+        </label>
+      ))}
+    </div>
+  </div>
+)}
+
+{["services", "commerce", "health", "tourism", "education"].includes(form.section) && (
+  <div className="bg-white rounded-2xl border border-stone-200 p-6 space-y-5">
+    <h2 className="text-sm font-medium text-stone-700">Más información</h2>
+    <label className="flex items-center gap-3 cursor-pointer">
+      <input type="checkbox" checked={form.pet_friendly}
+        onChange={e => handleChange("pet_friendly", e.target.checked)}
+        className="w-4 h-4 accent-primary-500" />
+      <div>
+        <span className="text-sm text-stone-700">Pet friendly 🐾</span>
+        <p className="text-xs text-stone-400">Aceptan mascotas</p>
+      </div>
+    </label>
+    <div>
+      <p className="text-sm font-medium text-stone-700 mb-3">Formas de pago</p>
+      <div className="flex gap-2 flex-wrap">
+        {[
+          { value: "efectivo", label: "Efectivo" },
+          { value: "debito", label: "Débito" },
+          { value: "credito", label: "Crédito" },
+          { value: "transferencia", label: "Transferencia" },
+          { value: "mercadopago", label: "Mercado Pago" },
+          { value: "qr", label: "QR" },
+        ].map(({ value, label }) => (
+          <button key={value}
+            onClick={() => {
+              const current = form.payment_methods
+              handleChange("payment_methods",
+                current.includes(value)
+                  ? current.filter((m: string) => m !== value)
+                  : [...current, value]
+              )
+            }}
+            className={`py-1.5 px-3 rounded-xl text-xs font-medium border transition-colors ${
+              form.payment_methods.includes(value)
+                ? "bg-primary-500 text-white border-primary-500"
+                : "bg-white text-stone-600 border-stone-200 hover:border-primary-300"
+            }`}>
+            {label}
+          </button>
+        ))}
+      </div>
+    </div>
+  </div>
+)}
 {/* Link al menú del día */}
 {form.section === "gastronomy" && (
   <div className="bg-white rounded-2xl border border-stone-200 p-6">

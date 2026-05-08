@@ -15,9 +15,9 @@ export default function MarqueeBand() {
     <div
       className="py-2.5 overflow-hidden"
       style={{
-        background: "rgba(200,96,58,0.08)",
-        borderTop: "1px solid rgba(200,96,58,0.1)",
-        borderBottom: "1px solid rgba(200,96,58,0.1)",
+        background: "rgba(45,69,48,0.06)",
+        borderTop: "1px solid rgba(45,69,48,0.08)",
+        borderBottom: "1px solid rgba(45,69,48,0.08)",
       }}
     >
       <div
@@ -31,10 +31,10 @@ export default function MarqueeBand() {
           <span
             key={i}
             className="text-xs font-medium tracking-widest uppercase inline-flex items-center"
-            style={{ color: "rgba(26,18,8,0.35)", marginRight: "2rem" }}
+            style={{ color: "rgba(45,69,48,0.4)", marginRight: "2rem" }}
           >
             {item}
-            <span style={{ color: "rgba(26,18,8,0.15)", marginLeft: "2rem" }}>✦</span>
+            <span style={{ color: "rgba(45,69,48,0.18)", marginLeft: "2rem" }}>✦</span>
           </span>
         ))}
       </div>

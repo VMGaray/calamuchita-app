@@ -29,11 +29,11 @@ export default function SectionsBar() {
       <nav
         className="hidden md:flex fixed right-0 top-1/2 -translate-y-1/2 z-40 flex-col gap-1 py-4 px-2"
         style={{
-          background: "rgba(245,237,224,0.85)",
+          background: "rgba(225,219,201,0.88)",
           backdropFilter: "blur(12px)",
-          borderLeft: "1px solid rgba(200,96,58,0.12)",
+          borderLeft: "1px solid rgba(45,69,48,0.12)",
           borderRadius: "16px 0 0 16px",
-          boxShadow: "-4px 0 24px rgba(100,50,20,0.06)",
+          boxShadow: "-4px 0 24px rgba(45,69,48,0.06)",
         }}
       >
         {sections.map(({ key, label, icon: Icon }) => {
@@ -50,7 +50,7 @@ export default function SectionsBar() {
               {/* Fondo hover/activo */}
               <motion.div
                 className="absolute inset-0 rounded-xl"
-                style={{ backgroundColor: "rgba(200,96,58,0.1)" }}
+                style={{ backgroundColor: "rgba(45,69,48,0.1)" }}
                 variants={{
                   rest:   { opacity: 0, scale: 0.9 },
                   hover:  { opacity: 1, scale: 1 },
@@ -59,11 +59,11 @@ export default function SectionsBar() {
                 transition={{ duration: 0.2 }}
               />
 
-              {/* Línea activa izquierda */}
+              {/* Línea activa derecha */}
               {isActive && (
                 <motion.div
                   className="absolute right-0 top-1/2 -translate-y-1/2 w-0.5 rounded-full"
-                  style={{ backgroundColor: "#c8603a", height: "60%" }}
+                  style={{ backgroundColor: "#2D4530", height: "60%" }}
                   layoutId="activeBar"
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
@@ -83,7 +83,7 @@ export default function SectionsBar() {
               >
                 <Icon
                   size={18}
-                  style={{ color: isActive ? "#c8603a" : "#6b3e1e" }}
+                  style={{ color: isActive ? "#2D4530" : "rgba(45,69,48,0.5)" }}
                 />
               </motion.div>
 
@@ -91,9 +91,9 @@ export default function SectionsBar() {
               <motion.span
                 className="relative z-10 text-[10px] font-medium text-center leading-tight"
                 variants={{
-                  rest:   { color: "#6b3e1e" },
-                  hover:  { color: "#3a1a08" },
-                  active: { color: "#c8603a" },
+                  rest:   { color: "rgba(45,69,48,0.55)" },
+                  hover:  { color: "#2D4530" },
+                  active: { color: "#2D4530" },
                 }}
                 transition={{ duration: 0.2 }}
               >
@@ -108,10 +108,10 @@ export default function SectionsBar() {
       <nav
         className="md:hidden fixed bottom-0 left-0 right-0 z-40 flex justify-around px-2 py-2"
         style={{
-          background: "rgba(245,237,224,0.95)",
+          background: "rgba(225,219,201,0.97)",
           backdropFilter: "blur(12px)",
-          borderTop: "1px solid rgba(200,96,58,0.12)",
-          boxShadow: "0 -4px 24px rgba(100,50,20,0.08)",
+          borderTop: "1px solid rgba(45,69,48,0.12)",
+          boxShadow: "0 -4px 24px rgba(45,69,48,0.06)",
         }}
       >
         {sections.map(({ key, label, icon: Icon }) => {
@@ -125,8 +125,8 @@ export default function SectionsBar() {
               whileHover="hover"
               initial="rest"
             >
-              <Icon size={18} style={{ color: isActive ? "#c8603a" : "rgba(42,26,8,0.4)" }} />
-              <span className="text-[9px] font-medium" style={{ color: isActive ? "#c8603a" : "rgba(42,26,8,0.45)" }}>
+              <Icon size={18} style={{ color: isActive ? "#2D4530" : "rgba(45,69,48,0.4)" }} />
+              <span className="text-[9px] font-medium" style={{ color: isActive ? "#2D4530" : "rgba(45,69,48,0.45)" }}>
                 {label}
               </span>
             </motion.button>

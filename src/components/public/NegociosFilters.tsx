@@ -34,7 +34,7 @@ export default function NegociosFilters({ params }: Props) {
           placeholder="Buscar por nombre..."
           defaultValue={params.q || ""}
           onChange={(e) => updateFilter("q", e.target.value)}
-          className="w-full bg-white border border-stone-200 rounded-2xl px-5 py-3 text-sm text-stone-700 placeholder:text-stone-400 outline-none focus:ring-2 focus:ring-primary-300"
+          className="w-full bg-white border border-stone-200 rounded-2xl px-5 py-3 text-sm text-stone-700 placeholder:text-stone-400 outline-none focus:ring-2 focus:ring-brand-pine/20"
         />
       </div>
 
@@ -47,8 +47,8 @@ export default function NegociosFilters({ params }: Props) {
               onClick={() => updateFilter("categoria", key)}
               className={`px-4 py-2 rounded-xl text-sm font-medium transition-colors ${
                 isActive
-                  ? "bg-primary-500 text-white"
-                  : "bg-white text-stone-600 border border-stone-200 hover:border-primary-300"
+                  ? "bg-brand-pine text-brand-sand"
+                  : "bg-white text-stone-600 border border-stone-200 hover:border-brand-pine/30"
               }`}
               whileTap={{ scale: 0.97 }}
             >
@@ -61,8 +61,8 @@ export default function NegociosFilters({ params }: Props) {
           onClick={() => updateFilter("abierto", params.abierto === "true" ? "" : "true")}
           className={`px-4 py-2 rounded-xl text-sm font-medium transition-colors ${
             params.abierto === "true"
-              ? "bg-primary-500 text-white"
-              : "bg-white text-stone-600 border border-stone-200 hover:border-primary-300"
+              ? "bg-brand-pine text-brand-sand"
+              : "bg-white text-stone-600 border border-stone-200 hover:border-brand-pine/30"
           }`}
           whileTap={{ scale: 0.97 }}
         >
@@ -73,8 +73,8 @@ export default function NegociosFilters({ params }: Props) {
           onClick={() => updateFilter("delivery", params.delivery === "true" ? "" : "true")}
           className={`px-4 py-2 rounded-xl text-sm font-medium transition-colors ${
             params.delivery === "true"
-              ? "bg-primary-500 text-white"
-              : "bg-white text-stone-600 border border-stone-200 hover:border-primary-300"
+              ? "bg-brand-pine text-brand-sand"
+              : "bg-white text-stone-600 border border-stone-200 hover:border-brand-pine/30"
           }`}
           whileTap={{ scale: 0.97 }}
         >

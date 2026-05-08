@@ -75,7 +75,7 @@ export default function BusinessesGrid() {
               <Card3D className="h-full">
                 <Link href={`/negocios/${business.slug}`} className="block h-full">
                   <div className="bg-white rounded-2xl overflow-hidden border border-stone-200 h-full">
-                    <div className="h-24 relative bg-primary-100">
+                    <div className="h-24 relative bg-brand-pine/10">
                       {business.cover_url ? (
                         <Image
                           src={business.cover_url}
@@ -96,11 +96,11 @@ export default function BusinessesGrid() {
                         {business.address && ` · ${business.address.split(",").pop()?.trim()}`}
                       </p>
                       <div className="flex items-center gap-1.5 flex-wrap">
-                        <span className="text-xs font-medium px-2 py-0.5 rounded-full bg-primary-100 text-primary-600">
+                        <span className="text-xs font-medium px-2 py-0.5 rounded-full bg-brand-pine/10 text-brand-pine">
                           Abierto
                         </span>
                         {business.offers_delivery && (
-                          <span className="text-xs font-medium px-2 py-0.5 rounded-full bg-blue-100 text-blue-600">
+                          <span className="text-xs font-medium px-2 py-0.5 rounded-full bg-brand-slate/10 text-brand-slate">
                             Delivery
                           </span>
                         )}

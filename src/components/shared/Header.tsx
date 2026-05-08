@@ -89,15 +89,15 @@ export default function Header() {
                       <div className="fixed inset-0 z-40" onClick={() => setMenuOpen(false)} />
                       <motion.div
                         className="absolute right-0 top-12 w-48 rounded-2xl overflow-hidden z-50"
-                        style={{ background: "rgba(246,225,213,0.95)", backdropFilter: "blur(16px)", border: "1px solid rgba(200,96,58,0.15)", boxShadow: "0 8px 32px rgba(100,50,20,0.12)" }}
+                        style={{ background: "rgba(225,219,201,0.97)", backdropFilter: "blur(16px)", border: "1px solid rgba(45,69,48,0.15)", boxShadow: "0 8px 32px rgba(45,69,48,0.1)" }}
                         initial={{ opacity: 0, y: -8, scale: 0.95 }}
                         animate={{ opacity: 1, y: 0, scale: 1 }}
                         exit={{ opacity: 0, y: -8, scale: 0.95 }}
                         transition={{ type: "spring", stiffness: 400, damping: 25 }}
                       >
-                        <div className="px-4 py-3" style={{ borderBottom: "1px solid rgba(200,96,58,0.1)" }}>
-                          <p className="text-sm font-medium" style={{ color: "#2a1a08" }}>{profile?.full_name}</p>
-                          <p className="text-xs" style={{ color: "rgba(42,26,8,0.5)" }}>
+                        <div className="px-4 py-3" style={{ borderBottom: "1px solid rgba(45,69,48,0.1)" }}>
+                          <p className="text-sm font-medium" style={{ color: "#2D4530" }}>{profile?.full_name}</p>
+                          <p className="text-xs" style={{ color: "rgba(45,69,48,0.5)" }}>
                             {profile?.role === "business" ? "Comercio" : profile?.role === "admin" ? "Admin" : "Cliente"}
                           </p>
                         </div>
@@ -105,20 +105,20 @@ export default function Header() {
                           {profile?.role === "business" && (
                             <Link href="/dashboard" onClick={() => setMenuOpen(false)}
                               className="flex items-center gap-2 px-3 py-2 text-sm rounded-xl transition-colors"
-                              style={{ color: "rgba(42,26,8,0.7)" }}>
+                              style={{ color: "rgba(45,69,48,0.75)" }}>
                               Mi panel
                             </Link>
                           )}
                           {profile?.role === "admin" && (
                             <Link href="/admin" onClick={() => setMenuOpen(false)}
                               className="flex items-center gap-2 px-3 py-2 text-sm rounded-xl transition-colors"
-                              style={{ color: "rgba(42,26,8,0.7)" }}>
+                              style={{ color: "rgba(45,69,48,0.75)" }}>
                               Panel admin
                             </Link>
                           )}
                           <button onClick={handleLogout}
                             className="w-full flex items-center gap-2 px-3 py-2 text-sm rounded-xl transition-colors"
-                            style={{ color: "#c8603a" }}>
+                            style={{ color: "#5E4B3B" }}>
                             Cerrar sesión
                           </button>
                         </div>
@@ -130,12 +130,12 @@ export default function Header() {
             ) : (
               <>
                 <Link href="/login" className="text-sm transition-colors"
-                  style={{ color: "rgba(42,26,8,0.6)" }}>
+                  style={{ color: "rgba(255,255,255,0.75)" }}>
                   Ingresar
                 </Link>
                 <Link href="/registro"
                   className="text-sm px-4 py-2 rounded-xl transition-colors"
-                  style={{ background: "rgba(200,96,58,0.12)", color: "#8a4e28", border: "1px solid rgba(200,96,58,0.2)" }}>
+                  style={{ background: "rgba(225,219,201,0.18)", color: "rgba(255,255,255,0.95)", border: "1px solid rgba(225,219,201,0.3)" }}>
                   Registrate
                 </Link>
               </>

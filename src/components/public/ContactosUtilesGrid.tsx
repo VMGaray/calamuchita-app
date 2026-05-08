@@ -41,20 +41,20 @@ const getIcon = (title: string) => {
 
 const contactColors: Record<string, { bg: string; icon: string; grad: string }> = {
   emergencias: {
-    bg: "bg-rose-50", icon: "text-rose-400",
-    grad: "from-[#fde8e8] to-[#fbd0d0]"
+    bg: "bg-brand-earth/10", icon: "text-brand-earth",
+    grad: "from-brand-earth/15 to-brand-earth/25"
   },
   salud: {
-    bg: "bg-sky-50", icon: "text-sky-400",
-    grad: "from-[#e0f2fe] to-[#bae6fd]"
+    bg: "bg-brand-pine/10", icon: "text-brand-pine",
+    grad: "from-brand-pine/15 to-brand-pine/25"
   },
   servicios: {
-    bg: "bg-amber-50", icon: "text-amber-400",
-    grad: "from-[#fef9c3] to-[#fde68a]"
+    bg: "bg-brand-slate/10", icon: "text-brand-slate",
+    grad: "from-brand-slate/15 to-brand-slate/25"
   },
   general: {
-    bg: "bg-slate-50", icon: "text-slate-400",
-    grad: "from-[#f1f5f9] to-[#e2e8f0]"
+    bg: "bg-brand-sand/50", icon: "text-brand-charcoal",
+    grad: "from-brand-sand/40 to-brand-sand/60"
   },
 }
 
@@ -218,16 +218,16 @@ function FlipCard({ contact }: { contact: Contact }) {
           style={{
             backfaceVisibility: "hidden",
             WebkitBackfaceVisibility: "hidden",
-            background: "rgba(255,255,255,0.7)",
+            background: "rgba(255,255,255,0.75)",
             backdropFilter: "blur(12px)",
             border: "1px solid rgba(255,255,255,0.9)",
-            boxShadow: "0 4px 20px rgba(0,0,0,0.06)",
+            boxShadow: "0 4px 20px rgba(45,69,48,0.06)",
           }}
         >
           <div className={`w-14 h-14 ${colors.bg} rounded-2xl flex items-center justify-center`}>
             <Icon size={26} className={colors.icon} />
           </div>
-          <p className="text-sm font-medium text-stone-700 text-center leading-tight">
+          <p className="text-sm font-medium text-center leading-tight" style={{ color: "#2D4530" }}>
             {contact.title}
           </p>
         </div>
@@ -242,9 +242,9 @@ function FlipCard({ contact }: { contact: Contact }) {
           }}
         >
           <div>
-            <p className="text-sm font-semibold text-stone-700 mb-1">{contact.title}</p>
+            <p className="text-sm font-semibold mb-1" style={{ color: "#2D4530" }}>{contact.title}</p>
             {contact.description && (
-              <p className="text-xs text-stone-500 leading-tight">{contact.description}</p>
+              <p className="text-xs leading-tight" style={{ color: "rgba(45,69,48,0.6)" }}>{contact.description}</p>
             )}
           </div>
           <div className="space-y-1.5">
@@ -254,25 +254,25 @@ function FlipCard({ contact }: { contact: Contact }) {
                 onClick={e => e.stopPropagation()}
                 className="flex items-center gap-2 hover:opacity-70 transition-opacity"
               >
-                <div className="w-6 h-6 bg-black/10 rounded-lg flex items-center justify-center flex-shrink-0">
-                  <Phone size={11} className="text-stone-600" />
+                <div className="w-6 h-6 rounded-lg flex items-center justify-center flex-shrink-0" style={{ background: "rgba(45,69,48,0.12)" }}>
+                  <Phone size={11} style={{ color: "#2D4530" }} />
                 </div>
-                <span className="text-sm font-medium text-stone-700">{contact.phone}</span>
+                <span className="text-sm font-medium" style={{ color: "#2D4530" }}>{contact.phone}</span>
               </a>
             ) : (
               <div className="flex items-center gap-2">
-                <div className="w-6 h-6 bg-black/10 rounded-lg flex items-center justify-center">
-                  <Phone size={11} className="text-stone-600" />
+                <div className="w-6 h-6 rounded-lg flex items-center justify-center" style={{ background: "rgba(45,69,48,0.12)" }}>
+                  <Phone size={11} style={{ color: "#2D4530" }} />
                 </div>
-                <span className="text-xs text-stone-400">Consultar número</span>
+                <span className="text-xs" style={{ color: "rgba(45,69,48,0.5)" }}>Consultar número</span>
               </div>
             )}
             {contact.schedule && (
               <div className="flex items-center gap-2">
-                <div className="w-6 h-6 bg-black/10 rounded-lg flex items-center justify-center flex-shrink-0">
-                  <Clock size={11} className="text-stone-600" />
+                <div className="w-6 h-6 rounded-lg flex items-center justify-center flex-shrink-0" style={{ background: "rgba(45,69,48,0.12)" }}>
+                  <Clock size={11} style={{ color: "#2D4530" }} />
                 </div>
-                <span className="text-xs text-stone-500">{contact.schedule}</span>
+                <span className="text-xs" style={{ color: "rgba(45,69,48,0.6)" }}>{contact.schedule}</span>
               </div>
             )}
           </div>
@@ -314,8 +314,8 @@ export default function ContactosUtilesGrid() {
     <div className="mb-12">
       <AnimateIn direction="left">
         <div className="flex items-center gap-2 mb-6">
-          <Phone size={18} style={{ color: "#c8603a" }} />
-          <h2 className="font-serif text-2xl" style={{ color: "#2a1a08" }}>
+          <Phone size={18} style={{ color: "#2D4530" }} />
+          <h2 className="font-serif text-2xl" style={{ color: "#2D4530" }}>
             Información Util
           </h2>
         </div>
@@ -333,14 +333,14 @@ export default function ContactosUtilesGrid() {
               style={
                 activeLocality === realIndex
                   ? {
-                      background: "#c8603a",
-                      color: "white",
-                      boxShadow: "0 4px 12px rgba(200,96,58,0.3)",
+                      background: "#2D4530",
+                      color: "#E1DBC9",
+                      boxShadow: "0 4px 12px rgba(45,69,48,0.25)",
                     }
                   : {
                       background: "rgba(255,255,255,0.6)",
-                      color: "rgba(42,26,8,0.6)",
-                      border: "1px solid rgba(200,96,58,0.15)",
+                      color: "rgba(45,69,48,0.65)",
+                      border: "1px solid rgba(45,69,48,0.15)",
                     }
               }
             >
@@ -354,9 +354,9 @@ export default function ContactosUtilesGrid() {
           onClick={handleToggleAll}
           className="flex items-center gap-1.5 px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 whitespace-nowrap"
           style={{
-            background: showAll ? "rgba(200,96,58,0.08)" : "rgba(255,255,255,0.6)",
-            color: "#c8603a",
-            border: "1px solid rgba(200,96,58,0.25)",
+            background: showAll ? "rgba(45,69,48,0.08)" : "rgba(255,255,255,0.6)",
+            color: "#2D4530",
+            border: "1px solid rgba(45,69,48,0.2)",
           }}
         >
           {showAll ? "− Menos localidades" : "+ Más localidades"}
@@ -387,8 +387,8 @@ export default function ContactosUtilesGrid() {
         animate={{ opacity: 1 }}
         className="mt-3 flex items-center gap-1.5"
       >
-        <MapPin size={11} style={{ color: "rgba(42,26,8,0.3)" }} />
-        <span className="text-xs" style={{ color: "rgba(42,26,8,0.35)" }}>
+        <MapPin size={11} style={{ color: "rgba(45,69,48,0.35)" }} />
+        <span className="text-xs" style={{ color: "rgba(45,69,48,0.4)" }}>
           {locality.contacts.length} contactos en {locality.name}
         </span>
       </motion.div>

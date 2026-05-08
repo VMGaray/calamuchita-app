@@ -1,10 +1,24 @@
 "use client"
 
 import { motion } from "framer-motion"
+import { useRouter } from "next/navigation"
+import { useState } from "react"
 import InteractiveText from "@/components/ui/InteractiveText"
 import MagneticButton from "@/components/ui/MagneticButton"
 
 export default function HeroSection() {
+  const router = useRouter()
+  const [query, setQuery] = useState("")
+
+  const handleSearch = () => {
+    if (!query.trim()) return
+    router.push(`/buscar?q=${encodeURIComponent(query.trim())}`)
+  }
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === "Enter") handleSearch()
+  }
+
   return (
     <section className="relative px-4 pt-8 pb-20 text-center overflow-hidden min-h-[340px] md:min-h-[480px]">
 
@@ -54,7 +68,7 @@ export default function HeroSection() {
         Gastronomía, salud, servicios, turismo y más. Explorá lo mejor del Valle de Calamuchita.
       </motion.p>
 
-      {/* Search — glassmorphism */}
+      {/* Search */}
       <motion.div
         className="relative z-10 flex max-w-lg mx-auto rounded-2xl overflow-hidden"
         style={{
@@ -70,13 +84,17 @@ export default function HeroSection() {
       >
         <input
           type="text"
+          value={query}
+          onChange={e => setQuery(e.target.value)}
+          onKeyDown={handleKeyDown}
           placeholder="Buscar restaurantes, servicios..."
           className="flex-1 bg-transparent border-none outline-none px-6 py-4 text-sm placeholder:text-stone-400"
-          style={{ color: "#2a1a08" }}
+          style={{ color: "#2D4530" }}
         />
         <MagneticButton
+          onClick={handleSearch}
           className="px-6 py-4 text-sm font-medium cursor-pointer"
-          style={{ background: "#c8603a", color: "white" }}
+          style={{ background: "#2D4530", color: "#E1DBC9" }}
         >
           Buscar
         </MagneticButton>

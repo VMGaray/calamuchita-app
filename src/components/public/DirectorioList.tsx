@@ -110,11 +110,11 @@ export default function DirectorioList({ section, filters }: Props) {
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Buscar por nombre..."
-            className="flex-1 bg-white border border-stone-200 rounded-2xl px-5 py-3 text-sm text-stone-700 placeholder:text-stone-400 outline-none focus:ring-2 focus:ring-primary-300"
+            className="flex-1 bg-white border border-stone-200 rounded-2xl px-5 py-3 text-sm text-stone-700 placeholder:text-stone-400 outline-none focus:ring-2 focus:ring-brand-pine/20"
           />
           <button
             type="submit"
-            className="bg-primary-500 text-primary-100 px-5 py-3 rounded-2xl text-sm font-medium hover:bg-primary-400 transition-colors"
+            className="bg-brand-pine text-brand-sand px-5 py-3 rounded-2xl text-sm font-medium hover:opacity-90 transition-colors"
           >
             Buscar
           </button>
@@ -126,7 +126,7 @@ export default function DirectorioList({ section, filters }: Props) {
         <button
           onClick={() => updateFilter("pueblo", "")}
           className={`px-3 py-1.5 rounded-xl text-xs border transition-colors ${
-            !filters.pueblo ? "bg-primary-500 text-primary-100 border-primary-500" : "bg-white text-stone-600 border-stone-200 hover:border-primary-300"
+            !filters.pueblo ? "bg-brand-pine text-brand-sand border-brand-pine" : "bg-white text-stone-600 border-stone-200 hover:border-brand-pine/30"
           }`}
         >
           Todos los pueblos
@@ -136,7 +136,7 @@ export default function DirectorioList({ section, filters }: Props) {
             key={p}
             onClick={() => updateFilter("pueblo", p)}
             className={`px-3 py-1.5 rounded-xl text-xs border transition-colors ${
-              filters.pueblo === p ? "bg-primary-500 text-primary-100 border-primary-500" : "bg-white text-stone-600 border-stone-200 hover:border-primary-300"
+              filters.pueblo === p ? "bg-brand-pine text-brand-sand border-brand-pine" : "bg-white text-stone-600 border-stone-200 hover:border-brand-pine/30"
             }`}
           >
             {p.replace("Villa General Belgrano", "VGB").replace("Santa Rosa de Calamuchita", "Santa Rosa")}
@@ -154,7 +154,7 @@ export default function DirectorioList({ section, filters }: Props) {
               key={label}
               onClick={() => updateFilter("cat", catKey)}
               className={`px-4 py-2 rounded-xl text-sm border transition-colors ${
-                isActive ? "bg-primary-500 text-primary-100 border-primary-500" : "bg-white text-stone-600 border-stone-200 hover:border-primary-300"
+                isActive ? "bg-brand-pine text-brand-sand border-brand-pine" : "bg-white text-stone-600 border-stone-200 hover:border-brand-pine/30"
               }`}
             >
               {label}
@@ -181,12 +181,12 @@ export default function DirectorioList({ section, filters }: Props) {
 
                     {/* Parte clickeable → va al detalle */}
                     <Link href={`/directorio/${section}/${business.slug}`} className="block">
-                      <div className="h-32 relative bg-primary-100">
+                      <div className="h-32 relative bg-brand-pine/10">
                         {business.cover_url ? (
                           <img src={business.cover_url} alt={business.name} className="w-full h-full object-cover" />
                         ) : (
                           <div className="w-full h-full flex items-center justify-center">
-                            <div className="w-12 h-12 bg-white/60 rounded-full flex items-center justify-center font-serif text-xl text-primary-400">
+                            <div className="w-12 h-12 bg-white/60 rounded-full flex items-center justify-center font-serif text-xl text-brand-pine/40">
                               {business.name[0]}
                             </div>
                           </div>
@@ -195,7 +195,7 @@ export default function DirectorioList({ section, filters }: Props) {
                       <div className="px-4 pt-4 pb-2">
                         <h3 className="text-base font-medium text-stone-800 mb-0.5">{business.name}</h3>
                         {business.subcategory && (
-                          <span className="inline-block text-xs font-medium px-2 py-0.5 rounded-full bg-primary-100 text-primary-600 mb-2">
+                          <span className="inline-block text-xs font-medium px-2 py-0.5 rounded-full bg-brand-pine/10 text-brand-pine mb-2">
                             {business.subcategory}
                           </span>
                         )}
@@ -218,7 +218,7 @@ export default function DirectorioList({ section, filters }: Props) {
                       {business.phone && (
                         <a
                           href={`tel:${business.phone}`}
-                          className="flex items-center gap-2 text-xs text-primary-500 hover:text-primary-600"
+                          className="flex items-center gap-2 text-xs text-brand-pine hover:text-brand-earth"
                         >
                           <Phone size={12} />
                           <span>{business.phone}</span>
@@ -229,7 +229,7 @@ export default function DirectorioList({ section, filters }: Props) {
                           href={`https://instagram.com/${business.instagram.replace("@", "")}`}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="flex items-center gap-2 text-xs text-primary-500 hover:text-primary-600"
+                          className="flex items-center gap-2 text-xs text-brand-pine hover:text-brand-earth"
                         >
                           <AtSign size={12} />
                           <span>{business.instagram}</span>
