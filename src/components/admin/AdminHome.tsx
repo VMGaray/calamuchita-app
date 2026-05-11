@@ -5,6 +5,7 @@ import Link from "next/link"
 import { createClient } from "@/lib/supabase/client"
 import AnimateIn from "@/components/ui/AnimateIn"
 import AnimatedCounter from "@/components/ui/AnimatedCounter"
+import { Eye, MessageCircle } from "lucide-react"
 
 const sectionLabels: Record<string, string> = {
   gastronomy: "Gastronomía",
@@ -22,6 +23,8 @@ export default function AdminHome() {
     active: 0,
     pending: 0,
     users: 0,
+    totalViews: 0,
+    totalLeads: 0,
     sections: {} as Record<string, number>
   })
   const [loading, setLoading] = useState(true)
@@ -34,12 +37,14 @@ export default function AdminHome() {
         { count: active },
         { count: pending },
         { count: users },
-        { data: businesses }
+        { data: businesses },
+        { data: analytics },
       ] = await Promise.all([
         supabase.from("businesses").select("*", { count: "exact", head: true }).eq("status", "active"),
         supabase.from("businesses").select("*", { count: "exact", head: true }).eq("status", "pending"),
         supabase.from("profiles").select("*", { count: "exact", head: true }),
         supabase.from("businesses").select("section").eq("status", "active"),
+        supabase.from("businesses").select("total_views, total_leads"),
       ])
 
       const sections: Record<string, number> = {}
@@ -47,10 +52,15 @@ export default function AdminHome() {
         sections[b.section] = (sections[b.section] || 0) + 1
       })
 
+      const totalViews = (analytics ?? []).reduce((s: number, b: { total_views?: number | null }) => s + (b.total_views ?? 0), 0)
+      const totalLeads = (analytics ?? []).reduce((s: number, b: { total_leads?: number | null }) => s + (b.total_leads ?? 0), 0)
+
       setStats({
         active: active || 0,
         pending: pending || 0,
         users: users || 0,
+        totalViews,
+        totalLeads,
         sections,
       })
       setLoading(false)
@@ -67,29 +77,59 @@ export default function AdminHome() {
       </div>
 
       {/* Métricas */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+      <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-4">
         <AnimateIn direction="up" delay={0}>
-          <div className="bg-white rounded-2xl border border-stone-200 p-6">
+          <div className="bg-white rounded-2xl border border-stone-200 p-5">
             <p className="text-xs text-stone-400 uppercase tracking-wider mb-2">Negocios activos</p>
             <p className="text-3xl font-serif text-stone-800">
-              {loading ? "..." : <AnimatedCounter to={stats.active} />}
+              {loading ? "…" : <AnimatedCounter to={stats.active} />}
+            </p>
+          </div>
+        </AnimateIn>
+        <AnimateIn direction="up" delay={0.05}>
+          <div className="bg-white rounded-2xl border border-stone-200 p-5">
+            <p className="text-xs text-stone-400 uppercase tracking-wider mb-2">Pendientes</p>
+            <p className="text-3xl font-serif text-stone-800">
+              {loading ? "…" : <AnimatedCounter to={stats.pending} />}
             </p>
           </div>
         </AnimateIn>
         <AnimateIn direction="up" delay={0.1}>
-          <div className="bg-white rounded-2xl border border-stone-200 p-6">
-            <p className="text-xs text-stone-400 uppercase tracking-wider mb-2">Pendientes de aprobación</p>
+          <div className="bg-white rounded-2xl border border-stone-200 p-5 col-span-2 md:col-span-1">
+            <p className="text-xs text-stone-400 uppercase tracking-wider mb-2">Usuarios registrados</p>
             <p className="text-3xl font-serif text-stone-800">
-              {loading ? "..." : <AnimatedCounter to={stats.pending} />}
+              {loading ? "…" : <AnimatedCounter to={stats.users} />}
             </p>
           </div>
         </AnimateIn>
+      </div>
+
+      {/* Analytics totales */}
+      <div className="grid grid-cols-2 gap-4 mb-8">
+        <AnimateIn direction="up" delay={0.15}>
+          <div className="rounded-2xl border p-5 flex items-center gap-4" style={{ background: "rgba(45,69,48,0.06)", borderColor: "rgba(45,69,48,0.15)" }}>
+            <div className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0" style={{ background: "rgba(45,69,48,0.12)" }}>
+              <Eye size={16} style={{ color: "#2D4530" }} />
+            </div>
+            <div>
+              <p className="text-xs uppercase tracking-wider mb-0.5" style={{ color: "rgba(45,69,48,0.6)" }}>Vistas totales</p>
+              <p className="text-2xl font-serif" style={{ color: "#2D4530" }}>
+                {loading ? "…" : <AnimatedCounter to={stats.totalViews} />}
+              </p>
+            </div>
+          </div>
+        </AnimateIn>
         <AnimateIn direction="up" delay={0.2}>
-          <div className="bg-white rounded-2xl border border-stone-200 p-6">
-            <p className="text-xs text-stone-400 uppercase tracking-wider mb-2">Usuarios registrados</p>
-            <p className="text-3xl font-serif text-stone-800">
-              {loading ? "..." : <AnimatedCounter to={stats.users} />}
-            </p>
+          <div className="rounded-2xl border p-5 flex items-center gap-4" style={{ background: "rgba(37,211,102,0.06)", borderColor: "rgba(37,211,102,0.2)" }}>
+            <div className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0" style={{ background: "rgba(37,211,102,0.1)" }}>
+              <MessageCircle size={16} style={{ color: "#128C7E" }} />
+            </div>
+            <div>
+              <p className="text-xs uppercase tracking-wider mb-0.5" style={{ color: "rgba(18,140,126,0.7)" }}>Contactos WA</p>
+              <p className="text-2xl font-serif" style={{ color: "#128C7E" }}>
+                {loading ? "…" : <AnimatedCounter to={stats.totalLeads} />}
+              </p>
+            </div>
           </div>
         </AnimateIn>
       </div>
@@ -110,6 +150,10 @@ export default function AdminHome() {
               </Link>
               <Link href="/admin/info-util" className="flex items-center justify-between p-3 rounded-xl hover:bg-stone-50 transition-colors">
                 <span className="text-sm text-stone-600">Gestionar info útil</span>
+                <span className="text-primary-500 text-sm">→</span>
+              </Link>
+              <Link href="/admin/marketing" className="flex items-center justify-between p-3 rounded-xl hover:bg-stone-50 transition-colors">
+                <span className="text-sm text-stone-600">Generar QR y calcomanías</span>
                 <span className="text-primary-500 text-sm">→</span>
               </Link>
             </div>

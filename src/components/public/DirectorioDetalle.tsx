@@ -1,5 +1,6 @@
 "use client"
 
+import { useEffect } from "react"
 import { motion } from "framer-motion"
 import AnimateIn from "@/components/ui/AnimateIn"
 import Image from "next/image"
@@ -10,6 +11,7 @@ import {
   UtensilsCrossed, Star
 } from "lucide-react"
 import WhatsAppLeadButton from "@/components/public/WhatsAppLeadButton"
+import { createClient } from "@/lib/supabase/client"
 
 const dayNames = ["Domingo", "Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado"]
 
@@ -39,6 +41,10 @@ interface Props {
 
 export default function DirectorioDetalle({ business, section }: Props) {
   const photos = business.business_photos || []
+
+  useEffect(() => {
+    createClient().rpc("increment_view", { business_id: business.id }).then()
+  }, [business.id])
 
   return (
     <div className="min-h-screen">

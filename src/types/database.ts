@@ -48,6 +48,8 @@ export interface Business {
   accepts_reservations: boolean // ← nuevo
   is_open: boolean
   is_premium?: boolean
+  total_views?: number
+  total_leads?: number
   offers_delivery: boolean
   offers_takeaway: boolean
   offers_dine_in: boolean

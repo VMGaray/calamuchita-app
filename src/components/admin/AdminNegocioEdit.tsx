@@ -9,6 +9,7 @@ import ImageUpload from "@/components/ui/ImageUpload"
 import PdfUpload from "@/components/ui/PdfUpload"
 import HorariosEditor, { HorarioDay } from "@/components/ui/HorariosEditor"
 import { ArrowLeft } from "lucide-react"
+import QRMarketing from "@/components/admin/QRMarketing"
 
 const sections: { value: BusinessSection; label: string }[] = [
   { value: "gastronomy", label: "Gastronomía" },
@@ -462,6 +463,9 @@ export default function AdminNegocioEdit({ id }: Props) {
     </div>
   </div>
 )}
+        {/* QR Marketing */}
+        <QRMarketing name={form.name} slug={form.slug} section={form.section} />
+
         {/* Botones */}
         <div className="flex gap-3">
           <button onClick={() => router.back()}

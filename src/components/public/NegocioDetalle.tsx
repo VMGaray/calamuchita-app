@@ -9,6 +9,7 @@ import Image from "next/image"
 import ReservaWhatsApp from "@/components/public/ReservaWhatsApp"
 import CartaInteractiva from "@/components/public/CartaInteractiva"
 import WhatsAppLeadButton from "@/components/public/WhatsAppLeadButton"
+import { createClient } from "@/lib/supabase/client"
 
 
 const dayNames = ["Domingo", "Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado"]
@@ -25,7 +26,8 @@ export default function NegocioDetalle({ business }: Props) {
       const y = infoRef.current.getBoundingClientRect().top + window.pageYOffset - 90
       window.scrollTo({ top: y, behavior: "smooth" })
     }
-  }, [])
+    createClient().rpc("increment_view", { business_id: business.id }).then()
+  }, [business.id])
 
   const todayMenu = business.daily_menus?.find((m: any) => {
     const today = new Date().toISOString().split("T")[0]

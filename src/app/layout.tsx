@@ -1,5 +1,12 @@
-import type { Metadata } from "next"
+import type { Metadata, Viewport } from "next"
 import "./globals.css"
+
+export const viewport: Viewport = {
+  themeColor: "#2D4530",
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 1,
+}
 import ClientOnly from "@/components/ui/ClientOnly"
 import PageTransition from "@/components/ui/PageTransition"
 import ScrollToTop from "@/components/ui/ScrollToTop"
@@ -19,6 +26,17 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary_large_image",
     images: ["/valle.jpg"],
+  },
+  // PWA
+  applicationName: "Calamuchita App",
+  appleWebApp: {
+    capable: true,
+    title: "Calamuchita",
+    statusBarStyle: "black-translucent",
+  },
+  formatDetection: { telephone: false },
+  icons: {
+    apple: [{ url: "/icons/apple-icon-180.png", sizes: "180x180" }],
   },
 }
 
