@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef } from "react"
 import AnimateIn from "@/components/ui/AnimateIn"
 import Card3D from "@/components/ui/Card3D"
 import { SkeletonBusinessGrid } from "@/components/ui/Skeleton"
@@ -38,6 +38,8 @@ const categoryLabel: Record<string, string> = {
 export default function NegociosList({ params }: Props) {
   const [businesses, setBusinesses] = useState<Business[]>([])
   const [loading, setLoading] = useState(true)
+  const resultsRef = useRef<HTMLDivElement>(null)
+  const isFirstRender = useRef(true)
 
   useEffect(() => {
     const fetchBusinesses = async () => {
@@ -63,6 +65,17 @@ export default function NegociosList({ params }: Props) {
     fetchBusinesses()
   }, [params.categoria, params.abierto, params.delivery, params.q])
 
+  // Scroll suave a los resultados cuando terminan de cargar (no en el primer render)
+  useEffect(() => {
+    if (isFirstRender.current) {
+      isFirstRender.current = false
+      return
+    }
+    if (!loading && resultsRef.current) {
+      resultsRef.current.scrollIntoView({ behavior: "smooth", block: "start" })
+    }
+  }, [loading])
+
   if (loading) return <SkeletonBusinessGrid count={6} />
 
   if (businesses.length === 0) {
@@ -74,7 +87,7 @@ export default function NegociosList({ params }: Props) {
   }
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+    <div ref={resultsRef} className="scroll-mt-28 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
       {businesses.map(({ id, name, slug, category, subcategory, address, logo_url, cover_url, is_open, offers_delivery, description }, i) => (
         <AnimateIn key={id} direction="up" delay={i * 0.07}>
           <Card3D className="h-full">

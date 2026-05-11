@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
 import AnimateIn from "@/components/ui/AnimateIn"
 import Card3D from "@/components/ui/Card3D"
@@ -55,6 +55,8 @@ export default function DirectorioList({ section, filters }: Props) {
   const [businesses, setBusinesses] = useState<Business[]>([])
   const [loading, setLoading] = useState(true)
   const [search, setSearch] = useState(filters.q || "")
+  const resultsRef = useRef<HTMLDivElement>(null)
+  const isFirstRender = useRef(true)
 
   const categories = sectionCategories[section] || []
   const activeCategory = filters.cat || ""
@@ -65,7 +67,7 @@ export default function DirectorioList({ section, filters }: Props) {
       const supabase = createClient()
       let query = supabase
         .from("businesses")
-        .select("id, name, slug, subcategory, address, phone, instagram, logo_url, cover_url, description")
+        .select("id, name, slug, subcategory, address, phone, whatsapp, instagram, logo_url, cover_url, description")
         .eq("status", "active")
         .eq("section", section)
 
@@ -87,6 +89,17 @@ export default function DirectorioList({ section, filters }: Props) {
     }
     fetchBusinesses()
   }, [section, activeCategory, filters.q, filters.pueblo])
+
+  // Scroll suave a los resultados cuando terminan de cargar (no en el primer render)
+  useEffect(() => {
+    if (isFirstRender.current) {
+      isFirstRender.current = false
+      return
+    }
+    if (!loading && resultsRef.current) {
+      resultsRef.current.scrollIntoView({ behavior: "smooth", block: "start" })
+    }
+  }, [loading])
 
   const updateFilter = (key: string, value: string) => {
     const current = new URLSearchParams(searchParams.toString())
@@ -121,13 +134,17 @@ export default function DirectorioList({ section, filters }: Props) {
         </div>
       </form>
 
-      {/* Filtro por pueblo */}
-      <div className="flex gap-2 flex-wrap mb-4">
+      {/* Filtro por pueblo — scroll horizontal en mobile, wrap en desktop */}
+      <div
+        className="flex gap-2 mb-4 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden md:flex-wrap"
+        style={{ scrollSnapType: "x mandatory", paddingBottom: "2px" }}
+      >
         <button
           onClick={() => updateFilter("pueblo", "")}
-          className={`px-3 py-1.5 rounded-xl text-xs border transition-colors ${
+          className={`flex-shrink-0 px-3 py-1.5 rounded-xl text-xs border transition-colors whitespace-nowrap ${
             !filters.pueblo ? "bg-brand-pine text-brand-sand border-brand-pine" : "bg-white text-stone-600 border-stone-200 hover:border-brand-pine/30"
           }`}
+          style={{ scrollSnapAlign: "start" }}
         >
           Todos los pueblos
         </button>
@@ -135,9 +152,10 @@ export default function DirectorioList({ section, filters }: Props) {
           <button
             key={p}
             onClick={() => updateFilter("pueblo", p)}
-            className={`px-3 py-1.5 rounded-xl text-xs border transition-colors ${
+            className={`flex-shrink-0 px-3 py-1.5 rounded-xl text-xs border transition-colors whitespace-nowrap ${
               filters.pueblo === p ? "bg-brand-pine text-brand-sand border-brand-pine" : "bg-white text-stone-600 border-stone-200 hover:border-brand-pine/30"
             }`}
+            style={{ scrollSnapAlign: "start" }}
           >
             {p.replace("Villa General Belgrano", "VGB").replace("Santa Rosa de Calamuchita", "Santa Rosa")}
           </button>
@@ -163,7 +181,8 @@ export default function DirectorioList({ section, filters }: Props) {
         })}
       </div>
 
-      {/* Resultados */}
+      {/* Resultados — ref para scroll automático al cambiar filtros */}
+      <div ref={resultsRef} className="scroll-mt-28">
       {loading ? (
         <SkeletonBusinessGrid count={6} />
       ) : businesses.length === 0 ? (
@@ -244,6 +263,7 @@ export default function DirectorioList({ section, filters }: Props) {
           </div>
         </>
       )}
+      </div>
     </div>
   )
 }

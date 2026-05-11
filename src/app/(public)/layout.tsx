@@ -2,6 +2,7 @@ import Header from "@/components/shared/Header"
 import HeroSection from "@/components/public/HeroSection"
 import StickyCategoryBar from "@/components/public/StickyCategoryBar"
 import Footer from "@/components/shared/Footer"
+import { LocalidadProvider } from "@/lib/context/LocalidadContext"
 import { headers } from "next/headers"
 
 export default async function PublicLayout({
@@ -58,15 +59,17 @@ export default async function PublicLayout({
         </div>
       </div>
 
-      <div className="relative -mt-20 z-30 flex flex-col flex-1">
-        <StickyCategoryBar />
-        <main className="flex-1">
-          {children}
-        </main>
-        <div className="pb-20 md:pb-0">
-          <Footer />
+      <LocalidadProvider>
+        <div className="relative -mt-20 z-30 flex flex-col flex-1">
+          <StickyCategoryBar />
+          <main className="flex-1">
+            {children}
+          </main>
+          <div className="pb-20 md:pb-0">
+            <Footer />
+          </div>
         </div>
-      </div>
+      </LocalidadProvider>
     </div>
   )
 }

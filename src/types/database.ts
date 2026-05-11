@@ -47,12 +47,25 @@ export interface Business {
   menu_link: string | null      // ← nuevo
   accepts_reservations: boolean // ← nuevo
   is_open: boolean
+  is_premium?: boolean
   offers_delivery: boolean
   offers_takeaway: boolean
   offers_dine_in: boolean
   status: BusinessStatus
   created_at: string
   updated_at: string
+}
+
+export interface Promotion {
+  id: string
+  business_id: string
+  title: string
+  description: string | null
+  discount_percent: number | null
+  discount_label: string | null
+  valid_until: string
+  is_active: boolean
+  created_at: string
 }
 
 export interface BusinessHours {

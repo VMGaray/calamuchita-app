@@ -72,14 +72,14 @@ export const sectionCategories = {
     { label: "Todos", desc: "Ver todos los eventos", href: "/directorio/events", bg: "bg-brand-sand/50", color: "text-brand-charcoal" },
   ],
   info: [
-    { label: "Cooperativas", desc: "Luz, agua y gas", href: "/directorio/info?cat=cooperativas", bg: "bg-brand-slate/10", color: "text-brand-slate" },
-    { label: "Emergencias", desc: "Bomberos, policía, SAME", href: "/directorio/info?cat=emergencias", bg: "bg-brand-earth/10", color: "text-brand-earth" },
-    { label: "Farmacias de turno", desc: "Guardia 24hs", href: "/directorio/info?cat=farmacias", bg: "bg-brand-pine/10", color: "text-brand-pine" },
-    { label: "Municipalidad", desc: "Trámites y contacto", href: "/directorio/info?cat=municipalidad", bg: "bg-brand-pine/10", color: "text-brand-pine" },
-    { label: "Transporte", desc: "Horarios de buses", href: "/directorio/info?cat=transporte", bg: "bg-brand-slate/10", color: "text-brand-slate" },
-    { label: "Turismo oficial", desc: "Oficinas de turismo", href: "/directorio/info?cat=turismo", bg: "bg-brand-pine/10", color: "text-brand-pine" },
-    { label: "Varios", desc: "Otra información útil", href: "/directorio/info?cat=varios", bg: "bg-brand-sand/50", color: "text-brand-charcoal" },
-    { label: "Todos", desc: "Ver toda la info útil", href: "/directorio/info", bg: "bg-brand-sand/50", color: "text-brand-charcoal" },
+    { label: "Cooperativas", desc: "Luz, agua y gas", href: "/info-util?categoria=cooperativas", bg: "bg-brand-slate/10", color: "text-brand-slate" },
+    { label: "Emergencias", desc: "Bomberos, policía, SAME", href: "/info-util?categoria=emergencias", bg: "bg-brand-earth/10", color: "text-brand-earth" },
+    { label: "Farmacias de turno", desc: "Guardia 24hs", href: "/info-util?categoria=farmacias", bg: "bg-brand-pine/10", color: "text-brand-pine" },
+    { label: "Municipalidad", desc: "Trámites y contacto", href: "/info-util?categoria=municipalidad", bg: "bg-brand-pine/10", color: "text-brand-pine" },
+    { label: "Transporte", desc: "Horarios de buses", href: "/info-util?categoria=transporte", bg: "bg-brand-slate/10", color: "text-brand-slate" },
+    { label: "Turismo oficial", desc: "Oficinas de turismo", href: "/info-util?categoria=turismo", bg: "bg-brand-pine/10", color: "text-brand-pine" },
+    { label: "Varios", desc: "Otra información útil", href: "/info-util?categoria=varios", bg: "bg-brand-sand/50", color: "text-brand-charcoal" },
+    { label: "Todos", desc: "Ver toda la info útil", href: "/info-util", bg: "bg-brand-sand/50", color: "text-brand-charcoal" },
   ],
 }
 

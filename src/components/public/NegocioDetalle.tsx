@@ -1,5 +1,6 @@
 "use client"
 
+import { useEffect, useRef } from "react"
 import { motion } from "framer-motion"
 import AnimateIn from "@/components/ui/AnimateIn"
 import { Phone, AtSign, MapPin, Clock, Truck, ShoppingBag, UtensilsCrossed, ArrowLeft } from "lucide-react"
@@ -7,6 +8,7 @@ import Link from "next/link"
 import Image from "next/image"
 import ReservaWhatsApp from "@/components/public/ReservaWhatsApp"
 import CartaInteractiva from "@/components/public/CartaInteractiva"
+import WhatsAppLeadButton from "@/components/public/WhatsAppLeadButton"
 
 
 const dayNames = ["Domingo", "Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado"]
@@ -16,6 +18,15 @@ interface Props {
 }
 
 export default function NegocioDetalle({ business }: Props) {
+  const infoRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    if (infoRef.current) {
+      const y = infoRef.current.getBoundingClientRect().top + window.pageYOffset - 90
+      window.scrollTo({ top: y, behavior: "smooth" })
+    }
+  }, [])
+
   const todayMenu = business.daily_menus?.find((m: any) => {
     const today = new Date().toISOString().split("T")[0]
     return m.date === today && m.is_published
@@ -55,8 +66,8 @@ export default function NegocioDetalle({ business }: Props) {
         )}
       </div>
 
-      {/* Contenido */}
-      <div className="max-w-4xl mx-auto px-4 pt-16 pb-12">
+      {/* Contenido — destino del scroll automático */}
+      <div ref={infoRef} className="scroll-mt-24 max-w-4xl mx-auto px-4 pt-16 pb-12">
 
         {/* Header */}
         <AnimateIn direction="up">
@@ -213,6 +224,16 @@ export default function NegocioDetalle({ business }: Props) {
                   )}
                 </div>
               </div>
+            </AnimateIn>
+
+            {/* WhatsApp Lead — todas las categorías */}
+            <AnimateIn direction="right" delay={0.12}>
+              <WhatsAppLeadButton
+                businessId={business.id}
+                businessName={business.name}
+                whatsapp={business.whatsapp ?? null}
+                phone={business.phone ?? null}
+              />
             </AnimateIn>
 
             {/* Reserva */}

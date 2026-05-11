@@ -20,7 +20,7 @@ export default function HeroSection() {
   }
 
   return (
-    <section className="relative px-4 pt-8 pb-20 text-center overflow-hidden min-h-[340px] md:min-h-[480px]">
+    <section className="relative px-4 pt-6 md:pt-8 pb-16 md:pb-20 text-center overflow-hidden min-h-[300px] md:min-h-[480px]">
 
       {/* Eyebrow */}
       <motion.span
@@ -53,7 +53,7 @@ export default function HeroSection() {
 
       {/* Subtitle */}
       <motion.p
-        className="relative z-10 text-base max-w-lg mx-auto mb-10 leading-relaxed px-5 py-3 rounded-2xl"
+        className="relative z-10 text-sm md:text-base max-w-lg mx-auto mb-7 md:mb-10 leading-relaxed px-4 md:px-5 py-2.5 md:py-3 rounded-2xl"
         style={{
           color: "rgba(255,255,255,0.95)",
           background: "rgba(0,0,0,0.25)",
