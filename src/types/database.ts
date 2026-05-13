@@ -182,3 +182,37 @@ export interface BusinessPhoto {
   sort_order: number
   created_at: string
 }
+
+export interface Locality {
+  id: string
+  name: string
+  slug: string
+  sort_order: number
+  created_at: string
+}
+
+export interface UtilityService {
+  id: string
+  locality_id: string
+  name: string
+  category: string
+  phone: string | null
+  address: string | null
+  description: string | null
+  is_active: boolean
+  sort_order: number
+  created_at: string
+}
+
+export interface TransportSchedule {
+  id: string
+  company: string
+  origin_id: string
+  destination_id: string
+  departure_time: string
+  arrival_time: string | null
+  days: string[]
+  notes: string | null
+  is_active: boolean
+  created_at: string
+}

@@ -4,6 +4,7 @@ import CalamuchitaSale from "@/components/public/CalamuchitaSale"
 import StatsSection from "@/components/public/StatsSection"
 import CtaBusiness from "@/components/public/CtaBusiness"
 import WaveDivider from "@/components/public/WaveDivider"
+import LocalidadSelectorWidget from "@/components/public/LocalidadSelectorWidget"
 import { createClient } from "@/lib/supabase/server"
 import { LOCALIDADES } from "@/lib/constants/telefonos"
 
@@ -104,6 +105,9 @@ export default async function HomePage() {
         <div className="max-w-6xl mx-auto px-4 py-10">
           <JoyasDelValle businesses={featuredBusinesses} />
           <CalamuchitaSale promotions={activePromotions} />
+          <div className="mt-10">
+            <LocalidadSelectorWidget />
+          </div>
           <StatsSection
             pueblosCount={LOCALIDADES.length}
             comerciosCount={comerciosCount ?? 0}

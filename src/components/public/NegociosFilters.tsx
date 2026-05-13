@@ -11,6 +11,18 @@ const categories = [
   { key: "bar", label: "Bares" },
 ]
 
+const pillActive = {
+  background: "#2D4530",
+  color: "#E1DBC9",
+  border: "1.5px solid #A3B18A",
+  boxShadow: "0 0 12px rgba(163,177,138,0.40)",
+}
+const pillInactive = {
+  background: "rgba(45,69,48,0.70)",
+  color: "rgba(225,219,201,0.85)",
+  border: "1px solid rgba(163,177,138,0.15)",
+}
+
 interface Props {
   params: { categoria?: string; abierto?: string; delivery?: string; q?: string }
 }
@@ -27,30 +39,45 @@ export default function NegociosFilters({ params }: Props) {
   }
 
   return (
-    <div className="mb-6 space-y-4">
+    <div className="mb-6 space-y-3">
+      {/* Búsqueda */}
       <div className="relative">
         <input
           type="text"
           placeholder="Buscar por nombre..."
           defaultValue={params.q || ""}
           onChange={(e) => updateFilter("q", e.target.value)}
-          className="w-full bg-white border border-stone-200 rounded-2xl px-5 py-3 text-sm text-stone-700 placeholder:text-stone-400 outline-none focus:ring-2 focus:ring-brand-pine/20"
+          className="w-full rounded-2xl px-5 py-3 text-sm outline-none placeholder:text-white/40"
+          style={{
+            background: "rgba(255,255,255,0.10)",
+            backdropFilter: "blur(16px)",
+            WebkitBackdropFilter: "blur(16px)",
+            border: "1px solid rgba(255,255,255,0.20)",
+            color: "#E1DBC9",
+          }}
         />
       </div>
 
-      <div className="flex gap-2 flex-wrap">
+      {/* Filtros — scroll horizontal sin wrap + fade derecho */}
+      <div
+        className="flex gap-2 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+        style={{
+          paddingBottom: "2px",
+          WebkitMaskImage: "linear-gradient(to right, black 80%, transparent 100%)",
+          maskImage: "linear-gradient(to right, black 80%, transparent 100%)",
+        }}
+      >
         {categories.map(({ key, label }) => {
           const isActive = (params.categoria || "") === key
           return (
             <motion.button
               key={key}
               onClick={() => updateFilter("categoria", key)}
-              className={`px-4 py-2 rounded-xl text-sm font-medium transition-colors ${
-                isActive
-                  ? "bg-brand-pine text-brand-sand"
-                  : "bg-white text-stone-600 border border-stone-200 hover:border-brand-pine/30"
-              }`}
-              whileTap={{ scale: 0.97 }}
+              className="flex-shrink-0 px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap"
+              style={isActive ? pillActive : pillInactive}
+              whileHover={{ y: -2 }}
+              whileTap={{ y: 0 }}
+              transition={{ type: "spring", stiffness: 400, damping: 22 }}
             >
               {label}
             </motion.button>
@@ -59,24 +86,22 @@ export default function NegociosFilters({ params }: Props) {
 
         <motion.button
           onClick={() => updateFilter("abierto", params.abierto === "true" ? "" : "true")}
-          className={`px-4 py-2 rounded-xl text-sm font-medium transition-colors ${
-            params.abierto === "true"
-              ? "bg-brand-pine text-brand-sand"
-              : "bg-white text-stone-600 border border-stone-200 hover:border-brand-pine/30"
-          }`}
-          whileTap={{ scale: 0.97 }}
+          className="flex-shrink-0 px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap"
+          style={params.abierto === "true" ? pillActive : pillInactive}
+          whileHover={{ y: -2 }}
+          whileTap={{ y: 0 }}
+          transition={{ type: "spring", stiffness: 400, damping: 22 }}
         >
           Abierto ahora
         </motion.button>
 
         <motion.button
           onClick={() => updateFilter("delivery", params.delivery === "true" ? "" : "true")}
-          className={`px-4 py-2 rounded-xl text-sm font-medium transition-colors ${
-            params.delivery === "true"
-              ? "bg-brand-pine text-brand-sand"
-              : "bg-white text-stone-600 border border-stone-200 hover:border-brand-pine/30"
-          }`}
-          whileTap={{ scale: 0.97 }}
+          className="flex-shrink-0 px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap"
+          style={params.delivery === "true" ? pillActive : pillInactive}
+          whileHover={{ y: -2 }}
+          whileTap={{ y: 0 }}
+          transition={{ type: "spring", stiffness: 400, damping: 22 }}
         >
           Con delivery
         </motion.button>

@@ -1,5 +1,6 @@
 import type { Metadata } from "next"
 import DirectorioDetalle from "@/components/public/DirectorioDetalle"
+import BackgroundManager from "@/components/public/BackgroundManager"
 import { createClient } from "@/lib/supabase/server"
 import { notFound } from "next/navigation"
 
@@ -85,5 +86,9 @@ export default async function DirectorioDetallePage({ params }: Props) {
 
   if (!business) notFound()
 
-  return <DirectorioDetalle business={business} section={section} />
+  return (
+    <BackgroundManager>
+      <DirectorioDetalle business={business} section={section} />
+    </BackgroundManager>
+  )
 }

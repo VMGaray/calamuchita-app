@@ -1,5 +1,7 @@
 import type { Metadata } from "next"
 import DirectorioList from "@/components/public/DirectorioList"
+import CategoryPageHeader from "@/components/public/CategoryPageHeader"
+import BackgroundManager from "@/components/public/BackgroundManager"
 import { SectionKey } from "@/lib/sections"
 
 interface Props {
@@ -54,20 +56,16 @@ export default async function DirectorioPage({ params, searchParams }: Props) {
   const filters = await searchParams
 
   return (
-    <div className="bg-sand-100 min-h-screen">
-      <div className="bg-primary-500 px-4 py-10">
-        <div className="max-w-6xl mx-auto">
-          <h1 className="font-serif text-4xl text-sand-100 mb-2">
-            {sectionTitles[section] || section}
-          </h1>
-          <p className="text-primary-200 text-sm">
-            {sectionDescs[section] || "Encontrá lo que necesitás en el Valle de Calamuchita"}
-          </p>
+    <BackgroundManager>
+      <div className="min-h-screen">
+        <CategoryPageHeader
+          title={sectionTitles[section] || section}
+          description={sectionDescs[section] || "Encontrá lo que necesitás en el Valle de Calamuchita"}
+        />
+        <div className="max-w-6xl mx-auto px-4 pb-12">
+          <DirectorioList section={section as SectionKey} filters={filters} />
         </div>
       </div>
-      <div className="max-w-6xl mx-auto px-4 py-8">
-        <DirectorioList section={section as SectionKey} filters={filters} />
-      </div>
-    </div>
+    </BackgroundManager>
   )
 }

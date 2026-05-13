@@ -65,7 +65,6 @@ export default function NegociosList({ params }: Props) {
     fetchBusinesses()
   }, [params.categoria, params.abierto, params.delivery, params.q])
 
-  // Scroll suave a los resultados cuando terminan de cargar (no en el primer render)
   useEffect(() => {
     if (isFirstRender.current) {
       isFirstRender.current = false
@@ -80,60 +79,94 @@ export default function NegociosList({ params }: Props) {
 
   if (businesses.length === 0) {
     return (
-      <div className="text-center py-16">
-        <p className="text-stone-400 text-sm">No encontramos negocios con esos filtros.</p>
+      <div
+        className="text-center py-16 rounded-2xl"
+        style={{
+          background: "rgba(255,255,255,0.10)",
+          backdropFilter: "blur(16px)",
+          WebkitBackdropFilter: "blur(16px)",
+          border: "1px solid rgba(255,255,255,0.15)",
+        }}
+      >
+        <p className="text-sm" style={{ color: "rgba(225,219,201,0.65)" }}>No encontramos negocios con esos filtros.</p>
       </div>
     )
   }
 
   return (
-    <div ref={resultsRef} className="scroll-mt-28 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-      {businesses.map(({ id, name, slug, category, subcategory, address, logo_url, cover_url, is_open, offers_delivery, description }, i) => (
-        <AnimateIn key={id} direction="up" delay={i * 0.07}>
-          <Card3D className="h-full">
-            <Link href={`/negocios/${slug}`} className="block h-full">
-              <div className="bg-white rounded-2xl overflow-hidden border border-stone-200 h-full">
-                <div className="h-36 relative bg-brand-pine/10">
-                  {cover_url ? (
-                    <Image src={cover_url} alt={name} fill className="object-cover" />
-                  ) : (
-                    <div className="w-full h-full flex items-center justify-center">
-                      <div className="w-16 h-16 bg-white/60 rounded-full" />
-                    </div>
-                  )}
-                  {is_open && (
-                    <span className="absolute top-3 right-3 text-xs font-medium px-2 py-1 rounded-full bg-brand-pine/10 text-brand-pine">
-                      Abierto
-                    </span>
-                  )}
-                </div>
-                <div className="p-4">
-                  <h3 className="text-base font-medium text-stone-800 mb-1">{name}</h3>
-                  <p className="text-xs text-stone-400 mb-2">
-                    {category ? categoryLabel[category] : subcategory || "Gastronomía"}
-                    {address && ` · ${address.split(",").pop()?.trim()}`}
-                  </p>
-                  {description && (
-                    <p className="text-sm text-stone-500 mb-3 leading-relaxed line-clamp-2">{description}</p>
-                  )}
-                  <div className="flex items-center gap-1.5 flex-wrap">
-                    {!is_open && (
-                      <span className="text-xs font-medium px-2 py-0.5 rounded-full bg-stone-100 text-stone-500">
-                        Cerrado
-                      </span>
+    <div ref={resultsRef} className="scroll-mt-28">
+      <p className="text-xs mb-4 font-medium" style={{ color: "rgba(255,255,255,0.60)" }}>
+        {businesses.length} resultado{businesses.length !== 1 ? "s" : ""}
+      </p>
+      <div className="flex gap-4 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden snap-x snap-mandatory -mx-4 px-4 pb-6 md:mx-0 md:px-0 md:grid md:grid-cols-2 lg:grid-cols-3 md:overflow-x-visible md:pb-0">
+        {businesses.map(({ id, name, slug, category, subcategory, address, cover_url, is_open, offers_delivery, description }, i) => (
+          <AnimateIn key={id} direction="up" delay={i * 0.07} className="w-[88vw] flex-shrink-0 snap-center md:w-auto">
+            <Card3D>
+              <Link href={`/negocios/${slug}`} className="block h-full">
+                <div
+                  className="rounded-2xl overflow-hidden h-full"
+                  style={{
+                    background: "rgba(255,255,255,0.10)",
+                    backdropFilter: "blur(16px)",
+                    WebkitBackdropFilter: "blur(16px)",
+                    border: "1px solid rgba(255,255,255,0.20)",
+                  }}
+                >
+                  {/* Cover — más alto en mobile para lucir la foto */}
+                  <div className="h-52 md:h-36 relative" style={{ background: "rgba(255,255,255,0.08)" }}>
+                    {cover_url ? (
+                      <Image src={cover_url} alt={name} fill className="object-cover" />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center">
+                        <div
+                          className="w-16 h-16 rounded-full flex items-center justify-center font-serif text-xl"
+                          style={{ background: "rgba(255,255,255,0.12)", color: "rgba(255,255,255,0.50)" }}
+                        >
+                          {name[0]}
+                        </div>
+                      </div>
                     )}
-                    {offers_delivery && (
-                      <span className="text-xs font-medium px-2 py-0.5 rounded-full bg-brand-slate/10 text-brand-slate">
-                        Delivery
+                    {is_open && (
+                      <span className="absolute top-3 right-3 text-xs font-medium px-2.5 py-1 rounded-full"
+                        style={{ background: "rgba(74,255,128,0.20)", color: "#6ee7a0" }}>
+                        Abierto
                       </span>
                     )}
                   </div>
+
+                  {/* Info */}
+                  <div className="p-4">
+                    <h3 className="text-base font-medium mb-1" style={{ color: "#E1DBC9" }}>{name}</h3>
+                    <p className="text-xs mb-2" style={{ color: "rgba(225,219,201,0.65)" }}>
+                      {category ? categoryLabel[category] : subcategory || "Gastronomía"}
+                      {address && ` · ${address.split(",").pop()?.trim()}`}
+                    </p>
+                    {description && (
+                      <p className="text-sm mb-3 leading-relaxed line-clamp-2" style={{ color: "rgba(225,219,201,0.75)" }}>
+                        {description}
+                      </p>
+                    )}
+                    <div className="flex items-center gap-1.5 flex-wrap">
+                      {!is_open && (
+                        <span className="text-xs font-medium px-2 py-0.5 rounded-full"
+                          style={{ background: "rgba(255,255,255,0.10)", color: "rgba(225,219,201,0.50)" }}>
+                          Cerrado
+                        </span>
+                      )}
+                      {offers_delivery && (
+                        <span className="text-xs font-medium px-2 py-0.5 rounded-full"
+                          style={{ background: "rgba(255,255,255,0.15)", color: "rgba(225,219,201,0.85)" }}>
+                          Delivery
+                        </span>
+                      )}
+                    </div>
+                  </div>
                 </div>
-              </div>
-            </Link>
-          </Card3D>
-        </AnimateIn>
-      ))}
+              </Link>
+            </Card3D>
+          </AnimateIn>
+        ))}
+      </div>
     </div>
   )
 }

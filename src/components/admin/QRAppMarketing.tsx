@@ -89,7 +89,7 @@ function buildStickerCanvas(qrCanvas: HTMLCanvasElement): HTMLCanvasElement {
   ctx.font = "italic 34px Georgia, 'Times New Roman', serif"
   ctx.textAlign = "center"
   ctx.textBaseline = "middle"
-  ctx.fillText("Todo Calamuchita en tu mano", S / 2, S - 112)
+  ctx.fillText("Todo el valle en un mismo lugar", S / 2, S - 112)
 
   // URL — very small
   ctx.fillStyle = "rgba(245,240,232,0.45)"
@@ -192,7 +192,7 @@ export default function QRAppMarketing() {
     <div class="qr-wrap">
       <img src="${qrDataUrl}" alt="QR Code">
     </div>
-    <p class="tagline">Todo Calamuchita en tu mano</p>
+    <p class="tagline">Todo el valle en un mismo lugar</p>
   </div>
 </body>
 </html>`)
@@ -341,7 +341,7 @@ export default function QRAppMarketing() {
                 lineHeight: 1.4,
               }}
             >
-              Todo Calamuchita en tu mano
+              Todo el valle en un mismo lugar
             </p>
           </div>
         </div>
