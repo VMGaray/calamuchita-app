@@ -67,18 +67,18 @@ export default function SectionModal({ section, onClose }: Props) {
     <AnimatePresence>
       {section && (
         <>
-          {/* Overlay */}
+          {/* Overlay — z-[110] supera al StickyCategoryBar (z-[100]) */}
           <motion.div
-            className="fixed inset-0 bg-black/40 z-40"
+            className="fixed inset-0 bg-black/40 z-[110]"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={onClose}
           />
 
-          {/* Modal que se viene hacia adelante */}
+          {/* Modal — z-[115] por encima del overlay y del StickyCategoryBar */}
           <motion.div
-            className="fixed top-28 left-1/2 -translate-x-1/2 z-50 w-full max-w-2xl px-4"
+            className="fixed top-28 left-1/2 -translate-x-1/2 z-[115] w-full max-w-2xl px-4"
             initial={{ opacity: 0, scale: 0.7, y: -40 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.8, y: -20 }}

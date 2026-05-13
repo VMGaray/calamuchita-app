@@ -1,7 +1,7 @@
 "use client"
 
 import Link from "next/link"
-import { MapPin } from "lucide-react"
+import { MapPin, Map as MapIcon } from "lucide-react" // Importamos MapIcon
 import { useState, useEffect } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import { createClient } from "@/lib/supabase/client"
@@ -46,24 +46,40 @@ export default function Header() {
       <div className="max-w-6xl mx-auto px-6">
         <div className="h-16 flex items-center justify-between">
 
-          {/* Logo */}
-          <Link href="/" className="flex items-center gap-2 -ml-3">
-            <div className="w-8 h-8 rounded-xl flex items-center justify-center"
-              style={{ background: "rgba(255,255,255,0.2)", border: "1px solid rgba(255,255,255,0.35)" }}>
-              <MapPin size={15} style={{ color: "rgba(255,255,255,0.9)" }} />
-            </div>
-            <span
-              className="font-serif text-xl font-semibold px-3 py-0.5 rounded-full"
-              style={{
-                color: "rgba(255,255,255,0.97)",
-                background: "rgba(0,0,0,0.2)",
-                backdropFilter: "blur(8px)",
-                textShadow: "0 1px 6px rgba(0,0,0,0.35)",
+          <div className="flex items-center gap-4"> {/* Contenedor para Logo + Mapa */}
+            {/* Logo */}
+            <Link href="/" className="flex items-center gap-2 -ml-3">
+              <div className="w-8 h-8 rounded-xl flex items-center justify-center"
+                style={{ background: "rgba(255,255,255,0.2)", border: "1px solid rgba(255,255,255,0.35)" }}>
+                <MapPin size={15} style={{ color: "rgba(255,255,255,0.9)" }} />
+              </div>
+              <span
+                className="font-serif text-xl font-semibold px-3 py-0.5 rounded-full"
+                style={{
+                  color: "rgba(255,255,255,0.97)",
+                  background: "rgba(0,0,0,0.2)",
+                  backdropFilter: "blur(8px)",
+                  textShadow: "0 1px 6px rgba(0,0,0,0.35)",
+                }}
+              >
+                Calamuchita App
+              </span>
+            </Link>
+
+            {/* BOTÓN DE MAPA (NUEVO) */}
+            <Link 
+              href="/mapa" 
+              className="flex items-center gap-2 px-3 py-1.5 rounded-full transition-all hover:scale-105 active:scale-95"
+              style={{ 
+                background: "rgba(45,69,48,0.4)", 
+                border: "1px solid rgba(255,255,255,0.2)",
+                backdropFilter: "blur(4px)" 
               }}
             >
-              Calamuchita App
-            </span>
-          </Link>
+              <MapIcon size={14} className="text-white/90" />
+              <span className="text-[10px] font-bold uppercase tracking-wider text-white/90 hidden sm:block">Explorar Mapa</span>
+            </Link>
+          </div>
 
           {/* Auth */}
           <div className="flex items-center gap-3">

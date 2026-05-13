@@ -14,20 +14,13 @@ export default async function PublicLayout({
   const headersList = await headers()
   const pathname = headersList.get("x-pathname") || ""
   const isSearchPage = pathname.startsWith("/buscar")
-
-  // Páginas con BackgroundManager propio (fondo full-page dinámico por localidad)
-  const isCategoryPage =
-    pathname.startsWith("/negocios") ||
-    pathname.startsWith("/directorio")
-
-  // Las páginas de detalle no muestran el FloatingLocalidadButton
+  const isCategoryPage = pathname.startsWith("/negocios") || pathname.startsWith("/directorio")
   const isDetailPage = /^\/directorio\/[^/]+\/[^/]+/.test(pathname)
   const showFloatingButton = isCategoryPage && !isDetailPage
 
   return (
     <div className="min-h-screen flex flex-col">
-
-      {/* Fondo estático del Home (solo en páginas sin BackgroundManager) */}
+      {/* Fondo estático del Home */}
       {!isCategoryPage && (
         <div className="absolute inset-0 z-0 h-[500px] pointer-events-none">
           <div
@@ -41,37 +34,39 @@ export default async function PublicLayout({
           />
           <div
             className="absolute inset-0"
-            style={{
-              background: "linear-gradient(to bottom, rgba(0,0,0,0.4) 0%, rgba(0,0,0,0) 100%)",
-            }}
+            style={{ background: "linear-gradient(to bottom, rgba(0,0,0,0.4) 0%, rgba(0,0,0,0) 100%)" }}
           />
         </div>
       )}
 
-      {/* Header — z-[200] para estar por encima del LocalidadProvider (z-[100]) y del FixedBackground */}
-      <header className="relative z-[200]">
+      {/* HEADER: z-50 es suficiente si lo demás está ordenado */}
+      <header className="relative z-[100]">
         <Header />
         {!isCategoryPage && !isSearchPage && <HeroSection />}
       </header>
 
       <LocalidadProvider>
-        {/*
-          z-[100] en este contenedor para que StickyCategoryBar y FloatingLocalidadButton
-          estén al mismo nivel de stacking context.
-          FloatingLocalidadButton (sheet z=101) > StickyCategoryBar (z=100) → sheet aparece encima.
-        */}
-        <div className={`relative z-[100] flex flex-col flex-1${!isCategoryPage ? " -mt-20" : ""}`}>
-          <StickyCategoryBar stickyOffset={isCategoryPage ? 64 : 0} />
-          <main className="flex-1 relative z-20">
+        {/* Eliminamos el z-[100] de aquí para no crear un contexto que atrape los clics */}
+        <div className={`relative flex flex-col flex-1 ${!isCategoryPage ? "-mt-20" : ""}`}>
+          
+          {/* La barra de categorías DEBE tener un z-index alto para ser clickeable */}
+          <div className="sticky top-0 z-[150]">
+             <StickyCategoryBar stickyOffset={isCategoryPage ? 64 : 0} />
+          </div>
+
+          <main className="flex-1 relative z-10">
             {children}
           </main>
-          {/* FloatingLocalidadButton aquí: mismo stacking context que StickyCategoryBar,
-              su sheet (z=101) supera al StickyCategoryBar (z=100) */}
-          {showFloatingButton && <FloatingLocalidadButton />}
+
+          {showFloatingButton && (
+            <div className="relative z-[160]">
+              <FloatingLocalidadButton />
+            </div>
+          )}
+          
           <Footer />
         </div>
       </LocalidadProvider>
-
     </div>
   )
 }

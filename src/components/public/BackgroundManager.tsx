@@ -55,8 +55,8 @@ export default function BackgroundManager({ children }: Props) {
         style={{ zIndex: -18 }}
       />
 
-      {/* Contenido de la página */}
-      <div className="relative z-10 min-h-screen">
+      {/* Contenido de la página - Bajamos el z-index a 1 para que no compita con la barra sticky */}
+      <div className="relative z-1 min-h-screen">
         {children}
       </div>
     </>
