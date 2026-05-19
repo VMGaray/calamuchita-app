@@ -24,7 +24,7 @@ export default function HeroSection() {
 
       {/* Eyebrow */}
       <motion.span
-        className="relative z-10 inline-block text-xs font-medium tracking-widest uppercase px-4 py-1.5 rounded-full mb-8"
+        className="relative z-10 inline-block text-xs font-medium tracking-widest uppercase px-4 py-1.5 rounded-full mb-4"
         style={{
           background: "rgba(0,0,0,0.22)",
           border: "1px solid rgba(255,255,255,0.3)",
@@ -40,7 +40,7 @@ export default function HeroSection() {
 
       {/* Title */}
       <h1
-        className="relative z-10 font-serif text-4xl md:text-6xl lg:text-7xl leading-tight mb-6"
+        className="relative z-10 font-serif text-4xl md:text-6xl lg:text-7xl leading-tight mb-3"
         style={{ color: "rgba(255,255,255,0.97)", textShadow: "0 2px 16px rgba(0,0,0,0.5), 0 1px 4px rgba(0,0,0,0.3)" }}
       >
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.3, delay: 0.3 }}>
@@ -53,7 +53,7 @@ export default function HeroSection() {
 
       {/* Subtitle */}
       <motion.p
-        className="relative z-10 text-sm md:text-base max-w-lg mx-auto mb-7 md:mb-10 leading-relaxed px-4 md:px-5 py-2.5 md:py-3 rounded-2xl"
+        className="relative z-10 text-sm md:text-base max-w-lg mx-auto mb-4 leading-relaxed px-4 md:px-5 py-2 md:py-2.5 rounded-2xl"
         style={{
           color: "rgba(255,255,255,0.95)",
           background: "rgba(0,0,0,0.25)",

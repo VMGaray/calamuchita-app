@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react"
 import { createClient } from "@/lib/supabase/client"
-import { Phone, MapPin, Clock, ToggleLeft, ToggleRight, Plus, Trash2 } from "lucide-react"
+import { Phone, MapPin, Clock, ToggleLeft, ToggleRight, Plus, Trash2, Pencil } from "lucide-react"
 import { UsefulContact } from "@/types/database"
 import AdminLocalidades from "./AdminLocalidades"
 import AdminServiciosUtiles from "./AdminServiciosUtiles"
@@ -129,6 +129,9 @@ function ContactosPanel() {
                   {contact.schedule && <span className="flex items-center gap-1 text-xs text-stone-400"><Clock size={10} />{contact.schedule}</span>}
                 </div>
               </div>
+              <button onClick={() => { setEditing(contact); setShowForm(true) }} className="w-7 h-7 flex items-center justify-center rounded-lg hover:bg-stone-100 text-stone-300 hover:text-stone-500 transition-colors">
+                <Pencil size={13} />
+              </button>
               <button onClick={() => handleToggle(contact.id, contact.is_active)}>
                 {contact.is_active
                   ? <ToggleRight size={20} className="text-[#A3B18A]" />
