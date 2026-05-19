@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from "react"
+import { useRouter } from "next/navigation"
 import { motion } from "framer-motion"
 import {
   UtensilsCrossed,
@@ -40,10 +41,15 @@ interface Props {
 }
 
 export default function StickyCategoryBar({ stickyOffset = 0 }: Props) {
+  const router = useRouter()
   const [activeSection, setActiveSection] = useState<SectionKey | null>(null)
 
   const handleClick = (key: SectionKey) => {
-    setActiveSection(prev => (prev === key ? null : key))
+    if (key === "events") {
+      router.push("/eventos")
+    } else {
+      setActiveSection(prev => (prev === key ? null : key))
+    }
   }
 
   return (

@@ -20,6 +20,16 @@ const nextConfig: NextConfig = {
         hostname: "mipljgnmpkkfveoaqlyx.supabase.co",
         pathname: "/storage/v1/object/public/**",
       },
+      {
+        protocol: "https",
+        hostname: "images.unsplash.com",
+        pathname: "/**",
+      },
+      {
+        protocol: "https",
+        hostname: "api.mapbox.com",
+        pathname: "/**",
+      },
     ],
   },
 }

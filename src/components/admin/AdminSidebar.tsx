@@ -10,6 +10,7 @@ import {
   BadgePercent,
   Megaphone,
   Phone,
+  CalendarDays,
   Settings,
   ExternalLink,
 } from "lucide-react"
@@ -17,6 +18,7 @@ import {
 const links = [
   { href: "/admin",             label: "Dashboard",    icon: LayoutDashboard },
   { href: "/admin/negocios",    label: "Negocios",     icon: Building2       },
+  { href: "/admin/eventos",     label: "Eventos",      icon: CalendarDays    },
   { href: "/admin/stats",       label: "Estadísticas", icon: BarChart2       },
   { href: "/admin/promociones", label: "Promociones",  icon: BadgePercent    },
   { href: "/admin/marketing",   label: "Marketing",    icon: Megaphone       },

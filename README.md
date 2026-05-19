@@ -17,6 +17,7 @@ Conecta a turistas y residentes con los comercios, servicios y restaurantes de l
 | Supabase | Base de datos (PostgreSQL), autenticación, storage |
 | Framer Motion 12 | Animaciones |
 | Lucide React | Iconografía |
+| Mapbox GL / react-map-gl | Mapa interactivo de comercios |
 | qrcode.react | Generación de QR en canvas |
 | Lenis | Smooth scrolling |
 
@@ -35,6 +36,8 @@ Conecta a turistas y residentes con los comercios, servicios y restaurantes de l
 - **Barra sticky de categorías** — grid 2×4 en mobile, barra horizontal en desktop
 - **Sistema de leads** — botón WhatsApp sticky en mobile que registra contactos vía RPC `increment_lead`
 - **SEO dinámico** — `generateMetadata` por negocio con Open Graph, Twitter Cards y títulos con descuento activo
+- **Agenda de eventos** — listado de eventos filtrable por localidad con detalle propio y galería de fotos
+- **Mapa interactivo** — comercios geolocalizados sobre Mapbox con popup de detalle y centrado en la ubicación del usuario
 
 ### Dashboard — Rol `business`
 
@@ -47,8 +50,9 @@ Conecta a turistas y residentes con los comercios, servicios y restaurantes de l
 
 ### Panel Admin — Rol `admin`
 
-- **Dashboard** — métricas globales: negocios activos, pendientes, usuarios, vistas totales y contactos WhatsApp acumulados
+- **Dashboard** — métricas globales: negocios activos, pendientes, usuarios, vistas totales, contactos WhatsApp y cantidad de eventos
 - **Negocios** — CRUD completo con filtro por sección, ordenamiento por fecha / vistas / contactos, toggle de estado, analytics por fila
+- **Eventos** — crear y listar eventos con título, descripción, localidad, fechas libres y galería de imágenes múltiples (storage `event-images`)
 - **Promociones** — listado de todas las promos con negocio vinculado, badge de descuento, estado (Activa / Pausada / Vencida) y toggle
 - **Marketing App** — generador de QR para la home de la app, descarga PNG del QR solo o del diseño de calcomanía (900×900 px) y vista de impresión A5
 - **Info Útil** — gestión de contactos de emergencia con filtro por categoría, toggle activo/inactivo y formulario de creación inline
@@ -84,6 +88,25 @@ $$;
 
 ---
 
+## Tabla `events` en Supabase
+
+```sql
+CREATE TABLE events (
+  id uuid DEFAULT gen_random_uuid() PRIMARY KEY,
+  title text NOT NULL,
+  description text,
+  localidad text,
+  date_description text,         -- Texto libre: "2 al 4 de Octubre"
+  category text DEFAULT 'festival',
+  image_url jsonb DEFAULT '[]',  -- Array de URLs de storage
+  created_at timestamptz DEFAULT now()
+);
+```
+
+Storage bucket requerido: `event-images` (público).
+
+---
+
 ## Roles de Usuario
 
 | Rol | Acceso |
@@ -105,6 +128,11 @@ src/
 │   │   ├── buscar/              # Búsqueda global
 │   │   ├── negocios/[slug]/     # Detalle gastronómico
 │   │   └── directorio/[section]/[slug]/
+│   ├── eventos/                 # Agenda pública de eventos
+│   │   ├── page.tsx             # Listado con filtros por localidad
+│   │   └── [id]/page.tsx        # Detalle con galería
+│   ├── mapa/                    # Mapa interactivo (Mapbox)
+│   │   └── page.tsx
 │   ├── dashboard/               # Panel de negocio
 │   │   ├── menu-del-dia/
 │   │   ├── carta/
@@ -112,6 +140,8 @@ src/
 │   │   └── reservas/
 │   └── admin/                   # Panel admin
 │       ├── negocios/[id]/
+│       ├── eventos/             # Crear y listar eventos
+│       │   └── [id]/            # Detalle de evento (admin)
 │       ├── promociones/
 │       ├── marketing/
 │       └── info-util/
@@ -123,10 +153,13 @@ src/
 │   ├── admin/                   # Panel admin (AdminHome, AdminNegocios,
 │   │                            #   AdminNegocioEdit, AdminPromociones,
 │   │                            #   AdminInfoUtil, QRMarketing, QRAppMarketing)
+│   ├── events/                  # EventCard (componente reutilizable)
 │   └── ui/                      # Utilidades reutilizables
 │
 ├── lib/
 │   ├── supabase/                # Clientes browser y server
+│   ├── hooks/
+│   │   └── useGeolocation.ts    # Hook de geolocalización del usuario
 │   ├── context/
 │   │   └── LocalidadContext.tsx # Estado global de localidad activa
 │   ├── constants/
@@ -154,6 +187,16 @@ brand-charcoal #3C3C3C   Carbón
 
 ---
 
+## Variables de Entorno
+
+```env
+NEXT_PUBLIC_SUPABASE_URL=
+NEXT_PUBLIC_SUPABASE_ANON_KEY=
+NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN=
+```
+
+---
+
 ## Localidades
 
 16 localidades del Valle de Calamuchita con teléfonos de emergencia:
@@ -168,18 +211,10 @@ Villa General Belgrano · Santa Rosa de Calamuchita · La Cumbrecita · Los Rear
 npm install
 
 cp .env.example .env.local
-# Completar NEXT_PUBLIC_SUPABASE_URL y NEXT_PUBLIC_SUPABASE_ANON_KEY
+# Completar NEXT_PUBLIC_SUPABASE_URL, NEXT_PUBLIC_SUPABASE_ANON_KEY
+# y NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN
 
 npm run dev
-```
-
----
-
-## Variables de Entorno
-
-```env
-NEXT_PUBLIC_SUPABASE_URL=
-NEXT_PUBLIC_SUPABASE_ANON_KEY=
 ```
 
 ---
@@ -204,12 +239,16 @@ npm run lint     # Lint del código
 /negocios/[slug]                    Detalle de negocio
 /directorio/[section]               Directorio por sección
 /directorio/[section]/[slug]        Detalle de directorio
+/eventos                            Agenda del Valle
+/eventos/[id]                       Detalle de evento
+/mapa                               Mapa interactivo de comercios
 /login                              Iniciar sesión
 /registro                           Crear cuenta
 /dashboard                          Panel de negocio
 /admin                              Panel administrador
 /admin/negocios                     Listado de negocios
 /admin/negocios/[id]                Edición de negocio + QR marketing
+/admin/eventos                      Crear y listar eventos
 /admin/promociones                  Gestión de promociones
 /admin/marketing                    QR general + calcomanías
 /admin/info-util                    Contactos de emergencia
@@ -222,4 +261,9 @@ npm run lint     # Lint del código
 | Funcionalidad | Estado |
 |---|---|
 | Suscripciones | Tipo definido en `database.ts`, sin UI |
-| WebGLBackground | Componente creado, sin integrar |
+| WebGLBackground | Componente creado (`components/public/WebGLBackground.tsx`), sin integrar |
+| Edición/borrado de eventos desde admin | Solo existe creación; falta poder editar o eliminar un evento existente |
+| Links a `/eventos` y `/mapa` en la navegación | Sin acceso desde Header ni desde la Home |
+| `EventCard` sin usar | Componente en `components/events/EventCard.tsx` creado pero no integrado en ninguna página |
+| Localidades en formulario de eventos | El admin solo muestra 5 de las 16 localidades disponibles |
+| Paginación de eventos | Sin implementar; puede volverse lento con muchos eventos |

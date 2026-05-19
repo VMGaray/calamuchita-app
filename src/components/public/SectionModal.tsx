@@ -52,6 +52,8 @@ interface Props {
 }
 
 export default function SectionModal({ section, onClose }: Props) {
+  if (section === "events") return null
+
   const categories = section ? sectionCategories[section] : []
 
   useEffect(() => {
@@ -65,9 +67,9 @@ export default function SectionModal({ section, onClose }: Props) {
 
   return (
     <AnimatePresence>
-      {section && (
+      {section && section !== "events" && (
         <>
-          {/* Overlay — z-[110] supera al StickyCategoryBar (z-[100]) */}
+          {/* Overlay */}
           <motion.div
             className="fixed inset-0 bg-black/40 z-[110]"
             initial={{ opacity: 0 }}
@@ -76,7 +78,7 @@ export default function SectionModal({ section, onClose }: Props) {
             onClick={onClose}
           />
 
-          {/* Modal — z-[115] por encima del overlay y del StickyCategoryBar */}
+          {/* Modal */}
           <motion.div
             className="fixed top-28 left-1/2 -translate-x-1/2 z-[115] w-full max-w-2xl px-4"
             initial={{ opacity: 0, scale: 0.7, y: -40 }}
@@ -84,7 +86,7 @@ export default function SectionModal({ section, onClose }: Props) {
             exit={{ opacity: 0, scale: 0.8, y: -20 }}
             transition={{ type: "spring", stiffness: 350, damping: 25 }}
           >
-            <div className="bg-white rounded-3xl overflow-hidden border border-brand-slate/20">
+            <div className="bg-white rounded-3xl overflow-hidden border border-brand-slate/20 shadow-2xl">
 
               {/* Header del modal */}
               <div className="bg-brand-pine px-6 py-4 flex items-center justify-between">
@@ -95,48 +97,49 @@ export default function SectionModal({ section, onClose }: Props) {
                     : section === "education" ? "Educación"
                     : section === "tourism" ? "Turismo"
                     : section === "commerce" ? "Comercios"
-                    : section === "events" ? "Eventos"
                     : "Info útil"}
                 </h2>
                 <button
                   onClick={onClose}
-                  className="text-brand-sand/60 hover:text-brand-sand text-2xl leading-none"
+                  className="text-brand-sand/60 hover:text-brand-sand text-3xl leading-none font-light"
                 >
-                  ×
+                  &times;
                 </button>
               </div>
 
-             {/* Grid de categorías con scroll */}
-<div className="p-4 overflow-y-auto max-h-[calc(100vh-14rem)]">
-  <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
-    {categories.map(({ label, desc, href, bg, color }, i) => {
-      const Icon = categoryIcons[label] || ShoppingBag
-      return (
-        <motion.div
-          key={label}
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: i * 0.03, type: "spring", stiffness: 300, damping: 20 }}
-        >
-          <Link
-            href={href}
-            onClick={onClose}
-            className="flex flex-col items-center text-center p-3 rounded-2xl border border-brand-slate/15 hover:border-brand-pine/30 hover:bg-brand-pine/5 transition-all group"
-          >
-            <motion.div
-              className={`w-10 h-10 ${bg} rounded-xl flex items-center justify-center mb-2`}
-              whileHover={{ y: -6, scale: 1.15 }}
-              transition={{ type: "spring", stiffness: 400, damping: 15 }}
-            >
-              <Icon size={18} className={color} />
-            </motion.div>
-            <p className="text-xs font-medium text-brand-charcoal leading-tight">{label}</p>
-          </Link>
-        </motion.div>
-      )
-    })}
-  </div>
-</div>
+              {/* Grid de categorías */}
+              <div className="p-4 overflow-y-auto max-h-[calc(100vh-14rem)] bg-[#FDFCF9]">
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
+                  {categories.map(({ label, desc, href, bg, color }, i) => {
+                    const Icon = categoryIcons[label] || ShoppingBag
+                    return (
+                      <motion.div
+                        key={label}
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: i * 0.03, type: "spring", stiffness: 300, damping: 20 }}
+                      >
+                        <Link
+                          href={href}
+                          onClick={onClose}
+                          className="flex flex-col items-center text-center p-3 rounded-2xl border border-brand-slate/10 hover:border-brand-pine/30 hover:bg-brand-pine/5 transition-all group h-full justify-center"
+                        >
+                          <motion.div
+                            className={`w-10 h-10 ${bg} rounded-xl flex items-center justify-center mb-2 shadow-sm`}
+                            whileHover={{ y: -6, scale: 1.15 }}
+                            transition={{ type: "spring", stiffness: 400, damping: 15 }}
+                          >
+                            <Icon size={18} className={color} />
+                          </motion.div>
+                          <p className="text-[11px] font-bold text-brand-charcoal leading-tight uppercase tracking-tight">
+                            {label}
+                          </p>
+                        </Link>
+                      </motion.div>
+                    )
+                  })}
+                </div>
+              </div>
             </div>
           </motion.div>
         </>

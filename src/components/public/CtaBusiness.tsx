@@ -2,8 +2,8 @@
 
 import { useEffect, useRef } from "react"
 import { motion } from "framer-motion"
-import { Send } from "lucide-react"
-import MagneticButton from "@/components/ui/MagneticButton"
+import { Send, LayoutGrid } from "lucide-react"
+import Link from "next/link"
 
 export default function CtaBusiness() {
   const canvasRef = useRef<HTMLCanvasElement>(null)
@@ -33,7 +33,6 @@ export default function CtaBusiness() {
       const rows = 10
       const speed = 0.4
 
-      // Líneas horizontales (van hacia el horizonte)
       for (let r = 0; r <= rows; r++) {
         const progress = ((r / rows) + (t * speed * 0.015)) % 1
         const z = progress
@@ -49,7 +48,6 @@ export default function CtaBusiness() {
         ctx.stroke()
       }
 
-      // Líneas verticales (van al punto de fuga)
       for (let c = 0; c <= cols; c++) {
         const xRatio = c / cols - 0.5
         ctx.beginPath()
@@ -258,31 +256,49 @@ export default function CtaBusiness() {
           ))}
         </motion.div>
 
-        {/* CTA */}
+        {/* CONTENEDOR DE BOTONES (PRIMARY & SECONDARY) */}
         <motion.div
-          initial={{ opacity: 0, scale: 0.95 }}
-          whileInView={{ opacity: 1, scale: 1 }}
+          initial={{ opacity: 0, y: 16 }}
+          whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.4 }}
-          className="flex flex-col sm:flex-row items-center justify-center gap-3 w-full"
+          className="flex flex-col sm:flex-row items-center justify-center gap-4 w-full max-w-md mt-4"
         >
-          {/* BOTÓN CENTRADO Y MAGNÉTICO */}
-          <div className="pt-6 flex justify-center">
-            <motion.a
-              href="https://wa.me/541145311047"
-              target="_blank"
-              rel="noopener noreferrer"
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              className="relative group px-12 py-5 rounded-2xl flex items-center gap-3 transition-all overflow-hidden"
-                  style={{ background: "#E1DBC9", boxShadow: "0 20px 40px -10px rgba(225,219,201,0.25)" }}
+          {/* Botón Principal: WhatsApp */}
+          <motion.a
+            href="https://wa.me/541145311047"
+            target="_blank"
+            rel="noopener noreferrer"
+            whileHover={{ scale: 1.03 }}
+            whileTap={{ scale: 0.98 }}
+            className="w-full sm:w-auto relative group px-8 py-4 rounded-2xl flex items-center justify-center gap-2.5 transition-all overflow-hidden"
+            style={{ 
+              background: "#E1DBC9", 
+              boxShadow: "0 12px 30px -10px rgba(225,219,201,0.2)" 
+            }}
+          >
+            <span className="font-black text-xs uppercase tracking-wider" style={{ color: "#2D4530" }}>
+              Escribime ahora
+            </span>
+            <Send size={14} className="group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" style={{ color: "#2D4530" }} />
+          </motion.a>
+
+          {/* Botón Secundario: Ver Planes (Link a /unite) */}
+          <Link href="/unite" className="w-full sm:w-auto">
+            <motion.div
+              whileHover={{ scale: 1.03, backgroundColor: "rgba(225,219,201,0.08)" }}
+              whileTap={{ scale: 0.98 }}
+              className="w-full sm:w-auto px-8 py-4 rounded-2xl flex items-center justify-center gap-2.5 transition-all cursor-pointer border"
+              style={{ 
+                borderColor: "rgba(225,219,201,0.3)", 
+                color: "#E1DBC9" 
+              }}
             >
-              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:animate-shimmer" />
-              <span className="relative z-10 font-black uppercase tracking-tighter" style={{ color: "#2D4530" }}>
-                Escribime ahora
+              <span className="font-bold text-xs uppercase tracking-wider">
+                Ver planes de lanzamiento
               </span>
-              <Send size={18} className="relative z-10 group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" style={{ color: "#2D4530" }} />
-            </motion.a>
-          </div>
+              <LayoutGrid size={14} className="opacity-70" />
+            </motion.div>
+          </Link>
         </motion.div>
       </div>
     </div>

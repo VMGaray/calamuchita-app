@@ -69,14 +69,18 @@ export default function CategoriesGrid({ section }: Props) {
         {displayed.map(({ label, desc, href, bg, color }, i) => {
           const Icon = categoryIcons[label] || ShoppingBag
           const size = bentoSizes[i] || "col-span-1 row-span-1"
+          
+          // --- LÓGICA MODIFICADA PARA EVENTOS ---
+          // Si la categoría es "Festivales" (que es la que aparece en Turismo), 
+          // mandamos a /eventos en lugar de abrir el modal de categoría.
+          const finalHref = label === "Festivales" ? "/eventos" : href;
+          
           const mobileFirst = size.split(" ").filter(c => !c.includes(":"))
-          const isBig = mobileFirst.includes("col-span-2") && mobileFirst.includes("row-span-2")
           const isWide = mobileFirst.includes("col-span-2") && !mobileFirst.includes("row-span-2")
-          const isTall = mobileFirst.includes("row-span-2") && !mobileFirst.includes("col-span-2")
 
           return (
             <AnimateIn key={label} direction="up" delay={i * 0.06} className={size}>
-              <Link href={href} className="block h-full">
+              <Link href={finalHref} className="block h-full">
                 <motion.div
                   className="relative h-full rounded-2xl overflow-hidden cursor-pointer group"
                   whileHover="hover"
@@ -89,7 +93,6 @@ export default function CategoriesGrid({ section }: Props) {
                     boxShadow: "0 4px 24px rgba(83,120,149,0.08)",
                   }}
                 >
-                  {/* Animated gradient border */}
                   <motion.div
                     className="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"
                     style={{
@@ -122,7 +125,6 @@ export default function CategoriesGrid({ section }: Props) {
                     : "flex-col justify-between p-4"
                   }`}>
 
-                    {/* Icon */}
                     <motion.div
                       className={`flex items-center justify-center rounded-2xl ${bg} ${
                         isWide ? "w-11 h-11 flex-shrink-0" : "w-11 h-11"
@@ -136,7 +138,6 @@ export default function CategoriesGrid({ section }: Props) {
                       <Icon size={20} className={color} />
                     </motion.div>
 
-                    {/* Text */}
                     <div className={isWide ? "flex-1 min-w-0" : ""}>
                       <motion.p
                         className="text-sm font-medium text-stone-800 leading-tight"

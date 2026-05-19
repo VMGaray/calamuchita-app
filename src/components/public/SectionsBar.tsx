@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { useSearchParams } from "next/navigation"
+import { useSearchParams, useRouter } from "next/navigation"
 import { motion } from "framer-motion"
 import { Utensils, Wrench, Heart, GraduationCap, Mountain, ShoppingBag, CalendarDays, Info } from "lucide-react"
 import SectionModal from "@/components/public/SectionModal"
@@ -19,9 +19,18 @@ const sections = [
 ]
 
 export default function SectionsBar() {
+  const router = useRouter()
   const searchParams = useSearchParams()
   const activeSection = searchParams.get("seccion") || ""
   const [modalSection, setModalSection] = useState<SectionKey | null>(null)
+
+ const handleSectionClick = (key: SectionKey) => {
+    if (key === "events") {
+      router.push("/eventos")
+    } else {
+      setModalSection(modalSection === key ? null : key)
+    }
+  }
 
   return (
     <>
@@ -41,13 +50,12 @@ export default function SectionsBar() {
           return (
             <motion.button
               key={key}
-              onClick={() => setModalSection(modalSection === key ? null : key)}
+              onClick={() => handleSectionClick(key)}
               className="relative flex flex-col items-center gap-1 px-3 py-3 cursor-pointer rounded-xl w-16"
               animate={isActive ? "active" : "rest"}
               whileHover="hover"
               initial="rest"
             >
-              {/* Fondo hover/activo */}
               <motion.div
                 className="absolute inset-0 rounded-xl"
                 style={{ backgroundColor: "rgba(45,69,48,0.1)" }}
@@ -59,7 +67,6 @@ export default function SectionsBar() {
                 transition={{ duration: 0.2 }}
               />
 
-              {/* Línea activa derecha */}
               {isActive && (
                 <motion.div
                   className="absolute right-0 top-1/2 -translate-y-1/2 w-0.5 rounded-full"
@@ -71,7 +78,6 @@ export default function SectionsBar() {
                 />
               )}
 
-              {/* Ícono */}
               <motion.div
                 className="relative z-10"
                 variants={{
@@ -87,7 +93,6 @@ export default function SectionsBar() {
                 />
               </motion.div>
 
-              {/* Label */}
               <motion.span
                 className="relative z-10 text-[10px] font-medium text-center leading-tight"
                 variants={{
@@ -119,7 +124,7 @@ export default function SectionsBar() {
           return (
             <motion.button
               key={key}
-              onClick={() => setModalSection(modalSection === key ? null : key)}
+              onClick={() => handleSectionClick(key)}
               className="relative flex flex-col items-center gap-0.5 px-2 py-1 cursor-pointer rounded-xl"
               animate={isActive ? "active" : "rest"}
               whileHover="hover"
@@ -134,10 +139,14 @@ export default function SectionsBar() {
         })}
       </nav>
 
-      <SectionModal
-        section={modalSection}
-        onClose={() => setModalSection(null)}
-      />
+      {/* --- CAMBIO CRÍTICO ACÁ --- */}
+      {/* Solo mostramos el modal si existe una sección y NO es la de eventos */}
+      {modalSection && modalSection !== "events" && (
+        <SectionModal
+          section={modalSection}
+          onClose={() => setModalSection(null)}
+        />
+      )}
     </>
   )
 }
