@@ -69,7 +69,7 @@ export default function CartaManager() {
       .order("sort_order")
 
     setCategories(data || [])
-    if (data?.length > 0) setExpandedCat(data[0].id)
+    if (data && data.length > 0) setExpandedCat(data[0].id)
     setLoading(false)
   }
 

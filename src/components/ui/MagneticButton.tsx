@@ -6,11 +6,12 @@ import { motion } from "framer-motion"
 interface Props {
   children: React.ReactNode
   className?: string
+  style?: React.CSSProperties
   onClick?: () => void
   href?: string
 }
 
-export default function MagneticButton({ children, className = "", onClick, href }: Props) {
+export default function MagneticButton({ children, className = "", style, onClick, href }: Props) {
   const ref = useRef<HTMLDivElement>(null)
   const [position, setPosition] = useState({ x: 0, y: 0 })
 
@@ -36,6 +37,7 @@ export default function MagneticButton({ children, className = "", onClick, href
       animate={{ x: position.x, y: position.y }}
       transition={{ type: "spring", stiffness: 200, damping: 15, mass: 0.5 }}
       className={className}
+      style={style}
       onClick={onClick}
     >
       {children}

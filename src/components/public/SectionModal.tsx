@@ -67,7 +67,7 @@ export default function SectionModal({ section, onClose }: Props) {
 
   return (
     <AnimatePresence>
-      {section && section !== "events" && (
+      {section && (
         <>
           {/* Overlay */}
           <motion.div
