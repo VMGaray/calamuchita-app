@@ -38,6 +38,7 @@ Conecta a turistas y residentes con los comercios, servicios y restaurantes de l
 - **SEO dinámico** — `generateMetadata` por negocio con Open Graph, Twitter Cards y títulos con descuento activo
 - **Agenda de eventos** — listado de eventos filtrable por localidad con detalle propio y galería de fotos
 - **Mapa interactivo** — comercios geolocalizados sobre Mapbox con popup de detalle y centrado en la ubicación del usuario
+- **Página de planes** (`/unite`) — landing para que negocios se sumen a la app: tres planes con precios (Oficios y Servicios $9.000/mes, Comercial $15.000/mes, Gastronómico $35.000/mes) y banner de "Club Fundadores" con primeros meses bonificados
 
 ### Dashboard — Rol `business`
 
@@ -55,7 +56,8 @@ Conecta a turistas y residentes con los comercios, servicios y restaurantes de l
 - **Eventos** — crear y listar eventos con título, descripción, localidad, fechas libres y galería de imágenes múltiples (storage `event-images`)
 - **Promociones** — listado de todas las promos con negocio vinculado, badge de descuento, estado (Activa / Pausada / Vencida) y toggle
 - **Marketing App** — generador de QR para la home de la app, descarga PNG del QR solo o del diseño de calcomanía (900×900 px) y vista de impresión A5
-- **Info Útil** — gestión de contactos de emergencia con filtro por categoría, toggle activo/inactivo y formulario de creación inline
+- **Suscripciones** — CRUD completo de suscripciones por negocio: estado (trial/activa/vencida/cancelada), precio, ciclo (mensual/anual), fechas del período y notas. Resumen con contadores por estado y filtro rápido
+- **Info Útil** — panel con 4 pestañas: (1) Contactos útiles: CRUD completo con filtro por categoría, toggle, creación y edición inline; (2) Localidades: gestión de las 16 localidades con slug y sort_order; (3) Servicios: servicios por localidad (categoría, teléfono, dirección, descripción); (4) Transporte: horarios de colectivos con empresa, origen/destino, días y horarios
 - **QR por negocio** — sección "Material de marketing" en cada ficha de edición con QR del perfil público, descarga PNG e impresión de cartel A5
 
 ---
@@ -84,6 +86,78 @@ CREATE OR REPLACE FUNCTION increment_lead(business_id uuid)
 RETURNS void LANGUAGE sql SECURITY DEFINER AS $$
   UPDATE businesses SET total_leads = total_leads + 1 WHERE id = business_id;
 $$;
+```
+
+---
+
+## Tabla `subscriptions` en Supabase
+
+```sql
+CREATE TABLE subscriptions (
+  id uuid DEFAULT gen_random_uuid() PRIMARY KEY,
+  business_id uuid REFERENCES businesses(id) ON DELETE CASCADE NOT NULL,
+  status text NOT NULL DEFAULT 'trial' CHECK (status IN ('trial','active','overdue','cancelled')),
+  price numeric NOT NULL DEFAULT 0,
+  billing_cycle text NOT NULL DEFAULT 'monthly' CHECK (billing_cycle IN ('monthly','yearly')),
+  current_period_start date NOT NULL,
+  current_period_end date NOT NULL,
+  notes text,
+  created_at timestamptz DEFAULT now()
+);
+```
+
+---
+
+## Tablas adicionales en Supabase
+
+```sql
+CREATE TABLE localities (
+  id uuid DEFAULT gen_random_uuid() PRIMARY KEY,
+  name text NOT NULL,
+  slug text NOT NULL UNIQUE,
+  sort_order integer NOT NULL DEFAULT 0,
+  created_at timestamptz DEFAULT now()
+);
+
+CREATE TABLE useful_contacts (
+  id uuid DEFAULT gen_random_uuid() PRIMARY KEY,
+  title text NOT NULL,
+  description text,
+  phone text,
+  address text,
+  schedule text,
+  category text NOT NULL DEFAULT 'other',
+  sort_order integer NOT NULL DEFAULT 0,
+  is_active boolean NOT NULL DEFAULT true,
+  created_at timestamptz DEFAULT now(),
+  updated_at timestamptz DEFAULT now()
+);
+
+CREATE TABLE utility_services (
+  id uuid DEFAULT gen_random_uuid() PRIMARY KEY,
+  locality_id uuid REFERENCES localities(id) ON DELETE CASCADE,
+  name text NOT NULL,
+  category text NOT NULL,
+  phone text,
+  address text,
+  description text,
+  is_active boolean NOT NULL DEFAULT true,
+  sort_order integer NOT NULL DEFAULT 0,
+  created_at timestamptz DEFAULT now()
+);
+
+CREATE TABLE transport_schedules (
+  id uuid DEFAULT gen_random_uuid() PRIMARY KEY,
+  company text NOT NULL,
+  origin_id uuid REFERENCES localities(id),
+  destination_id uuid REFERENCES localities(id),
+  departure_time text NOT NULL,
+  arrival_time text,
+  days text[] NOT NULL DEFAULT '{}',
+  notes text,
+  is_active boolean NOT NULL DEFAULT true,
+  created_at timestamptz DEFAULT now()
+);
 ```
 
 ---
@@ -131,6 +205,8 @@ src/
 │   ├── eventos/                 # Agenda pública de eventos
 │   │   ├── page.tsx             # Listado con filtros por localidad
 │   │   └── [id]/page.tsx        # Detalle con galería
+│   ├── unite/                   # Landing de planes/precios para negocios
+│   │   └── page.tsx
 │   ├── mapa/                    # Mapa interactivo (Mapbox)
 │   │   └── page.tsx
 │   ├── dashboard/               # Panel de negocio
@@ -152,7 +228,9 @@ src/
 │   ├── dashboard/               # Panel de negocio
 │   ├── admin/                   # Panel admin (AdminHome, AdminNegocios,
 │   │                            #   AdminNegocioEdit, AdminPromociones,
-│   │                            #   AdminInfoUtil, QRMarketing, QRAppMarketing)
+│   │                            #   AdminInfoUtil, AdminLocalidades,
+│   │                            #   AdminServiciosUtiles, AdminTransporte,
+│   │                            #   QRMarketing, QRAppMarketing)
 │   ├── events/                  # EventCard (componente reutilizable)
 │   └── ui/                      # Utilidades reutilizables
 │
@@ -251,7 +329,8 @@ npm run lint     # Lint del código
 /admin/eventos                      Crear y listar eventos
 /admin/promociones                  Gestión de promociones
 /admin/marketing                    QR general + calcomanías
-/admin/info-util                    Contactos de emergencia
+/admin/info-util                    Contactos, localidades, servicios y transporte
+/unite                              Landing de planes para negocios
 ```
 
 ---
@@ -260,10 +339,10 @@ npm run lint     # Lint del código
 
 | Funcionalidad | Estado |
 |---|---|
-| Suscripciones | Tipo definido en `database.ts`, sin UI |
+| Suscripciones — vista en dashboard del negocio | El admin puede gestionar suscripciones; falta que cada negocio vea su propio estado desde `/dashboard` |
 | WebGLBackground | Componente creado (`components/public/WebGLBackground.tsx`), sin integrar |
-| Edición/borrado de eventos desde admin | Solo existe creación; falta poder editar o eliminar un evento existente |
-| Links a `/eventos` y `/mapa` en la navegación | Sin acceso desde Header ni desde la Home |
-| `EventCard` sin usar | Componente en `components/events/EventCard.tsx` creado pero no integrado en ninguna página |
-| Localidades en formulario de eventos | El admin solo muestra 5 de las 16 localidades disponibles |
-| Paginación de eventos | Sin implementar; puede volverse lento con muchos eventos |
+| Edición/borrado de eventos desde admin | Lógica parcial (`editingId` state); sin lista de eventos con botones de acción |
+| Link a `/eventos` en la navegación | `/mapa` ya tiene acceso desde el Header; `/eventos` todavía no |
+| `EventCard` sin usar | Componente en `components/events/EventCard.tsx` creado pero no integrado |
+| Selector de localidad en formulario de eventos | El campo localidad no tiene selector; usa valor por defecto |
+| Paginación de eventos | Sin implementar |

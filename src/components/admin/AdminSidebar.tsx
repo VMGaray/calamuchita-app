@@ -11,18 +11,20 @@ import {
   Megaphone,
   Phone,
   CalendarDays,
+  CreditCard,
   Settings,
   ExternalLink,
 } from "lucide-react"
 
 const links = [
-  { href: "/admin",             label: "Dashboard",    icon: LayoutDashboard },
-  { href: "/admin/negocios",    label: "Negocios",     icon: Building2       },
-  { href: "/admin/eventos",     label: "Eventos",      icon: CalendarDays    },
-  { href: "/admin/stats",       label: "Estadísticas", icon: BarChart2       },
-  { href: "/admin/promociones", label: "Promociones",  icon: BadgePercent    },
-  { href: "/admin/marketing",   label: "Marketing",    icon: Megaphone       },
-  { href: "/admin/info-util",   label: "Info Útil",    icon: Phone           },
+  { href: "/admin",                  label: "Dashboard",      icon: LayoutDashboard },
+  { href: "/admin/negocios",         label: "Negocios",       icon: Building2       },
+  { href: "/admin/eventos",          label: "Eventos",        icon: CalendarDays    },
+  { href: "/admin/stats",            label: "Estadísticas",   icon: BarChart2       },
+  { href: "/admin/promociones",      label: "Promociones",    icon: BadgePercent    },
+  { href: "/admin/suscripciones",    label: "Suscripciones",  icon: CreditCard      },
+  { href: "/admin/marketing",        label: "Marketing",      icon: Megaphone       },
+  { href: "/admin/info-util",        label: "Info Útil",      icon: Phone           },
 ]
 
 export default function AdminSidebar() {

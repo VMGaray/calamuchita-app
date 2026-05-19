@@ -5,6 +5,7 @@ import StatsSection from "@/components/public/StatsSection"
 import CtaBusiness from "@/components/public/CtaBusiness"
 import WaveDivider from "@/components/public/WaveDivider"
 import LocalidadSelectorWidget from "@/components/public/LocalidadSelectorWidget"
+import WebGLBackground from "@/components/public/WebGLBackground"
 import { createClient } from "@/lib/supabase/server"
 import { LOCALIDADES } from "@/lib/constants/telefonos"
 
@@ -101,8 +102,9 @@ export default async function HomePage() {
 
       <WaveDivider fill={BODY_BG} bgColor={CAROUSEL_BG_BOTTOM} />
 
-      <div style={{ background: BODY_BG }}>
-        <div className="max-w-6xl mx-auto px-4 py-10">
+      <div className="relative overflow-hidden" style={{ background: BODY_BG }}>
+        <WebGLBackground />
+        <div className="relative z-10 max-w-6xl mx-auto px-4 py-10">
           <JoyasDelValle businesses={featuredBusinesses} />
           <CalamuchitaSale promotions={activePromotions} />
           <div className="mt-10">

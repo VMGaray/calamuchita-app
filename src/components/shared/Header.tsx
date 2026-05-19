@@ -1,7 +1,7 @@
 "use client"
 
 import Link from "next/link"
-import { MapPin, Map as MapIcon } from "lucide-react" // Importamos MapIcon
+import { MapPin, Map as MapIcon, CalendarDays } from "lucide-react"
 import { useState, useEffect } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import { createClient } from "@/lib/supabase/client"
@@ -66,18 +66,30 @@ export default function Header() {
               </span>
             </Link>
 
-            {/* BOTÓN DE MAPA (NUEVO) */}
-            <Link 
-              href="/mapa" 
+            <Link
+              href="/mapa"
               className="flex items-center gap-2 px-3 py-1.5 rounded-full transition-all hover:scale-105 active:scale-95"
-              style={{ 
-                background: "rgba(45,69,48,0.4)", 
+              style={{
+                background: "rgba(45,69,48,0.4)",
                 border: "1px solid rgba(255,255,255,0.2)",
-                backdropFilter: "blur(4px)" 
+                backdropFilter: "blur(4px)"
               }}
             >
               <MapIcon size={14} className="text-white/90" />
               <span className="text-[10px] font-bold uppercase tracking-wider text-white/90 hidden sm:block">Explorar Mapa</span>
+            </Link>
+
+            <Link
+              href="/eventos"
+              className="flex items-center gap-2 px-3 py-1.5 rounded-full transition-all hover:scale-105 active:scale-95"
+              style={{
+                background: "rgba(45,69,48,0.4)",
+                border: "1px solid rgba(255,255,255,0.2)",
+                backdropFilter: "blur(4px)"
+              }}
+            >
+              <CalendarDays size={14} className="text-white/90" />
+              <span className="text-[10px] font-bold uppercase tracking-wider text-white/90 hidden sm:block">Agenda</span>
             </Link>
           </div>
 
