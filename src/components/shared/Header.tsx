@@ -54,7 +54,7 @@ export default function Header() {
                 <MapPin size={15} style={{ color: "rgba(255,255,255,0.9)" }} />
               </div>
               <span
-                className="font-serif text-xl font-semibold px-3 py-0.5 rounded-full"
+                className="font-serif text-xl font-semibold px-3 py-0.5 rounded-full hidden sm:inline"
                 style={{
                   color: "rgba(255,255,255,0.97)",
                   background: "rgba(0,0,0,0.2)",
@@ -162,7 +162,7 @@ export default function Header() {
                   Ingresar
                 </Link>
                 <Link href="/registro"
-                  className="text-sm px-4 py-2 rounded-xl transition-colors"
+                  className="text-sm px-4 py-2 rounded-xl transition-colors hidden sm:block"
                   style={{ background: "rgba(225,219,201,0.18)", color: "rgba(255,255,255,0.95)", border: "1px solid rgba(225,219,201,0.3)" }}>
                   Registrate
                 </Link>

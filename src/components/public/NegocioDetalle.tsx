@@ -137,7 +137,7 @@ export default function NegocioDetalle({ business }: Props) {
           <div className="md:col-span-2 space-y-8">
             
             {/* Descripción y Botones de Acción */}
-            <div className="bg-white rounded-3xl border border-stone-200 p-8 shadow-sm">
+            <div className="bg-white rounded-3xl border border-stone-200 p-4 md:p-8 shadow-sm">
               <h3 className="text-[10px] font-black text-stone-400 uppercase tracking-[0.2em] mb-4">Descripción</h3>
               <p className="text-stone-600 text-lg leading-relaxed mb-8">
                 {business.description || `${business.name} le da la bienvenida al Valle de Calamuchita.`}
@@ -167,7 +167,7 @@ export default function NegocioDetalle({ business }: Props) {
 
             {/* Menú del día */}
             {todayMenu && todayMenu.daily_menu_items?.length > 0 && (
-              <div className="bg-white rounded-3xl border border-stone-200 p-8 shadow-sm">
+              <div className="bg-white rounded-3xl border border-stone-200 p-4 md:p-8 shadow-sm">
                 <div className="flex items-center gap-2 mb-6">
                   <UtensilsCrossed size={20} className="text-accent-400" />
                   <h2 className="font-serif text-2xl text-stone-800">Menú del día</h2>

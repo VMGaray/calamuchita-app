@@ -25,7 +25,7 @@ export default function WebGLBackground() {
 
     const vert = `attribute vec2 p; void main(){gl_Position=vec4(p,0,1);}`
     const frag = `
-      precision highp float;
+      precision mediump float;
       uniform float t; uniform vec2 res; uniform vec2 mouse;
       float noise(vec2 p){
         vec2 i=floor(p),f=fract(p),u=f*f*(3.-2.*f);
@@ -33,24 +33,20 @@ export default function WebGLBackground() {
           mix(fract(sin(dot(i,vec2(127.1,311.7)))*43758.5),fract(sin(dot(i+vec2(1,0),vec2(127.1,311.7)))*43758.5),u.x),
           mix(fract(sin(dot(i+vec2(0,1),vec2(127.1,311.7)))*43758.5),fract(sin(dot(i+vec2(1,1),vec2(127.1,311.7)))*43758.5),u.x),u.y);
       }
-      float fbm(vec2 p){float v=0.,a=0.5;for(int i=0;i<5;i++){v+=a*noise(p);p=p*2.1+vec2(1.7,9.2);a*=0.5;}return v;}
+      float fbm(vec2 p){float v=0.,a=0.5;for(int i=0;i<3;i++){v+=a*noise(p);p=p*2.1+vec2(1.7,9.2);a*=0.5;}return v;}
       void main(){
         vec2 uv=gl_FragCoord.xy/res; uv.y=1.-uv.y;
         vec3 base=vec3(0.945,0.898,0.847);
         vec3 warm=vec3(0.925,0.820,0.745);
         vec3 accent=vec3(0.900,0.710,0.620);
-        vec3 deep=vec3(0.870,0.620,0.510);
         float n1=fbm(uv*2.2+vec2(t*0.05,0.));
         float n2=fbm(uv*1.6-vec2(0.,t*0.035)+vec2(2.3,1.1));
-        float n3=fbm(uv*3.0+vec2(t*0.025,t*0.04));
         vec3 col=mix(base,warm,n1*0.7);
-        col=mix(col,accent,n2*0.5);
-        col=mix(col,deep,n3*0.25*(1.-uv.y*0.5));
+        col=mix(col,accent,n2*0.45);
         float vig=1.-length((uv-0.5)*1.4);
-        col=mix(col*0.92,col,smoothstep(0.,1.,vig));
+        col=mix(col*0.93,col,smoothstep(0.,1.,vig));
         vec2 m=mouse/res; m.y=1.-m.y;
-        float d=length(uv-m);
-        col+=vec3(0.06,0.03,0.01)*exp(-d*2.5)*0.5;
+        col+=vec3(0.05,0.02,0.01)*exp(-length(uv-m)*2.5)*0.4;
         gl_FragColor=vec4(clamp(col,0.,1.),1.);
       }
     `
@@ -80,7 +76,7 @@ export default function WebGLBackground() {
     }
     window.addEventListener("mousemove", onMove)
 
-    const pts = Array.from({ length: 120 }, () => ({
+    const pts = Array.from({ length: 60 }, () => ({
       x: Math.random() * bg.width, y: Math.random() * bg.height,
       r: Math.random() * 1.2 + 0.2,
       vx: (Math.random() - .5) * 0.15, vy: (Math.random() - .5) * 0.15,
@@ -90,26 +86,27 @@ export default function WebGLBackground() {
 
     let rafId: number
     function render(ts: number) {
-      tmx += (mx - tmx) * 0.08; tmy += (my - tmy) * 0.08
-      gl!.uniform1f(tl, ts * 0.001)
-      gl!.uniform2f(rl, bg!.width, bg!.height)
-      gl!.uniform2f(ml, tmx, tmy)
-      gl!.drawArrays(gl!.TRIANGLE_STRIP, 0, 4)
+      if (!document.hidden) {
+        tmx += (mx - tmx) * 0.08; tmy += (my - tmy) * 0.08
+        gl!.uniform1f(tl, ts * 0.001)
+        gl!.uniform2f(rl, bg!.width, bg!.height)
+        gl!.uniform2f(ml, tmx, tmy)
+        gl!.drawArrays(gl!.TRIANGLE_STRIP, 0, 4)
 
-      ctx!.clearRect(0, 0, pc!.width, pc!.height)
-      pts.forEach(p => {
-        p.x += p.vx; p.y += p.vy; p.tw += 0.015
-        if (p.x < 0) p.x = pc!.width; if (p.x > pc!.width) p.x = 0
-        if (p.y < 0) p.y = pc!.height; if (p.y > pc!.height) p.y = 0
-        const o = p.o * (0.4 + 0.6 * Math.sin(p.tw))
-        ctx!.beginPath(); ctx!.arc(p.x, p.y, p.r, 0, Math.PI * 2)
-        ctx!.fillStyle = `rgba(255,240,220,${o})`; ctx!.fill()
-        if (Math.sin(p.tw * 2) > 0.85) {
-          ctx!.beginPath(); ctx!.arc(p.x, p.y, p.r * 4, 0, Math.PI * 2)
-          ctx!.fillStyle = `rgba(255,220,190,${o * 0.15})`; ctx!.fill()
-        }
-      })
-
+        ctx!.clearRect(0, 0, pc!.width, pc!.height)
+        pts.forEach(p => {
+          p.x += p.vx; p.y += p.vy; p.tw += 0.015
+          if (p.x < 0) p.x = pc!.width; if (p.x > pc!.width) p.x = 0
+          if (p.y < 0) p.y = pc!.height; if (p.y > pc!.height) p.y = 0
+          const o = p.o * (0.4 + 0.6 * Math.sin(p.tw))
+          ctx!.beginPath(); ctx!.arc(p.x, p.y, p.r, 0, Math.PI * 2)
+          ctx!.fillStyle = `rgba(255,240,220,${o})`; ctx!.fill()
+          if (Math.sin(p.tw * 2) > 0.85) {
+            ctx!.beginPath(); ctx!.arc(p.x, p.y, p.r * 4, 0, Math.PI * 2)
+            ctx!.fillStyle = `rgba(255,220,190,${o * 0.15})`; ctx!.fill()
+          }
+        })
+      }
       rafId = requestAnimationFrame(render)
     }
     rafId = requestAnimationFrame(render)

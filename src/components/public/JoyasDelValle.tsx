@@ -102,7 +102,7 @@ export default function JoyasDelValle({ businesses }: { businesses: FeaturedBusi
 
   const tick = useCallback(
     (time: number) => {
-      if (lastTimeRef.current !== undefined && !isPausedRef.current) {
+      if (!document.hidden && lastTimeRef.current !== undefined && !isPausedRef.current) {
         const dt = Math.min(time - lastTimeRef.current, 50) / 1000
         let next = x.get() - SPEED * dt
         if (next <= -SET_W) next += SET_W
@@ -144,13 +144,13 @@ export default function JoyasDelValle({ businesses }: { businesses: FeaturedBusi
           <h2 className="text-4xl sm:text-6xl md:text-9xl font-black tracking-tighter leading-none text-[#2D4530] mb-4 md:mb-6">
             DESTACADOS
           </h2>
-          <div className="flex justify-between items-end">
-            <p className="text-[#C9A44B] font-bold text-xs md:text-sm uppercase tracking-[0.6em] border-l-4 border-[#C9A44B] pl-4">
+          <div className="flex justify-end sm:justify-between items-end gap-4">
+            <p className="hidden sm:block text-[#C9A44B] font-bold text-xs md:text-sm uppercase tracking-[0.6em] border-l-4 border-[#C9A44B] pl-4">
               Descubrí nuestros negocios destacados.
             </p>
             <Link
               href="/negocios"
-              className="group flex items-center gap-2 text-xs font-black text-[#2D4530] uppercase border-b-2 border-[#2D4530] pb-1"
+              className="group flex items-center gap-2 text-xs font-black text-[#2D4530] uppercase border-b-2 border-[#2D4530] pb-1 flex-shrink-0"
             >
               Explorar <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform" />
             </Link>

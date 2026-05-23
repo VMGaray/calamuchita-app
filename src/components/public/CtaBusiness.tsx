@@ -133,12 +133,14 @@ export default function CtaBusiness() {
     }
 
     const draw = () => {
-      const W = canvas.width
-      const H = canvas.height
-      ctx.clearRect(0, 0, W, H)
-      drawGrid()
-      drawParticles()
-      t += 0.016
+      if (!document.hidden) {
+        const W = canvas.width
+        const H = canvas.height
+        ctx.clearRect(0, 0, W, H)
+        drawGrid()
+        drawParticles()
+        t += 0.016
+      }
       animId = requestAnimationFrame(draw)
     }
 

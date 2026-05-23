@@ -74,7 +74,7 @@ export default function CartaInteractiva({ categories, business }: Props) {
 
   return (
     <>
-      <div className="bg-white rounded-2xl p-6" style={{ border: "1px solid rgba(45,69,48,0.1)" }}>
+      <div className="bg-white rounded-2xl p-4 md:p-6" style={{ border: "1px solid rgba(45,69,48,0.1)" }}>
         <div className="flex items-center justify-between mb-6">
           <h2 className="font-serif text-xl" style={{ color: "#2D4530" }}>Carta</h2>
           {totalItems > 0 && (

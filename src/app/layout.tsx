@@ -1,5 +1,8 @@
 import type { Metadata, Viewport } from "next"
+import { Inter } from "next/font/google"
 import "./globals.css"
+
+const inter = Inter({ subsets: ["latin"], display: "swap", variable: "--font-sans" })
 
 export const viewport: Viewport = {
   themeColor: "#2D4530",
@@ -46,7 +49,7 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="es">
+    <html lang="es" className={inter.variable}>
       <body className="cursor-none">
         <ScrollToTop />
         <ClientOnly />
