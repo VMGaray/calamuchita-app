@@ -28,10 +28,10 @@ export const sectionCategories = {
   ],
   health: [
     { label: "Clínicas", desc: "Atención médica general", href: "/directorio/health?cat=clinicas", bg: "bg-brand-pine/10", color: "text-brand-pine" },
-    { label: "Consultorios Médicos", desc: "Consultas especializadas", href: "/directorio/health?cat=consultorios", bg: "bg-brand-pine/10", color: "text-brand-pine" },
     { label: "Especialidades", desc: "Médicos especializados", href: "/directorio/health?cat=especialidades", bg: "bg-brand-slate/10", color: "text-brand-slate" },
-    { label: "Farmacias", desc: "Farmacias del valle", href: "/directorio/health?cat=farmacias", bg: "bg-brand-pine/10", color: "text-brand-pine" },
     { label: "Hospitales y Dispensarios", desc: "Guardias y urgencias", href: "/directorio/health?cat=hospitales", bg: "bg-brand-earth/10", color: "text-brand-earth" },
+    { label: "Laboratorios", desc: "Análisis clínicos y diagnóstico", href: "/directorio/health?cat=laboratorios", bg: "bg-brand-slate/10", color: "text-brand-slate" },
+    { label: "Terapias alternativas", desc: "Kinesiología, acupuntura y más", href: "/directorio/health?cat=terapias", bg: "bg-brand-pine/10", color: "text-brand-pine" },
     { label: "Todos", desc: "Ver todos los servicios de salud", href: "/directorio/health", bg: "bg-brand-sand/50", color: "text-brand-charcoal" },
   ],
   education: [

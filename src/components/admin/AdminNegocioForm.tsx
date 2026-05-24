@@ -35,6 +35,17 @@ const subcategoryOptions: Record<string, string[]> = {
   tourism: MASTER_CATEGORIES.tourism.subcategories.map(s => s.label),
 }
 
+const COBERTURAS = [
+  "APROSS", "IOMA", "OSDE", "PAMI", "Swiss Medical",
+  "Medifé", "Galeno", "Sancor Salud", "Omint", "Particular",
+]
+
+const ESPECIALIDADES_SUGERIDAS = [
+  "Cardiología", "Clínica médica", "Dermatología", "Ginecología",
+  "Kinesiología", "Neurología", "Nutrición", "Odontología",
+  "Oftalmología", "Pediatría", "Psicología", "Traumatología",
+]
+
 const pueblos = [
   "Villa General Belgrano", "Los Reartes", "Santa Rosa de Calamuchita",
   "La Cumbrecita", "Yacanto", "Amboy", "Villa Ciudad de América",
@@ -86,6 +97,9 @@ export default function AdminNegocioForm() {
     logo_url: null as string | null,
     cover_url: null as string | null,
     menu_pdf_url: null as string | null,
+    doctor_name: "",
+    medical_specialties: [] as string[],
+    health_coverages: [] as string[],
   })
 
   const handleChange = (field: string, value: any) => {
@@ -110,6 +124,15 @@ export default function AdminNegocioForm() {
       payment_methods: prev.payment_methods.includes(method)
         ? prev.payment_methods.filter(m => m !== method)
         : [...prev.payment_methods, method]
+    }))
+  }
+
+  const toggleHealthArray = (field: "medical_specialties" | "health_coverages", value: string) => {
+    setForm(prev => ({
+      ...prev,
+      [field]: prev[field].includes(value)
+        ? prev[field].filter(v => v !== value)
+        : [...prev[field], value]
     }))
   }
 
@@ -153,6 +176,9 @@ export default function AdminNegocioForm() {
       logo_url: form.logo_url,
       cover_url: form.cover_url,
       menu_pdf_url: form.menu_pdf_url,
+      doctor_name: form.section === "health" ? form.doctor_name || null : null,
+      medical_specialties: form.section === "health" ? form.medical_specialties : [],
+      health_coverages: form.section === "health" ? form.health_coverages : [],
     })
 
     if (insertError) {
@@ -175,6 +201,7 @@ export default function AdminNegocioForm() {
   }
 
   const isGastronomy = form.section === "gastronomy"
+  const isHealth = form.section === "health"
   const isServicesOrCommerce = ["services", "commerce", "health", "tourism", "education"].includes(form.section)
 
   return (
@@ -385,6 +412,86 @@ export default function AdminNegocioForm() {
                         : "bg-white text-stone-600 border-stone-200 hover:border-primary-300"
                     }`}>
                     {label}
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Salud — campos específicos */}
+        {isHealth && (
+          <div className="bg-white rounded-2xl border border-stone-200 p-6 space-y-5">
+            <h2 className="text-sm font-medium text-stone-700">Información de salud</h2>
+
+            <div>
+              <label className="block text-sm font-medium text-stone-700 mb-1">
+                Nombre del profesional <span className="text-stone-400 font-normal">(opcional)</span>
+              </label>
+              <input
+                type="text"
+                value={form.doctor_name}
+                onChange={e => handleChange("doctor_name", e.target.value)}
+                placeholder="Dr./Dra. Nombre Apellido"
+                className="w-full px-4 py-2.5 rounded-xl border border-stone-200 text-stone-800 text-sm outline-none focus:ring-2 focus:ring-primary-300"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-stone-700 mb-2">Especialidades</label>
+              <div className="flex gap-2 flex-wrap mb-3">
+                {ESPECIALIDADES_SUGERIDAS.map(esp => (
+                  <button
+                    key={esp}
+                    onClick={() => toggleHealthArray("medical_specialties", esp)}
+                    className={`py-1.5 px-3 rounded-xl text-xs font-medium border transition-colors ${
+                      form.medical_specialties.includes(esp)
+                        ? "bg-primary-500 text-white border-primary-500"
+                        : "bg-white text-stone-600 border-stone-200 hover:border-primary-300"
+                    }`}
+                  >
+                    {esp}
+                  </button>
+                ))}
+              </div>
+              <input
+                type="text"
+                placeholder="Escribí una especialidad y presioná Enter..."
+                className="w-full px-4 py-2.5 rounded-xl border border-stone-200 text-stone-800 text-sm outline-none focus:ring-2 focus:ring-primary-300"
+                onKeyDown={e => {
+                  if (e.key === "Enter" && e.currentTarget.value.trim()) {
+                    toggleHealthArray("medical_specialties", e.currentTarget.value.trim())
+                    e.currentTarget.value = ""
+                    e.preventDefault()
+                  }
+                }}
+              />
+              {form.medical_specialties.length > 0 && (
+                <div className="flex gap-2 flex-wrap mt-2">
+                  {form.medical_specialties.map(esp => (
+                    <span key={esp} className="flex items-center gap-1 py-1 px-2.5 rounded-full text-xs bg-primary-50 text-primary-600 border border-primary-100">
+                      {esp}
+                      <button onClick={() => toggleHealthArray("medical_specialties", esp)} className="hover:text-red-400 ml-0.5 leading-none">×</button>
+                    </span>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-stone-700 mb-2">Coberturas aceptadas</label>
+              <div className="flex gap-2 flex-wrap">
+                {COBERTURAS.map(cob => (
+                  <button
+                    key={cob}
+                    onClick={() => toggleHealthArray("health_coverages", cob)}
+                    className={`py-1.5 px-3 rounded-xl text-xs font-medium border transition-colors ${
+                      form.health_coverages.includes(cob)
+                        ? "bg-primary-500 text-white border-primary-500"
+                        : "bg-white text-stone-600 border-stone-200 hover:border-primary-300"
+                    }`}
+                  >
+                    {cob}
                   </button>
                 ))}
               </div>

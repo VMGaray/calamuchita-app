@@ -14,7 +14,7 @@ import {
   PartyPopper, ChefHat, Mic, Medal, Palette, Baby,
   Store, Salad, Shirt, Gem, HardHat, MoreHorizontal,
   Clock3, Landmark, Lightbulb, Bus, Info,
-  Armchair, Dog, HeartPulse, Smartphone
+  Armchair, Dog, HeartPulse, Smartphone, FlaskConical
 } from "lucide-react"
 
 const categoryIcons: Record<string, any> = {
@@ -27,8 +27,9 @@ const categoryIcons: Record<string, any> = {
   "Limpieza": Sparkles, "Mecánica": Car, "Perforaciones": Droplets, "Piletero": Waves,
   "Pintor": Paintbrush, "Plomería": Wrench, "Zinguero": Home,
   // Salud
-  "Clínicas": Building, "Consultorios Médicos": Stethoscope, "Especialidades": Brain,
-  "Farmacias": Pill, "Hospitales y Dispensarios": AlertCircle,
+  "Clínicas": Building, "Especialidades": Brain,
+  "Hospitales y Dispensarios": AlertCircle, "Laboratorios": FlaskConical,
+  "Terapias alternativas": Leaf,
   // Educación
   "Arte y Música": Music, "Colegios": GraduationCap, "Deporte": Trophy,
   "Idiomas": Languages, "Maestras/os Particulares": Users,
