@@ -98,6 +98,8 @@ export default function BusinessesGrid() {
                             alt={business.name}
                             fill
                             className="object-cover"
+                            sizes="(max-width: 768px) 50vw, 25vw"
+                            quality={70}
                           />
                         ) : (
                           <div className="w-full h-full flex items-center justify-center">

@@ -31,8 +31,8 @@ export default function BackgroundManager({ children }: Props) {
             <motion.div
               className="absolute inset-0 pointer-events-none"
               initial={{ scale: 1 }}
-              animate={{ scale: 1.1 }}
-              transition={{ duration: 22, repeat: Infinity, repeatType: "reverse", ease: "easeInOut" }}
+              animate={{ scale: 1.05 }}
+              transition={{ duration: 30, repeat: Infinity, repeatType: "reverse", ease: "easeInOut" }}
               style={
                 imgSrc
                   ? { backgroundImage: `url(${imgSrc})`, backgroundSize: "cover", backgroundPosition: "center" }

@@ -68,6 +68,7 @@ export default function Header() {
 
             <Link
               href="/mapa"
+              prefetch={false}
               className="flex items-center gap-2 px-3 py-1.5 rounded-full transition-all hover:scale-105 active:scale-95"
               style={{
                 background: "rgba(45,69,48,0.4)",

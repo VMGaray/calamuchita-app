@@ -5,7 +5,7 @@ import StatsSection from "@/components/public/StatsSection"
 import CtaBusiness from "@/components/public/CtaBusiness"
 import WaveDivider from "@/components/public/WaveDivider"
 import LocalidadSelectorWidget from "@/components/public/LocalidadSelectorWidget"
-import WebGLBackground from "@/components/public/WebGLBackground"
+import WebGLBackground from "@/components/public/WebGLBackgroundLazy"
 import { createClient } from "@/lib/supabase/server"
 import { LOCALIDADES } from "@/lib/constants/telefonos"
 

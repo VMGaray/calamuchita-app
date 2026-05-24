@@ -176,7 +176,7 @@ export default function MenusDelDiaCarousel() {
 
   // ---- Render: cabecera común a todos los estados ----
   const Header = (
-    <div className="relative z-20 max-w-6xl w-full px-4 md:px-6 mb-8 md:mb-10">
+    <div className="relative z-20 max-w-6xl w-full px-4 md:px-6 mb-4 md:mb-10">
       <div className="grid grid-cols-1 md:grid-cols-5 gap-6 md:gap-10 items-center">
         <motion.div
           initial={{ opacity: 0, x: -30 }}
@@ -196,13 +196,26 @@ export default function MenusDelDiaCarousel() {
         </motion.div>
 
         <motion.div
-          initial={{ opacity: 0, scale: 0.8 }}
-          whileInView={{ opacity: 1, scale: 1 }}
+          initial={{ opacity: 0 }}
+          whileInView={{ opacity: 1 }}
           viewport={{ once: true }}
+          transition={{ duration: 0.6 }}
           className="md:col-span-2 relative flex justify-center md:justify-end"
         >
-          <div className="relative w-48 h-48 sm:w-64 sm:h-64 md:w-80 md:h-80 rounded-full overflow-hidden shadow-[0_25px_60px_rgba(0,0,0,0.2)] border-4 md:border-8 border-white/50">
-            <video src="/videoMenu.mp4" autoPlay loop muted playsInline className="w-full h-full object-cover" />
+          {/* will-change: transform aísla el video en su propia capa GPU */}
+          <div
+            className="relative w-48 h-48 sm:w-64 sm:h-64 md:w-80 md:h-80 rounded-full overflow-hidden shadow-[0_25px_60px_rgba(0,0,0,0.2)] border-4 md:border-8 border-white/50"
+            style={{ willChange: "transform" }}
+          >
+            <video
+              src="/videoMenu.mp4"
+              autoPlay
+              loop
+              muted
+              playsInline
+              preload="auto"
+              className="w-full h-full object-cover"
+            />
             <div className="absolute inset-0 bg-brand-pine/10 pointer-events-none" />
           </div>
           <div className="absolute -z-10 top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[130%] h-[130%] bg-brand-earth/10 rounded-full blur-3xl" />
@@ -224,7 +237,7 @@ export default function MenusDelDiaCarousel() {
   if (loading) {
     return (
       <div
-        className="relative z-60 overflow-hidden py-16 flex flex-col items-center"
+        className="relative z-60 overflow-hidden pt-0 pb-16 md:py-16 flex flex-col items-center"
         style={{ background: "linear-gradient(160deg, #D6CEBC 0%, #C9C0A9 100%)" }}
       >
         {/* Cabecera esqueleto */}
@@ -257,7 +270,7 @@ export default function MenusDelDiaCarousel() {
   if (menus.length === 0) {
     return (
       <div
-        className="relative z-60 overflow-hidden py-16 flex flex-col items-center"
+        className="relative z-60 overflow-hidden pt-0 pb-16 md:py-16 flex flex-col items-center"
         style={{ background: "linear-gradient(160deg, #D6CEBC 0%, #C9C0A9 100%)" }}
       >
         {Header}
@@ -280,7 +293,7 @@ export default function MenusDelDiaCarousel() {
   // ---- Estado: datos listos ----
   return (
     <div
-      className="relative z-60 overflow-hidden py-16 flex flex-col items-center"
+      className="relative z-60 overflow-hidden pt-0 pb-16 md:py-16 flex flex-col items-center"
       style={{ background: "linear-gradient(160deg, #D6CEBC 0%, #C9C0A9 100%)" }}
     >
       {Header}

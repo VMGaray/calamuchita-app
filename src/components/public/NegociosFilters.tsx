@@ -39,41 +39,26 @@ export default function NegociosFilters({ params }: Props) {
   }
 
  return (
-    <div className="mb-6 space-y-3 relative"> {/* Agregamos relative aquí */}
-      
-      {/* ── BARRA DE BÚSQUEDA FLOTANTE ── */}
-      <div className="absolute left-0 right-0 -top-40 md:-top-50 z-50"> 
-        {/* -top-40 en mobile y -top-52 en desktop. 
-           Esto la saca de su lugar y la manda para arriba.
-           Si queda muy alta, bajá el número (ej: -top-32).
-        */}
-        <div className="px-1">
-          <input
-            type="text"
-            placeholder="Buscar por nombre..."
-            defaultValue={params.q || ""}
-            onChange={(e) => updateFilter("q", e.target.value)}
-            className="w-full rounded-2xl px-6 py-4 text-sm outline-none shadow-2xl"
-            style={{
-              background: "rgba(255,255,255,0.15)",
-              backdropFilter: "blur(20px)",
-              WebkitBackdropFilter: "blur(20px)",
-              border: "1px solid rgba(255,255,255,0.30)",
-              color: "#E1DBC9",
-              boxShadow: "0 10px 30px rgba(0,0,0,0.3)"
-            }}
-          />
-        </div>
-      </div>
+    <div className="mb-6 space-y-3">
+      {/* ── BARRA DE BÚSQUEDA ── */}
+      <input
+        type="text"
+        placeholder="Buscar por nombre..."
+        defaultValue={params.q || ""}
+        onChange={(e) => updateFilter("q", e.target.value)}
+        className="w-full rounded-2xl px-5 py-3 text-sm outline-none"
+        style={{
+          background: "rgba(255,255,255,0.10)",
+          backdropFilter: "blur(16px)",
+          WebkitBackdropFilter: "blur(16px)",
+          border: "1px solid rgba(255,255,255,0.20)",
+          color: "#E1DBC9",
+        }}
+      />
 
-      {/* ── ESPACIADOR ── */}
-      {/* Como la barra de arriba ahora es absoluta, no ocupa espacio. 
-          Dejamos este div para que los botones de categorías no se peguen al título */}
-      <div className="h-2" />
-
-      {/* ── FILTROS (LAS PELOTITAS) ── */}
+      {/* ── FILTROS ── */}
       <div
-        className="flex gap-2 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden relative z-40"
+        className="flex gap-2 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
         style={{
           paddingBottom: "2px",
           WebkitMaskImage: "linear-gradient(to right, black 85%, transparent 100%)",

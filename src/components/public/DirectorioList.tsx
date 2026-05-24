@@ -13,6 +13,7 @@ import { createClient } from "@/lib/supabase/client"
 import { sectionCategories, SectionKey } from "@/lib/sections"
 import { Phone, AtSign, MapPin, X, LayoutGrid, Check } from "lucide-react"
 import Link from "next/link"
+import Image from "next/image"
 
 interface Business {
   id: string
@@ -344,7 +345,7 @@ export default function DirectorioList({ section, filters }: Props) {
                       <Link href={`/directorio/${section}/${business.slug}`} className="block">
                         <div className="h-48 md:h-32 relative" style={{ background: "rgba(255,255,255,0.08)" }}>
                           {business.cover_url ? (
-                            <img src={business.cover_url} alt={business.name} className="w-full h-full object-cover" />
+                            <Image src={business.cover_url} alt={business.name} fill className="object-cover" sizes="(max-width: 768px) 88vw, (max-width: 1024px) 50vw, 33vw" quality={70} />
                           ) : (
                             <div className="w-full h-full flex items-center justify-center">
                               <div

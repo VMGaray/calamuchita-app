@@ -7,6 +7,7 @@ import { SkeletonBusinessGrid } from "@/components/ui/Skeleton"
 import { createClient } from "@/lib/supabase/client"
 import Link from "next/link"
 import Image from "next/image"
+import { ChevronLeft, ChevronRight } from "lucide-react"
 
 interface Business {
   id: string
@@ -38,8 +39,33 @@ const categoryLabel: Record<string, string> = {
 export default function NegociosList({ params }: Props) {
   const [businesses, setBusinesses] = useState<Business[]>([])
   const [loading, setLoading] = useState(true)
+  const [atStart, setAtStart] = useState(true)
+  const [atEnd, setAtEnd] = useState(false)
   const resultsRef = useRef<HTMLDivElement>(null)
+  const scrollRef = useRef<HTMLDivElement>(null)
   const isFirstRender = useRef(true)
+
+  const checkScroll = () => {
+    const el = scrollRef.current
+    if (!el) return
+    setAtStart(el.scrollLeft <= 4)
+    setAtEnd(el.scrollLeft >= el.scrollWidth - el.clientWidth - 4)
+  }
+
+  useEffect(() => {
+    const el = scrollRef.current
+    if (!el) return
+    checkScroll()
+    el.addEventListener("scroll", checkScroll, { passive: true })
+    return () => el.removeEventListener("scroll", checkScroll)
+  }, [businesses])
+
+  const scrollBy = (dir: "left" | "right") => {
+    const el = scrollRef.current
+    if (!el) return
+    const cardWidth = el.clientWidth * 0.88 + 16
+    el.scrollBy({ left: dir === "left" ? -cardWidth : cardWidth, behavior: "smooth" })
+  }
 
   useEffect(() => {
     const fetchBusinesses = async () => {
@@ -98,7 +124,43 @@ export default function NegociosList({ params }: Props) {
       <p className="text-xs mb-4 font-medium" style={{ color: "rgba(255,255,255,0.60)" }}>
         {businesses.length} resultado{businesses.length !== 1 ? "s" : ""}
       </p>
-      <div className="flex gap-4 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden snap-x snap-mandatory -mx-4 px-4 pb-6 md:mx-0 md:px-0 md:grid md:grid-cols-2 lg:grid-cols-3 md:overflow-x-visible md:pb-0">
+
+      {/* Wrapper relativo solo en mobile para posicionar las flechas */}
+      <div className="relative">
+        {businesses.length > 1 && (
+          <>
+            <button
+              onClick={() => scrollBy("left")}
+              className="md:hidden absolute left-0 top-[calc(50%-24px)] -translate-y-1/2 z-10 w-8 h-8 flex items-center justify-center rounded-full transition-opacity duration-200"
+              style={{
+                background: "rgba(45,69,48,0.85)",
+                border: "1px solid rgba(163,177,138,0.4)",
+                boxShadow: "0 2px 12px rgba(0,0,0,0.3)",
+                opacity: atStart ? 0 : 1,
+                pointerEvents: atStart ? "none" : "auto",
+              }}
+              aria-label="Anterior"
+            >
+              <ChevronLeft size={16} color="#E1DBC9" />
+            </button>
+            <button
+              onClick={() => scrollBy("right")}
+              className="md:hidden absolute right-0 top-[calc(50%-24px)] -translate-y-1/2 z-10 w-8 h-8 flex items-center justify-center rounded-full transition-opacity duration-200"
+              style={{
+                background: "rgba(45,69,48,0.85)",
+                border: "1px solid rgba(163,177,138,0.4)",
+                boxShadow: "0 2px 12px rgba(0,0,0,0.3)",
+                opacity: atEnd ? 0 : 1,
+                pointerEvents: atEnd ? "none" : "auto",
+              }}
+              aria-label="Siguiente"
+            >
+              <ChevronRight size={16} color="#E1DBC9" />
+            </button>
+          </>
+        )}
+
+      <div ref={scrollRef} className="flex gap-4 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden snap-x snap-mandatory -mx-4 px-4 pb-6 md:mx-0 md:px-0 md:grid md:grid-cols-2 lg:grid-cols-3 md:overflow-x-visible md:pb-0">
         {businesses.map(({ id, name, slug, category, subcategory, address, cover_url, is_open, offers_delivery, description }, i) => (
           <AnimateIn key={id} direction="up" delay={i * 0.07} className="w-[88vw] flex-shrink-0 snap-center md:w-auto">
             <Card3D>
@@ -115,7 +177,7 @@ export default function NegociosList({ params }: Props) {
                   {/* Cover — más alto en mobile para lucir la foto */}
                   <div className="h-52 md:h-36 relative" style={{ background: "rgba(255,255,255,0.08)" }}>
                     {cover_url ? (
-                      <Image src={cover_url} alt={name} fill className="object-cover" />
+                      <Image src={cover_url} alt={name} fill className="object-cover" sizes="(max-width: 768px) 88vw, (max-width: 1024px) 50vw, 33vw" quality={70} />
                     ) : (
                       <div className="w-full h-full flex items-center justify-center">
                         <div
@@ -166,6 +228,7 @@ export default function NegociosList({ params }: Props) {
             </Card3D>
           </AnimateIn>
         ))}
+      </div>
       </div>
     </div>
   )

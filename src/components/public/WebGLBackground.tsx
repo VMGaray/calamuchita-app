@@ -76,7 +76,9 @@ export default function WebGLBackground() {
     }
     window.addEventListener("mousemove", onMove)
 
-    const pts = Array.from({ length: 60 }, () => ({
+    const isMobile = window.innerWidth < 768
+    const particleCount = isMobile ? 20 : 45
+    const pts = Array.from({ length: particleCount }, () => ({
       x: Math.random() * bg.width, y: Math.random() * bg.height,
       r: Math.random() * 1.2 + 0.2,
       vx: (Math.random() - .5) * 0.15, vy: (Math.random() - .5) * 0.15,
@@ -84,30 +86,36 @@ export default function WebGLBackground() {
       tw: Math.random() * Math.PI * 2
     }))
 
+    // Throttle a ~24fps para reducir carga de GPU
+    const TARGET_FPS = isMobile ? 20 : 24
+    const FRAME_MS = 1000 / TARGET_FPS
+    let lastFrame = 0
     let rafId: number
-    function render(ts: number) {
-      if (!document.hidden) {
-        tmx += (mx - tmx) * 0.08; tmy += (my - tmy) * 0.08
-        gl!.uniform1f(tl, ts * 0.001)
-        gl!.uniform2f(rl, bg!.width, bg!.height)
-        gl!.uniform2f(ml, tmx, tmy)
-        gl!.drawArrays(gl!.TRIANGLE_STRIP, 0, 4)
 
-        ctx!.clearRect(0, 0, pc!.width, pc!.height)
-        pts.forEach(p => {
-          p.x += p.vx; p.y += p.vy; p.tw += 0.015
-          if (p.x < 0) p.x = pc!.width; if (p.x > pc!.width) p.x = 0
-          if (p.y < 0) p.y = pc!.height; if (p.y > pc!.height) p.y = 0
-          const o = p.o * (0.4 + 0.6 * Math.sin(p.tw))
-          ctx!.beginPath(); ctx!.arc(p.x, p.y, p.r, 0, Math.PI * 2)
-          ctx!.fillStyle = `rgba(255,240,220,${o})`; ctx!.fill()
-          if (Math.sin(p.tw * 2) > 0.85) {
-            ctx!.beginPath(); ctx!.arc(p.x, p.y, p.r * 4, 0, Math.PI * 2)
-            ctx!.fillStyle = `rgba(255,220,190,${o * 0.15})`; ctx!.fill()
-          }
-        })
-      }
+    function render(ts: number) {
       rafId = requestAnimationFrame(render)
+      if (document.hidden || ts - lastFrame < FRAME_MS) return
+      lastFrame = ts
+
+      tmx += (mx - tmx) * 0.08; tmy += (my - tmy) * 0.08
+      gl!.uniform1f(tl, ts * 0.001)
+      gl!.uniform2f(rl, bg!.width, bg!.height)
+      gl!.uniform2f(ml, tmx, tmy)
+      gl!.drawArrays(gl!.TRIANGLE_STRIP, 0, 4)
+
+      ctx!.clearRect(0, 0, pc!.width, pc!.height)
+      pts.forEach(p => {
+        p.x += p.vx; p.y += p.vy; p.tw += 0.015
+        if (p.x < 0) p.x = pc!.width; if (p.x > pc!.width) p.x = 0
+        if (p.y < 0) p.y = pc!.height; if (p.y > pc!.height) p.y = 0
+        const o = p.o * (0.4 + 0.6 * Math.sin(p.tw))
+        ctx!.beginPath(); ctx!.arc(p.x, p.y, p.r, 0, Math.PI * 2)
+        ctx!.fillStyle = `rgba(255,240,220,${o})`; ctx!.fill()
+        if (Math.sin(p.tw * 2) > 0.85) {
+          ctx!.beginPath(); ctx!.arc(p.x, p.y, p.r * 4, 0, Math.PI * 2)
+          ctx!.fillStyle = `rgba(255,220,190,${o * 0.15})`; ctx!.fill()
+        }
+      })
     }
     rafId = requestAnimationFrame(render)
 
