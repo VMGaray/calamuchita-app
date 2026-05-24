@@ -2,16 +2,17 @@
 
 import Link from "next/link"
 import { usePathname, useRouter } from "next/navigation"
-import { MapPin, LayoutDashboard, BookOpen, CalendarDays, ShoppingBag, Settings, LogOut } from "lucide-react"
+import { MapPin, LayoutDashboard, BookOpen, CalendarDays, ShoppingBag, Settings, LogOut, BarChart2, UtensilsCrossed } from "lucide-react"
 import { createClient } from "@/lib/supabase/client"
 
 const links = [
-  { href: "/dashboard", label: "Inicio", icon: LayoutDashboard },
-  { href: "/dashboard/carta", label: "Carta", icon: BookOpen },
-  { href: "/dashboard/menu-del-dia", label: "Menú del día", icon: CalendarDays },
-  { href: "/dashboard/pedidos", label: "Pedidos", icon: ShoppingBag },
-  { href: "/dashboard/reservas", label: "Reservas", icon: CalendarDays },
-  { href: "/dashboard/configuracion", label: "Mi local", icon: Settings },
+  { href: "/dashboard",               label: "Inicio",       icon: LayoutDashboard },
+  { href: "/dashboard/menu-del-dia",  label: "Menú del día", icon: UtensilsCrossed },
+  { href: "/dashboard/carta",         label: "Carta",        icon: BookOpen        },
+  { href: "/dashboard/pedidos",       label: "Pedidos",      icon: ShoppingBag     },
+  { href: "/dashboard/reservas",      label: "Reservas",     icon: CalendarDays    },
+  { href: "/dashboard/estadisticas",  label: "Estadísticas", icon: BarChart2       },
+  { href: "/dashboard/configuracion", label: "Mi local",     icon: Settings        },
 ]
 
 export default function Sidebar() {

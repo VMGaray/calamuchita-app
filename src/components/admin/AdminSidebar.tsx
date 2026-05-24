@@ -14,11 +14,13 @@ import {
   CreditCard,
   Settings,
   ExternalLink,
+  UserPlus,
 } from "lucide-react"
 
 const links = [
   { href: "/admin",                  label: "Dashboard",      icon: LayoutDashboard },
   { href: "/admin/negocios",         label: "Negocios",       icon: Building2       },
+  { href: "/admin/solicitudes",      label: "Solicitudes",    icon: UserPlus        },
   { href: "/admin/eventos",          label: "Eventos",        icon: CalendarDays    },
   { href: "/admin/stats",            label: "Estadísticas",   icon: BarChart2       },
   { href: "/admin/promociones",      label: "Promociones",    icon: BadgePercent    },

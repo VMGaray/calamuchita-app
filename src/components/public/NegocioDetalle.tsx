@@ -51,6 +51,10 @@ export default function NegocioDetalle({ business }: Props) {
     createClient().rpc("increment_view", { business_id: business.id }).then()
   }, [business.id])
 
+  const recordLead = (type: string) => {
+    createClient().from("business_leads").insert({ business_id: business.id, type }).then()
+  }
+
   const waNumber = (business.whatsapp || business.phone)?.replace(/\D/g, "")
   const waLink = waNumber
     ? `https://wa.me/${waNumber}?text=${encodeURIComponent(`Hola! Me contacto desde Calamuchita App por el negocio ${business.name}.`)}`
@@ -71,12 +75,14 @@ export default function NegocioDetalle({ business }: Props) {
     if (hasMenu) {
       cartaRef.current?.scrollIntoView({ behavior: "smooth", block: "start" })
     } else if (waNumber) {
+      recordLead("whatsapp")
       const msg = encodeURIComponent(`Hola ${business.name}! Quiero hacer un pedido. ¿Me compartís el menú disponible? Gracias!`)
       window.open(`https://wa.me/${waNumber}?text=${msg}`, "_blank")
     }
   }
 
   const handleEnviarReserva = () => {
+    recordLead("reserva")
     const phone = (business.whatsapp || business.phone)?.replace(/\D/g, "") || ""
     const fullPhone = phone.startsWith("54") ? phone : `54${phone}`
     const msg = encodeURIComponent(
@@ -261,7 +267,11 @@ export default function NegocioDetalle({ business }: Props) {
                 
                 <div className="space-y-4">
                   {business.phone && (
-                    <div className="flex items-center gap-4">
+                    <a
+                      href={`tel:${business.phone}`}
+                      onClick={() => recordLead("phone")}
+                      className="flex items-center gap-4 hover:opacity-80 transition-opacity"
+                    >
                       <div className="w-10 h-10 rounded-xl bg-stone-100 flex items-center justify-center">
                         <Phone size={18} className="text-stone-500" />
                       </div>
@@ -269,7 +279,7 @@ export default function NegocioDetalle({ business }: Props) {
                         <p className="text-[10px] text-stone-400 font-bold uppercase">Teléfono</p>
                         <p className="text-sm font-bold text-stone-800">{business.phone}</p>
                       </div>
-                    </div>
+                    </a>
                   )}
 
                   {business.address && (
@@ -312,9 +322,11 @@ export default function NegocioDetalle({ business }: Props) {
               </div>
 
               {waLink && (
-                <a 
+                <a
                   href={waLink}
                   target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={() => recordLead("whatsapp")}
                   className="flex items-center justify-center gap-3 bg-[#25D366] text-white py-5 font-black text-xs uppercase tracking-widest hover:brightness-110 transition-all"
                 >
                   <MessageCircle size={20} fill="currentColor" />

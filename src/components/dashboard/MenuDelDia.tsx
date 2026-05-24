@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react"
 import { createClient } from "@/lib/supabase/client"
 import { Plus, Trash2, Eye, EyeOff } from "lucide-react"
+import ImageUpload from "@/components/ui/ImageUpload"
 
 interface DailyMenuItem {
   id?: string
@@ -10,6 +11,7 @@ interface DailyMenuItem {
   description: string
   price: string
   includes_drink: boolean
+  image_url: string | null
 }
 
 export default function MenuDelDia() {
@@ -60,6 +62,7 @@ export default function MenuDelDia() {
           description: i.description || "",
           price: i.price.toString(),
           includes_drink: i.includes_drink,
+          image_url: i.image_url || null,
         })))
       }
 
@@ -81,6 +84,7 @@ export default function MenuDelDia() {
           description: i.description || "",
           price: i.price.toString(),
           includes_drink: i.includes_drink,
+          image_url: null, // no copiamos fotos del día anterior
         })))
       }
 
@@ -91,7 +95,7 @@ export default function MenuDelDia() {
   }, [])
 
   const addItem = () => {
-    setItems(prev => [...prev, { name: "", description: "", price: "", includes_drink: false }])
+    setItems(prev => [...prev, { name: "", description: "", price: "", includes_drink: false, image_url: null }])
   }
 
   const removeItem = (index: number) => {
@@ -130,10 +134,10 @@ export default function MenuDelDia() {
           description: i.description || null,
           price: parseFloat(i.price),
           includes_drink: i.includes_drink,
+          image_url: i.image_url || null,
         }))
       )
     } else {
-      // Crear nuevo menú
       const { data: newMenu } = await supabase
         .from("daily_menus")
         .insert({ business_id: businessId, date: today, is_published: publish })
@@ -149,6 +153,7 @@ export default function MenuDelDia() {
             description: i.description || null,
             price: parseFloat(i.price),
             includes_drink: i.includes_drink,
+            image_url: i.image_url || null,
           }))
         )
       }
@@ -264,7 +269,17 @@ export default function MenuDelDia() {
               </div>
             </div>
 
-            <label className="flex items-center gap-2 cursor-pointer">
+            <div className="mt-3">
+              <p className="text-xs text-stone-500 mb-2">Foto del plato (opcional)</p>
+              <ImageUpload
+                value={item.image_url}
+                onChange={(url) => updateItem(index, "image_url", url)}
+                folder="menu-items"
+                label=""
+              />
+            </div>
+
+            <label className="flex items-center gap-2 cursor-pointer mt-3">
               <input
                 type="checkbox"
                 checked={item.includes_drink}
