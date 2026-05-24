@@ -1,7 +1,8 @@
 "use client"
 
+import { useRef, useState, useEffect } from "react"
 import { motion } from "framer-motion"
-import { Share2, ArrowRight, Tag, Calendar } from "lucide-react"
+import { Share2, ArrowRight, Tag, Calendar, ChevronLeft, ChevronRight } from "lucide-react"
 import Link from "next/link"
 import AnimateIn from "@/components/ui/AnimateIn"
 
@@ -151,8 +152,32 @@ export default function CalamuchitaSale({
 }: {
   promotions: Promotion[]
 }) {
-  // Si no hay promos, no se muestra la sección
   if (!promotions || promotions.length === 0) return null
+
+  const scrollRef = useRef<HTMLDivElement>(null)
+  const [atStart, setAtStart] = useState(true)
+  const [atEnd, setAtEnd] = useState(false)
+
+  const checkScroll = () => {
+    const el = scrollRef.current
+    if (!el) return
+    setAtStart(el.scrollLeft <= 4)
+    setAtEnd(el.scrollLeft >= el.scrollWidth - el.clientWidth - 4)
+  }
+
+  useEffect(() => {
+    const el = scrollRef.current
+    if (!el) return
+    checkScroll()
+    el.addEventListener("scroll", checkScroll, { passive: true })
+    return () => el.removeEventListener("scroll", checkScroll)
+  }, [])
+
+  const scrollBy = (dir: "left" | "right") => {
+    const el = scrollRef.current
+    if (!el) return
+    el.scrollBy({ left: dir === "left" ? -(el.clientWidth * 0.85) : el.clientWidth * 0.85, behavior: "smooth" })
+  }
 
   const handleShare = async (promo: Promotion) => {
     const biz = promo.businesses
@@ -178,22 +203,64 @@ export default function CalamuchitaSale({
       <AnimateIn direction="left">
         <div className="flex items-center gap-2 mb-1">
           <Tag size={14} style={{ color: "#B85C38" }} />
-          <span
-            className="text-xs font-semibold uppercase tracking-widest"
-            style={{ color: "#B85C38" }}
-          >
+          <span className="text-xs font-semibold uppercase tracking-widest" style={{ color: "#B85C38" }}>
             Ofertas vigentes
           </span>
         </div>
-        <h2
-          className="font-serif text-2xl md:text-3xl mb-6"
-          style={{ color: "#2D1A0E" }}
-        >
+        <h2 className="font-serif text-2xl md:text-3xl mb-6" style={{ color: "#2D1A0E" }}>
           Calamuchita Sale
         </h2>
       </AnimateIn>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-8">
+      {/* ── MOBILE: carrusel con flechas ── */}
+      <div className="md:hidden relative">
+        {promotions.length > 1 && (
+          <>
+            <button
+              onClick={() => scrollBy("left")}
+              className="absolute left-0 top-1/2 -translate-y-1/2 z-10 w-8 h-8 flex items-center justify-center rounded-full transition-opacity duration-200"
+              style={{
+                background: "rgba(184,92,56,0.85)",
+                border: "1px solid rgba(196,164,128,0.5)",
+                boxShadow: "0 2px 12px rgba(0,0,0,0.15)",
+                opacity: atStart ? 0 : 1,
+                pointerEvents: atStart ? "none" : "auto",
+              }}
+              aria-label="Anterior"
+            >
+              <ChevronLeft size={16} color="#FFFAF4" />
+            </button>
+            <button
+              onClick={() => scrollBy("right")}
+              className="absolute right-0 top-1/2 -translate-y-1/2 z-10 w-8 h-8 flex items-center justify-center rounded-full transition-opacity duration-200"
+              style={{
+                background: "rgba(184,92,56,0.85)",
+                border: "1px solid rgba(196,164,128,0.5)",
+                boxShadow: "0 2px 12px rgba(0,0,0,0.15)",
+                opacity: atEnd ? 0 : 1,
+                pointerEvents: atEnd ? "none" : "auto",
+              }}
+              aria-label="Siguiente"
+            >
+              <ChevronRight size={16} color="#FFFAF4" />
+            </button>
+          </>
+        )}
+
+        <div
+          ref={scrollRef}
+          className="flex gap-4 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden snap-x snap-mandatory -mx-2 px-2 pb-2"
+        >
+          {promotions.map((promo) => (
+            <div key={promo.id} className="w-[85vw] flex-shrink-0 snap-center">
+              <TicketCard promo={promo} onShare={() => handleShare(promo)} />
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* ── DESKTOP: grilla original ── */}
+      <div className="hidden md:grid md:grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-8">
         {promotions.map((promo, i) => (
           <AnimateIn key={promo.id} direction="up" delay={i * 0.07}>
             <TicketCard promo={promo} onShare={() => handleShare(promo)} />
