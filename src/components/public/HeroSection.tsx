@@ -20,7 +20,7 @@ export default function HeroSection() {
   }
 
   return (
-    <section className="relative px-4 pt-6 md:pt-8 pb-16 md:pb-20 text-center overflow-hidden min-h-[300px] md:min-h-[480px]">
+    <section className="relative px-4 pt-6 md:pt-8 pb-28 md:pb-20 text-center overflow-hidden min-h-[300px] md:min-h-[480px]">
 
       {/* Eyebrow */}
       <motion.span

@@ -57,8 +57,8 @@ export default function StickyCategoryBar({ stickyOffset = 0 }: Props) {
       <div className="sticky z-[100] px-3 py-3" style={{ top: stickyOffset }}>
 
         {/* ── MOBILE: grid 4 × 2 ── */}
-        <div className="md:hidden rounded-2xl p-2" style={glassContainer}>
-          <div className="grid grid-cols-4 gap-2">
+        <div className="md:hidden rounded-2xl p-1.5" style={glassContainer}>
+          <div className="grid grid-cols-4 gap-1.5">
             {categories.map(({ key, label, icon: Icon }) => {
               const active = activeSection === key
               return (
@@ -67,25 +67,24 @@ export default function StickyCategoryBar({ stickyOffset = 0 }: Props) {
                   onClick={() => handleClick(key)}
                   whileTap={{ scale: 0.92 }}
                   transition={{ type: "spring", stiffness: 500, damping: 28 }}
-                  className="flex flex-col items-center justify-center gap-1.5 py-3 px-1 rounded-2xl cursor-pointer"
+                  className="flex flex-col items-center justify-center gap-1 py-2 px-1 rounded-xl cursor-pointer"
                   style={{
                     background: active
-                      ? "rgba(45,69,48,0.82)"
-                      : "rgba(255,255,255,0.12)",
+                      ? "rgba(45,69,48,0.78)"
+                      : "rgba(255,255,255,0.10)",
                     border: active
-                      ? "1px solid rgba(45,69,48,0.90)"
-                      : "1px solid rgba(255,255,255,0.30)",
-                    color: active ? "#E1DBC9" : "rgba(45,69,48,0.80)",
+                      ? "1px solid rgba(45,69,48,0.85)"
+                      : "1px solid rgba(255,255,255,0.22)",
+                    color: active ? "#E1DBC9" : "rgba(45,69,48,0.75)",
                   }}
                 >
                   <Icon
-                    size={22}
-                    strokeWidth={active ? 2.2 : 1.7}
+                    size={17}
+                    strokeWidth={active ? 2.2 : 1.6}
                     style={{ color: active ? "#E1DBC9" : undefined }}
                   />
                   <span
-                    className={`text-[9px] uppercase leading-tight text-center ${active ? "font-bold" : "font-medium"}`}
-                    style={{ letterSpacing: "0.04em" }}
+                    className={`text-[8px] leading-tight text-center tracking-wide ${active ? "font-semibold" : "font-medium"}`}
                   >
                     {label}
                   </span>
