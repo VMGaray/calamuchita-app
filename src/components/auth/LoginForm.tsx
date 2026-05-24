@@ -42,8 +42,9 @@ export default function LoginForm() {
     setForgotLoading(true)
     setForgotError(null)
     const supabase = createClient()
+    const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || window.location.origin
     const { error } = await supabase.auth.resetPasswordForEmail(forgotEmail, {
-      redirectTo: `${window.location.origin}/reset-password`,
+      redirectTo: `${siteUrl}/auth/callback?next=/reset-password`,
     })
     setForgotLoading(false)
     if (error) {
