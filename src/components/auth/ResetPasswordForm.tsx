@@ -14,13 +14,30 @@ export default function ResetPasswordForm() {
   const [success, setSuccess] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
-  useEffect(() => {
-    const supabase = createClient()
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setHasSession(!!session)
+ useEffect(() => {
+  const supabase = createClient()
+  
+  // Escuchar cuando Supabase intercambia el code por una sesión
+  const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+    if (event === "PASSWORD_RECOVERY") {
+      setHasSession(true)
       setVerifying(false)
-    })
-  }, [])
+    } else if (event === "SIGNED_IN" && session) {
+      setHasSession(true)
+      setVerifying(false)
+    }
+  })
+
+  // También verificar si ya hay sesión activa
+  supabase.auth.getSession().then(({ data: { session } }) => {
+    if (session) {
+      setHasSession(true)
+    }
+    setVerifying(false)
+  })
+
+  return () => subscription.unsubscribe()
+}, [])
 
   const handleReset = async () => {
     if (password !== confirmPassword) {

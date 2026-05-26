@@ -8,7 +8,10 @@ import AnimateIn from "@/components/ui/AnimateIn"
 const pueblos = [
   "Villa General Belgrano", "Los Reartes", "Santa Rosa de Calamuchita",
   "La Cumbrecita", "Yacanto", "Amboy", "Villa Ciudad de América",
-  "Embalse", "Villa del Dique",
+  "Embalse", "Villa del Dique", "Villa Rumipal", "Los Molinos",
+  "Almafuerte", "Villa Berna", "Arroyo San Antonio", "Lutti",
+  "Río de los Sauces", "Las Bajadas", "Villa Quillinzo", "Calmayo",
+  "La Molina", "Cerro Los Linderos",
 ]
 
 const sections = [
@@ -31,7 +34,7 @@ export default function Footer() {
         <motion.div
           className="flex gap-8 whitespace-nowrap"
           animate={{ x: ["0%", "-50%"] }}
-          transition={{ duration: 30, repeat: Infinity, ease: "linear" }}
+          transition={{ duration: 45, repeat: Infinity, ease: "linear" }}
         >
           {[...pueblos, ...pueblos].map((pueblo, i) => (
             <span key={i} className="text-xs font-medium tracking-widest uppercase flex items-center gap-8"
@@ -84,29 +87,10 @@ export default function Footer() {
 
           <AnimateIn direction="up" delay={0.2}>
             <div>
-              <p className="text-xs font-medium uppercase tracking-wider mb-4" style={{ color: "rgba(225,219,201,0.35)" }}>
-                Para comercios
-              </p>
-              <ul className="space-y-2 mb-6">
-                <li>
-                  <Link href="/registro" className="text-sm transition-colors"
-                    style={{ color: "rgba(225,219,201,0.45)" }}
-                    onMouseEnter={e => (e.currentTarget.style.color = "#E1DBC9")}
-                    onMouseLeave={e => (e.currentTarget.style.color = "rgba(225,219,201,0.45)")}>
-                    Sumá tu local
-                  </Link>
-                </li>
-                <li>
-                  <Link href="/login" className="text-sm transition-colors"
-                    style={{ color: "rgba(225,219,201,0.45)" }}
-                    onMouseEnter={e => (e.currentTarget.style.color = "#E1DBC9")}
-                    onMouseLeave={e => (e.currentTarget.style.color = "rgba(225,219,201,0.45)")}>
-                    Acceder al panel
-                  </Link>
-                </li>
-              </ul>
               <motion.a
-                href="/registro"
+                href="https://wa.me/5491145311047"
+                target="_blank"
+                rel="noopener noreferrer"
                 className="inline-block px-5 py-2.5 rounded-xl text-sm font-medium"
                 style={{ background: "rgba(225,219,201,0.1)", border: "1px solid rgba(225,219,201,0.2)", color: "#E1DBC9" }}
                 whileHover={{ background: "rgba(225,219,201,0.18)" }}
@@ -122,9 +106,17 @@ export default function Footer() {
           <p className="text-xs" style={{ color: "rgba(225,219,201,0.25)" }}>
             © 2025 Calamuchita App · Valle de Calamuchita, Córdoba
           </p>
-          <p className="text-xs" style={{ color: "rgba(225,219,201,0.25)" }}>
-            Hecho con amor en las sierras 🌿
-          </p>
+          <a
+            href="https://vmg-setup-ai.vercel.app/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-xs transition-colors"
+            style={{ color: "rgba(225,219,201,0.25)" }}
+            onMouseEnter={e => (e.currentTarget.style.color = "#E1DBC9")}
+            onMouseLeave={e => (e.currentTarget.style.color = "rgba(225,219,201,0.25)")}
+          >
+            VMG.Setup.Ai
+          </a>
         </div>
       </div>
     </footer>
