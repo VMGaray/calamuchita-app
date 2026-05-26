@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useEffect, useState, type ElementType } from "react"
 import { createClient } from "@/lib/supabase/client"
 import { Globe, Phone, Instagram, MapPin, Mail, Save, CheckCircle, AlertCircle, Loader2 } from "lucide-react"
 
@@ -42,7 +42,7 @@ function Field({
   label, icon: Icon, value, onChange, placeholder, type = "text", textarea = false,
 }: {
   label: string
-  icon: React.ElementType
+  icon: ElementType
   value: string
   onChange: (v: string) => void
   placeholder?: string
