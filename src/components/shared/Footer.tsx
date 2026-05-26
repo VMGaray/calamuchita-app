@@ -1,17 +1,15 @@
 "use client"
 
+import { useEffect, useState } from "react"
 import Link from "next/link"
 import { motion } from "framer-motion"
 import { MapPin } from "lucide-react"
 import AnimateIn from "@/components/ui/AnimateIn"
+import { createClient } from "@/lib/supabase/client"
 
-const pueblos = [
+const FALLBACK_PUEBLOS = [
   "Villa General Belgrano", "Los Reartes", "Santa Rosa de Calamuchita",
-  "La Cumbrecita", "Yacanto", "Amboy", "Villa Ciudad de América",
-  "Embalse", "Villa del Dique", "Villa Rumipal", "Los Molinos",
-  "Almafuerte", "Villa Berna", "Arroyo San Antonio", "Lutti",
-  "Río de los Sauces", "Las Bajadas", "Villa Quillinzo", "Calmayo",
-  "La Molina", "Cerro Los Linderos",
+  "La Cumbrecita", "Yacanto", "Amboy", "Embalse", "Villa del Dique",
 ]
 
 const sections = [
@@ -26,6 +24,18 @@ const sections = [
 ]
 
 export default function Footer() {
+  const [pueblos, setPueblos] = useState<string[]>(FALLBACK_PUEBLOS)
+
+  useEffect(() => {
+    createClient()
+      .from("localities")
+      .select("name")
+      .order("sort_order")
+      .then(({ data }) => {
+        if (data && data.length > 0) setPueblos(data.map(l => l.name))
+      })
+  }, [])
+
   return (
     <footer style={{ background: "#0e1a10", borderTop: "1px solid rgba(225,219,201,0.08)" }}>
 
