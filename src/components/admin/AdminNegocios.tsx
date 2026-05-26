@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react"
 import Link from "next/link"
-import { Plus, Pencil, Trash2, Eye, ArrowUpDown, ArrowUp, ArrowDown } from "lucide-react"
+import { Plus, Pencil, Trash2, Eye, ArrowUpDown, ArrowUp, ArrowDown, Star } from "lucide-react"
 import { createClient } from "@/lib/supabase/client"
 import { Business } from "@/types/database"
 
@@ -84,6 +84,12 @@ export default function AdminNegocios() {
     const supabase = createClient()
     await supabase.from("businesses").update({ status: newStatus }).eq("id", id)
     fetchBusinesses()
+  }
+
+  const handleTogglePremium = async (id: string, current: boolean) => {
+    const supabase = createClient()
+    await supabase.from("businesses").update({ is_premium: !current }).eq("id", id)
+    setBusinesses(prev => prev.map(b => b.id === id ? { ...b, is_premium: !current } : b))
   }
 
   const handleSort = (key: SortKey) => {
@@ -199,7 +205,15 @@ export default function AdminNegocios() {
 
               {/* Info */}
               <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium text-stone-800 truncate">{business.name}</p>
+                <div className="flex items-center gap-2">
+                  <p className="text-sm font-medium text-stone-800 truncate">{business.name}</p>
+                  {business.is_premium && (
+                    <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full text-[10px] font-bold bg-yellow-100 text-yellow-700 flex-shrink-0">
+                      <Star size={9} fill="currentColor" />
+                      Destacado
+                    </span>
+                  )}
+                </div>
                 <div className="flex items-center gap-2 mt-0.5 flex-wrap">
                   <span className="text-xs text-stone-400">{sectionLabels[business.section]}</span>
                   {business.subcategory && (
@@ -246,6 +260,17 @@ export default function AdminNegocios() {
 
               {/* Acciones */}
               <div className="flex items-center gap-2 flex-shrink-0">
+                <button
+                  onClick={() => handleTogglePremium(business.id, !!business.is_premium)}
+                  title={business.is_premium ? "Quitar de destacados" : "Marcar como destacado"}
+                  className={`w-8 h-8 flex items-center justify-center rounded-xl transition-colors ${
+                    business.is_premium
+                      ? "bg-yellow-100 text-yellow-500 hover:bg-yellow-200"
+                      : "hover:bg-stone-100 text-stone-300 hover:text-yellow-400"
+                  }`}
+                >
+                  <Star size={15} fill={business.is_premium ? "currentColor" : "none"} />
+                </button>
                 <Link
                   href={`/admin/negocios/${business.id}`}
                   className="w-8 h-8 flex items-center justify-center rounded-xl hover:bg-stone-100 text-stone-400 hover:text-stone-600 transition-colors"

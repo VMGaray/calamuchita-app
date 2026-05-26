@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react"
 import { createClient } from "@/lib/supabase/client"
-import { Plus, Trash2, GripVertical } from "lucide-react"
+import { Plus, Trash2, GripVertical, Pencil, Check, X } from "lucide-react"
 import { Locality } from "@/types/database"
 
 function toSlug(name: string) {
@@ -18,6 +18,8 @@ export default function AdminLocalidades() {
   const [loading, setLoading] = useState(true)
   const [name, setName] = useState("")
   const [saving, setSaving] = useState(false)
+  const [editingId, setEditingId] = useState<string | null>(null)
+  const [editingName, setEditingName] = useState("")
 
   const fetch = async () => {
     const { data } = await createClient()
@@ -42,6 +44,28 @@ export default function AdminLocalidades() {
     setName("")
     setSaving(false)
     fetch()
+  }
+
+  const startEdit = (loc: Locality) => {
+    setEditingId(loc.id)
+    setEditingName(loc.name)
+  }
+
+  const cancelEdit = () => {
+    setEditingId(null)
+    setEditingName("")
+  }
+
+  const handleUpdate = async (id: string) => {
+    if (!editingName.trim()) return
+    await createClient().from("localities").update({
+      name: editingName.trim(),
+      slug: toSlug(editingName.trim()),
+    }).eq("id", id)
+    setLocalities(prev => prev.map(l =>
+      l.id === id ? { ...l, name: editingName.trim(), slug: toSlug(editingName.trim()) } : l
+    ))
+    cancelEdit()
   }
 
   const handleDelete = async (id: string) => {
@@ -94,17 +118,63 @@ export default function AdminLocalidades() {
               className={`flex items-center gap-3 px-5 py-3 ${i !== localities.length - 1 ? "border-b border-stone-100" : ""}`}
             >
               <GripVertical size={14} className="text-stone-300 flex-shrink-0" />
-              <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium text-stone-800">{loc.name}</p>
-                <p className="text-[10px] text-stone-400 font-mono">{loc.slug}</p>
-              </div>
-              <span className="text-xs text-stone-300 tabular-nums">#{loc.sort_order}</span>
-              <button
-                onClick={() => handleDelete(loc.id)}
-                className="w-7 h-7 flex items-center justify-center rounded-lg hover:bg-red-50 text-stone-300 hover:text-red-400 transition-colors"
-              >
-                <Trash2 size={13} />
-              </button>
+
+              {editingId === loc.id ? (
+                /* Modo edición inline */
+                <div className="flex-1 flex items-center gap-2">
+                  <input
+                    autoFocus
+                    value={editingName}
+                    onChange={e => setEditingName(e.target.value)}
+                    onKeyDown={e => {
+                      if (e.key === "Enter") handleUpdate(loc.id)
+                      if (e.key === "Escape") cancelEdit()
+                    }}
+                    className="flex-1 px-3 py-1.5 rounded-lg border border-[#A3B18A] text-sm text-stone-800 outline-none"
+                  />
+                  {editingName.trim() && (
+                    <p className="text-[10px] text-stone-400 font-mono hidden sm:block">
+                      {toSlug(editingName)}
+                    </p>
+                  )}
+                  <button
+                    onClick={() => handleUpdate(loc.id)}
+                    className="w-7 h-7 flex items-center justify-center rounded-lg bg-[#2D4530] text-white hover:bg-[#3a5a3e] transition-colors"
+                    title="Guardar"
+                  >
+                    <Check size={13} />
+                  </button>
+                  <button
+                    onClick={cancelEdit}
+                    className="w-7 h-7 flex items-center justify-center rounded-lg hover:bg-stone-100 text-stone-400 transition-colors"
+                    title="Cancelar"
+                  >
+                    <X size={13} />
+                  </button>
+                </div>
+              ) : (
+                /* Modo vista */
+                <>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-medium text-stone-800">{loc.name}</p>
+                    <p className="text-[10px] text-stone-400 font-mono">{loc.slug}</p>
+                  </div>
+                  <span className="text-xs text-stone-300 tabular-nums">#{loc.sort_order}</span>
+                  <button
+                    onClick={() => startEdit(loc)}
+                    className="w-7 h-7 flex items-center justify-center rounded-lg hover:bg-stone-100 text-stone-300 hover:text-stone-500 transition-colors"
+                    title="Editar"
+                  >
+                    <Pencil size={13} />
+                  </button>
+                  <button
+                    onClick={() => handleDelete(loc.id)}
+                    className="w-7 h-7 flex items-center justify-center rounded-lg hover:bg-red-50 text-stone-300 hover:text-red-400 transition-colors"
+                  >
+                    <Trash2 size={13} />
+                  </button>
+                </>
+              )}
             </div>
           ))}
         </div>

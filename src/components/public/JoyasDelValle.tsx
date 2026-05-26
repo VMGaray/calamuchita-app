@@ -1,7 +1,7 @@
 "use client"
 
 import { useRef, useCallback, useEffect } from "react"
-import { motion, useMotionValue } from "framer-motion"
+import { motion, useMotionValue, animate } from "framer-motion"
 import { ArrowRight, ChevronLeft, ChevronRight, Plus } from "lucide-react"
 import Link from "next/link"
 
@@ -92,6 +92,9 @@ export default function JoyasDelValle({ businesses }: { businesses: FeaturedBusi
   const isPausedRef = useRef(false)
   const rafRef = useRef<number>(0)
   const lastTimeRef = useRef<number | undefined>(undefined)
+  const pauseTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+
+  const STEP = CARD_W + GAP
 
   // Normaliza x al rango (-SET_W, 0]
   const normalize = (v: number) => {
@@ -116,11 +119,27 @@ export default function JoyasDelValle({ businesses }: { businesses: FeaturedBusi
 
   useEffect(() => {
     rafRef.current = requestAnimationFrame(tick)
-    return () => cancelAnimationFrame(rafRef.current)
+    return () => {
+      cancelAnimationFrame(rafRef.current)
+      if (pauseTimerRef.current) clearTimeout(pauseTimerRef.current)
+    }
   }, [tick])
 
   const navigate = (dir: 1 | -1) => {
-    x.set(normalize(x.get() + dir * -(CARD_W + GAP)))
+    // Snap al múltiplo más cercano de STEP, luego mover un card
+    const current = x.get()
+    const snapped = Math.round(current / STEP) * STEP
+    const next = normalize(snapped + dir * -STEP)
+
+    // Animar suavemente hasta la posición correcta
+    animate(x, next, { type: "spring", stiffness: 300, damping: 35 })
+
+    // Pausar el auto-scroll durante 3s
+    isPausedRef.current = true
+    if (pauseTimerRef.current) clearTimeout(pauseTimerRef.current)
+    pauseTimerRef.current = setTimeout(() => {
+      isPausedRef.current = false
+    }, 3000)
   }
 
   if (N === 0) return null
@@ -133,6 +152,11 @@ export default function JoyasDelValle({ businesses }: { businesses: FeaturedBusi
       className="py-16 md:py-24 bg-transparent overflow-hidden group/jdv"
       onMouseEnter={() => { isPausedRef.current = true }}
       onMouseLeave={() => { isPausedRef.current = false }}
+      onTouchStart={() => { isPausedRef.current = true }}
+      onTouchEnd={() => {
+        if (pauseTimerRef.current) clearTimeout(pauseTimerRef.current)
+        pauseTimerRef.current = setTimeout(() => { isPausedRef.current = false }, 3000)
+      }}
     >
       {/* Header */}
       <div className="px-6 mb-12 md:mb-16 max-w-7xl mx-auto">
@@ -145,8 +169,8 @@ export default function JoyasDelValle({ businesses }: { businesses: FeaturedBusi
             DESTACADOS
           </h2>
           <div className="flex justify-end sm:justify-between items-end gap-4">
-            <p className="hidden sm:block text-[#C9A44B] font-bold text-xs md:text-sm uppercase tracking-[0.6em] border-l-4 border-[#C9A44B] pl-4">
-              Descubrí nuestros negocios destacados.
+            <p className="hidden sm:block text-[#2D4530] font-bold text-base md:text-xl uppercase tracking-[0.4em] border-l-4 border-[#C9A44B] pl-4">
+              Del Valle
             </p>
             <Link
               href="/negocios"
@@ -201,7 +225,10 @@ export default function JoyasDelValle({ businesses }: { businesses: FeaturedBusi
 
         {/* Tira */}
         <div className="overflow-hidden py-6 md:py-10">
-          <motion.div className="flex" style={{ x, gap: GAP }}>
+          <motion.div
+            className="flex"
+            style={{ x, gap: GAP, marginLeft: `calc(50% - ${CARD_W / 2}px)` }}
+          >
             {items.map((biz, idx) => (
               <FeaturedCard key={`${biz.id}-${idx}`} biz={biz} />
             ))}

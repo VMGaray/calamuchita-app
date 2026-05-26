@@ -204,11 +204,11 @@ export default function CalamuchitaSale({
         <div className="flex items-center gap-2 mb-1">
           <Tag size={14} style={{ color: "#B85C38" }} />
           <span className="text-xs font-semibold uppercase tracking-widest" style={{ color: "#B85C38" }}>
-            Ofertas vigentes
+            No te pierdas las
           </span>
         </div>
         <h2 className="font-serif text-2xl md:text-3xl mb-6" style={{ color: "#2D1A0E" }}>
-          Calamuchita Sale
+          Promos exclusivas para vos
         </h2>
       </AnimateIn>
 

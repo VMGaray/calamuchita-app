@@ -8,7 +8,7 @@ import { MASTER_CATEGORIES } from "@/lib/constants/categories"
 import ImageUpload from "@/components/ui/ImageUpload"
 import PdfUpload from "@/components/ui/PdfUpload"
 import HorariosEditor, { HorarioDay } from "@/components/ui/HorariosEditor"
-import { ArrowLeft } from "lucide-react"
+import { ArrowLeft, Star } from "lucide-react"
 import QRMarketing from "@/components/admin/QRMarketing"
 
 const sections: { value: BusinessSection; label: string }[] = [
@@ -75,6 +75,7 @@ export default function AdminNegocioEdit({ id }: Props) {
     menu_link: "",
     pet_friendly: false,
     payment_methods: [] as string[],
+    is_premium: false,
   })
 
   useEffect(() => {
@@ -112,6 +113,7 @@ export default function AdminNegocioEdit({ id }: Props) {
           menu_link: business.menu_link || "",
           pet_friendly: business.pet_friendly || false,
           payment_methods: business.payment_methods || [],
+          is_premium: business.is_premium || false,
         })
       }
 
@@ -162,6 +164,7 @@ export default function AdminNegocioEdit({ id }: Props) {
         menu_link: form.menu_link || null,
         pet_friendly: form.pet_friendly,
         payment_methods: form.payment_methods,
+        is_premium: form.is_premium,
       })
       .eq("id", id)
 
@@ -463,6 +466,28 @@ export default function AdminNegocioEdit({ id }: Props) {
     </div>
   </div>
 )}
+        {/* Destacado en carrusel */}
+        <div className={`rounded-2xl border-2 p-4 transition-colors ${form.is_premium ? "border-yellow-400 bg-yellow-50" : "border-stone-200 bg-white"}`}>
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${form.is_premium ? "bg-yellow-100" : "bg-stone-100"}`}>
+                <Star size={18} fill={form.is_premium ? "currentColor" : "none"} className={form.is_premium ? "text-yellow-500" : "text-stone-400"} />
+              </div>
+              <div>
+                <p className="text-sm font-semibold text-stone-800">Destacado en página principal</p>
+                <p className="text-xs text-stone-500">Aparece en el carrusel de Destacados del Valle</p>
+              </div>
+            </div>
+            <button
+              type="button"
+              onClick={() => handleChange("is_premium", !form.is_premium)}
+              className={`relative w-12 h-6 rounded-full transition-colors flex-shrink-0 ${form.is_premium ? "bg-yellow-400" : "bg-stone-200"}`}
+            >
+              <span className={`absolute top-0.5 left-0.5 w-5 h-5 rounded-full bg-white shadow transition-transform ${form.is_premium ? "translate-x-6" : "translate-x-0"}`} />
+            </button>
+          </div>
+        </div>
+
         {/* QR Marketing */}
         <QRMarketing name={form.name} slug={form.slug} section={form.section} />
 

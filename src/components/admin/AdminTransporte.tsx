@@ -2,17 +2,17 @@
 
 import { useEffect, useState } from "react"
 import { createClient } from "@/lib/supabase/client"
-import { Plus, Trash2, ToggleLeft, ToggleRight } from "lucide-react"
+import { Plus, Trash2, ToggleLeft, ToggleRight, Pencil } from "lucide-react"
 import { Locality, TransportSchedule } from "@/types/database"
 
 const DAYS = [
-  { key: "lunes",    short: "Lu" },
-  { key: "martes",   short: "Ma" },
-  { key: "miercoles",short: "Mi" },
-  { key: "jueves",   short: "Ju" },
-  { key: "viernes",  short: "Vi" },
-  { key: "sabado",   short: "Sá" },
-  { key: "domingo",  short: "Do" },
+  { key: "lunes",     short: "Lu" },
+  { key: "martes",    short: "Ma" },
+  { key: "miercoles", short: "Mi" },
+  { key: "jueves",    short: "Ju" },
+  { key: "viernes",   short: "Vi" },
+  { key: "sabado",    short: "Sá" },
+  { key: "domingo",   short: "Do" },
 ]
 
 const EMPTY_FORM = {
@@ -30,6 +30,7 @@ export default function AdminTransporte() {
   const [schedules, setSchedules] = useState<ScheduleWithLocalities[]>([])
   const [loading, setLoading] = useState(true)
   const [showForm, setShowForm] = useState(false)
+  const [editingId, setEditingId] = useState<string | null>(null)
   const [form, setForm] = useState(EMPTY_FORM)
   const [saving, setSaving] = useState(false)
   const [filterOrigin, setFilterOrigin] = useState("")
@@ -49,17 +50,36 @@ export default function AdminTransporte() {
 
   useEffect(() => { fetchAll() }, [])
 
-  const toggleDay = (day: string) => {
+  const toggleDay = (day: string) =>
     setForm(p => ({
       ...p,
       days: p.days.includes(day) ? p.days.filter(d => d !== day) : [...p.days, day],
     }))
+
+  const openNew = () => {
+    setForm(EMPTY_FORM)
+    setEditingId(null)
+    setShowForm(true)
+  }
+
+  const openEdit = (s: ScheduleWithLocalities) => {
+    setForm({
+      company: s.company,
+      origin_id: s.origin_id,
+      destination_id: s.destination_id,
+      departure_time: s.departure_time.slice(0, 5),
+      arrival_time: s.arrival_time ? s.arrival_time.slice(0, 5) : "",
+      days: s.days || [],
+      notes: s.notes || "",
+    })
+    setEditingId(s.id)
+    setShowForm(true)
   }
 
   const handleSave = async () => {
     if (!form.company || !form.origin_id || !form.destination_id || !form.departure_time) return
     setSaving(true)
-    await createClient().from("transport_schedules").insert([{
+    const payload = {
       company: form.company,
       origin_id: form.origin_id,
       destination_id: form.destination_id,
@@ -67,10 +87,16 @@ export default function AdminTransporte() {
       arrival_time: form.arrival_time || null,
       days: form.days,
       notes: form.notes || null,
-      is_active: true,
-    }])
+    }
+    const supabase = createClient()
+    if (editingId) {
+      await supabase.from("transport_schedules").update(payload).eq("id", editingId)
+    } else {
+      await supabase.from("transport_schedules").insert([{ ...payload, is_active: true }])
+    }
     setSaving(false)
     setShowForm(false)
+    setEditingId(null)
     setForm(EMPTY_FORM)
     fetchAll()
   }
@@ -104,7 +130,7 @@ export default function AdminTransporte() {
           {localities.map(l => <option key={l.id} value={l.id}>{l.name}</option>)}
         </select>
         <button
-          onClick={() => setShowForm(true)}
+          onClick={openNew}
           className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-[#2D4530] text-white text-sm font-medium hover:bg-[#3a5a3e] transition-colors"
         >
           <Plus size={14} />
@@ -153,8 +179,13 @@ export default function AdminTransporte() {
                       </span>
                     ))}
                   </div>
+                  {s.notes && <span className="text-[10px] text-stone-400 truncate max-w-[120px]">{s.notes}</span>}
                 </div>
               </div>
+
+              <button onClick={() => openEdit(s)} className="w-7 h-7 flex items-center justify-center rounded-lg hover:bg-stone-100 text-stone-300 hover:text-stone-500 transition-colors" title="Editar">
+                <Pencil size={13} />
+              </button>
               <button onClick={() => handleToggle(s.id, s.is_active)}>
                 {s.is_active
                   ? <ToggleRight size={20} className="text-[#A3B18A]" />
@@ -171,7 +202,9 @@ export default function AdminTransporte() {
       {showForm && (
         <div className="fixed inset-0 z-50 flex items-end md:items-center justify-center p-4 bg-black/40 backdrop-blur-sm">
           <div className="bg-white rounded-2xl w-full max-w-md p-6 space-y-4 shadow-xl max-h-[90vh] overflow-y-auto">
-            <h3 className="text-base font-medium text-stone-800">Nuevo horario</h3>
+            <h3 className="text-base font-medium text-stone-800">
+              {editingId ? "Editar horario" : "Nuevo horario"}
+            </h3>
 
             <div>
               <label className="block text-xs font-medium text-stone-600 mb-1">Empresa *</label>
@@ -216,10 +249,7 @@ export default function AdminTransporte() {
               <label className="block text-xs font-medium text-stone-600 mb-2">Días</label>
               <div className="flex gap-1.5 flex-wrap">
                 {DAYS.map(d => (
-                  <button
-                    key={d.key}
-                    type="button"
-                    onClick={() => toggleDay(d.key)}
+                  <button key={d.key} type="button" onClick={() => toggleDay(d.key)}
                     className="px-2.5 py-1 rounded-lg text-xs font-medium transition-colors"
                     style={
                       form.days.includes(d.key)
@@ -241,13 +271,18 @@ export default function AdminTransporte() {
             </div>
 
             <div className="flex gap-3 pt-1">
-              <button onClick={() => setShowForm(false)} className="flex-1 py-2.5 rounded-xl border border-stone-200 text-stone-600 text-sm hover:bg-stone-50 transition-colors">Cancelar</button>
+              <button
+                onClick={() => { setShowForm(false); setEditingId(null); setForm(EMPTY_FORM) }}
+                className="flex-1 py-2.5 rounded-xl border border-stone-200 text-stone-600 text-sm hover:bg-stone-50 transition-colors"
+              >
+                Cancelar
+              </button>
               <button
                 onClick={handleSave}
                 disabled={saving || !form.company || !form.origin_id || !form.destination_id || !form.departure_time}
                 className="flex-1 py-2.5 rounded-xl bg-[#2D4530] text-white text-sm font-medium hover:bg-[#3a5a3e] transition-colors disabled:opacity-50"
               >
-                {saving ? "Guardando…" : "Guardar"}
+                {saving ? "Guardando…" : editingId ? "Guardar cambios" : "Guardar"}
               </button>
             </div>
           </div>

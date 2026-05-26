@@ -37,16 +37,26 @@ export default function InstallPrompt() {
   if (!isVisible) return null;
 
   return (
-    <div className="fixed bottom-4 left-4 right-4 bg-[#1C352D] text-[#F5F2EB] p-4 rounded-xl shadow-2xl flex items-center justify-between z-50 border border-emerald-800">
-      <div>
+    <div className="fixed bottom-4 left-4 right-4 bg-[#1C352D] text-[#F5F2EB] p-4 rounded-xl shadow-2xl flex items-center gap-3 z-50 border border-emerald-800">
+      <div className="flex-1">
         <p className="font-semibold text-sm">Llevá el Valle en tu celular</p>
         <p className="text-xs text-gray-300">Instalá la app para un acceso más rápido.</p>
       </div>
-      <button 
+      <button
         onClick={handleInstallClick}
-        className="bg-[#F5F2EB] text-[#1C352D] px-4 py-2 rounded-lg text-sm font-bold hover:bg-opacity-90 transition-all"
+        className="bg-[#F5F2EB] text-[#1C352D] px-4 py-2 rounded-lg text-sm font-bold hover:bg-opacity-90 transition-all flex-shrink-0"
       >
         Instalar
+      </button>
+      <button
+        onClick={() => setIsVisible(false)}
+        aria-label="Cerrar"
+        className="flex-shrink-0 w-7 h-7 flex items-center justify-center rounded-full transition-colors"
+        style={{ background: "rgba(255,255,255,0.1)", color: "rgba(245,242,235,0.6)" }}
+        onMouseEnter={e => (e.currentTarget.style.color = "#F5F2EB")}
+        onMouseLeave={e => (e.currentTarget.style.color = "rgba(245,242,235,0.6)")}
+      >
+        ×
       </button>
     </div>
   );

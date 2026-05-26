@@ -165,8 +165,8 @@ export default function AdminHome() {
                 </div>
                 <span className="text-primary-500 text-sm">→</span>
               </Link>
-              <Link href="/admin/gastronomia" className="flex items-center justify-between p-3 rounded-xl hover:bg-stone-50 transition-colors">
-                <span className="text-sm text-stone-600">Ver comercios pendientes</span>
+              <Link href="/admin/solicitudes" className="flex items-center justify-between p-3 rounded-xl hover:bg-stone-50 transition-colors">
+                <span className="text-sm text-stone-600">Ver solicitudes pendientes</span>
                 <span className="text-primary-500 text-sm">→</span>
               </Link>
               <Link href="/admin/info-util" className="flex items-center justify-between p-3 rounded-xl hover:bg-stone-50 transition-colors">
