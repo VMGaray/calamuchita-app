@@ -2,8 +2,7 @@
 
 import { useState } from "react"
 import { motion, AnimatePresence } from "framer-motion"
-import { MapPin, Check, ChevronDown, ChevronUp, ArrowRight } from "lucide-react"
-import Link from "next/link"
+import { MapPin, Check, ChevronDown, ChevronUp } from "lucide-react"
 import { useLocalidad } from "@/lib/context/LocalidadContext"
 import { LOCALIDADES, MAIN_LOCALIDADES } from "@/lib/constants/telefonos"
 
@@ -22,7 +21,7 @@ export default function LocalidadSelectorWidget() {
       }}
     >
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-5">
+      <div className="flex items-center gap-3 mb-5">
         <div className="flex items-center gap-3">
           <div
             className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0"
@@ -35,21 +34,11 @@ export default function LocalidadSelectorWidget() {
               ¿Dónde estás?
             </h2>
             <p className="text-xs mt-0.5" style={{ color: "rgba(45,69,48,0.55)" }}>
-              Elegí tu localidad para ver info y servicios del lugar
+              Elegí tu localidad para ver la información del lugar.
             </p>
           </div>
         </div>
 
-        {localidad && (
-          <Link
-            href="/info-util"
-            className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full text-xs font-medium transition-opacity hover:opacity-80 flex-shrink-0"
-            style={{ background: "#2D4530", color: "#E1DBC9" }}
-          >
-            Ver Info Útil de {localidad.split(" ").slice(0, 2).join(" ")}
-            <ArrowRight size={12} />
-          </Link>
-        )}
       </div>
 
       {/* Locality pills */}
