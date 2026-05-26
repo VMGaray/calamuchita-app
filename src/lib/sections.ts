@@ -55,7 +55,6 @@ export const sectionCategories = {
     { label: "Indumentaria", desc: "Ropa y calzado", href: "/directorio/commerce?cat=indumentaria", bg: "bg-brand-slate/10", color: "text-brand-slate" },
     { label: "Mascotas", desc: "Tiendas para mascotas", href: "/directorio/commerce?cat=mascotas", bg: "bg-brand-pine/10", color: "text-brand-pine" },
     { label: "Niños", desc: "Artículos infantiles", href: "/directorio/commerce?cat=ninos", bg: "bg-brand-earth/10", color: "text-brand-earth" },
-    { label: "Salud", desc: "Farmacias y parafarmacia", href: "/directorio/commerce?cat=salud", bg: "bg-brand-pine/10", color: "text-brand-pine" },
     { label: "Tecnología", desc: "Electrónica y celulares", href: "/directorio/commerce?cat=tecnologia", bg: "bg-brand-charcoal/10", color: "text-brand-charcoal" },
     { label: "Vehículos", desc: "Repuestos y accesorios", href: "/directorio/commerce?cat=vehiculos", bg: "bg-brand-slate/10", color: "text-brand-slate" },
     { label: "Varios", desc: "Otros comercios del valle", href: "/directorio/commerce?cat=varios", bg: "bg-brand-sand/50", color: "text-brand-charcoal" },

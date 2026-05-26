@@ -3,8 +3,10 @@
 import { useEffect } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import Link from "next/link"
+import { usePathname, useSearchParams } from "next/navigation"
+import { useLocalidad } from "@/lib/context/LocalidadContext"
 import { sectionCategories, SectionKey } from "@/lib/sections"
-import { ShoppingBag } from "lucide-react"
+import { ShoppingBag, MapPin, Check } from "lucide-react"
 import {
   Utensils, Coffee, Beer, Bike, Clock,
   Wrench, Zap, Flame, Car, Building, Paintbrush, Hammer, KeyRound, Leaf, Waves, Home, Bug, Droplets, Sparkles,
@@ -14,35 +16,27 @@ import {
   PartyPopper, ChefHat, Mic, Medal, Palette, Baby,
   Store, Salad, Shirt, Gem, HardHat, MoreHorizontal,
   Clock3, Landmark, Lightbulb, Bus, Info,
-  Armchair, Dog, HeartPulse, Smartphone, FlaskConical
+  Armchair, Dog, Smartphone, FlaskConical
 } from "lucide-react"
 
 const categoryIcons: Record<string, any> = {
-  // Gastronomía
   "Restaurantes": Utensils, "Bar/Café": Coffee, "Viandas": ShoppingBag,
   "Delivery": Bike, "Abierto ahora": Clock,
-  // Servicios
   "Cerrajero": KeyRound, "Construcción": Building, "Desinfecciones": Bug,
   "Electricidad": Zap, "Gasista": Flame, "Herrero": Hammer, "Jardinero": Leaf,
   "Limpieza": Sparkles, "Mecánica": Car, "Perforaciones": Droplets, "Piletero": Waves,
   "Pintor": Paintbrush, "Plomería": Wrench, "Zinguero": Home,
-  // Salud
   "Clínicas": Building, "Especialidades": Brain,
   "Hospitales y Dispensarios": AlertCircle, "Laboratorios": FlaskConical,
   "Terapias alternativas": Leaf,
-  // Educación
   "Arte y Música": Music, "Colegios": GraduationCap, "Deporte": Trophy,
   "Idiomas": Languages, "Maestras/os Particulares": Users,
-  // Turismo
   "Actividades y Paseos": Activity, "Agencia de Viajes": Plane,
   "Alojamiento": Hotel, "Alquiler": Compass, "Excursiones": Map,
-  // Comercios
   "Hogar": Armchair, "Indumentaria": Shirt, "Mascotas": Dog, "Niños": Baby,
-  "Salud": HeartPulse, "Tecnología": Smartphone, "Vehículos": Car,
-  // Eventos
+  "Tecnología": Smartphone, "Vehículos": Car,
   "Culturales": Palette, "Deportivos": Medal, "Festivales": PartyPopper,
   "Gastronomía": ChefHat, "Infantiles": Baby, "Música": Mic,
-  // Info
   "Cooperativas": Lightbulb, "Emergencias": AlertCircle, "Farmacias de turno": Clock3,
   "Municipalidad": Landmark, "Transporte": Bus, "Turismo oficial": Info,
 }
@@ -52,9 +46,54 @@ interface Props {
   onClose: () => void
 }
 
+function useActiveCategory(categories: { label: string; href: string }[]) {
+  const pathname = usePathname()
+  const searchParams = useSearchParams()
+
+  return categories.find(({ href }) => {
+    const [hrefPath, hrefQuery] = href.split("?")
+    if (pathname !== hrefPath) return false
+    if (!hrefQuery) return searchParams.toString() === ""
+    const hrefParams = new URLSearchParams(hrefQuery)
+    for (const [key, value] of hrefParams) {
+      if (searchParams.get(key) !== value) return false
+    }
+    return true
+  }) ?? null
+}
+
+function ActiveFiltersBar({ activeCategory, section }: { activeCategory: { label: string } | null; section: SectionKey }) {
+  const { localidad } = useLocalidad()
+  if (!activeCategory && !localidad) return null
+
+  return (
+    <div className="flex flex-wrap gap-2 mb-3 pb-3" style={{ borderBottom: "1px solid rgba(45,69,48,0.08)" }}>
+      {localidad && (
+        <span
+          className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-medium"
+          style={{ background: "rgba(45,69,48,0.08)", color: "#2D4530" }}
+        >
+          <MapPin size={10} />
+          {localidad}
+        </span>
+      )}
+      {activeCategory && (
+        <span
+          className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-semibold"
+          style={{ background: "#2D4530", color: "#E1DBC9" }}
+        >
+          <Check size={10} strokeWidth={2.5} />
+          {activeCategory.label}
+        </span>
+      )}
+    </div>
+  )
+}
+
 export default function SectionModal({ section, onClose }: Props) {
   const isVisible = section !== null && section !== "events"
   const categories = isVisible ? sectionCategories[section!] : []
+  const activeCategory = useActiveCategory(categories)
 
   useEffect(() => {
     document.body.style.overflow = isVisible ? "hidden" : ""
@@ -71,6 +110,57 @@ export default function SectionModal({ section, onClose }: Props) {
     : section === "tourism" ? "Turismo"
     : section === "commerce" ? "Comercios"
     : "Info útil"
+
+  const renderGrid = (cols: string) => (
+    <div className={`grid ${cols} gap-2`}>
+      {categories.map(({ label, href, bg, color }, i) => {
+        const Icon = categoryIcons[label] || ShoppingBag
+        const isActive = activeCategory?.href === href
+
+        return (
+          <motion.div
+            key={label}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: i * 0.03, type: "spring", stiffness: 300, damping: 20 }}
+          >
+            <Link
+              href={href}
+              onClick={onClose}
+              className="flex flex-col items-center text-center p-3 rounded-2xl border transition-all h-full justify-center"
+              style={
+                isActive
+                  ? { background: "#2D4530", borderColor: "#2D4530", color: "#E1DBC9" }
+                  : { background: "white", borderColor: "rgba(107,123,132,0.1)" }
+              }
+            >
+              <motion.div
+                className={`w-10 h-10 rounded-xl flex items-center justify-center mb-2 shadow-sm ${isActive ? "" : bg}`}
+                style={isActive ? { background: "rgba(225,219,201,0.18)" } : {}}
+                whileHover={{ y: -4, scale: 1.1 }}
+                transition={{ type: "spring", stiffness: 400, damping: 15 }}
+              >
+                <Icon
+                  size={18}
+                  className={isActive ? "" : color}
+                  style={isActive ? { color: "#E1DBC9" } : {}}
+                />
+              </motion.div>
+              {isActive && (
+                <Check size={9} strokeWidth={3} className="absolute top-2 right-2 opacity-70" style={{ color: "#E1DBC9" }} />
+              )}
+              <p
+                className="text-[11px] font-bold leading-tight uppercase tracking-tight"
+                style={isActive ? { color: "#E1DBC9" } : { color: "#3C3C3C" }}
+              >
+                {label}
+              </p>
+            </Link>
+          </motion.div>
+        )
+      })}
+    </div>
+  )
 
   return (
     <AnimatePresence>
@@ -103,21 +193,25 @@ export default function SectionModal({ section, onClose }: Props) {
               </button>
             </div>
             <div className="p-4 overflow-y-auto bg-[#FDFCF9]" style={{ maxHeight: "60vh" }}>
-              <div className="grid grid-cols-2 gap-2">
-                {categories.map(({ label, href, bg, color }, i) => {
-                  const Icon = categoryIcons[label] || ShoppingBag
-                  return (
-                    <motion.div key={`m-${label}`} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.03, type: "spring", stiffness: 300, damping: 20 }}>
-                      <Link href={href} onClick={onClose} className="flex flex-col items-center text-center p-3 rounded-2xl border border-brand-slate/10 hover:border-brand-pine/30 hover:bg-brand-pine/5 transition-all h-full justify-center">
-                        <div className={`w-10 h-10 ${bg} rounded-xl flex items-center justify-center mb-2 shadow-sm`}>
-                          <Icon size={18} className={color} />
-                        </div>
-                        <p className="text-[11px] font-bold text-brand-charcoal leading-tight uppercase tracking-tight">{label}</p>
-                      </Link>
-                    </motion.div>
-                  )
-                })}
-              </div>
+              <ActiveFiltersBar activeCategory={activeCategory} section={section!} />
+              {section === "gastronomy" && (
+                <Link
+                  href="/menu-del-dia"
+                  onClick={onClose}
+                  className="flex items-center justify-between w-full mb-4 px-4 py-3 rounded-2xl border transition-all"
+                  style={{ background: "#2D4530", borderColor: "#2D4530", color: "#E1DBC9" }}
+                >
+                  <div className="flex items-center gap-3">
+                    <Utensils size={18} />
+                    <div>
+                      <p className="text-sm font-bold leading-tight">Menú del Día</p>
+                      <p className="text-xs opacity-70">Ver los menús de hoy en el Valle</p>
+                    </div>
+                  </div>
+                  <span className="text-lg opacity-60">→</span>
+                </Link>
+              )}
+              {renderGrid("grid-cols-2")}
             </div>
           </motion.div>
 
@@ -137,21 +231,25 @@ export default function SectionModal({ section, onClose }: Props) {
                 </button>
               </div>
               <div className="p-4 overflow-y-auto max-h-[calc(100vh-14rem)] bg-[#FDFCF9]">
-                <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
-                  {categories.map(({ label, href, bg, color }, i) => {
-                    const Icon = categoryIcons[label] || ShoppingBag
-                    return (
-                      <motion.div key={`d-${label}`} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.03, type: "spring", stiffness: 300, damping: 20 }}>
-                        <Link href={href} onClick={onClose} className="flex flex-col items-center text-center p-3 rounded-2xl border border-brand-slate/10 hover:border-brand-pine/30 hover:bg-brand-pine/5 transition-all group h-full justify-center">
-                          <motion.div className={`w-10 h-10 ${bg} rounded-xl flex items-center justify-center mb-2 shadow-sm`} whileHover={{ y: -6, scale: 1.15 }} transition={{ type: "spring", stiffness: 400, damping: 15 }}>
-                            <Icon size={18} className={color} />
-                          </motion.div>
-                          <p className="text-[11px] font-bold text-brand-charcoal leading-tight uppercase tracking-tight">{label}</p>
-                        </Link>
-                      </motion.div>
-                    )
-                  })}
-                </div>
+                <ActiveFiltersBar activeCategory={activeCategory} section={section!} />
+                {section === "gastronomy" && (
+                  <Link
+                    href="/menu-del-dia"
+                    onClick={onClose}
+                    className="flex items-center justify-between w-full mb-4 px-4 py-3 rounded-2xl border transition-all hover:opacity-90"
+                    style={{ background: "#2D4530", borderColor: "#2D4530", color: "#E1DBC9" }}
+                  >
+                    <div className="flex items-center gap-3">
+                      <Utensils size={18} />
+                      <div>
+                        <p className="text-sm font-bold leading-tight">Menú del Día</p>
+                        <p className="text-xs opacity-70">Ver los menús de hoy en el Valle</p>
+                      </div>
+                    </div>
+                    <span className="text-lg opacity-60">→</span>
+                  </Link>
+                )}
+                {renderGrid("grid-cols-2 md:grid-cols-3")}
               </div>
             </div>
           </motion.div>

@@ -1,15 +1,11 @@
-import MenusDelDiaCarousel from "@/components/public/MenusDelDiaCarousel"
 import JoyasDelValle from "@/components/public/JoyasDelValle"
 import CalamuchitaSale from "@/components/public/CalamuchitaSale"
 import VMGPromoSection from "@/components/public/VMGPromoSection"
 import CtaBusiness from "@/components/public/CtaBusiness"
-import WaveDivider from "@/components/public/WaveDivider"
 import LocalidadSelectorWidget from "@/components/public/LocalidadSelectorWidget"
 import WebGLBackground from "@/components/public/WebGLBackgroundLazy"
 import { createClient } from "@/lib/supabase/server"
 
-const CAROUSEL_BG_TOP = "#D6CEBC"
-const CAROUSEL_BG_BOTTOM = "#C9C0A9"
 const BODY_BG = "#E1DBC9"
 
 type FeaturedBusiness = {
@@ -78,14 +74,9 @@ export default async function HomePage() {
 
   return (
     <div>
-      <WaveDivider fill={CAROUSEL_BG_TOP} bgColor={BODY_BG} />
-      <div className="mt-10">
-            <LocalidadSelectorWidget />
-          </div>
-
-      <MenusDelDiaCarousel />
-
-      <WaveDivider fill={BODY_BG} bgColor={CAROUSEL_BG_BOTTOM} />
+      <div className="max-w-6xl mx-auto px-4 pt-10 pb-4">
+        <LocalidadSelectorWidget />
+      </div>
 
       <div className="relative overflow-hidden" style={{ background: BODY_BG }}>
         <WebGLBackground />
