@@ -10,9 +10,11 @@ export const viewport: Viewport = {
   initialScale: 1,
   maximumScale: 1,
 }
+
 import ClientOnly from "@/components/ui/ClientOnly"
 import PageTransition from "@/components/ui/PageTransition"
 import ScrollToTop from "@/components/ui/ScrollToTop"
+import InstallPrompt from "@/components/ui/InstallPrompt" // ✨ Importamos el cartel de instalación
 
 export const metadata: Metadata = {
   title: {
@@ -20,6 +22,7 @@ export const metadata: Metadata = {
     default: "Calamuchita App",
   },
   description: "Todo el Valle de Calamuchita en un solo lugar. Gastronomía, servicios, salud, turismo y más en Córdoba, Argentina.",
+  manifest: "/manifest", // ✨ Vinculación clave para que Next.js asocie tu manifest.ts
   openGraph: {
     siteName: "Calamuchita App",
     locale: "es_AR",
@@ -34,7 +37,7 @@ export const metadata: Metadata = {
   applicationName: "Calamuchita App",
   appleWebApp: {
     capable: true,
-    title: "Calamuchita",
+    title: "Calamuchita App",
     statusBarStyle: "black-translucent",
   },
   formatDetection: { telephone: false },
@@ -56,6 +59,9 @@ export default function RootLayout({
         <PageTransition>
           {children}
         </PageTransition>
+        
+        {/* ✨ Inyectamos el cartel en la raíz para que vigile toda la navegación */}
+        <InstallPrompt /> 
       </body>
     </html>
   )
