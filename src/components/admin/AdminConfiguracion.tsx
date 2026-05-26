@@ -2,7 +2,7 @@
 
 import { useEffect, useState, type ElementType } from "react"
 import { createClient } from "@/lib/supabase/client"
-import { Globe, Phone, Instagram, MapPin, Mail, Save, CheckCircle, AlertCircle, Loader2 } from "lucide-react"
+import { Globe, Phone, AtSign, MapPin, Mail, Save, CheckCircle, AlertCircle, Loader2 } from "lucide-react"
 
 const SECTIONS = [
   { id: "sitio",    label: "Sitio" },
@@ -201,7 +201,7 @@ insert into site_config (id) values ('main')
 
         {active === "redes" && (
           <>
-            <Field label="Instagram" icon={Instagram} value={config.instagram} onChange={set("instagram")} placeholder="@calamuchita.app" />
+            <Field label="Instagram" icon={AtSign} value={config.instagram} onChange={set("instagram")} placeholder="@calamuchita.app" />
             <Field label="Facebook"  icon={Globe}     value={config.facebook}  onChange={set("facebook")}  placeholder="facebook.com/calamuchitaapp" />
             <Field label="TikTok"    icon={Globe}     value={config.tiktok}    onChange={set("tiktok")}    placeholder="@calamuchita.app" />
           </>
