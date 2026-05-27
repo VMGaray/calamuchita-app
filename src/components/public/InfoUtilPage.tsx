@@ -7,7 +7,7 @@ import {
   Flame, Shield, Stethoscope, Zap,
   MapPin, Copy, Check, Phone,
   AlertCircle, Lightbulb, Pill, Landmark, Bus, Info, MoreHorizontal,
-  ArrowLeft, RefreshCw, ExternalLink, Clock, ArrowRight,
+  ArrowLeft, RefreshCw, ExternalLink, Clock, Dog,
 } from "lucide-react"
 import Link from "next/link"
 import {
@@ -28,34 +28,41 @@ interface DBService {
   phone: string | null
   address: string | null
   description: string | null
+  hours: string | null
+  specialties: string | null
+  has_guardia: boolean
+  is_on_duty: boolean
+}
+
+// Categorías que solo muestran datos de DB (sin hardcoded SERVICIOS)
+const DB_ONLY_CATEGORIES = new Set(["farmacias", "municipalidad", "turismo", "veterinarias", "transporte"])
+
+// Mapa de clave URL → categoría en DB
+const CATEGORIA_TO_DB: Record<string, string> = {
+  cooperativas:  "utility",
+  salud:         "health",
+  farmacias:     "pharmacy",
+  municipalidad: "municipal",
+  turismo:       "tourism",
+  veterinarias:  "veterinary",
+  transporte:    "transport",
 }
 
 interface DBLocality { id: string; name: string }
 
-interface TransportResult {
-  id: string
-  company: string
-  departure_time: string
-  arrival_time: string | null
-  days: string[]
-  notes: string | null
-}
-
 const SERVICE_CAT_ICONS: Record<string, { Icon: any; color: string; bg: string }> = {
-  emergency: { Icon: Flame,      color: "#B83232", bg: "rgba(184,50,50,0.10)" },
-  health:    { Icon: Stethoscope,color: "#1A6B44", bg: "rgba(26,107,68,0.10)" },
-  municipal: { Icon: Landmark,   color: "#2D4530", bg: "rgba(45,69,48,0.10)"  },
-  security:  { Icon: Shield,     color: "#1C4680", bg: "rgba(28,70,128,0.10)" },
-  utility:   { Icon: Zap,        color: "#A06B0A", bg: "rgba(160,107,10,0.10)"},
-  transport: { Icon: Bus,        color: "#2D4530", bg: "rgba(45,69,48,0.10)"  },
-  tourism:   { Icon: Info,       color: "#5E4B3B", bg: "rgba(94,75,59,0.10)"  },
-  other:     { Icon: Phone,      color: "#6B7B84", bg: "rgba(107,123,132,0.10)"},
+  emergency:  { Icon: Flame,       color: "#B83232", bg: "rgba(184,50,50,0.10)"  },
+  health:     { Icon: Stethoscope, color: "#1A6B44", bg: "rgba(26,107,68,0.10)"  },
+  pharmacy:   { Icon: Pill,        color: "#5B3A8C", bg: "rgba(91,58,140,0.10)"  },
+  veterinary: { Icon: Dog,         color: "#A0522D", bg: "rgba(160,82,45,0.10)"  },
+  municipal:  { Icon: Landmark,    color: "#2D4530", bg: "rgba(45,69,48,0.10)"   },
+  security:   { Icon: Shield,      color: "#1C4680", bg: "rgba(28,70,128,0.10)"  },
+  utility:    { Icon: Zap,         color: "#A06B0A", bg: "rgba(160,107,10,0.10)" },
+  transport:  { Icon: Bus,         color: "#2D4530", bg: "rgba(45,69,48,0.10)"   },
+  tourism:    { Icon: Info,        color: "#5E4B3B", bg: "rgba(94,75,59,0.10)"   },
+  other:      { Icon: Phone,       color: "#6B7B84", bg: "rgba(107,123,132,0.10)"},
 }
 
-const DAYS_SHORT: Record<string, string> = {
-  lunes: "Lu", martes: "Ma", miercoles: "Mi",
-  jueves: "Ju", viernes: "Vi", sabado: "Sá", domingo: "Do",
-}
 
 type ServicioKey = keyof LocalidadData
 
@@ -99,14 +106,15 @@ const SERVICIOS = [
 ]
 
 const CATEGORIAS = [
-  { key: "todos", label: "Todos", Icon: MoreHorizontal },
-  { key: "emergencias", label: "Emergencias", Icon: AlertCircle },
-  { key: "cooperativas", label: "Cooperativas", Icon: Lightbulb },
-  { key: "salud", label: "Salud", Icon: Stethoscope },
-  { key: "farmacias", label: "Farmacias de turno", Icon: Pill },
-  { key: "municipalidad", label: "Municipalidad", Icon: Landmark },
-  { key: "transporte", label: "Transporte", Icon: Bus },
-  { key: "turismo", label: "Turismo oficial", Icon: Info },
+  { key: "todos",        label: "Todos",               Icon: MoreHorizontal },
+  { key: "emergencias",  label: "Emergencias",          Icon: AlertCircle    },
+  { key: "cooperativas", label: "Cooperativas",         Icon: Lightbulb      },
+  { key: "salud",        label: "Salud",                Icon: Stethoscope    },
+  { key: "farmacias",    label: "Farmacias de turno",   Icon: Pill           },
+  { key: "veterinarias", label: "Veterinarias de turno",Icon: Dog            },
+  { key: "municipalidad",label: "Municipalidad",        Icon: Landmark       },
+  { key: "transporte",   label: "Transporte",           Icon: Bus            },
+  { key: "turismo",      label: "Turismo oficial",      Icon: Info           },
 ]
 
 const CATEGORIA_SERVICIOS: Partial<Record<string, ServicioKey[]>> = {
@@ -221,12 +229,6 @@ export default function InfoUtilPage({ initialCategoria, initialPueblo }: Props)
   const [dbServices, setDbServices] = useState<DBService[]>([])
   const [dbLocalities, setDbLocalities] = useState<DBLocality[]>([])
 
-  // Transport search
-  const [transOrigin, setTransOrigin] = useState("")
-  const [transDest, setTransDest] = useState("")
-  const [transResults, setTransResults] = useState<TransportResult[]>([])
-  const [transLoading, setTransLoading] = useState(false)
-
   // Fetch DB localities once
   useEffect(() => {
     createClient()
@@ -242,29 +244,12 @@ export default function InfoUtilPage({ initialCategoria, initialPueblo }: Props)
     if (!loc) { setDbServices([]); return }
     createClient()
       .from("utility_services")
-      .select("id, name, category, phone, address, description")
+      .select("id, name, category, phone, address, description, hours, specialties, has_guardia, is_on_duty")
       .eq("locality_id", loc.id)
       .eq("is_active", true)
       .order("sort_order")
       .then(({ data }) => setDbServices(data || []))
   }, [localidad, dbLocalities])
-
-  // Fetch transport schedules
-  useEffect(() => {
-    if (!transOrigin || !transDest) { setTransResults([]); return }
-    setTransLoading(true)
-    createClient()
-      .from("transport_schedules")
-      .select("id, company, departure_time, arrival_time, days, notes")
-      .eq("origin_id", transOrigin)
-      .eq("destination_id", transDest)
-      .eq("is_active", true)
-      .order("departure_time")
-      .then(({ data }) => {
-        setTransResults(data || [])
-        setTransLoading(false)
-      })
-  }, [transOrigin, transDest])
 
   const categoria = searchParams.get("categoria") ?? initialCategoria ?? "todos"
   const visibleLocalidades = showAll ? LOCALIDADES : MAIN_LOCALIDADES
@@ -320,6 +305,10 @@ export default function InfoUtilPage({ initialCategoria, initialPueblo }: Props)
   } else if (CATEGORIA_SERVICIOS[categoria]) {
     const keys = CATEGORIA_SERVICIOS[categoria]!
     serviciosToShow = SERVICIOS.filter((s) => keys.includes(s.key))
+  } else if (DB_ONLY_CATEGORIES.has(categoria)) {
+    // Categorías que vienen 100% de la DB — no hay datos hardcodeados
+    serviciosToShow = []
+    isUnsupportedCategory = false
   } else {
     serviciosToShow = []
     isUnsupportedCategory = true
@@ -331,6 +320,15 @@ export default function InfoUtilPage({ initialCategoria, initialPueblo }: Props)
     serviciosToShow.every((s) => data[s.key] === null)
 
   const showEmptyState = isUnsupportedCategory || allNull
+
+  // Filtrar dbServices por categoría activa
+  const dbCatFilter = categoria && categoria !== "todos" ? CATEGORIA_TO_DB[categoria] : null
+  const filteredDbServices = dbCatFilter
+    ? dbServices.filter(s => s.category === dbCatFilter)
+    : dbServices
+
+  // Servicio de turno (farmacia o veterinaria)
+  const dutyService = filteredDbServices.find(s => s.is_on_duty)
 
   const gridCols =
     serviciosToShow.length === 1
@@ -468,121 +466,8 @@ export default function InfoUtilPage({ initialCategoria, initialPueblo }: Props)
         </div>
       </div>
 
-      {/* Buscador de transporte — visible cuando la categoría es "transporte" */}
-      {categoria === "transporte" && (
-        <motion.div
-          initial={{ opacity: 0, y: 12 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="mb-8 rounded-3xl p-6 md:p-8"
-          style={{ background: "#EBE6DA" }}
-        >
-          <div className="flex items-center gap-2 mb-5">
-            <Bus size={18} style={{ color: "#2D4530" }} />
-            <h2 className="font-serif text-xl" style={{ color: "#2D4530" }}>Horarios de colectivos</h2>
-          </div>
-
-          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 mb-6">
-            <div className="flex-1">
-              <label className="block text-xs font-medium mb-1.5" style={{ color: "rgba(45,69,48,0.55)" }}>Desde</label>
-              <select
-                value={transOrigin}
-                onChange={e => setTransOrigin(e.target.value)}
-                className="w-full px-4 py-2.5 rounded-xl border text-sm outline-none"
-                style={{ background: "white", borderColor: "rgba(45,69,48,0.15)", color: "#2D4530" }}
-              >
-                <option value="">— Elegí origen —</option>
-                {dbLocalities.map(l => <option key={l.id} value={l.id}>{l.name}</option>)}
-              </select>
-            </div>
-            <ArrowRight size={16} className="hidden sm:block flex-shrink-0 mt-5" style={{ color: "rgba(45,69,48,0.3)" }} />
-            <div className="flex-1">
-              <label className="block text-xs font-medium mb-1.5" style={{ color: "rgba(45,69,48,0.55)" }}>Hasta</label>
-              <select
-                value={transDest}
-                onChange={e => setTransDest(e.target.value)}
-                className="w-full px-4 py-2.5 rounded-xl border text-sm outline-none"
-                style={{ background: "white", borderColor: "rgba(45,69,48,0.15)", color: "#2D4530" }}
-              >
-                <option value="">— Elegí destino —</option>
-                {dbLocalities.filter(l => l.id !== transOrigin).map(l => <option key={l.id} value={l.id}>{l.name}</option>)}
-              </select>
-            </div>
-          </div>
-
-          {transLoading && <p className="text-sm text-center" style={{ color: "rgba(45,69,48,0.45)" }}>Buscando horarios…</p>}
-
-          {!transLoading && transOrigin && transDest && transResults.length === 0 && (
-            <p className="text-sm text-center py-4" style={{ color: "rgba(45,69,48,0.45)" }}>
-              Sin horarios registrados para este trayecto
-            </p>
-          )}
-
-          {transResults.length > 0 && (
-            <div className="relative">
-              {/* vertical line */}
-              <div
-                className="absolute left-[27px] top-0 bottom-0 w-px"
-                style={{ background: "rgba(45,69,48,0.12)" }}
-              />
-              <div className="space-y-3">
-                {transResults.map((r, i) => (
-                  <div key={r.id} className="flex gap-4 items-start">
-                    {/* timeline dot */}
-                    <div className="relative flex-shrink-0 flex flex-col items-center" style={{ width: 54 }}>
-                      <div
-                        className="w-[54px] text-center rounded-xl py-1.5 font-mono font-bold text-base leading-none z-10"
-                        style={{ background: i === 0 ? "#2D4530" : "white", color: i === 0 ? "#E1DBC9" : "#2D4530", border: "1px solid rgba(45,69,48,0.15)" }}
-                      >
-                        {r.departure_time.slice(0, 5)}
-                      </div>
-                      {r.arrival_time && (
-                        <div className="text-[10px] mt-1 font-mono" style={{ color: "rgba(45,69,48,0.45)" }}>
-                          → {r.arrival_time.slice(0, 5)}
-                        </div>
-                      )}
-                    </div>
-
-                    {/* content */}
-                    <div
-                      className="flex-1 rounded-2xl px-4 py-3 mb-1"
-                      style={{
-                        background: "rgba(255,255,255,0.80)",
-                        border: "1px solid rgba(45,69,48,0.08)",
-                        boxShadow: "0 2px 8px rgba(45,69,48,0.05)",
-                      }}
-                    >
-                      <p className="text-sm font-semibold leading-tight" style={{ color: "#2D4530" }}>{r.company}</p>
-                      <div className="flex gap-0.5 mt-1.5">
-                        {Object.entries(DAYS_SHORT).map(([key, short]) => (
-                          <span
-                            key={key}
-                            className="text-[9px] px-1.5 py-0.5 rounded-md font-medium"
-                            style={
-                              r.days.includes(key)
-                                ? { background: "#A3B18A", color: "white" }
-                                : { background: "rgba(45,69,48,0.06)", color: "rgba(45,69,48,0.25)" }
-                            }
-                          >
-                            {short}
-                          </span>
-                        ))}
-                      </div>
-                      {r.notes && (
-                        <p className="text-xs mt-1.5 leading-snug" style={{ color: "rgba(45,69,48,0.50)" }}>
-                          {r.notes}
-                        </p>
-                      )}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-        </motion.div>
-      )}
-
-      {/* Panel principal */}
-      <div
+      {/* Panel principal — solo para categorías con datos hardcodeados */}
+      {!DB_ONLY_CATEGORIES.has(categoria) && <div
         className="relative overflow-hidden rounded-3xl px-6 md:px-10 pt-8 pb-10"
         style={{ background: "#EBE6DA" }}
       >
@@ -682,52 +567,127 @@ export default function InfoUtilPage({ initialCategoria, initialPueblo }: Props)
             )}
           </AnimatePresence>
         </div>
-      </div>
-      {/* Servicios adicionales desde la base de datos */}
-      {dbServices.length > 0 && (
+      </div>}
+
+      {/* ── Sección de servicios de la base de datos ── */}
+      {filteredDbServices.length > 0 && (
         <motion.div
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.15 }}
           className="mt-8"
         >
-          <h2 className="font-serif text-xl mb-4" style={{ color: "#2D4530" }}>
-            Más servicios en {localidad}
-          </h2>
+          {/* Banner "De turno HOY" para farmacias y veterinarias */}
+          {dutyService && (
+            <div
+              className="flex items-center gap-4 rounded-2xl px-5 py-4 mb-5"
+              style={{
+                background: "linear-gradient(135deg, rgba(234,179,8,0.15) 0%, rgba(234,179,8,0.08) 100%)",
+                border: "1.5px solid rgba(234,179,8,0.40)",
+              }}
+            >
+              <div className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0"
+                style={{ background: "rgba(234,179,8,0.18)" }}>
+                <Zap size={20} style={{ color: "#92400e" }} strokeWidth={2} />
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-xs font-bold uppercase tracking-wider mb-0.5"
+                  style={{ color: "rgba(146,64,14,0.75)" }}>De turno hoy</p>
+                <p className="text-base font-bold leading-tight" style={{ color: "#78350f" }}>
+                  {dutyService.name}
+                </p>
+                {dutyService.hours && (
+                  <p className="text-xs mt-0.5" style={{ color: "rgba(120,53,15,0.70)" }}>
+                    <Clock size={10} className="inline mr-1" />{dutyService.hours}
+                  </p>
+                )}
+              </div>
+              {dutyService.phone && (
+                <a href={`tel:${dutyService.phone}`}
+                  className="flex items-center gap-1.5 px-4 py-2 rounded-xl font-semibold text-sm flex-shrink-0 transition-opacity hover:opacity-80"
+                  style={{ background: "#92400e", color: "white" }}>
+                  <Phone size={14} />
+                  Llamar
+                </a>
+              )}
+            </div>
+          )}
+
+          {/* Título de sección */}
+          {!DB_ONLY_CATEGORIES.has(categoria) && (
+            <h2 className="font-serif text-xl mb-4" style={{ color: "#2D4530" }}>
+              Más servicios en {localidad}
+            </h2>
+          )}
+
+          {/* Grid de cards */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            {dbServices.map(service => {
+            {filteredDbServices.map(service => {
               const meta = SERVICE_CAT_ICONS[service.category] ?? SERVICE_CAT_ICONS.other
               const { Icon, color, bg } = meta
+              const isOnDuty = service.is_on_duty
               return (
                 <div
                   key={service.id}
                   className="rounded-2xl overflow-hidden"
                   style={{
-                    background: "rgba(255,255,255,0.80)",
+                    background: isOnDuty ? "rgba(255,253,240,0.95)" : "rgba(255,255,255,0.80)",
                     backdropFilter: "blur(12px)",
-                    border: "1px solid rgba(255,255,255,0.9)",
+                    border: isOnDuty ? "1.5px solid rgba(234,179,8,0.35)" : "1px solid rgba(255,255,255,0.9)",
                     boxShadow: "0 2px 12px rgba(45,69,48,0.07)",
                   }}
                 >
                   {/* top info row */}
                   <div className="flex items-start gap-3 px-4 pt-4 pb-3">
-                    <div
-                      className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0"
-                      style={{ background: bg }}
-                    >
+                    <div className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0"
+                      style={{ background: bg }}>
                       <Icon size={18} style={{ color }} strokeWidth={1.8} />
                     </div>
                     <div className="flex-1 min-w-0">
-                      <p className="text-sm font-semibold leading-tight" style={{ color: "#2D4530" }}>{service.name}</p>
-                      {service.description && (
-                        <p className="text-xs mt-0.5 leading-snug" style={{ color: "rgba(45,69,48,0.50)" }}>{service.description}</p>
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <p className="text-sm font-semibold leading-tight" style={{ color: "#2D4530" }}>
+                          {service.name}
+                        </p>
+                        {/* Guardia badge para dispensarios */}
+                        {service.has_guardia && (
+                          <span className="text-[10px] font-bold px-2 py-0.5 rounded-full"
+                            style={{ background: "rgba(184,50,50,0.12)", color: "#B83232" }}>
+                            🚑 Guardia
+                          </span>
+                        )}
+                      </div>
+                      {/* Especialidades */}
+                      {service.specialties && (
+                        <p className="text-xs mt-0.5" style={{ color: "rgba(45,69,48,0.60)" }}>
+                          {service.specialties}
+                        </p>
                       )}
+                      {/* Descripción / Destinos (transporte) */}
+                      {service.description && !service.specialties && (
+                        service.category === "transport" ? (
+                          <p className="text-xs mt-1 font-medium" style={{ color: "rgba(45,69,48,0.65)" }}>
+                            🚌 {service.description}
+                          </p>
+                        ) : (
+                          <p className="text-xs mt-0.5 leading-snug" style={{ color: "rgba(45,69,48,0.50)" }}>
+                            {service.description}
+                          </p>
+                        )
+                      )}
+                      {/* Horario */}
+                      {service.hours && (
+                        <p className="inline-flex items-center gap-1 text-xs mt-1" style={{ color: "rgba(45,69,48,0.55)" }}>
+                          <Clock size={10} />
+                          {service.hours}
+                        </p>
+                      )}
+                      {/* Dirección */}
                       {service.address && (
                         <a
                           href={`https://maps.google.com/?q=${encodeURIComponent(service.address + ", " + localidad)}`}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="inline-flex items-center gap-1 text-xs mt-1 transition-opacity hover:opacity-70"
+                          className="flex items-center gap-1 text-xs mt-1 transition-opacity hover:opacity-70"
                           style={{ color: "rgba(45,69,48,0.50)" }}
                         >
                           <MapPin size={10} />
@@ -738,7 +698,7 @@ export default function InfoUtilPage({ initialCategoria, initialPueblo }: Props)
                     </div>
                   </div>
 
-                  {/* large call button */}
+                  {/* Botón llamar */}
                   {service.phone && (
                     <a
                       href={`tel:${service.phone}`}

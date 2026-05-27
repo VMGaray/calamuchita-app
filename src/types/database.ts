@@ -199,6 +199,10 @@ export interface UtilityService {
   phone: string | null
   address: string | null
   description: string | null
+  hours: string | null
+  specialties: string | null
+  has_guardia: boolean
+  is_on_duty: boolean
   is_active: boolean
   sort_order: number
   created_at: string

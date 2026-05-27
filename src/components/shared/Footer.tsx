@@ -48,9 +48,9 @@ export default function Footer() {
         >
           {[...pueblos, ...pueblos].map((pueblo, i) => (
             <span key={i} className="text-xs font-medium tracking-widest uppercase flex items-center gap-8"
-              style={{ color: "rgba(225,219,201,0.22)" }}>
+              style={{ color: "rgba(225,219,201,0.45)" }}>
               {pueblo}
-              <span style={{ color: "rgba(225,219,201,0.1)" }}>✦</span>
+              <span style={{ color: "rgba(225,219,201,0.25)" }}>✦</span>
             </span>
           ))}
         </motion.div>
@@ -69,25 +69,25 @@ export default function Footer() {
                 </div>
                 <span className="font-serif" style={{ color: "#E1DBC9" }}>Calamuchita App</span>
               </Link>
-              <p className="text-sm leading-relaxed mb-4" style={{ color: "rgba(225,219,201,0.45)" }}>
+              <p className="text-sm leading-relaxed mb-4" style={{ color: "rgba(225,219,201,0.72)" }}>
                 La plataforma del Valle de Calamuchita. Gastronomía, servicios, salud, turismo y más.
               </p>
-              <p className="text-xs" style={{ color: "rgba(225,219,201,0.25)" }}>Córdoba, Argentina</p>
+              <p className="text-xs" style={{ color: "rgba(225,219,201,0.55)" }}>Córdoba, Argentina</p>
             </div>
           </AnimateIn>
 
           <AnimateIn direction="up" delay={0.1}>
             <div>
-              <p className="text-xs font-medium uppercase tracking-wider mb-4" style={{ color: "rgba(225,219,201,0.35)" }}>
+              <p className="text-xs font-medium uppercase tracking-wider mb-4" style={{ color: "rgba(225,219,201,0.62)" }}>
                 Explorar
               </p>
               <div className="grid grid-cols-2 gap-y-2">
                 {sections.map(({ label, href }) => (
                   <Link key={label} href={href}
                     className="text-sm transition-colors"
-                    style={{ color: "rgba(225,219,201,0.45)" }}
+                    style={{ color: "rgba(225,219,201,0.72)" }}
                     onMouseEnter={e => (e.currentTarget.style.color = "#E1DBC9")}
-                    onMouseLeave={e => (e.currentTarget.style.color = "rgba(225,219,201,0.45)")}>
+                    onMouseLeave={e => (e.currentTarget.style.color = "rgba(225,219,201,0.72)")}>
                     {label}
                   </Link>
                 ))}
@@ -113,7 +113,7 @@ export default function Footer() {
 
         <div className="mt-10 pt-6 flex flex-col md:flex-row justify-between items-center gap-2"
           style={{ borderTop: "1px solid rgba(225,219,201,0.07)" }}>
-          <p className="text-xs" style={{ color: "rgba(225,219,201,0.25)" }}>
+          <p className="text-xs" style={{ color: "rgba(225,219,201,0.55)" }}>
             © 2025 Calamuchita App · Valle de Calamuchita, Córdoba
           </p>
           <a
@@ -121,9 +121,9 @@ export default function Footer() {
             target="_blank"
             rel="noopener noreferrer"
             className="text-xs transition-colors"
-            style={{ color: "rgba(225,219,201,0.25)" }}
+            style={{ color: "rgba(225,219,201,0.55)" }}
             onMouseEnter={e => (e.currentTarget.style.color = "#E1DBC9")}
-            onMouseLeave={e => (e.currentTarget.style.color = "rgba(225,219,201,0.25)")}
+            onMouseLeave={e => (e.currentTarget.style.color = "rgba(225,219,201,0.55)")}
           >
             VMG.Setup.Ai
           </a>

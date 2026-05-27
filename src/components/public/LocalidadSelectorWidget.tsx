@@ -33,7 +33,7 @@ export default function LocalidadSelectorWidget() {
             <h2 className="font-serif text-xl leading-tight" style={{ color: "#2D4530" }}>
               ¿Dónde estás?
             </h2>
-            <p className="text-xs mt-0.5" style={{ color: "rgba(45,69,48,0.55)" }}>
+            <p className="text-xs mt-0.5" style={{ color: "rgba(45,69,48,0.82)" }}>
               Elegí tu localidad para ver la información del lugar.
             </p>
           </div>
@@ -95,7 +95,7 @@ export default function LocalidadSelectorWidget() {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0 }}
             className="text-xs mt-4"
-            style={{ color: "rgba(45,69,48,0.50)" }}
+            style={{ color: "rgba(45,69,48,0.80)" }}
           >
             Mostrando info para{" "}
             <strong style={{ color: "#2D4530" }}>{localidad}</strong>.

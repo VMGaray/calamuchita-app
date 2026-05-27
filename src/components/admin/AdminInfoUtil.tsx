@@ -23,11 +23,14 @@ const TABS: { key: Tab; label: string }[] = [
 
 const CATEGORY_LABELS: Record<string, string> = {
   emergency:   "Emergencias",
-  health:      "Salud",
-  transport:   "Transporte",
+  health:      "Salud / Dispensario",
+  pharmacy:    "Farmacia",
+  veterinary:  "Veterinaria",
   municipal:   "Municipal",
+  utility:     "Cooperativa",
+  tourism:     "Turismo",
   security:    "Seguridad",
-  utility:     "Servicios",
+  transport:   "Transporte",
   other:       "Otros",
 }
 
