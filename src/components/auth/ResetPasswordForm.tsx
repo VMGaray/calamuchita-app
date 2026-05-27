@@ -1,11 +1,12 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { useRouter } from "next/navigation"
+import { useRouter, useSearchParams } from "next/navigation"
 import { createClient } from "@/lib/supabase/client"
 
 export default function ResetPasswordForm() {
   const router = useRouter()
+  const searchParams = useSearchParams()
   const [password, setPassword] = useState("")
   const [confirmPassword, setConfirmPassword] = useState("")
   const [loading, setLoading] = useState(false)
@@ -14,30 +15,36 @@ export default function ResetPasswordForm() {
   const [success, setSuccess] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
- useEffect(() => {
-  const supabase = createClient()
-  
-  // Escuchar cuando Supabase intercambia el code por una sesión
-  const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-    if (event === "PASSWORD_RECOVERY") {
-      setHasSession(true)
-      setVerifying(false)
-    } else if (event === "SIGNED_IN" && session) {
-      setHasSession(true)
-      setVerifying(false)
-    }
-  })
+  useEffect(() => {
+    const supabase = createClient()
+    const code = searchParams.get("code")
 
-  // También verificar si ya hay sesión activa
-  supabase.auth.getSession().then(({ data: { session } }) => {
-    if (session) {
-      setHasSession(true)
+    // Flujo PKCE: el link trae ?code=XXX en la URL
+    if (code) {
+      supabase.auth.exchangeCodeForSession(code).then(({ error }) => {
+        if (!error) setHasSession(true)
+        setVerifying(false)
+      })
+      return
     }
-    setVerifying(false)
-  })
 
-  return () => subscription.unsubscribe()
-}, [])
+    // Flujo implícito: el link trae #access_token=...&type=recovery en el hash
+    // onAuthStateChange lo detecta automáticamente y dispara PASSWORD_RECOVERY
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      if (event === "PASSWORD_RECOVERY" || (event === "SIGNED_IN" && session)) {
+        setHasSession(true)
+        setVerifying(false)
+      }
+    })
+
+    // Fallback: verificar si ya hay sesión activa
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (session) setHasSession(true)
+      setVerifying(false)
+    })
+
+    return () => subscription.unsubscribe()
+  }, [searchParams])
 
   const handleReset = async () => {
     if (password !== confirmPassword) {
