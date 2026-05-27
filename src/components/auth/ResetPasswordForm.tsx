@@ -17,16 +17,16 @@ export default function ResetPasswordForm() {
 
   useEffect(() => {
     const supabase = createClient()
-    const code = searchParams.get("code")
     const urlError = searchParams.get("error")
 
-    // Supabase redirigió con error (ej: token expirado)
+    // Supabase redirigió con error explícito (token inválido/expirado)
     if (urlError) {
       setVerifying(false)
       return
     }
 
-    // Flujo PKCE: el link trae ?code=XXX en la URL
+    // Caso 1: llegó directo con ?code= (sin pasar por /auth/callback)
+    const code = searchParams.get("code")
     if (code) {
       supabase.auth.exchangeCodeForSession(code).then(({ error }) => {
         if (!error) setHasSession(true)
@@ -35,16 +35,15 @@ export default function ResetPasswordForm() {
       return
     }
 
-    // Flujo implícito: el link trae #access_token=...&type=recovery en el hash
-    // onAuthStateChange lo detecta automáticamente y dispara PASSWORD_RECOVERY
+    // Caso 2 (flujo normal): /auth/callback ya hizo el intercambio server-side
+    // y guardó la sesión en cookies — la leemos directamente
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-      if (event === "PASSWORD_RECOVERY" || (event === "SIGNED_IN" && session)) {
-        setHasSession(true)
+      if (event === "PASSWORD_RECOVERY" || event === "SIGNED_IN") {
+        if (session) setHasSession(true)
         setVerifying(false)
       }
     })
 
-    // Fallback: verificar si ya hay sesión activa
     supabase.auth.getSession().then(({ data: { session } }) => {
       if (session) setHasSession(true)
       setVerifying(false)
