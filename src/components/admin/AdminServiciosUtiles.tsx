@@ -36,6 +36,7 @@ export default function AdminServiciosUtiles() {
   const [editing, setEditing] = useState<UtilityService | null>(null)
   const [form, setForm] = useState(EMPTY_FORM)
   const [saving, setSaving] = useState(false)
+  const [saveError, setSaveError] = useState<string | null>(null)
 
   const refreshServices = async (localityId: string) => {
     const { data } = await createClient()
@@ -98,6 +99,7 @@ export default function AdminServiciosUtiles() {
   const handleSave = async () => {
     if (!form.name || !selectedLocality) return
     setSaving(true)
+    setSaveError(null)
     const payload = {
       name:        form.name,
       category:    form.category,
@@ -111,12 +113,17 @@ export default function AdminServiciosUtiles() {
       sort_order:  Number(form.sort_order) || 0,
       locality_id: selectedLocality,
     }
+    let error
     if (editing) {
-      await createClient().from("utility_services").update(payload).eq("id", editing.id)
+      ;({ error } = await createClient().from("utility_services").update(payload).eq("id", editing.id))
     } else {
-      await createClient().from("utility_services").insert([{ ...payload, is_active: true }])
+      ;({ error } = await createClient().from("utility_services").insert([{ ...payload, is_active: true }]))
     }
     setSaving(false)
+    if (error) {
+      setSaveError(error.message)
+      return
+    }
     setShowForm(false)
     setEditing(null)
     await refreshServices(selectedLocality)
@@ -244,14 +251,28 @@ export default function AdminServiciosUtiles() {
         <div className="fixed inset-0 z-50 flex items-end md:items-center justify-center p-4 bg-black/40 backdrop-blur-sm">
           <div className="bg-white rounded-2xl w-full max-w-md p-6 space-y-3 shadow-xl max-h-[90vh] overflow-y-auto">
             <h3 className="text-base font-medium text-stone-800 mb-1">
-              {editing ? "Editar servicio" : `Nuevo servicio — ${localityName}`}
+              {editing ? "Editar servicio" : "Nuevo servicio"}
             </h3>
+
+            {/* Pueblo */}
+            <div>
+              <label className="block text-xs font-medium text-stone-600 mb-1">Pueblo / Localidad *</label>
+              <select
+                value={selectedLocality}
+                onChange={e => setSelectedLocality(e.target.value)}
+                className="w-full px-3 py-2 rounded-xl border border-stone-200 text-sm bg-white outline-none focus:ring-2 focus:ring-[#A3B18A]/50"
+              >
+                {localities.map(l => (
+                  <option key={l.id} value={l.id}>{l.name}</option>
+                ))}
+              </select>
+            </div>
 
             {/* Nombre */}
             <div>
               <label className="block text-xs font-medium text-stone-600 mb-1">Nombre *</label>
               <input value={form.name} onChange={e => set("name", e.target.value)}
-                placeholder="Ej: Farmacia del Centro"
+                placeholder="Ej: Dispensario Municipal"
                 className="w-full px-3 py-2 rounded-xl border border-stone-200 text-sm outline-none focus:ring-2 focus:ring-[#A3B18A]/50" />
             </div>
 
@@ -282,10 +303,14 @@ export default function AdminServiciosUtiles() {
             {/* Especialidades — solo Salud/Dispensario */}
             {isHealthCategory && (
               <div>
-                <label className="block text-xs font-medium text-stone-600 mb-1">Especialidades</label>
-                <input value={form.specialties} onChange={e => set("specialties", e.target.value)}
-                  placeholder="Clínica, Pediatría, Odontología…"
-                  className="w-full px-3 py-2 rounded-xl border border-stone-200 text-sm outline-none focus:ring-2 focus:ring-[#A3B18A]/50" />
+                <label className="block text-xs font-medium text-stone-600 mb-1">Especialidades / Comentarios</label>
+                <textarea
+                  value={form.specialties}
+                  onChange={e => set("specialties", e.target.value)}
+                  placeholder={"Clínica General, Pediatría, Odontología…\nAtención: lunes y miércoles"}
+                  rows={3}
+                  className="w-full px-3 py-2 rounded-xl border border-stone-200 text-sm outline-none focus:ring-2 focus:ring-[#A3B18A]/50 resize-none"
+                />
               </div>
             )}
 
@@ -312,12 +337,18 @@ export default function AdminServiciosUtiles() {
               </label>
             )}
 
+            {saveError && (
+              <div className="px-3 py-2 rounded-xl bg-red-50 border border-red-200 text-xs text-red-700">
+                Error al guardar: {saveError}
+              </div>
+            )}
+
             <div className="flex gap-3 pt-2">
-              <button onClick={() => setShowForm(false)}
+              <button onClick={() => { setShowForm(false); setSaveError(null) }}
                 className="flex-1 py-2.5 rounded-xl border border-stone-200 text-stone-600 text-sm hover:bg-stone-50 transition-colors">
                 Cancelar
               </button>
-              <button onClick={handleSave} disabled={saving || !form.name}
+              <button onClick={handleSave} disabled={saving || !form.name || !selectedLocality}
                 className="flex-1 py-2.5 rounded-xl bg-[#2D4530] text-white text-sm font-medium hover:bg-[#3a5a3e] transition-colors disabled:opacity-50">
                 {saving ? "Guardando…" : "Guardar"}
               </button>

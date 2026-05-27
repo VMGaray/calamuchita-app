@@ -170,18 +170,22 @@ function ContactForm({ initial, onClose, onSaved }: { initial: UsefulContact | n
     sort_order: initial?.sort_order ?? 0,
   })
   const [saving, setSaving] = useState(false)
+  const [saveError, setSaveError] = useState<string | null>(null)
   const set = (k: string, v: string | number) => setForm(p => ({ ...p, [k]: v }))
 
   const handleSave = async () => {
     if (!form.title) return
     setSaving(true)
+    setSaveError(null)
     const supabase = createClient()
+    let error
     if (initial) {
-      await supabase.from("useful_contacts").update({ ...form, updated_at: new Date().toISOString() }).eq("id", initial.id)
+      ;({ error } = await supabase.from("useful_contacts").update({ ...form, updated_at: new Date().toISOString() }).eq("id", initial.id))
     } else {
-      await supabase.from("useful_contacts").insert([{ ...form, is_active: true }])
+      ;({ error } = await supabase.from("useful_contacts").insert([{ ...form, is_active: true }]))
     }
     setSaving(false)
+    if (error) { setSaveError(error.message); return }
     onSaved()
   }
 
@@ -208,6 +212,11 @@ function ContactForm({ initial, onClose, onSaved }: { initial: UsefulContact | n
             {Object.entries(CATEGORY_LABELS).map(([v, l]) => <option key={v} value={v}>{l}</option>)}
           </select>
         </div>
+        {saveError && (
+          <div className="px-3 py-2 rounded-xl bg-red-50 border border-red-200 text-xs text-red-700">
+            Error al guardar: {saveError}
+          </div>
+        )}
         <div className="flex gap-3 pt-2">
           <button onClick={onClose} className="flex-1 py-2.5 rounded-xl border border-stone-200 text-stone-600 text-sm hover:bg-stone-50 transition-colors">Cancelar</button>
           <button onClick={handleSave} disabled={saving || !form.title}
