@@ -355,9 +355,9 @@ export default function AdminNegocioEdit({ id }: Props) {
           <h2 className="text-sm font-medium text-stone-700 mb-4">Servicios</h2>
           <div className="space-y-3">
             {[
+              { key: "offers_dine_in", label: "Salón" },
               { key: "offers_delivery", label: "Delivery" },
               { key: "offers_takeaway", label: "Take away" },
-              { key: "offers_dine_in", label: "Comer en el lugar" },
               { key: "accepts_reservations", label: "Reserva de mesa" },
             ].map(({ key, label }) => (
               <label key={key} className="flex items-center gap-3 cursor-pointer">
@@ -390,9 +390,9 @@ export default function AdminNegocioEdit({ id }: Props) {
     <h2 className="text-sm font-medium text-stone-700 mb-4">Servicios</h2>
     <div className="space-y-3">
       {[
+        { key: "offers_dine_in", label: "Salón" },
         { key: "offers_delivery", label: "Delivery" },
         { key: "offers_takeaway", label: "Take away" },
-        { key: "offers_dine_in", label: "Comer en el lugar" },
         { key: "accepts_reservations", label: "Reserva de mesa" },
       ].map(({ key, label }) => (
         <label key={key} className="flex items-center gap-3 cursor-pointer">

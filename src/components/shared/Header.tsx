@@ -43,59 +43,80 @@ export default function Header() {
 
   return (
     <header className="sticky top-0 z-50" style={{ background: "transparent" }}>
-      <div className="max-w-6xl mx-auto px-6">
-        <div className="h-16 flex items-center justify-between">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6">
+        <div className="h-16 flex items-center justify-between gap-2">
 
-          <div className="flex items-center gap-4"> {/* Contenedor para Logo + Mapa */}
+          {/* ── IZQUIERDA: Logo + accesos rápidos ── */}
+          <div className="flex items-center gap-2 sm:gap-4 min-w-0">
+
             {/* Logo */}
-            <Link href="/" className="flex items-center gap-2 -ml-3">
-              <div className="w-8 h-8 rounded-xl flex items-center justify-center"
-                style={{ background: "rgba(255,255,255,0.2)", border: "1px solid rgba(255,255,255,0.35)" }}>
+            <Link href="/" className="flex items-center gap-1.5 sm:gap-2 flex-shrink-0 -ml-1 sm:-ml-3">
+              <div
+                className="w-8 h-8 rounded-xl flex items-center justify-center"
+                style={{ background: "rgba(255,255,255,0.2)", border: "1px solid rgba(255,255,255,0.35)" }}
+              >
                 <MapPin size={15} style={{ color: "rgba(255,255,255,0.9)" }} />
               </div>
-              <span
-                className="font-serif text-xl font-semibold px-3 py-0.5 rounded-full hidden sm:inline"
-                style={{
-                  color: "rgba(255,255,255,0.97)",
-                  background: "rgba(0,0,0,0.2)",
-                  backdropFilter: "blur(8px)",
-                  textShadow: "0 1px 6px rgba(0,0,0,0.35)",
-                }}
-              >
-                Calamuchita App
-              </span>
+
+              {/* Nombre en dos líneas — igual en mobile y desktop */}
+              <div className="flex flex-col leading-none">
+                <span
+                  className="font-serif text-[15px] sm:text-[17px] font-semibold"
+                  style={{ color: "rgba(255,255,255,0.97)", textShadow: "0 1px 6px rgba(0,0,0,0.40)" }}
+                >
+                  Calamuchita
+                </span>
+                <span
+                  className="font-serif text-[10px] sm:text-[11px] font-medium tracking-widest uppercase"
+                  style={{ color: "rgba(255,255,255,0.97)", textShadow: "0 1px 6px rgba(0,0,0,0.40)" }}
+                >
+                  App
+                </span>
+              </div>
             </Link>
 
+            {/* Botón Mapa */}
             <Link
               href="/mapa"
               prefetch={false}
-              className="flex items-center gap-2 px-3 py-1.5 rounded-full transition-all hover:scale-105 active:scale-95"
+              className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-full transition-all hover:scale-105 active:scale-95 flex-shrink-0"
               style={{
-                background: "rgba(45,69,48,0.4)",
-                border: "1px solid rgba(255,255,255,0.2)",
-                backdropFilter: "blur(4px)"
+                background: "rgba(45,69,48,0.45)",
+                border: "1px solid rgba(255,255,255,0.22)",
+                backdropFilter: "blur(4px)",
               }}
             >
-              <MapIcon size={14} className="text-white/90" />
-              <span className="text-[10px] font-bold uppercase tracking-wider text-white/90 hidden sm:block">Explorar Mapa</span>
+              <MapIcon size={15} className="text-white/90" />
+              {/* Mobile: etiqueta corta siempre visible */}
+              <span className="sm:hidden text-[11px] font-bold uppercase tracking-wide text-white/90">
+                Mapa
+              </span>
+              {/* Desktop: etiqueta larga */}
+              <span className="hidden sm:block text-[10px] font-bold uppercase tracking-wider text-white/90">
+                Explorar Mapa
+              </span>
             </Link>
 
+            {/* Botón Agenda — oculto en mobile (ya está en la barra de categorías) */}
             <Link
               href="/eventos"
-              className="flex items-center gap-2 px-3 py-1.5 rounded-full transition-all hover:scale-105 active:scale-95"
+              className="hidden sm:flex items-center gap-1.5 px-2.5 py-1.5 rounded-full transition-all hover:scale-105 active:scale-95 flex-shrink-0"
               style={{
-                background: "rgba(45,69,48,0.4)",
-                border: "1px solid rgba(255,255,255,0.2)",
-                backdropFilter: "blur(4px)"
+                background: "rgba(45,69,48,0.45)",
+                border: "1px solid rgba(255,255,255,0.22)",
+                backdropFilter: "blur(4px)",
               }}
             >
-              <CalendarDays size={14} className="text-white/90" />
-              <span className="text-[10px] font-bold uppercase tracking-wider text-white/90 hidden sm:block">Agenda</span>
+              <CalendarDays size={15} className="text-white/90" />
+              {/* Etiqueta visible en todos los tamaños */}
+              <span className="text-[11px] font-bold uppercase tracking-wide text-white/90">
+                Agenda
+              </span>
             </Link>
           </div>
 
-          {/* Auth */}
-          <div className="flex items-center gap-3">
+          {/* ── DERECHA: Auth ── */}
+          <div className="flex items-center gap-2 sm:gap-3 flex-shrink-0">
             {user ? (
               <div className="relative">
                 <motion.button
@@ -103,8 +124,10 @@ export default function Header() {
                   className="flex items-center gap-2"
                   whileTap={{ scale: 0.97 }}
                 >
-                  <div className="w-8 h-8 rounded-full flex items-center justify-center"
-                    style={{ background: "rgba(255,255,255,0.2)", border: "1px solid rgba(255,255,255,0.35)" }}>
+                  <div
+                    className="w-8 h-8 rounded-full flex items-center justify-center"
+                    style={{ background: "rgba(255,255,255,0.2)", border: "1px solid rgba(255,255,255,0.35)" }}
+                  >
                     <span className="text-xs font-medium" style={{ color: "rgba(255,255,255,0.95)" }}>{initials}</span>
                   </div>
                   <span className="text-sm hidden md:block" style={{ color: "rgba(255,255,255,0.8)" }}>
@@ -118,7 +141,12 @@ export default function Header() {
                       <div className="fixed inset-0 z-40" onClick={() => setMenuOpen(false)} />
                       <motion.div
                         className="absolute right-0 top-12 w-48 rounded-2xl overflow-hidden z-50"
-                        style={{ background: "rgba(225,219,201,0.97)", backdropFilter: "blur(16px)", border: "1px solid rgba(45,69,48,0.15)", boxShadow: "0 8px 32px rgba(45,69,48,0.1)" }}
+                        style={{
+                          background: "rgba(225,219,201,0.97)",
+                          backdropFilter: "blur(16px)",
+                          border: "1px solid rgba(45,69,48,0.15)",
+                          boxShadow: "0 8px 32px rgba(45,69,48,0.1)",
+                        }}
                         initial={{ opacity: 0, y: -8, scale: 0.95 }}
                         animate={{ opacity: 1, y: 0, scale: 1 }}
                         exit={{ opacity: 0, y: -8, scale: 0.95 }}
@@ -164,12 +192,17 @@ export default function Header() {
                 </Link>
                 <Link href="/registro"
                   className="text-sm px-4 py-2 rounded-xl transition-colors hidden sm:block"
-                  style={{ background: "rgba(225,219,201,0.18)", color: "rgba(255,255,255,0.95)", border: "1px solid rgba(225,219,201,0.3)" }}>
+                  style={{
+                    background: "rgba(225,219,201,0.18)",
+                    color: "rgba(255,255,255,0.95)",
+                    border: "1px solid rgba(225,219,201,0.3)",
+                  }}>
                   Registrate
                 </Link>
               </>
             )}
           </div>
+
         </div>
       </div>
     </header>

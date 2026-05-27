@@ -218,7 +218,7 @@ export default function CtaBusiness() {
             textShadow: "0 2px 40px rgba(223, 134, 102, 0.973)",
           }}
         >
-          ¿Querés formar parte de <br />CALAMUCHITA APP?
+          ¿Querés suscribirte a <br />CALAMUCHITA APP?
         </motion.h2>
 
         {/* Subtítulo */}

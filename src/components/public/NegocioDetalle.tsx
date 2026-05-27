@@ -199,6 +199,15 @@ export default function NegocioDetalle({ business }: Props) {
                 <div className="pt-6 border-t border-stone-100">
                   <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                     <button
+                      onClick={handleVerCarta}
+                      disabled={!hasMenu}
+                      className="flex items-center justify-center gap-2 bg-brand-pine text-white px-4 py-4 rounded-2xl font-bold text-sm shadow-md hover:bg-brand-pine/90 transition-all active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed"
+                    >
+                      <UtensilsCrossed size={18} />
+                      <span className="whitespace-nowrap">Ver Carta</span>
+                    </button>
+
+                    <button
                       onClick={() => setShowReserva(true)}
                       disabled={!waNumber}
                       className="flex items-center justify-center gap-2 bg-brand-pine text-white px-4 py-4 rounded-2xl font-bold text-sm shadow-md hover:bg-brand-pine/90 transition-all active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed"
@@ -214,15 +223,6 @@ export default function NegocioDetalle({ business }: Props) {
                     >
                       <ShoppingBag size={18} />
                       <span className="whitespace-nowrap">Hacer pedido</span>
-                    </button>
-
-                    <button
-                      onClick={handleVerCarta}
-                      disabled={!hasMenu}
-                      className="flex items-center justify-center gap-2 bg-brand-pine text-white px-4 py-4 rounded-2xl font-bold text-sm shadow-md hover:bg-brand-pine/90 transition-all active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed"
-                    >
-                      <UtensilsCrossed size={18} />
-                      <span className="whitespace-nowrap">Ver Carta</span>
                     </button>
                   </div>
                 </div>
@@ -340,6 +340,12 @@ export default function NegocioDetalle({ business }: Props) {
               <div className="bg-white rounded-3xl border border-stone-200 p-6 shadow-sm">
                 <h3 className="text-[10px] font-black text-stone-400 uppercase tracking-[0.2em] mb-4">Servicios</h3>
                 <div className="space-y-3">
+                  {business.offers_dine_in && (
+                    <div className="flex items-center gap-3 text-stone-600">
+                      <UtensilsCrossed size={18} className="text-brand-pine" />
+                      <span className="text-sm font-bold">Salón</span>
+                    </div>
+                  )}
                   {business.offers_delivery && (
                     <div className="flex items-center gap-3 text-stone-600">
                       <Truck size={18} className="text-brand-pine" />
@@ -350,12 +356,6 @@ export default function NegocioDetalle({ business }: Props) {
                     <div className="flex items-center gap-3 text-stone-600">
                       <ShoppingBag size={18} className="text-brand-pine" />
                       <span className="text-sm font-bold">Take away</span>
-                    </div>
-                  )}
-                  {business.offers_dine_in && (
-                    <div className="flex items-center gap-3 text-stone-600">
-                      <UtensilsCrossed size={18} className="text-brand-pine" />
-                      <span className="text-sm font-bold">Comer en el lugar</span>
                     </div>
                   )}
                 </div>

@@ -9,6 +9,13 @@ import Link from "next/link"
 import Image from "next/image"
 import { ChevronLeft, ChevronRight } from "lucide-react"
 
+type BusinessHour = {
+  day_of_week: number
+  opens_at: string
+  closes_at: string
+  is_closed: boolean
+}
+
 interface Business {
   id: string
   name: string
@@ -22,10 +29,11 @@ interface Business {
   offers_delivery: boolean
   offers_takeaway: boolean
   description: string | null
+  business_hours: BusinessHour[]
 }
 
 interface Props {
-  params: { categoria?: string; abierto?: string; delivery?: string; q?: string }
+  params: { categoria?: string; abierto?: string; delivery?: string; takeaway?: string; q?: string }
 }
 
 const categoryLabel: Record<string, string> = {
@@ -34,6 +42,20 @@ const categoryLabel: Record<string, string> = {
   viandas: "Viandas",
   bar: "Bar",
   other: "Gastronomía",
+}
+
+/**
+ * Calcula si un negocio está abierto en este momento basándose en sus horarios.
+ * Usa el campo manual `is_open` como fallback si no hay horarios configurados.
+ */
+function calcIsOpen(hours: BusinessHour[], fallback: boolean): boolean {
+  if (!hours || hours.length === 0) return fallback
+  const now = new Date()
+  const day = now.getDay() // 0=Domingo … 6=Sábado
+  const hhmm = `${String(now.getHours()).padStart(2, "0")}:${String(now.getMinutes()).padStart(2, "0")}`
+  const today = hours.find(h => h.day_of_week === day)
+  if (!today || today.is_closed) return false
+  return hhmm >= today.opens_at.slice(0, 5) && hhmm <= today.closes_at.slice(0, 5)
 }
 
 export default function NegociosList({ params }: Props) {
@@ -74,22 +96,30 @@ export default function NegociosList({ params }: Props) {
 
       let query = supabase
         .from("businesses")
-        .select("id, name, slug, category, subcategory, address, logo_url, cover_url, is_open, offers_delivery, offers_takeaway, description")
+        .select("id, name, slug, category, subcategory, address, logo_url, cover_url, is_open, offers_delivery, offers_takeaway, description, business_hours(day_of_week, opens_at, closes_at, is_closed)")
         .eq("status", "active")
         .eq("section", "gastronomy")
 
       if (params.categoria) query = query.eq("category", params.categoria)
-      if (params.abierto === "true") query = query.eq("is_open", true)
+      // "abierto" ya NO filtra en DB — lo calculamos cliente con los horarios reales
       if (params.delivery === "true") query = query.eq("offers_delivery", true)
+      if (params.takeaway === "true") query = query.eq("offers_takeaway", true)
       if (params.q) query = query.ilike("name", `%${params.q}%`)
 
       const { data } = await query.order("name")
-      setBusinesses(data || [])
+      let result = (data || []) as Business[]
+
+      // Filtro "Abierto ahora" calculado desde los horarios reales
+      if (params.abierto === "true") {
+        result = result.filter(b => calcIsOpen(b.business_hours, b.is_open))
+      }
+
+      setBusinesses(result)
       setLoading(false)
     }
 
     fetchBusinesses()
-  }, [params.categoria, params.abierto, params.delivery, params.q])
+  }, [params.categoria, params.abierto, params.delivery, params.takeaway, params.q])
 
   useEffect(() => {
     if (isFirstRender.current) {
@@ -161,73 +191,84 @@ export default function NegociosList({ params }: Props) {
         )}
 
       <div ref={scrollRef} className="flex gap-4 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden snap-x snap-mandatory -mx-4 px-4 pb-6 md:mx-0 md:px-0 md:grid md:grid-cols-2 lg:grid-cols-3 md:overflow-x-visible md:pb-0">
-        {businesses.map(({ id, name, slug, category, subcategory, address, cover_url, is_open, offers_delivery, description }, i) => (
-          <AnimateIn key={id} direction="up" delay={i * 0.07} className="w-[88vw] flex-shrink-0 snap-center md:w-auto">
-            <Card3D>
-              <Link href={`/negocios/${slug}`} className="block h-full">
-                <div
-                  className="rounded-2xl overflow-hidden h-full"
-                  style={{
-                    background: "rgba(255,255,255,0.10)",
-                    backdropFilter: "blur(16px)",
-                    WebkitBackdropFilter: "blur(16px)",
-                    border: "1px solid rgba(255,255,255,0.20)",
-                  }}
-                >
-                  {/* Cover — más alto en mobile para lucir la foto */}
-                  <div className="h-52 md:h-36 relative" style={{ background: "rgba(255,255,255,0.08)" }}>
-                    {cover_url ? (
-                      <Image src={cover_url} alt={name} fill className="object-cover" sizes="(max-width: 768px) 88vw, (max-width: 1024px) 50vw, 33vw" quality={70} />
-                    ) : (
-                      <div className="w-full h-full flex items-center justify-center">
-                        <div
-                          className="w-16 h-16 rounded-full flex items-center justify-center font-serif text-xl"
-                          style={{ background: "rgba(255,255,255,0.12)", color: "rgba(255,255,255,0.50)" }}
-                        >
-                          {name[0]}
-                        </div>
-                      </div>
-                    )}
-                    {is_open && (
-                      <span className="absolute top-3 right-3 text-xs font-medium px-2.5 py-1 rounded-full"
-                        style={{ background: "rgba(74,255,128,0.20)", color: "#6ee7a0" }}>
-                        Abierto
-                      </span>
-                    )}
-                  </div>
+        {businesses.map((biz, i) => {
+          const { id, name, slug, category, subcategory, address, cover_url, is_open, offers_delivery, offers_takeaway, description, business_hours } = biz
+          const isOpen = calcIsOpen(business_hours, is_open)
 
-                  {/* Info */}
-                  <div className="p-4">
-                    <h3 className="text-base font-medium mb-1" style={{ color: "#E1DBC9" }}>{name}</h3>
-                    <p className="text-xs mb-2" style={{ color: "rgba(225,219,201,0.65)" }}>
-                      {category ? categoryLabel[category] : subcategory || "Gastronomía"}
-                      {address && ` · ${address.split(",").pop()?.trim()}`}
-                    </p>
-                    {description && (
-                      <p className="text-sm mb-3 leading-relaxed line-clamp-2" style={{ color: "rgba(225,219,201,0.75)" }}>
-                        {description}
-                      </p>
-                    )}
-                    <div className="flex items-center gap-1.5 flex-wrap">
-                      {!is_open && (
-                        <span className="text-xs font-medium px-2 py-0.5 rounded-full"
-                          style={{ background: "rgba(255,255,255,0.10)", color: "rgba(225,219,201,0.50)" }}>
-                          Cerrado
-                        </span>
+          return (
+            <AnimateIn key={id} direction="up" delay={i * 0.07} className="w-[88vw] flex-shrink-0 snap-center md:w-auto">
+              <Card3D>
+                <Link href={`/negocios/${slug}`} className="block h-full">
+                  <div
+                    className="rounded-2xl overflow-hidden h-full"
+                    style={{
+                      background: "rgba(255,255,255,0.10)",
+                      backdropFilter: "blur(16px)",
+                      WebkitBackdropFilter: "blur(16px)",
+                      border: "1px solid rgba(255,255,255,0.20)",
+                    }}
+                  >
+                    {/* Cover */}
+                    <div className="h-52 md:h-36 relative" style={{ background: "rgba(255,255,255,0.08)" }}>
+                      {cover_url ? (
+                        <Image src={cover_url} alt={name} fill className="object-cover" sizes="(max-width: 768px) 88vw, (max-width: 1024px) 50vw, 33vw" quality={70} />
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center">
+                          <div
+                            className="w-16 h-16 rounded-full flex items-center justify-center font-serif text-xl"
+                            style={{ background: "rgba(255,255,255,0.12)", color: "rgba(255,255,255,0.50)" }}
+                          >
+                            {name[0]}
+                          </div>
+                        </div>
                       )}
-                      {offers_delivery && (
-                        <span className="text-xs font-medium px-2 py-0.5 rounded-full"
-                          style={{ background: "rgba(255,255,255,0.15)", color: "rgba(225,219,201,0.85)" }}>
-                          Delivery
+                      {isOpen && (
+                        <span className="absolute top-3 right-3 text-xs font-medium px-2.5 py-1 rounded-full"
+                          style={{ background: "rgba(74,255,128,0.20)", color: "#6ee7a0" }}>
+                          Abierto
                         </span>
                       )}
                     </div>
+
+                    {/* Info */}
+                    <div className="p-4">
+                      <h3 className="text-base font-medium mb-1" style={{ color: "#E1DBC9" }}>{name}</h3>
+                      <p className="text-xs mb-2" style={{ color: "rgba(225,219,201,0.65)" }}>
+                        {category ? categoryLabel[category] : subcategory || "Gastronomía"}
+                        {address && ` · ${address.split(",").pop()?.trim()}`}
+                      </p>
+                      {description && (
+                        <p className="text-sm mb-3 leading-relaxed line-clamp-2" style={{ color: "rgba(225,219,201,0.75)" }}>
+                          {description}
+                        </p>
+                      )}
+                      <div className="flex items-center gap-1.5 flex-wrap">
+                        {!isOpen && (
+                          <span className="text-xs font-medium px-2 py-0.5 rounded-full"
+                            style={{ background: "rgba(255,255,255,0.10)", color: "rgba(225,219,201,0.50)" }}>
+                            Cerrado
+                          </span>
+                        )}
+                        {offers_delivery && (
+                          <span className="text-xs font-medium px-2 py-0.5 rounded-full"
+                            style={{ background: "rgba(255,255,255,0.15)", color: "rgba(225,219,201,0.85)" }}>
+                            Delivery
+                          </span>
+                        )}
+                        {offers_takeaway && (
+                          <span className="text-xs font-medium px-2 py-0.5 rounded-full"
+                            style={{ background: "rgba(255,255,255,0.15)", color: "rgba(225,219,201,0.85)" }}>
+                            Take Away
+                          </span>
+                        )}
+                      </div>
+                    </div>
                   </div>
-                </div>
-              </Link>
-            </Card3D>
-          </AnimateIn>
-        ))}
+                </Link>
+              </Card3D>
+            </AnimateIn>
+          )
+        })}
       </div>
       </div>
     </div>

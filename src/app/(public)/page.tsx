@@ -80,7 +80,7 @@ export default async function HomePage() {
 
       <div className="relative overflow-hidden" style={{ background: BODY_BG }}>
         <WebGLBackground />
-        <div className="relative z-10 max-w-6xl mx-auto px-4 py-10">
+        <div className="relative z-10 max-w-6xl mx-auto px-4 pt-2 pb-10">
           <JoyasDelValle businesses={featuredBusinesses} />
           <CalamuchitaSale promotions={activePromotions} />
           

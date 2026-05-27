@@ -149,7 +149,7 @@ export default function JoyasDelValle({ businesses }: { businesses: FeaturedBusi
 
   return (
     <section
-      className="py-16 md:py-24 bg-transparent overflow-hidden group/jdv"
+      className="pt-4 pb-16 md:pt-6 md:pb-24 bg-transparent overflow-hidden group/jdv"
       onMouseEnter={() => { isPausedRef.current = true }}
       onMouseLeave={() => { isPausedRef.current = false }}
       onTouchStart={() => { isPausedRef.current = true }}

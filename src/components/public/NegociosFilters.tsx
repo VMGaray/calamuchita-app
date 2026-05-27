@@ -24,7 +24,7 @@ const pillInactive = {
 }
 
 interface Props {
-  params: { categoria?: string; abierto?: string; delivery?: string; q?: string }
+  params: { categoria?: string; abierto?: string; delivery?: string; takeaway?: string; q?: string }
 }
 
 export default function NegociosFilters({ params }: Props) {
@@ -102,6 +102,17 @@ export default function NegociosFilters({ params }: Props) {
           transition={{ type: "spring", stiffness: 400, damping: 22 }}
         >
           Con delivery
+        </motion.button>
+
+        <motion.button
+          onClick={() => updateFilter("takeaway", params.takeaway === "true" ? "" : "true")}
+          className="flex-shrink-0 px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap"
+          style={params.takeaway === "true" ? pillActive : pillInactive}
+          whileHover={{ y: -2 }}
+          whileTap={{ y: 0 }}
+          transition={{ type: "spring", stiffness: 400, damping: 22 }}
+        >
+          Take Away
         </motion.button>
       </div>
     </div>

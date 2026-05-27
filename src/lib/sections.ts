@@ -3,6 +3,7 @@ export const sectionCategories = {
     { label: "Abierto ahora", desc: "Locales disponibles hoy", href: "/negocios?abierto=true", bg: "bg-brand-earth/10", color: "text-brand-earth" },
     { label: "Bar/Café", desc: "Tragos, café y más", href: "/negocios?categoria=cafe_bar", bg: "bg-brand-earth/10", color: "text-brand-earth" },
     { label: "Delivery", desc: "Pedidos a domicilio", href: "/negocios?delivery=true", bg: "bg-brand-pine/10", color: "text-brand-pine" },
+    { label: "Take Away", desc: "Pedí y retirá en el local", href: "/negocios?takeaway=true", bg: "bg-brand-slate/10", color: "text-brand-slate" },
     { label: "Restaurantes", desc: "Cocina regional y menú del día", href: "/negocios?categoria=restaurant", bg: "bg-brand-earth/10", color: "text-brand-earth" },
     { label: "Viandas", desc: "Comida casera para llevar", href: "/negocios?categoria=viandas", bg: "bg-brand-slate/10", color: "text-brand-slate" },
     { label: "Varios", desc: "Otros locales gastronómicos", href: "/negocios?categoria=other", bg: "bg-brand-sand/50", color: "text-brand-charcoal" },

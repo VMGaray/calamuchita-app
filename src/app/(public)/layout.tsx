@@ -1,6 +1,7 @@
 import Header from "@/components/shared/Header"
 import HeroSection from "@/components/public/HeroSection"
 import StickyCategoryBar from "@/components/public/StickyCategoryBar"
+import ContextBar from "@/components/public/ContextBar"
 import FloatingLocalidadButton from "@/components/public/FloatingLocalidadButton"
 import Footer from "@/components/shared/Footer"
 import { LocalidadProvider } from "@/lib/context/LocalidadContext"
@@ -51,7 +52,9 @@ export default async function PublicLayout({
           
           {/* La barra de categorías DEBE tener un z-index alto para ser clickeable */}
           <div className="sticky top-0 z-[150]">
-             <StickyCategoryBar stickyOffset={isCategoryPage ? 64 : 0} />
+            <StickyCategoryBar stickyOffset={isCategoryPage ? 64 : 0} />
+            {/* Barra de contexto: solo visible en mobile, siempre sticky junto a la barra de categorías */}
+            <ContextBar />
           </div>
 
           <main className="flex-1 relative z-10">

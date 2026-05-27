@@ -7,10 +7,17 @@ import { SkeletonBusinessGrid } from "@/components/ui/Skeleton"
 import { createClient } from "@/lib/supabase/client"
 import Link from "next/link"
 import Image from "next/image"
-import { MapPin } from "lucide-react" // Importamos icono para la distancia
-//import { useGeolocation } from "@/lib/hooks/useGeolocation"
+import { MapPin } from "lucide-react"
 import { calculateDistance } from "@/lib/utils/distance"
 import { useGeolocation } from "../../lib/hooks/useGeolocation"
+
+type BusinessHour = {
+  day_of_week: number
+  opens_at: string
+  closes_at: string
+  is_closed: boolean
+}
+
 interface Business {
   id: string
   name: string
@@ -24,16 +31,29 @@ interface Business {
   is_open: boolean
   offers_delivery: boolean
   offers_takeaway: boolean
-  // Agregamos coordenadas a la interfaz
   latitude: number | null
   longitude: number | null
+  business_hours: BusinessHour[]
+}
+
+/**
+ * Calcula si un negocio está abierto ahora según sus horarios configurados.
+ * Usa is_open como fallback si no hay horarios.
+ */
+function calcIsOpen(hours: BusinessHour[], fallback: boolean): boolean {
+  if (!hours || hours.length === 0) return fallback
+  const now = new Date()
+  const day = now.getDay()
+  const hhmm = `${String(now.getHours()).padStart(2, "0")}:${String(now.getMinutes()).padStart(2, "0")}`
+  const today = hours.find(h => h.day_of_week === day)
+  if (!today || today.is_closed) return false
+  return hhmm >= today.opens_at.slice(0, 5) && hhmm <= today.closes_at.slice(0, 5)
 }
 
 export default function BusinessesGrid() {
   const [businesses, setBusinesses] = useState<Business[]>([])
   const [loading, setLoading] = useState(true)
-  
-  // Obtenemos la ubicación del usuario
+
   const { location } = useGeolocation()
 
   useEffect(() => {
@@ -41,13 +61,16 @@ export default function BusinessesGrid() {
       const supabase = createClient()
       const { data } = await supabase
         .from("businesses")
-        // IMPORTANTE: Agregamos latitude y longitude al select
-        .select("id, name, slug, category, subcategory, section, address, logo_url, cover_url, is_open, offers_delivery, offers_takeaway, latitude, longitude")
+        .select("id, name, slug, category, subcategory, section, address, logo_url, cover_url, is_open, offers_delivery, offers_takeaway, latitude, longitude, business_hours(day_of_week, opens_at, closes_at, is_closed)")
         .eq("status", "active")
         .eq("section", "gastronomy")
-        .eq("is_open", true)
-        .limit(4)
-      setBusinesses(data || [])
+        // No filtramos is_open en BD — calculamos desde horarios
+        .limit(20) // traemos más y filtramos cliente para mostrar 4 abiertos
+
+      const all = (data || []) as Business[]
+      // Filtramos los que están abiertos ahora según sus horarios reales
+      const open = all.filter(b => calcIsOpen(b.business_hours, b.is_open)).slice(0, 4)
+      setBusinesses(open)
       setLoading(false)
     }
     fetchBusinesses()
@@ -81,7 +104,6 @@ export default function BusinessesGrid() {
       ) : (
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
           {businesses.map((business, i) => {
-            // CALCULAMOS LA DISTANCIA PARA ESTE NEGOCIO
             const distance = (location && business.latitude && business.longitude)
               ? calculateDistance(location.latitude, location.longitude, business.latitude, business.longitude)
               : null
@@ -107,15 +129,14 @@ export default function BusinessesGrid() {
                           </div>
                         )}
                       </div>
-                      
+
                       <div className="p-3 flex-grow flex flex-col justify-between">
                         <div>
                           <h3 className="text-sm font-bold text-stone-800 mb-0.5 truncate">{business.name}</h3>
                           <p className="text-[10px] text-stone-400 mb-1 uppercase font-bold tracking-wider">
                             {business.category ? categoryLabel[business.category] : business.subcategory || "Gastronomía"}
                           </p>
-                          
-                          {/* DISTANCIA (Solo si existe ubicación) */}
+
                           {distance && (
                             <div className="flex items-center gap-1 text-[10px] text-brand-pine font-bold mb-2">
                               <MapPin size={10} className="fill-brand-pine/20" />

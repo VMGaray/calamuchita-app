@@ -18,6 +18,13 @@ export default function ResetPasswordForm() {
   useEffect(() => {
     const supabase = createClient()
     const code = searchParams.get("code")
+    const urlError = searchParams.get("error")
+
+    // Supabase redirigió con error (ej: token expirado)
+    if (urlError) {
+      setVerifying(false)
+      return
+    }
 
     // Flujo PKCE: el link trae ?code=XXX en la URL
     if (code) {

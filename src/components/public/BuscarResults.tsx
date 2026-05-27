@@ -27,6 +27,23 @@ const sectionColors: Record<string, string> = {
   info:       "bg-brand-sand/50 text-brand-charcoal",
 }
 
+type BusinessHour = {
+  day_of_week: number
+  opens_at: string
+  closes_at: string
+  is_closed: boolean
+}
+
+function calcIsOpen(hours: BusinessHour[], fallback: boolean): boolean {
+  if (!hours || hours.length === 0) return fallback
+  const now = new Date()
+  const day = now.getDay()
+  const hhmm = `${String(now.getHours()).padStart(2, "0")}:${String(now.getMinutes()).padStart(2, "0")}`
+  const today = hours.find(h => h.day_of_week === day)
+  if (!today || today.is_closed) return false
+  return hhmm >= today.opens_at.slice(0, 5) && hhmm <= today.closes_at.slice(0, 5)
+}
+
 interface Business {
   id: string
   name: string
@@ -40,6 +57,7 @@ interface Business {
   is_open: boolean
   phone: string | null
   whatsapp: string | null
+  business_hours: BusinessHour[]
 }
 
 interface Props {
@@ -132,7 +150,7 @@ export default function BuscarResults({ query, results }: Props) {
                         <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${sectionColors[business.section]}`}>
                           {sectionLabels[business.section]}
                         </span>
-                        {business.is_open && (
+                        {calcIsOpen(business.business_hours, business.is_open) && (
                           <span className="text-xs font-medium px-2 py-0.5 rounded-full bg-brand-pine/10 text-brand-pine">
                             Abierto
                           </span>

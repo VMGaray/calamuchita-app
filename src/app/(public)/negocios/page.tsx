@@ -8,6 +8,7 @@ interface Props {
     categoria?: string
     abierto?: string
     delivery?: string
+    takeaway?: string
     q?: string
   }>
 }
