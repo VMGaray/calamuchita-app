@@ -7,7 +7,7 @@ import { BusinessSection, BusinessCategory } from "@/types/database"
 import { MASTER_CATEGORIES } from "@/lib/constants/categories"
 import ImageUpload from "@/components/ui/ImageUpload"
 import PdfUpload from "@/components/ui/PdfUpload"
-import HorariosEditor, { HorarioDay, expandHorariosForSave } from "@/components/ui/HorariosEditor"
+import HorariosEditor, { HorarioDay, expandHorariosForSave, defaultHorarios } from "@/components/ui/HorariosEditor"
 
 const sections: { value: BusinessSection; label: string }[] = [
   { value: "gastronomy", label: "Gastronomía" },
@@ -73,7 +73,7 @@ export default function AdminNegocioForm() {
   const router = useRouter()
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  const [horarios, setHorarios] = useState<HorarioDay[]>([])
+  const [horarios, setHorarios] = useState<HorarioDay[]>(defaultHorarios)
   const [galleryPhotos, setGalleryPhotos] = useState<(string | null)[]>([null, null, null])
   const [branches, setBranches] = useState<Array<{ address: string; pueblo: string }>>([])
 

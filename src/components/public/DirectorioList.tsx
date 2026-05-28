@@ -170,7 +170,13 @@ export default function DirectorioList({ section, filters }: Props) {
         .eq("section", section)
 
       if (activeCategory && activeCategory !== "varios") {
-        query = query.ilike("subcategory", `%${activeCategory}%`)
+        // Usar el label real de la categoría (con tildes) para que el ilike haga match
+        // con lo que se guarda desde el admin (ej: "vehiculos" → "Vehículos")
+        const catLabel = (sectionCategories[section] ?? []).find(c => {
+          const key = c.href.includes("cat=") ? c.href.split("cat=")[1] : ""
+          return key === activeCategory
+        })?.label ?? activeCategory
+        query = query.ilike("subcategory", `%${catLabel}%`)
       }
       if (filters.q) query = query.ilike("name", `%${filters.q}%`)
       const pueblosFilter = filters.pueblo ? filters.pueblo.split(',').filter(Boolean) : []

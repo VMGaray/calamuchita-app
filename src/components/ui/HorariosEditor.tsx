@@ -66,7 +66,7 @@ export function mergeHorariosFromDB(rows: any[]): HorarioDay[] {
   })
 }
 
-const defaultHorarios: HorarioDay[] = days.map(d => ({
+export const defaultHorarios: HorarioDay[] = days.map(d => ({
   day_of_week: d.value,
   opens_at: "09:00",
   closes_at: "18:00",

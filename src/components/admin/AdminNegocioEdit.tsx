@@ -7,7 +7,7 @@ import { BusinessSection, BusinessCategory } from "@/types/database"
 import { MASTER_CATEGORIES } from "@/lib/constants/categories"
 import ImageUpload from "@/components/ui/ImageUpload"
 import PdfUpload from "@/components/ui/PdfUpload"
-import HorariosEditor, { HorarioDay, expandHorariosForSave, mergeHorariosFromDB } from "@/components/ui/HorariosEditor"
+import HorariosEditor, { HorarioDay, expandHorariosForSave, mergeHorariosFromDB, defaultHorarios } from "@/components/ui/HorariosEditor"
 import { ArrowLeft, Star } from "lucide-react"
 import QRMarketing from "@/components/admin/QRMarketing"
 
@@ -52,7 +52,7 @@ export default function AdminNegocioEdit({ id }: Props) {
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [success, setSuccess] = useState(false)
-  const [horarios, setHorarios] = useState<HorarioDay[]>([])
+  const [horarios, setHorarios] = useState<HorarioDay[]>(defaultHorarios)
   const [galleryPhotos, setGalleryPhotos] = useState<(string | null)[]>([null, null, null])
   const [branches, setBranches] = useState<Array<{ address: string; pueblo: string }>>([])
 

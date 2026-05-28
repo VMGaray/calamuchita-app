@@ -126,7 +126,7 @@ export default function DirectorioDetalle({ business, section }: Props) {
     <div className="min-h-screen">
 
       {/* ── HERO ──────────────────────────────────────── */}
-      <div className="relative h-72 md:h-[420px]">
+      <div className="relative h-64 md:h-80">
 
         {/* Images / logo fallback / gradient fallback */}
         {heroImages.length > 0 ? (
@@ -282,7 +282,7 @@ export default function DirectorioDetalle({ business, section }: Props) {
                 <AnimateIn direction="up" delay={0.03}>
                   <div
                     className="relative w-full overflow-hidden rounded-[20px]"
-                    style={{ aspectRatio: "4/3", background: "#F0EAD9", border: "1px solid rgba(45,69,48,0.09)" }}
+                    style={{ aspectRatio: "4/3", maxHeight: 300, background: "#F0EAD9", border: "1px solid rgba(45,69,48,0.09)" }}
                   >
                     <Image
                       src={business.cover_url}
