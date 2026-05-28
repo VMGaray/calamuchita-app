@@ -39,7 +39,9 @@ const subcategoryOptions: Record<string, string[]> = {
 const pueblos = [
   "Villa General Belgrano", "Los Reartes", "Santa Rosa de Calamuchita",
   "La Cumbrecita", "Yacanto", "Amboy", "Villa Ciudad de América",
-  "Embalse", "Villa del Dique",
+  "Embalse", "Villa del Dique", "Villa Rumipal", "Villa Alpina",
+  "Villa Berna", "Villa Ciudad Parque", "La Cruz", "Intiyaco",
+  "Potrero de Garay", "Villa Quillinzo",
 ]
 
 interface Props { id: string }
@@ -51,6 +53,7 @@ export default function AdminNegocioEdit({ id }: Props) {
   const [error, setError] = useState<string | null>(null)
   const [success, setSuccess] = useState(false)
   const [horarios, setHorarios] = useState<HorarioDay[]>([])
+  const [galleryPhotos, setGalleryPhotos] = useState<(string | null)[]>([null, null, null])
 
   const [form, setForm] = useState({
     name: "",
@@ -124,6 +127,17 @@ export default function AdminNegocioEdit({ id }: Props) {
         .order("day_of_week")
 
       if (horariosData) setHorarios(horariosData)
+
+      const { data: photosData } = await supabase
+        .from("business_photos")
+        .select("url")
+        .eq("business_id", id)
+
+      if (photosData) {
+        const urls = photosData.map((p: any) => p.url as string)
+        setGalleryPhotos([urls[0] || null, urls[1] || null, urls[2] || null])
+      }
+
       setLoading(false)
     }
     fetch()
@@ -174,6 +188,14 @@ export default function AdminNegocioEdit({ id }: Props) {
       await supabase.from("business_hours").delete().eq("business_id", id)
       await supabase.from("business_hours").insert(
         horarios.map(h => ({ ...h, business_id: id }))
+      )
+    }
+
+    await supabase.from("business_photos").delete().eq("business_id", id)
+    const validPhotos = galleryPhotos.filter(Boolean) as string[]
+    if (validPhotos.length > 0) {
+      await supabase.from("business_photos").insert(
+        validPhotos.map(url => ({ business_id: id, url }))
       )
     }
 
@@ -381,6 +403,24 @@ export default function AdminNegocioEdit({ id }: Props) {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <ImageUpload value={form.logo_url} onChange={(url) => handleChange("logo_url", url)} folder="logos" label="Logo" />
             <ImageUpload value={form.cover_url} onChange={(url) => handleChange("cover_url", url)} folder="covers" label="Foto de portada" />
+          </div>
+          <div>
+            <p className="text-sm font-medium text-stone-700 mb-1">Fotos adicionales <span className="text-stone-400 font-normal">(carrusel en el detalle — hasta 3)</span></p>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-3">
+              {[0, 1, 2].map(i => (
+                <ImageUpload
+                  key={i}
+                  value={galleryPhotos[i]}
+                  onChange={url => {
+                    const next = [...galleryPhotos]
+                    next[i] = url
+                    setGalleryPhotos(next)
+                  }}
+                  folder="gallery"
+                  label={`Foto ${i + 1}`}
+                />
+              ))}
+            </div>
           </div>
         </div>
 

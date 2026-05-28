@@ -74,6 +74,7 @@ export default function AdminNegocioForm() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [horarios, setHorarios] = useState<HorarioDay[]>([])
+  const [galleryPhotos, setGalleryPhotos] = useState<(string | null)[]>([null, null, null])
 
   const [form, setForm] = useState({
     name: "",
@@ -187,13 +188,21 @@ export default function AdminNegocioForm() {
       return
     }
 
-    if (horarios.length > 0) {
+    const validPhotos = galleryPhotos.filter(Boolean) as string[]
+    if (horarios.length > 0 || validPhotos.length > 0) {
       const { data: saved } = await supabase
         .from("businesses").select("id").eq("slug", uniqueSlug).single()
       if (saved) {
-        await supabase.from("business_hours").insert(
-          horarios.map(h => ({ ...h, business_id: saved.id }))
-        )
+        if (horarios.length > 0) {
+          await supabase.from("business_hours").insert(
+            horarios.map(h => ({ ...h, business_id: saved.id }))
+          )
+        }
+        if (validPhotos.length > 0) {
+          await supabase.from("business_photos").insert(
+            validPhotos.map(url => ({ business_id: saved.id, url }))
+          )
+        }
       }
     }
 
@@ -513,6 +522,24 @@ export default function AdminNegocioForm() {
               folder="logos" label="Logo" />
             <ImageUpload value={form.cover_url} onChange={url => handleChange("cover_url", url)}
               folder="covers" label="Foto de portada" />
+          </div>
+          <div>
+            <p className="text-sm font-medium text-stone-700 mb-1">Fotos adicionales <span className="text-stone-400 font-normal">(carrusel en el detalle — hasta 3)</span></p>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-3">
+              {[0, 1, 2].map(i => (
+                <ImageUpload
+                  key={i}
+                  value={galleryPhotos[i]}
+                  onChange={url => {
+                    const next = [...galleryPhotos]
+                    next[i] = url
+                    setGalleryPhotos(next)
+                  }}
+                  folder="gallery"
+                  label={`Foto ${i + 1}`}
+                />
+              ))}
+            </div>
           </div>
         </div>
 

@@ -44,6 +44,7 @@ export const MASTER_CATEGORIES = {
     subcategories: [
       { label: "Hogar", icon: Armchair, bg: "bg-orange-50", color: "text-orange-700" },
       { label: "Indumentaria", icon: Shirt, bg: "bg-pink-50", color: "text-pink-600" },
+      { label: "Inmobiliarias", icon: Building, bg: "bg-blue-50", color: "text-blue-600" },
       { label: "Mascotas", icon: Dog, bg: "bg-amber-50", color: "text-amber-600" },
       { label: "Niños", icon: Baby, bg: "bg-indigo-50", color: "text-indigo-600" },
       { label: "Salud", icon: HeartPulse, bg: "bg-green-50", color: "text-green-600" },
