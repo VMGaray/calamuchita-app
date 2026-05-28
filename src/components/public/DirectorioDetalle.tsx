@@ -278,6 +278,24 @@ export default function DirectorioDetalle({ business, section }: Props) {
             {/* ── Main column ── */}
             <div className="md:col-span-2 space-y-4">
 
+              {business.cover_url && (
+                <AnimateIn direction="up" delay={0.03}>
+                  <div
+                    className="relative w-full overflow-hidden rounded-[20px]"
+                    style={{ aspectRatio: "4/3", background: "#F0EAD9", border: "1px solid rgba(45,69,48,0.09)" }}
+                  >
+                    <Image
+                      src={business.cover_url}
+                      alt={business.name}
+                      fill
+                      className="object-contain"
+                      sizes="(max-width: 768px) 100vw, 66vw"
+                      quality={85}
+                    />
+                  </div>
+                </AnimateIn>
+              )}
+
               {business.description && (
                 <AnimateIn direction="up" delay={0.05}>
                   <div className="p-6" style={card}>
