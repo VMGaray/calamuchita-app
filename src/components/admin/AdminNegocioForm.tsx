@@ -7,7 +7,7 @@ import { BusinessSection, BusinessCategory } from "@/types/database"
 import { MASTER_CATEGORIES } from "@/lib/constants/categories"
 import ImageUpload from "@/components/ui/ImageUpload"
 import PdfUpload from "@/components/ui/PdfUpload"
-import HorariosEditor, { HorarioDay } from "@/components/ui/HorariosEditor"
+import HorariosEditor, { HorarioDay, expandHorariosForSave } from "@/components/ui/HorariosEditor"
 
 const sections: { value: BusinessSection; label: string }[] = [
   { value: "gastronomy", label: "Gastronomía" },
@@ -75,6 +75,7 @@ export default function AdminNegocioForm() {
   const [error, setError] = useState<string | null>(null)
   const [horarios, setHorarios] = useState<HorarioDay[]>([])
   const [galleryPhotos, setGalleryPhotos] = useState<(string | null)[]>([null, null, null])
+  const [branches, setBranches] = useState<Array<{ address: string; pueblo: string }>>([])
 
   const [form, setForm] = useState({
     name: "",
@@ -189,19 +190,23 @@ export default function AdminNegocioForm() {
     }
 
     const validPhotos = galleryPhotos.filter(Boolean) as string[]
-    if (horarios.length > 0 || validPhotos.length > 0) {
+    const horariosExpanded = expandHorariosForSave(horarios)
+    if (horariosExpanded.length > 0 || validPhotos.length > 0 || branches.length > 0) {
       const { data: saved } = await supabase
         .from("businesses").select("id").eq("slug", uniqueSlug).single()
       if (saved) {
-        if (horarios.length > 0) {
+        if (horariosExpanded.length > 0) {
           await supabase.from("business_hours").insert(
-            horarios.map(h => ({ ...h, business_id: saved.id }))
+            horariosExpanded.map(h => ({ ...h, business_id: saved.id }))
           )
         }
         if (validPhotos.length > 0) {
           await supabase.from("business_photos").insert(
             validPhotos.map(url => ({ business_id: saved.id, url }))
           )
+        }
+        if (branches.length > 0) {
+          await supabase.from("businesses").update({ branches }).eq("id", saved.id)
         }
       }
     }
@@ -361,6 +366,54 @@ export default function AdminNegocioForm() {
             <input type="text" value={form.address} onChange={e => handleChange("address", e.target.value)}
               placeholder="Calle y número"
               className="w-full px-4 py-2.5 rounded-xl border border-stone-200 text-stone-800 text-sm outline-none focus:ring-2 focus:ring-primary-300" />
+          </div>
+
+          {/* Sucursales */}
+          <div>
+            <div className="flex items-center justify-between mb-2">
+              <label className="text-sm font-medium text-stone-700">Sucursales <span className="text-stone-400 font-normal">(domicilios adicionales)</span></label>
+              <button
+                type="button"
+                onClick={() => setBranches(prev => [...prev, { address: "", pueblo: "" }])}
+                className="text-xs font-medium px-3 py-1.5 rounded-xl border border-primary-300 text-primary-600 hover:bg-primary-50 transition-colors"
+              >
+                + Agregar sucursal
+              </button>
+            </div>
+            {branches.length === 0 && (
+              <p className="text-xs text-stone-400">Sin sucursales — una sola dirección.</p>
+            )}
+            <div className="space-y-3">
+              {branches.map((branch, i) => (
+                <div key={i} className="p-3 rounded-xl border border-stone-200 bg-stone-50 space-y-2">
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-semibold text-stone-600">Sucursal {i + 1}</span>
+                    <button
+                      type="button"
+                      onClick={() => setBranches(prev => prev.filter((_, idx) => idx !== i))}
+                      className="text-xs text-red-400 hover:text-red-500"
+                    >
+                      Eliminar
+                    </button>
+                  </div>
+                  <select
+                    value={branch.pueblo}
+                    onChange={e => setBranches(prev => prev.map((b, idx) => idx === i ? { ...b, pueblo: e.target.value } : b))}
+                    className="w-full px-3 py-2 rounded-lg border border-stone-200 text-stone-800 text-sm outline-none focus:ring-2 focus:ring-primary-300 bg-white"
+                  >
+                    <option value="">Seleccioná un pueblo</option>
+                    {pueblos.map(p => <option key={p} value={p}>{p}</option>)}
+                  </select>
+                  <input
+                    type="text"
+                    value={branch.address}
+                    onChange={e => setBranches(prev => prev.map((b, idx) => idx === i ? { ...b, address: e.target.value } : b))}
+                    placeholder="Calle y número"
+                    className="w-full px-3 py-2 rounded-lg border border-stone-200 text-stone-800 text-sm outline-none focus:ring-2 focus:ring-primary-300"
+                  />
+                </div>
+              ))}
+            </div>
           </div>
         </div>
 

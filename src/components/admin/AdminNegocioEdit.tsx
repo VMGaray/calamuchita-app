@@ -7,7 +7,7 @@ import { BusinessSection, BusinessCategory } from "@/types/database"
 import { MASTER_CATEGORIES } from "@/lib/constants/categories"
 import ImageUpload from "@/components/ui/ImageUpload"
 import PdfUpload from "@/components/ui/PdfUpload"
-import HorariosEditor, { HorarioDay } from "@/components/ui/HorariosEditor"
+import HorariosEditor, { HorarioDay, expandHorariosForSave, mergeHorariosFromDB } from "@/components/ui/HorariosEditor"
 import { ArrowLeft, Star } from "lucide-react"
 import QRMarketing from "@/components/admin/QRMarketing"
 
@@ -54,6 +54,7 @@ export default function AdminNegocioEdit({ id }: Props) {
   const [success, setSuccess] = useState(false)
   const [horarios, setHorarios] = useState<HorarioDay[]>([])
   const [galleryPhotos, setGalleryPhotos] = useState<(string | null)[]>([null, null, null])
+  const [branches, setBranches] = useState<Array<{ address: string; pueblo: string }>>([])
 
   const [form, setForm] = useState({
     name: "",
@@ -118,6 +119,7 @@ export default function AdminNegocioEdit({ id }: Props) {
           payment_methods: business.payment_methods || [],
           is_premium: business.is_premium || false,
         })
+        setBranches(business.branches || [])
       }
 
       const { data: horariosData } = await supabase
@@ -126,7 +128,7 @@ export default function AdminNegocioEdit({ id }: Props) {
         .eq("business_id", id)
         .order("day_of_week")
 
-      if (horariosData) setHorarios(horariosData)
+      if (horariosData) setHorarios(mergeHorariosFromDB(horariosData))
 
       const { data: photosData } = await supabase
         .from("business_photos")
@@ -187,9 +189,12 @@ export default function AdminNegocioEdit({ id }: Props) {
     if (horarios.length > 0) {
       await supabase.from("business_hours").delete().eq("business_id", id)
       await supabase.from("business_hours").insert(
-        horarios.map(h => ({ ...h, business_id: id }))
+        expandHorariosForSave(horarios).map(h => ({ ...h, business_id: id }))
       )
     }
+
+    // Guardar sucursales (requiere columna `branches jsonb default '[]'` en businesses)
+    await supabase.from("businesses").update({ branches }).eq("id", id)
 
     const validPhotos = galleryPhotos.filter(Boolean) as string[]
     await supabase.from("business_photos").delete().eq("business_id", id)
@@ -372,6 +377,54 @@ export default function AdminNegocioEdit({ id }: Props) {
             <label className="block text-sm font-medium text-stone-700 mb-1">Dirección</label>
             <input type="text" value={form.address} onChange={(e) => handleChange("address", e.target.value)}
               className="w-full px-4 py-2.5 rounded-xl border border-stone-200 text-stone-800 text-sm outline-none focus:ring-2 focus:ring-primary-300" />
+          </div>
+
+          {/* Sucursales */}
+          <div>
+            <div className="flex items-center justify-between mb-2">
+              <label className="text-sm font-medium text-stone-700">Sucursales <span className="text-stone-400 font-normal">(domicilios adicionales)</span></label>
+              <button
+                type="button"
+                onClick={() => setBranches(prev => [...prev, { address: "", pueblo: "" }])}
+                className="text-xs font-medium px-3 py-1.5 rounded-xl border border-primary-300 text-primary-600 hover:bg-primary-50 transition-colors"
+              >
+                + Agregar sucursal
+              </button>
+            </div>
+            {branches.length === 0 && (
+              <p className="text-xs text-stone-400">Sin sucursales — una sola dirección.</p>
+            )}
+            <div className="space-y-3">
+              {branches.map((branch, i) => (
+                <div key={i} className="p-3 rounded-xl border border-stone-200 bg-stone-50 space-y-2">
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-semibold text-stone-600">Sucursal {i + 1}</span>
+                    <button
+                      type="button"
+                      onClick={() => setBranches(prev => prev.filter((_, idx) => idx !== i))}
+                      className="text-xs text-red-400 hover:text-red-500"
+                    >
+                      Eliminar
+                    </button>
+                  </div>
+                  <select
+                    value={branch.pueblo}
+                    onChange={e => setBranches(prev => prev.map((b, idx) => idx === i ? { ...b, pueblo: e.target.value } : b))}
+                    className="w-full px-3 py-2 rounded-lg border border-stone-200 text-stone-800 text-sm outline-none focus:ring-2 focus:ring-primary-300 bg-white"
+                  >
+                    <option value="">Seleccioná un pueblo</option>
+                    {pueblos.map(p => <option key={p} value={p}>{p}</option>)}
+                  </select>
+                  <input
+                    type="text"
+                    value={branch.address}
+                    onChange={e => setBranches(prev => prev.map((b, idx) => idx === i ? { ...b, address: e.target.value } : b))}
+                    placeholder="Calle y número"
+                    className="w-full px-3 py-2 rounded-lg border border-stone-200 text-stone-800 text-sm outline-none focus:ring-2 focus:ring-primary-300"
+                  />
+                </div>
+              ))}
+            </div>
           </div>
         </div>
         <div>

@@ -411,21 +411,36 @@ export default function DirectorioDetalle({ business, section }: Props) {
                       <SectionLabel>Horarios</SectionLabel>
                     </div>
                     <div className="space-y-2">
-                      {[...business.business_hours]
-                        .sort((a: any, b: any) => a.day_of_week - b.day_of_week)
-                        .map((h: any) => {
-                          const isToday = h.day_of_week === todayIdx
+                      {(() => {
+                        const sorted = [...business.business_hours].sort((a: any, b: any) => a.day_of_week - b.day_of_week)
+                        // Agrupar turnos por día (puede haber 2 filas para horario cortado)
+                        const byDay = new Map<number, any[]>()
+                        for (const h of sorted) {
+                          const arr = byDay.get(h.day_of_week) ?? []
+                          arr.push(h)
+                          byDay.set(h.day_of_week, arr)
+                        }
+                        return Array.from(byDay.entries()).map(([day, rows]) => {
+                          const isToday = day === todayIdx
+                          const first = rows[0]
+                          const second = rows[1]
+                          const timeStr = first.is_closed
+                            ? "Cerrado"
+                            : second
+                              ? `${first.opens_at.slice(0,5)}–${first.closes_at.slice(0,5)} · ${second.opens_at.slice(0,5)}–${second.closes_at.slice(0,5)}`
+                              : `${first.opens_at.slice(0,5)} – ${first.closes_at.slice(0,5)}`
                           return (
-                            <div key={h.id} className="flex justify-between items-center text-xs">
+                            <div key={day} className="flex justify-between items-center text-xs">
                               <span style={{ color: isToday ? "#2D4530" : "rgba(45,69,48,0.42)", fontWeight: isToday ? 700 : 400 }}>
-                                {DAY_SHORT[h.day_of_week]}
+                                {DAY_SHORT[day]}
                               </span>
                               <span style={{ color: isToday ? "#2D4530" : "rgba(45,69,48,0.55)", fontWeight: isToday ? 700 : 400 }}>
-                                {h.is_closed ? "Cerrado" : `${h.opens_at.slice(0, 5)} – ${h.closes_at.slice(0, 5)}`}
+                                {timeStr}
                               </span>
                             </div>
                           )
-                        })}
+                        })
+                      })()}
                     </div>
                   </div>
                 </AnimateIn>
