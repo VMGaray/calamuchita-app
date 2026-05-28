@@ -54,6 +54,7 @@ export const sectionCategories = {
   commerce: [
     { label: "Hogar", desc: "Muebles y decoración", href: "/directorio/commerce?cat=hogar", bg: "bg-brand-earth/10", color: "text-brand-earth" },
     { label: "Indumentaria", desc: "Ropa y calzado", href: "/directorio/commerce?cat=indumentaria", bg: "bg-brand-slate/10", color: "text-brand-slate" },
+    { label: "Inmobiliarias", desc: "Propiedades y alquileres", href: "/directorio/commerce?cat=inmobiliarias", bg: "bg-brand-pine/10", color: "text-brand-pine" },
     { label: "Mascotas", desc: "Tiendas para mascotas", href: "/directorio/commerce?cat=mascotas", bg: "bg-brand-pine/10", color: "text-brand-pine" },
     { label: "Niños", desc: "Artículos infantiles", href: "/directorio/commerce?cat=ninos", bg: "bg-brand-earth/10", color: "text-brand-earth" },
     { label: "Tecnología", desc: "Electrónica y celulares", href: "/directorio/commerce?cat=tecnologia", bg: "bg-brand-charcoal/10", color: "text-brand-charcoal" },

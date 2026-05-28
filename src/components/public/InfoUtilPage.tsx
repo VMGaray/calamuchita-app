@@ -228,6 +228,7 @@ export default function InfoUtilPage({ initialCategoria, initialPueblo }: Props)
   // ── DB services ─────────────────────────────────────────────────────────
   const [dbServices, setDbServices] = useState<DBService[]>([])
   const [dbLocalities, setDbLocalities] = useState<DBLocality[]>([])
+  const [globalContacts, setGlobalContacts] = useState<DBService[]>([])
 
   // Fetch DB localities once
   useEffect(() => {
@@ -236,6 +237,30 @@ export default function InfoUtilPage({ initialCategoria, initialPueblo }: Props)
       .select("id, name")
       .order("sort_order")
       .then(({ data }) => setDbLocalities(data || []))
+  }, [])
+
+  // Fetch useful_contacts (sin localidad, son globales) once
+  useEffect(() => {
+    createClient()
+      .from("useful_contacts")
+      .select("id, title, category, phone, address, description, schedule")
+      .eq("is_active", true)
+      .order("sort_order")
+      .then(({ data }) => {
+        const normalized: DBService[] = (data || []).map(c => ({
+          id: c.id,
+          name: c.title,
+          category: c.category,
+          phone: c.phone ?? null,
+          address: c.address ?? null,
+          description: c.description ?? null,
+          hours: c.schedule ?? null,
+          specialties: null,
+          has_guardia: false,
+          is_on_duty: false,
+        }))
+        setGlobalContacts(normalized)
+      })
   }, [])
 
   // Fetch utility_services when locality changes
@@ -321,11 +346,15 @@ export default function InfoUtilPage({ initialCategoria, initialPueblo }: Props)
 
   const showEmptyState = isUnsupportedCategory || allNull
 
-  // Filtrar dbServices por categoría activa
+  // Filtrar dbServices por categoría activa (locality-specific + globales)
   const dbCatFilter = categoria && categoria !== "todos" ? CATEGORIA_TO_DB[categoria] : null
-  const filteredDbServices = dbCatFilter
+  const filteredLocalServices = dbCatFilter
     ? dbServices.filter(s => s.category === dbCatFilter)
     : dbServices
+  const filteredGlobalContacts = dbCatFilter
+    ? globalContacts.filter(s => s.category === dbCatFilter)
+    : globalContacts
+  const filteredDbServices = [...filteredLocalServices, ...filteredGlobalContacts]
 
   // Servicio de turno (farmacia o veterinaria)
   const dutyService = filteredDbServices.find(s => s.is_on_duty)

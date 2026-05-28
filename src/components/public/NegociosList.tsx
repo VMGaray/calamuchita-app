@@ -242,7 +242,7 @@ export default function NegociosList({ params }: Props) {
                           {description}
                         </p>
                       )}
-                      <div className="flex items-center gap-1.5 flex-wrap">
+                      <div className="flex items-center gap-1.5 flex-wrap mb-3">
                         {!isOpen && (
                           <span className="text-xs font-medium px-2 py-0.5 rounded-full"
                             style={{ background: "rgba(255,255,255,0.10)", color: "rgba(225,219,201,0.50)" }}>
@@ -261,6 +261,17 @@ export default function NegociosList({ params }: Props) {
                             Take Away
                           </span>
                         )}
+                      </div>
+                      <div
+                        className="flex items-center justify-between w-full px-3 py-2.5 rounded-xl text-xs font-semibold"
+                        style={{
+                          background: "rgba(45,69,48,0.55)",
+                          color: "#E1DBC9",
+                          border: "1px solid rgba(163,177,138,0.25)",
+                        }}
+                      >
+                        <span>Ver más</span>
+                        <ChevronRight size={13} />
                       </div>
                     </div>
                   </div>

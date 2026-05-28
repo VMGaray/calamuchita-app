@@ -11,7 +11,7 @@ import Card3D from "@/components/ui/Card3D"
 import { SkeletonBusinessGrid } from "@/components/ui/Skeleton"
 import { createClient } from "@/lib/supabase/client"
 import { sectionCategories, SectionKey } from "@/lib/sections"
-import { Phone, AtSign, MapPin, X, LayoutGrid, Check } from "lucide-react"
+import { Phone, AtSign, MapPin, X, LayoutGrid, Check, ChevronRight } from "lucide-react"
 import Link from "next/link"
 import Image from "next/image"
 
@@ -172,7 +172,11 @@ export default function DirectorioList({ section, filters }: Props) {
         query = query.ilike("subcategory", `%${activeCategory}%`)
       }
       if (filters.q) query = query.ilike("name", `%${filters.q}%`)
-      if (filters.pueblo) query = query.ilike("address", `%${filters.pueblo}%`)
+      const pueblosFilter = filters.pueblo ? filters.pueblo.split(',').filter(Boolean) : []
+      if (pueblosFilter.length > 0) {
+        const orParts = [...pueblosFilter.map(p => `address.ilike.%${p}%`), 'address.is.null'].join(',')
+        query = query.or(orParts)
+      }
 
       const { data } = await query.order("name")
       setBusinesses(data || [])
@@ -195,10 +199,18 @@ export default function DirectorioList({ section, filters }: Props) {
     router.push(`/directorio/${section}?${current.toString()}`)
   }
 
-  const selectPueblo = (pueblo: string) => {
-    updateFilter("pueblo", pueblo)
-    if (pueblo) setLocalidad(pueblo)
+  const selectedPueblos = filters.pueblo ? filters.pueblo.split(',').filter(Boolean) : []
+
+  const togglePueblo = (pueblo: string) => {
+    const set = new Set(selectedPueblos)
+    if (set.has(pueblo)) set.delete(pueblo)
+    else set.add(pueblo)
+    const next = Array.from(set)
+    updateFilter("pueblo", next.join(','))
+    if (next.length === 1) setLocalidad(next[0])
   }
+
+  const clearPueblos = () => updateFilter("pueblo", "")
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault()
@@ -242,23 +254,23 @@ export default function DirectorioList({ section, filters }: Props) {
           style={maskFade}
         >
           <button
-            onClick={() => selectPueblo("")}
+            onClick={clearPueblos}
             className="flex-shrink-0 px-3 py-1.5 rounded-full text-xs font-medium whitespace-nowrap transition-shadow"
             style={
-              !filters.pueblo
+              selectedPueblos.length === 0
                 ? { background: "#2D4530", color: "#E1DBC9", boxShadow: "0 4px 14px rgba(45,69,48,0.35)" }
                 : { background: "#E1DBC9", color: "#2D4530" }
             }
           >
-            Todos
+            Todas
           </button>
           {pueblos.map(p => (
             <button
               key={p}
-              onClick={() => selectPueblo(p)}
+              onClick={() => togglePueblo(p)}
               className="flex-shrink-0 px-3 py-1.5 rounded-full text-xs font-medium whitespace-nowrap transition-shadow"
               style={
-                filters.pueblo === p
+                selectedPueblos.includes(p)
                   ? { background: "#2D4530", color: "#E1DBC9", boxShadow: "0 4px 14px rgba(45,69,48,0.35)" }
                   : { background: "#E1DBC9", color: "#2D4530" }
               }
@@ -324,87 +336,94 @@ export default function DirectorioList({ section, filters }: Props) {
             </p>
 
             {/* Carrusel en mobile, grilla en desktop */}
-            <div className="flex gap-4 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden snap-x snap-mandatory -mx-4 px-4 pb-6 md:mx-0 md:px-0 md:grid md:grid-cols-2 lg:grid-cols-3 md:overflow-x-visible md:pb-0">
+            <div className="flex gap-4 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden snap-x snap-mandatory -mx-4 px-4 pb-6 md:mx-0 md:px-0 md:grid md:grid-cols-2 lg:grid-cols-3 md:overflow-x-visible md:pb-0 md:gap-5">
               {businesses.map((business, i) => (
                 <AnimateIn
                   key={business.id}
                   direction="up"
                   delay={i * 0.05}
-                  className="w-[88vw] flex-shrink-0 snap-center md:w-auto"
+                  className="w-[82vw] flex-shrink-0 snap-center md:w-auto"
                 >
-                  <Card3D>
-                    <div
-                      className="rounded-2xl overflow-hidden"
-                      style={{
-                        background: "rgba(255,255,255,0.10)",
-                        backdropFilter: "blur(16px)",
-                        WebkitBackdropFilter: "blur(16px)",
-                        border: "1px solid rgba(255,255,255,0.20)",
-                      }}
-                    >
-                      <Link href={`/directorio/${section}/${business.slug}`} className="block">
-                        <div className="h-48 md:h-32 relative" style={{ background: "rgba(255,255,255,0.08)" }}>
-                          {business.cover_url ? (
-                            <Image src={business.cover_url} alt={business.name} fill className="object-cover" sizes="(max-width: 768px) 88vw, (max-width: 1024px) 50vw, 33vw" quality={70} />
-                          ) : (
-                            <div className="w-full h-full flex items-center justify-center">
-                              <div
-                                className="w-12 h-12 rounded-full flex items-center justify-center font-serif text-xl"
-                                style={{ background: "rgba(255,255,255,0.12)", color: "rgba(255,255,255,0.50)" }}
-                              >
-                                {business.name[0]}
-                              </div>
-                            </div>
-                          )}
+                  <Link
+                    href={`/directorio/${section}/${business.slug}`}
+                    className="block rounded-2xl overflow-hidden shadow-sm transition-shadow hover:shadow-md"
+                    style={{ background: "#FFFFFF", border: "1px solid rgba(45,69,48,0.09)" }}
+                  >
+                    {/* ── Image area ── */}
+                    <div className="relative overflow-hidden aspect-[4/3]">
+                      {business.cover_url ? (
+                        <Image
+                          src={business.cover_url}
+                          alt={business.name}
+                          fill
+                          className="object-cover"
+                          sizes="(max-width: 768px) 82vw, (max-width: 1024px) 50vw, 33vw"
+                          quality={70}
+                        />
+                      ) : business.logo_url ? (
+                        <div className="w-full h-full bg-white flex items-center justify-center p-5">
+                          <div className="relative w-full h-full">
+                            <Image
+                              src={business.logo_url}
+                              alt={business.name}
+                              fill
+                              className="object-contain"
+                              sizes="(max-width: 768px) 82vw, (max-width: 1024px) 50vw, 33vw"
+                              quality={80}
+                            />
+                          </div>
                         </div>
-                        <div className="px-4 pt-4 pb-2">
-                          <h3 className="text-base font-medium mb-0.5" style={{ color: "#E1DBC9" }}>
-                            {business.name}
-                          </h3>
-                          {business.subcategory && (
-                            <span
-                              className="inline-block text-xs font-medium px-2 py-0.5 rounded-full mb-2"
-                              style={{ background: "rgba(255,255,255,0.15)", color: "rgba(225,219,201,0.85)" }}
-                            >
-                              {business.subcategory}
-                            </span>
-                          )}
-                          {business.description && (
-                            <p className="text-sm mb-3 leading-relaxed line-clamp-2" style={{ color: "rgba(225,219,201,0.75)" }}>
-                              {business.description}
-                            </p>
-                          )}
-                          {business.address && (
-                            <div className="flex items-center gap-2 text-xs mb-1" style={{ color: "rgba(225,219,201,0.55)" }}>
-                              <MapPin size={12} />
-                              <span>{business.address}</span>
-                            </div>
-                          )}
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center"
+                          style={{ background: "#E1DBC9" }}>
+                          <div className="w-14 h-14 rounded-2xl flex items-center justify-center font-serif text-2xl font-bold"
+                            style={{ background: "#2D4530", color: "#E1DBC9" }}>
+                            {business.name[0]}
+                          </div>
                         </div>
-                      </Link>
+                      )}
+                    </div>
 
-                      <div className="px-4 pb-4 space-y-1">
-                        {business.phone && (
-                          <a href={`tel:${business.phone}`} className="flex items-center gap-2 text-xs" style={{ color: "rgba(225,219,201,0.70)" }}>
-                            <Phone size={12} />
-                            <span>{business.phone}</span>
-                          </a>
-                        )}
-                        {business.instagram && (
-                          <a
-                            href={`https://instagram.com/${business.instagram.replace("@", "")}`}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="flex items-center gap-2 text-xs"
-                            style={{ color: "rgba(225,219,201,0.70)" }}
-                          >
-                            <AtSign size={12} />
-                            <span>{business.instagram}</span>
-                          </a>
-                        )}
+                    {/* ── Text area — cream background ── */}
+                    <div className="px-4 pt-3.5 pb-4" style={{ background: "#F5EFE3" }}>
+                      <h3 className="text-sm font-bold leading-snug mb-1.5 line-clamp-2"
+                        style={{ color: "#2D4530" }}>
+                        {business.name}
+                      </h3>
+
+                      {business.subcategory && (
+                        <span
+                          className="inline-block text-[10px] font-semibold px-2 py-0.5 rounded-full mb-2 uppercase tracking-wide"
+                          style={{ background: "rgba(45,69,48,0.10)", color: "#2D4530" }}
+                        >
+                          {business.subcategory}
+                        </span>
+                      )}
+
+                      {business.description && (
+                        <p className="text-xs mb-2.5 leading-relaxed line-clamp-2"
+                          style={{ color: "rgba(45,69,48,0.60)" }}>
+                          {business.description}
+                        </p>
+                      )}
+
+                      {business.address && (
+                        <div className="flex items-center gap-1.5 text-xs mb-3"
+                          style={{ color: "rgba(45,69,48,0.50)" }}>
+                          <MapPin size={11} className="flex-shrink-0" />
+                          <span className="truncate">{business.address}</span>
+                        </div>
+                      )}
+
+                      <div
+                        className="flex items-center justify-between w-full px-3 py-2.5 rounded-xl text-xs font-semibold"
+                        style={{ background: "#2D4530", color: "#E1DBC9" }}
+                      >
+                        <span>Ver más</span>
+                        <ChevronRight size={13} />
                       </div>
                     </div>
-                  </Card3D>
+                  </Link>
                 </AnimateIn>
               ))}
             </div>
@@ -428,22 +447,22 @@ export default function DirectorioList({ section, filters }: Props) {
                 <DrawerHeader icon={<MapPin size={16} />} title="Localidades" onClose={() => setShowPueblos(false)} />
                 <div className="overflow-y-auto flex-1 py-2">
                   <button
-                    onClick={() => { selectPueblo(""); setShowPueblos(false) }}
+                    onClick={() => { clearPueblos(); setShowPueblos(false) }}
                     className="w-full flex items-center gap-3 px-5 py-3.5 text-left transition-colors"
-                    style={!filters.pueblo ? { background: "rgba(45,69,48,0.08)" } : undefined}
+                    style={selectedPueblos.length === 0 ? { background: "rgba(45,69,48,0.08)" } : undefined}
                   >
-                    <MapPin size={13} style={{ color: !filters.pueblo ? "#2D4530" : "rgba(45,69,48,0.30)", flexShrink: 0 }} />
-                    <span className="text-sm flex-1" style={{ color: !filters.pueblo ? "#2D4530" : "rgba(45,69,48,0.65)", fontWeight: !filters.pueblo ? 600 : 400 }}>
-                      Todos los pueblos
+                    <MapPin size={13} style={{ color: selectedPueblos.length === 0 ? "#2D4530" : "rgba(45,69,48,0.30)", flexShrink: 0 }} />
+                    <span className="text-sm flex-1" style={{ color: selectedPueblos.length === 0 ? "#2D4530" : "rgba(45,69,48,0.65)", fontWeight: selectedPueblos.length === 0 ? 600 : 400 }}>
+                      Todas las localidades
                     </span>
-                    {!filters.pueblo && <Check size={14} style={{ color: "#2D4530", flexShrink: 0 }} />}
+                    {selectedPueblos.length === 0 && <Check size={14} style={{ color: "#2D4530", flexShrink: 0 }} />}
                   </button>
                   {pueblos.map(p => {
-                    const isActive = filters.pueblo === p
+                    const isActive = selectedPueblos.includes(p)
                     return (
                       <button
                         key={p}
-                        onClick={() => { selectPueblo(p); setShowPueblos(false) }}
+                        onClick={() => togglePueblo(p)}
                         className="w-full flex items-center gap-3 px-5 py-3.5 text-left transition-colors"
                         style={isActive ? { background: "rgba(45,69,48,0.08)" } : undefined}
                       >
@@ -456,7 +475,17 @@ export default function DirectorioList({ section, filters }: Props) {
                     )
                   })}
                 </div>
-                <div className="h-6 flex-shrink-0" />
+                <div className="px-5 pb-5 pt-2 flex-shrink-0">
+                  <button
+                    onClick={() => setShowPueblos(false)}
+                    className="w-full py-3 rounded-2xl text-sm font-semibold"
+                    style={{ background: "#2D4530", color: "#E1DBC9" }}
+                  >
+                    {selectedPueblos.length > 0
+                      ? `Aplicar (${selectedPueblos.length} localidad${selectedPueblos.length > 1 ? 'es' : ''})`
+                      : 'Cerrar'}
+                  </button>
+                </div>
               </motion.div>
             </>
           )}
