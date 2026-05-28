@@ -38,7 +38,10 @@ function FeaturedCard({ biz }: { biz: FeaturedBusiness }) {
       className="relative flex-shrink-0 group cursor-pointer"
       style={{ width: CARD_W, height: 420 }}
     >
-      <Link href={`/negocios/${biz.slug}`} className="block w-full h-full">
+      <Link
+        href={biz.section === "gastronomy" ? `/negocios/${biz.slug}` : `/directorio/${biz.section}/${biz.slug}`}
+        className="block w-full h-full"
+      >
         <div className="w-full h-full relative overflow-hidden rounded-[40px] bg-[#2D4530] shadow-2xl">
           {/* Imagen con zoom lento */}
           <motion.div

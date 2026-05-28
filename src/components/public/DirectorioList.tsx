@@ -26,6 +26,7 @@ interface Business {
   logo_url: string | null
   cover_url: string | null
   description: string | null
+  is_premium: boolean
 }
 
 interface Props {
@@ -164,7 +165,7 @@ export default function DirectorioList({ section, filters }: Props) {
       const supabase = createClient()
       let query = supabase
         .from("businesses")
-        .select("id, name, slug, subcategory, address, phone, whatsapp, instagram, logo_url, cover_url, description")
+        .select("id, name, slug, subcategory, address, phone, whatsapp, instagram, logo_url, cover_url, description, is_premium")
         .eq("status", "active")
         .eq("section", section)
 
@@ -178,7 +179,9 @@ export default function DirectorioList({ section, filters }: Props) {
         query = query.or(orParts)
       }
 
-      const { data } = await query.order("name")
+      const { data } = await query
+        .order("is_premium", { ascending: false })
+        .order("name")
       setBusinesses(data || [])
       setLoading(false)
     }
@@ -351,6 +354,14 @@ export default function DirectorioList({ section, filters }: Props) {
                   >
                     {/* ── Image area ── */}
                     <div className="relative overflow-hidden aspect-[4/3]">
+                      {business.is_premium && (
+                        <div
+                          className="absolute top-2.5 left-2.5 z-10 flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-tight"
+                          style={{ background: "#C9A44B", color: "#1a1a1a" }}
+                        >
+                          ★ Destacado
+                        </div>
+                      )}
                       {business.cover_url ? (
                         <Image
                           src={business.cover_url}

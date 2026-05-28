@@ -191,17 +191,17 @@ export default function AdminNegocioEdit({ id }: Props) {
       )
     }
 
-    await supabase.from("business_photos").delete().eq("business_id", id)
     const validPhotos = galleryPhotos.filter(Boolean) as string[]
+    await supabase.from("business_photos").delete().eq("business_id", id)
     if (validPhotos.length > 0) {
       await supabase.from("business_photos").insert(
         validPhotos.map(url => ({ business_id: id, url }))
       )
     }
 
-    setSuccess(true)
     setSaving(false)
-    setTimeout(() => setSuccess(false), 3000)
+    setSuccess(true)
+    setTimeout(() => setSuccess(false), 4000)
   }
 
   if (loading) {
@@ -226,6 +226,15 @@ export default function AdminNegocioEdit({ id }: Props) {
 
       {error && <div className="bg-red-50 text-red-600 text-sm px-4 py-3 rounded-xl mb-6">{error}</div>}
       {success && <div className="bg-green-50 text-green-600 text-sm px-4 py-3 rounded-xl mb-6">¡Guardado correctamente!</div>}
+
+      {/* Toast fijo — visible sin importar el scroll */}
+      {(success || error) && (
+        <div className={`fixed bottom-6 left-1/2 -translate-x-1/2 z-50 px-5 py-3 rounded-2xl text-sm font-semibold shadow-xl pointer-events-none ${
+          success ? "bg-green-500 text-white" : "bg-red-500 text-white"
+        }`}>
+          {success ? "¡Guardado correctamente!" : error}
+        </div>
+      )}
 
       <div className="space-y-6">
 
