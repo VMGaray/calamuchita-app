@@ -211,8 +211,11 @@ export default function NegociosList({ params }: Props) {
                       border: "1px solid rgba(255,255,255,0.20)",
                     }}
                   >
-                    {/* Cover — aspect-video reserva espacio antes de que cargue la imagen (anti-CLS) */}
-                    <div className="aspect-video relative" style={{ background: "rgba(255,255,255,0.08)" }}>
+                    {/* Cover — aspect-video anti-CLS; shimmer debajo de la imagen durante la carga */}
+                    <div className="aspect-video relative bg-white/5">
+                      {/* shimmer: queda cubierto por la imagen una vez que carga */}
+                      <div className="absolute inset-0 animate-pulse bg-gradient-to-r from-white/0 via-white/[0.07] to-white/0" />
+
                       {is_premium && (
                         <div
                           className="absolute top-2.5 left-2.5 z-10 flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-tight"
@@ -221,10 +224,19 @@ export default function NegociosList({ params }: Props) {
                           ★ Destacado
                         </div>
                       )}
+
                       {cover_url ? (
-                        <Image src={cover_url} alt={name} fill className="object-cover" sizes="(max-width: 768px) 88vw, (max-width: 1024px) 50vw, 33vw" quality={70} />
+                        <Image
+                          src={cover_url}
+                          alt={name}
+                          fill
+                          className="object-cover"
+                          sizes="(max-width: 768px) 88vw, (max-width: 1024px) 50vw, 33vw"
+                          quality={70}
+                          priority={i < 3}
+                        />
                       ) : (
-                        <div className="w-full h-full flex items-center justify-center">
+                        <div className="absolute inset-0 flex items-center justify-center">
                           <div
                             className="w-16 h-16 rounded-full flex items-center justify-center font-serif text-xl"
                             style={{ background: "rgba(255,255,255,0.12)", color: "rgba(255,255,255,0.50)" }}
@@ -233,8 +245,9 @@ export default function NegociosList({ params }: Props) {
                           </div>
                         </div>
                       )}
+
                       {isOpen && (
-                        <span className="absolute top-3 right-3 text-xs font-medium px-2.5 py-1 rounded-full"
+                        <span className="absolute top-3 right-3 z-10 text-xs font-medium px-2.5 py-1 rounded-full"
                           style={{ background: "rgba(74,255,128,0.20)", color: "#6ee7a0" }}>
                           Abierto
                         </span>

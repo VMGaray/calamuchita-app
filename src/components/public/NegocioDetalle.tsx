@@ -124,8 +124,19 @@ export default function NegocioDetalle({ business }: Props) {
             {/* Logo + Nombre + Badges */}
             <div className="flex gap-4 items-start mb-6">
               {business.logo_url && (
-                <div className="relative w-20 h-20 rounded-2xl overflow-hidden border border-stone-100 shadow-sm shrink-0">
-                  <Image src={business.logo_url} alt={business.name} fill className="object-cover" sizes="80px" quality={80} />
+                /* bg-white + object-contain: logo visible completo aunque tenga fondo blanco/transparente */
+                <div className="relative w-20 h-20 rounded-2xl overflow-hidden border border-stone-100 shadow-sm shrink-0 bg-white">
+                  {/* shimmer cubierto por la imagen al cargar */}
+                  <div className="absolute inset-0 animate-pulse bg-gradient-to-r from-stone-50 via-stone-100 to-stone-50" />
+                  <Image
+                    src={business.logo_url}
+                    alt={business.name}
+                    fill
+                    priority
+                    className="object-contain p-1.5"
+                    sizes="80px"
+                    quality={85}
+                  />
                 </div>
               )}
               <div className="flex-1 min-w-0 pt-1">
@@ -273,7 +284,9 @@ export default function NegocioDetalle({ business }: Props) {
       {/* CARRUSEL DE FOTOS */}
       {photos.length > 0 && (
         <div className="max-w-6xl mx-auto px-4 pb-8">
-          <div className="rounded-3xl overflow-hidden h-64 md:h-96 relative">
+          {/* bg-stone-100 + shimmer visibles hasta que la primera foto carga */}
+          <div className="rounded-3xl overflow-hidden h-64 md:h-96 relative bg-stone-100">
+            <div className="absolute inset-0 animate-pulse bg-gradient-to-r from-stone-100 via-stone-50 to-stone-100" />
             <Swiper
               modules={[Pagination, Autoplay]}
               pagination={{ clickable: true }}
@@ -288,8 +301,8 @@ export default function NegocioDetalle({ business }: Props) {
                     fill
                     className="object-cover"
                     priority={index === 0}
-                    sizes="100vw"
-                    quality={75}
+                    sizes="(max-width: 768px) calc(100vw - 32px), (max-width: 1200px) calc(100vw - 32px), 1120px"
+                    quality={index === 0 ? 85 : 75}
                   />
                 </SwiperSlide>
               ))}
