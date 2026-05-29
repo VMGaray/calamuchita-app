@@ -2,7 +2,7 @@
 
 import { useState, useRef } from "react"
 import { createClient } from "@/lib/supabase/client"
-import { Upload, X, ImageIcon } from "lucide-react"
+import { Upload, X, ImageIcon, Loader2 } from "lucide-react"
 import Image from "next/image"
 
 interface Props {
@@ -18,48 +18,79 @@ export default function ImageUpload({
   onChange,
   bucket = "businesses",
   folder = "covers",
-  label = "Subir imagen"
+  label = "Subir imagen",
 }: Props) {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const inputRef = useRef<HTMLInputElement>(null)
 
   const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    // 1. Verificar que haya un archivo seleccionado antes de continuar
     const file = e.target.files?.[0]
     if (!file) return
 
     if (file.size > 5 * 1024 * 1024) {
-      setError("La imagen no puede superar 5MB")
+      setError("La imagen no puede superar 5 MB")
       return
     }
 
     setLoading(true)
     setError(null)
 
-    const supabase = createClient()
-    const ext = file.name.split(".").pop()
-    const fileName = `${folder}/${Date.now()}.${ext}`
+    try {
+      const supabase = createClient()
+      const ext = (file.name.split(".").pop() ?? "jpg").toLowerCase()
+      const fileName = `${folder}/${Date.now()}.${ext}`
 
-    const { error: uploadError } = await supabase.storage
-      .from(bucket)
-      .upload(fileName, file, { upsert: true })
+      // 2. Upload con desestructuración completa — data puede ser null si falla
+      const { data: uploadData, error: uploadError } = await supabase.storage
+        .from(bucket)
+        .upload(fileName, file, { upsert: true })
 
-    if (uploadError) {
-      setError("Error al subir la imagen")
+      // 3. Guardia doble: chequear tanto uploadError como uploadData nulo
+      if (uploadError || !uploadData) {
+        setError(
+          uploadError?.message ??
+          "El upload falló. Verificá que el bucket exista y tenga acceso público."
+        )
+        return
+      }
+
+      // Usar uploadData.path (path real confirmado por Supabase) en lugar de fileName
+      const { data: urlData } = supabase.storage
+        .from(bucket)
+        .getPublicUrl(uploadData.path)
+
+      onChange(urlData.publicUrl)
+
+      // Resetear el input para permitir re-seleccionar el mismo archivo
+      if (inputRef.current) inputRef.current.value = ""
+
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : "Error inesperado al subir la imagen"
+      setError(message)
+      console.error("[ImageUpload] error:", err)
+    } finally {
+      // setLoading siempre se ejecuta, incluso si hay excepción
       setLoading(false)
-      return
     }
-
-    const { data } = supabase.storage.from(bucket).getPublicUrl(fileName)
-    onChange(data.publicUrl)
-    setLoading(false)
   }
 
   const handleRemove = async () => {
     if (!value) return
-    const supabase = createClient()
-    const path = value.split(`${bucket}/`)[1]
-    if (path) await supabase.storage.from(bucket).remove([path])
+
+    try {
+      const supabase = createClient()
+      // Extraer el path relativo al bucket desde la URL pública
+      const bucketPrefix = `/storage/v1/object/public/${bucket}/`
+      const relativePath = value.split(bucketPrefix)[1]
+      if (relativePath) {
+        await supabase.storage.from(bucket).remove([relativePath])
+      }
+    } catch (err) {
+      console.error("[ImageUpload] error al eliminar:", err)
+    }
+
     onChange(null)
   }
 
@@ -74,42 +105,54 @@ export default function ImageUpload({
           <div className="relative h-48 w-full">
             <Image
               src={value}
-              alt="imagen"
+              alt="Imagen subida"
               fill
               className="object-cover"
+              sizes="(max-width: 768px) 100vw, 480px"
             />
           </div>
           <button
+            type="button"
             onClick={handleRemove}
-            className="absolute top-3 right-3 w-8 h-8 bg-red-500 text-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+            aria-label="Eliminar imagen"
+            className="absolute top-3 right-3 w-8 h-8 bg-red-500 text-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity shadow-md"
           >
             <X size={14} />
           </button>
         </div>
       ) : (
         <div
-          onClick={() => inputRef.current?.click()}
-          className="border-2 border-dashed border-stone-200 rounded-2xl h-48 flex flex-col items-center justify-center cursor-pointer hover:border-primary-300 hover:bg-primary-50 transition-colors"
+          role="button"
+          tabIndex={0}
+          onClick={() => !loading && inputRef.current?.click()}
+          onKeyDown={e => e.key === "Enter" && !loading && inputRef.current?.click()}
+          className="border-2 border-dashed border-stone-200 rounded-2xl h-48 flex flex-col items-center justify-center cursor-pointer hover:border-[#2D4530]/40 hover:bg-[#2D4530]/4 transition-colors"
         >
           {loading ? (
             <div className="text-center">
-              <div className="w-8 h-8 border-2 border-primary-500 border-t-transparent rounded-full animate-spin mx-auto mb-2" />
-              <p className="text-xs text-stone-400">Subiendo...</p>
+              <Loader2
+                size={24}
+                className="animate-spin mx-auto mb-2"
+                style={{ color: "#2D4530", opacity: 0.5 }}
+              />
+              <p className="text-xs text-stone-400">Subiendo imagen…</p>
             </div>
           ) : (
-            <div className="text-center">
+            <div className="text-center pointer-events-none">
               <div className="w-12 h-12 bg-stone-100 rounded-xl flex items-center justify-center mx-auto mb-3">
                 <ImageIcon size={22} className="text-stone-400" />
               </div>
-              <p className="text-sm text-stone-500 mb-1">Hacé click para subir</p>
-              <p className="text-xs text-stone-400">PNG, JPG hasta 5MB</p>
+              <p className="text-sm text-stone-500 mb-1">
+                Hacé click para subir
+              </p>
+              <p className="text-xs text-stone-400">PNG, JPG o WEBP · máx. 5 MB</p>
             </div>
           )}
         </div>
       )}
 
       {error && (
-        <p className="text-xs text-red-500 mt-2">{error}</p>
+        <p className="text-xs text-red-500 mt-2 leading-snug">{error}</p>
       )}
 
       <input
@@ -118,6 +161,7 @@ export default function ImageUpload({
         accept="image/*"
         onChange={handleUpload}
         className="hidden"
+        aria-hidden
       />
     </div>
   )
