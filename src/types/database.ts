@@ -166,6 +166,7 @@ export interface UsefulContact {
   title: string
   description: string | null
   phone: string | null
+  phone_2: string | null
   address: string | null
   schedule: string | null
   category: string
@@ -197,6 +198,7 @@ export interface UtilityService {
   name: string
   category: string
   phone: string | null
+  phone_2: string | null
   address: string | null
   description: string | null
   hours: string | null

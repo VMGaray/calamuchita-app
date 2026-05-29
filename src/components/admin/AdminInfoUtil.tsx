@@ -12,11 +12,11 @@ import AdminTransporte from "./AdminTransporte"
 
 type Tab = "contactos" | "localidades" | "servicios" | "transporte"
 
-const TABS: { key: Tab; label: string }[] = [
-  { key: "contactos",  label: "Contactos útiles" },
-  { key: "localidades",label: "Localidades" },
-  { key: "servicios",  label: "Servicios" },
-  { key: "transporte", label: "Transporte" },
+const TABS: { key: Tab; label: string; desc: string }[] = [
+  { key: "servicios",   label: "Servicios",          desc: "Cooperativas, salud, farmacias y más — organizados por localidad" },
+  { key: "contactos",   label: "Contactos generales", desc: "Contactos que aparecen para todos los pueblos (sin filtro de localidad)" },
+  { key: "transporte",  label: "Transporte",          desc: "Horarios de micros y traslados" },
+  { key: "localidades", label: "Localidades",         desc: "Administrar la lista de pueblos del valle" },
 ]
 
 // ─── category labels ─────────────────────────────────────────────────────────
@@ -164,6 +164,7 @@ function ContactForm({ initial, onClose, onSaved }: { initial: UsefulContact | n
     title: initial?.title ?? "",
     description: initial?.description ?? "",
     phone: initial?.phone ?? "",
+    phone_2: initial?.phone_2 ?? "",
     address: initial?.address ?? "",
     schedule: initial?.schedule ?? "",
     category: initial?.category ?? "other",
@@ -191,11 +192,29 @@ function ContactForm({ initial, onClose, onSaved }: { initial: UsefulContact | n
 
   return (
     <div className="fixed inset-0 z-50 flex items-end md:items-center justify-center p-4 bg-black/40 backdrop-blur-sm">
-      <div className="bg-white rounded-2xl w-full max-w-md p-6 space-y-3 shadow-xl">
+      <div className="bg-white rounded-2xl w-full max-w-md p-6 space-y-3 shadow-xl max-h-[90vh] overflow-y-auto">
         <h3 className="text-base font-medium text-stone-800">{initial ? "Editar contacto" : "Nuevo contacto"}</h3>
+
+        <div>
+          <label className="block text-xs font-medium text-stone-600 mb-1">Nombre *</label>
+          <input value={form.title} onChange={e => set("title", e.target.value)} placeholder="Ej: Hospital Municipal"
+            className="w-full px-3 py-2 rounded-xl border border-stone-200 text-sm outline-none focus:ring-2 focus:ring-[#A3B18A]/50" />
+        </div>
+
+        <div className="grid grid-cols-2 gap-2">
+          <div>
+            <label className="block text-xs font-medium text-stone-600 mb-1">Teléfono principal</label>
+            <input value={form.phone} onChange={e => set("phone", e.target.value)} placeholder="03546-461300"
+              className="w-full px-3 py-2 rounded-xl border border-stone-200 text-sm outline-none focus:ring-2 focus:ring-[#A3B18A]/50" />
+          </div>
+          <div>
+            <label className="block text-xs font-medium text-stone-600 mb-1">2º teléfono (opcional)</label>
+            <input value={form.phone_2} onChange={e => set("phone_2", e.target.value)} placeholder="03546-462400"
+              className="w-full px-3 py-2 rounded-xl border border-stone-200 text-sm outline-none focus:ring-2 focus:ring-[#A3B18A]/50" />
+          </div>
+        </div>
+
         {[
-          { key: "title",    label: "Nombre *",   placeholder: "Ej: Hospital Municipal" },
-          { key: "phone",    label: "Teléfono",   placeholder: "351 123 4567" },
           { key: "address",  label: "Dirección",  placeholder: "Av. Principal 100" },
           { key: "schedule", label: "Horario",    placeholder: "Lun–Vie 8–18 h" },
         ].map(({ key, label, placeholder }) => (
@@ -205,6 +224,15 @@ function ContactForm({ initial, onClose, onSaved }: { initial: UsefulContact | n
               className="w-full px-3 py-2 rounded-xl border border-stone-200 text-sm outline-none focus:ring-2 focus:ring-[#A3B18A]/50" />
           </div>
         ))}
+
+        <div>
+          <label className="block text-xs font-medium text-stone-600 mb-1">Notas / Comentarios</label>
+          <textarea value={form.description} onChange={e => set("description", e.target.value)}
+            placeholder="Info adicional, aclaraciones, áreas de atención…"
+            rows={3}
+            className="w-full px-3 py-2 rounded-xl border border-stone-200 text-sm outline-none focus:ring-2 focus:ring-[#A3B18A]/50 resize-none" />
+        </div>
+
         <div>
           <label className="block text-xs font-medium text-stone-600 mb-1">Categoría</label>
           <select value={form.category} onChange={e => set("category", e.target.value)}
@@ -212,6 +240,7 @@ function ContactForm({ initial, onClose, onSaved }: { initial: UsefulContact | n
             {Object.entries(CATEGORY_LABELS).map(([v, l]) => <option key={v} value={v}>{l}</option>)}
           </select>
         </div>
+
         {saveError && (
           <div className="px-3 py-2 rounded-xl bg-red-50 border border-red-200 text-xs text-red-700">
             Error al guardar: {saveError}
@@ -232,17 +261,19 @@ function ContactForm({ initial, onClose, onSaved }: { initial: UsefulContact | n
 // ─── Main export ─────────────────────────────────────────────────────────────
 
 export default function AdminInfoUtil() {
-  const [tab, setTab] = useState<Tab>("contactos")
+  const [tab, setTab] = useState<Tab>("servicios")
+
+  const activeTab = TABS.find(t => t.key === tab)!
 
   return (
     <div>
       <div className="mb-8">
         <h1 className="text-2xl text-stone-800 mb-1">Info Útil</h1>
-        <p className="text-stone-500 text-sm">Contactos, localidades, servicios y horarios de transporte</p>
+        <p className="text-stone-500 text-sm">Gestión de servicios y contactos del Valle de Calamuchita</p>
       </div>
 
       {/* Tab bar */}
-      <div className="flex gap-1 p-1 rounded-2xl mb-6 w-fit" style={{ background: "rgba(45,69,48,0.07)" }}>
+      <div className="flex flex-wrap gap-1 p-1 rounded-2xl mb-2 w-fit" style={{ background: "rgba(45,69,48,0.07)" }}>
         {TABS.map(t => (
           <button
             key={t.key}
@@ -258,6 +289,11 @@ export default function AdminInfoUtil() {
           </button>
         ))}
       </div>
+
+      {/* Descripción del tab activo */}
+      <p className="text-xs mb-6" style={{ color: "rgba(45,69,48,0.45)" }}>
+        {activeTab.desc}
+      </p>
 
       {tab === "contactos"   && <ContactosPanel />}
       {tab === "localidades" && <AdminLocalidades />}

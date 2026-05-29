@@ -78,6 +78,16 @@ function SectionLabel({ children }: { children: React.ReactNode }) {
   )
 }
 
+function calcIsOpenNow(hours: any[]): boolean {
+  if (!hours || hours.length === 0) return false
+  const now = new Date()
+  const day = now.getDay()
+  const hhmm = `${String(now.getHours()).padStart(2, "0")}:${String(now.getMinutes()).padStart(2, "0")}`
+  const todayRows = hours.filter((h: any) => h.day_of_week === day && !h.is_closed)
+  if (todayRows.length === 0) return false
+  return todayRows.some((h: any) => hhmm >= h.opens_at.slice(0, 5) && hhmm <= h.closes_at.slice(0, 5))
+}
+
 interface Props {
   business: any
   section: string
@@ -103,8 +113,10 @@ export default function DirectorioDetalle({ business, section }: Props) {
     : null
 
   const todayIdx = new Date().getDay()
-  const todayHours = business.business_hours?.find((h: any) => h.day_of_week === todayIdx)
-  const isOpenToday = todayHours && !todayHours.is_closed
+  const todayRows = (business.business_hours ?? []).filter((h: any) => h.day_of_week === todayIdx)
+  const todayIsClosed = todayRows.length > 0 && todayRows.every((h: any) => h.is_closed)
+  const isOpenNow = calcIsOpenNow(business.business_hours ?? [])
+  const hasHoursData = todayRows.length > 0
 
   const hasActions = waLink || mapsLink || business.phone
 
@@ -225,14 +237,14 @@ export default function DirectorioDetalle({ business, section }: Props) {
                 {business.subcategory}
               </span>
             )}
-            {todayHours && (
+            {hasHoursData && (
               <span className="text-xs font-medium px-3 py-1 rounded-full"
-                style={isOpenToday
+                style={isOpenNow
                   ? { background: "rgba(45,160,70,0.25)", color: "#6FD98A", border: "1px solid rgba(45,160,70,0.35)" }
-                  : { background: "rgba(0,0,0,0.30)", color: "rgba(225,219,201,0.55)" }}>
-                {todayHours.is_closed
-                  ? "Cerrado hoy"
-                  : `Hoy: ${todayHours.opens_at.slice(0, 5)} – ${todayHours.closes_at.slice(0, 5)}`}
+                  : todayIsClosed
+                    ? { background: "rgba(0,0,0,0.30)", color: "rgba(225,219,201,0.55)" }
+                    : { background: "rgba(200,60,60,0.28)", color: "#FF9090", border: "1px solid rgba(200,60,60,0.35)" }}>
+                {todayIsClosed ? "Cerrado hoy" : isOpenNow ? "Abierto ahora" : "Cerrado ahora"}
               </span>
             )}
           </div>
@@ -353,6 +365,16 @@ export default function DirectorioDetalle({ business, section }: Props) {
               <AnimateIn direction="right" delay={0.08}>
                 <div className="p-5" style={card}>
                   <SectionLabel>Contacto</SectionLabel>
+                  {hasHoursData && (
+                    <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold mb-4"
+                      style={isOpenNow
+                        ? { background: "rgba(45,160,70,0.10)", color: "#1A7A35", border: "1px solid rgba(45,160,70,0.22)" }
+                        : { background: "rgba(200,60,60,0.08)", color: "#B83030", border: "1px solid rgba(200,60,60,0.18)" }}>
+                      <div className="w-1.5 h-1.5 rounded-full"
+                        style={{ background: isOpenNow ? "#22A84A" : "#CC3030" }} />
+                      {isOpenNow ? "Abierto ahora" : todayIsClosed ? "Cerrado hoy" : "Cerrado ahora"}
+                    </div>
+                  )}
                   <div className="space-y-3">
                     {business.phone && (
                       <InfoRow icon={<Phone size={14} style={{ color: "#2D4530" }} />}>
@@ -398,6 +420,21 @@ export default function DirectorioDetalle({ business, section }: Props) {
                         </span>
                       </InfoRow>
                     )}
+                    {(business.branches ?? []).length > 0 && (business.branches as any[]).map((branch: any, i: number) => (
+                      <InfoRow key={i} icon={<MapPin size={14} style={{ color: "rgba(45,69,48,0.40)" }} />}>
+                        <div>
+                          <span className="text-[10px] font-bold uppercase tracking-wide block mb-0.5"
+                            style={{ color: "rgba(45,69,48,0.38)" }}>
+                            Sucursal
+                          </span>
+                          <span className="text-sm leading-snug" style={{ color: "rgba(45,69,48,0.65)" }}>
+                            {branch.pueblo
+                              ? `${branch.pueblo}${branch.address ? ` – ${branch.address}` : ""}`
+                              : branch.address}
+                          </span>
+                        </div>
+                      </InfoRow>
+                    ))}
                   </div>
                 </div>
               </AnimateIn>

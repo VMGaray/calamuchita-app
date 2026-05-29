@@ -26,6 +26,7 @@ interface DBService {
   name: string
   category: string
   phone: string | null
+  phone_2: string | null
   address: string | null
   description: string | null
   hours: string | null
@@ -243,7 +244,7 @@ export default function InfoUtilPage({ initialCategoria, initialPueblo }: Props)
   useEffect(() => {
     createClient()
       .from("useful_contacts")
-      .select("id, title, category, phone, address, description, schedule")
+      .select("id, title, category, phone, phone_2, address, description, schedule")
       .eq("is_active", true)
       .order("sort_order")
       .then(({ data }) => {
@@ -252,6 +253,7 @@ export default function InfoUtilPage({ initialCategoria, initialPueblo }: Props)
           name: c.title,
           category: c.category,
           phone: c.phone ?? null,
+          phone_2: c.phone_2 ?? null,
           address: c.address ?? null,
           description: c.description ?? null,
           hours: c.schedule ?? null,
@@ -269,7 +271,7 @@ export default function InfoUtilPage({ initialCategoria, initialPueblo }: Props)
     if (!loc) { setDbServices([]); return }
     createClient()
       .from("utility_services")
-      .select("id, name, category, phone, address, description, hours, specialties, has_guardia, is_on_duty")
+      .select("id, name, category, phone, phone_2, address, description, hours, specialties, has_guardia, is_on_duty")
       .eq("locality_id", loc.id)
       .eq("is_active", true)
       .order("sort_order")
@@ -727,20 +729,27 @@ export default function InfoUtilPage({ initialCategoria, initialPueblo }: Props)
                     </div>
                   </div>
 
-                  {/* Botón llamar */}
-                  {service.phone && (
-                    <a
-                      href={`tel:${service.phone}`}
-                      className="flex items-center justify-center gap-2.5 w-full py-3.5 font-semibold text-sm transition-opacity active:opacity-80"
-                      style={{
-                        background: "#2D4530",
-                        color: "#E1DBC9",
-                        borderTop: "1px solid rgba(45,69,48,0.12)",
-                      }}
-                    >
-                      <Phone size={15} strokeWidth={2} />
-                      Llamar · {service.phone}
-                    </a>
+                  {/* Botones llamar */}
+                  {(service.phone || service.phone_2) && (
+                    <div className={`grid gap-px ${service.phone && service.phone_2 ? "grid-cols-2" : "grid-cols-1"}`}
+                      style={{ borderTop: "1px solid rgba(45,69,48,0.12)" }}>
+                      {service.phone && (
+                        <a href={`tel:${service.phone}`}
+                          className="flex items-center justify-center gap-2 py-3.5 font-semibold text-sm transition-opacity active:opacity-80"
+                          style={{ background: "#2D4530", color: "#E1DBC9" }}>
+                          <Phone size={14} strokeWidth={2} />
+                          {service.phone_2 ? service.phone : `Llamar · ${service.phone}`}
+                        </a>
+                      )}
+                      {service.phone_2 && (
+                        <a href={`tel:${service.phone_2}`}
+                          className="flex items-center justify-center gap-2 py-3.5 font-semibold text-sm transition-opacity active:opacity-80"
+                          style={{ background: "rgba(45,69,48,0.85)", color: "#E1DBC9" }}>
+                          <Phone size={14} strokeWidth={2} />
+                          {service.phone_2}
+                        </a>
+                      )}
+                    </div>
                   )}
                 </div>
               )

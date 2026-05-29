@@ -22,7 +22,7 @@ const DUTY_CATEGORIES = new Set(["pharmacy", "veterinary"])
 const HEALTH_CATEGORIES = new Set(["health"])
 
 const EMPTY_FORM = {
-  name: "", category: "other", phone: "", address: "",
+  name: "", category: "other", phone: "", phone_2: "", address: "",
   description: "", hours: "", specialties: "",
   has_guardia: false, is_on_duty: false, sort_order: 0,
 }
@@ -85,6 +85,7 @@ export default function AdminServiciosUtiles() {
       name:        s.name,
       category:    s.category,
       phone:       s.phone       || "",
+      phone_2:     s.phone_2     || "",
       address:     s.address     || "",
       description: s.description || "",
       hours:       s.hours       || "",
@@ -104,6 +105,7 @@ export default function AdminServiciosUtiles() {
       name:        form.name,
       category:    form.category,
       phone:       form.phone       || null,
+      phone_2:     form.phone_2     || null,
       address:     form.address     || null,
       description: form.description || null,
       hours:       form.hours       || null,
@@ -152,6 +154,10 @@ export default function AdminServiciosUtiles() {
   const localityName = localities.find(l => l.id === selectedLocality)?.name ?? ""
   const isDutyCategory  = DUTY_CATEGORIES.has(form.category)
   const isHealthCategory = HEALTH_CATEGORIES.has(form.category)
+  const notesLabel = isHealthCategory ? "Especialidades / Comentarios" : "Notas / Comentarios"
+  const notesPlaceholder = isHealthCategory
+    ? "Clínica General, Pediatría…\nAtención: lunes y miércoles"
+    : "Info adicional, aclaraciones, áreas de atención…"
 
   return (
     <div className="space-y-5">
@@ -209,6 +215,7 @@ export default function AdminServiciosUtiles() {
                   </div>
                   <div className="flex gap-3 mt-0.5 flex-wrap">
                     {s.phone   && <p className="text-xs text-stone-400">{s.phone}</p>}
+                    {s.phone_2 && <p className="text-xs text-stone-400">{s.phone_2}</p>}
                     {s.hours   && <p className="text-xs text-stone-400">🕐 {s.hours}</p>}
                   </div>
                 </div>
@@ -285,12 +292,26 @@ export default function AdminServiciosUtiles() {
               </select>
             </div>
 
-            {/* Campos comunes */}
+            {/* Teléfonos */}
+            <div className="grid grid-cols-2 gap-2">
+              <div>
+                <label className="block text-xs font-medium text-stone-600 mb-1">Teléfono principal</label>
+                <input value={form.phone} onChange={e => set("phone", e.target.value)}
+                  placeholder="03546-461300"
+                  className="w-full px-3 py-2 rounded-xl border border-stone-200 text-sm outline-none focus:ring-2 focus:ring-[#A3B18A]/50" />
+              </div>
+              <div>
+                <label className="block text-xs font-medium text-stone-600 mb-1">2º teléfono (opcional)</label>
+                <input value={form.phone_2} onChange={e => set("phone_2", e.target.value)}
+                  placeholder="03546-462400"
+                  className="w-full px-3 py-2 rounded-xl border border-stone-200 text-sm outline-none focus:ring-2 focus:ring-[#A3B18A]/50" />
+              </div>
+            </div>
+
+            {/* Dirección y Horario */}
             {[
-              { key: "phone",       label: "Teléfono",   placeholder: "351 123 4567" },
-              { key: "address",     label: "Dirección",  placeholder: "Av. Principal 100" },
-              { key: "hours",       label: "Horario",    placeholder: "Lun–Vie 8–20 h / Sáb 9–13 h" },
-              { key: "description", label: "Descripción", placeholder: "Info adicional" },
+              { key: "address", label: "Dirección",  placeholder: "Av. Principal 100" },
+              { key: "hours",   label: "Horario",    placeholder: "Lun–Vie 8–20 h / Sáb 9–13 h" },
             ].map(f => (
               <div key={f.key}>
                 <label className="block text-xs font-medium text-stone-600 mb-1">{f.label}</label>
@@ -300,19 +321,17 @@ export default function AdminServiciosUtiles() {
               </div>
             ))}
 
-            {/* Especialidades — solo Salud/Dispensario */}
-            {isHealthCategory && (
-              <div>
-                <label className="block text-xs font-medium text-stone-600 mb-1">Especialidades / Comentarios</label>
-                <textarea
-                  value={form.specialties}
-                  onChange={e => set("specialties", e.target.value)}
-                  placeholder={"Clínica General, Pediatría, Odontología…\nAtención: lunes y miércoles"}
-                  rows={3}
-                  className="w-full px-3 py-2 rounded-xl border border-stone-200 text-sm outline-none focus:ring-2 focus:ring-[#A3B18A]/50 resize-none"
-                />
-              </div>
-            )}
+            {/* Notas — siempre visible */}
+            <div>
+              <label className="block text-xs font-medium text-stone-600 mb-1">{notesLabel}</label>
+              <textarea
+                value={form.specialties}
+                onChange={e => set("specialties", e.target.value)}
+                placeholder={notesPlaceholder}
+                rows={3}
+                className="w-full px-3 py-2 rounded-xl border border-stone-200 text-sm outline-none focus:ring-2 focus:ring-[#A3B18A]/50 resize-none"
+              />
+            </div>
 
             {/* Checkboxes condicionales */}
             {isHealthCategory && (
