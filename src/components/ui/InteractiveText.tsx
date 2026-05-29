@@ -11,11 +11,17 @@ export default function InteractiveText({ text, className = "" }: Props) {
   const words = text.split(" ")
 
   return (
-    <span className={`inline-flex flex-wrap justify-center gap-x-4 ${className}`}>
+    // inline (not flex) eliminates flex-wrap reflow that was shifting content
+    // margin-right uses em so spacing scales with font-size across breakpoints
+    <span className={`inline leading-[inherit] ${className}`}>
       {words.map((word, i) => (
         <motion.span
           key={i}
-          style={{ display: "inline-block", cursor: "default" }}
+          style={{
+            display: "inline-block",
+            cursor: "default",
+            marginRight: i < words.length - 1 ? "0.28em" : 0,
+          }}
           whileHover={{
             y: -8,
             scale: 1.08,

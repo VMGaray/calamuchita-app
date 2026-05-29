@@ -408,22 +408,29 @@ export default function DirectorioList({ section, filters }: Props) {
                         {business.name}
                       </h3>
 
-                      {business.subcategory && (
-                        <span
-                          className="inline-block text-[10px] font-semibold px-2 py-0.5 rounded-full mb-2 uppercase tracking-wide"
-                          style={{ background: "rgba(45,69,48,0.10)", color: "#2D4530" }}
-                        >
-                          {business.subcategory}
-                        </span>
-                      )}
+                      {/* min-h-[24px] reserva la fila de badge aunque subcategory sea null */}
+                      <div className="min-h-[24px]">
+                        {business.subcategory && (
+                          <span
+                            className="inline-block text-[10px] font-semibold px-2 py-0.5 rounded-full mb-2 uppercase tracking-wide"
+                            style={{ background: "rgba(45,69,48,0.10)", color: "#2D4530" }}
+                          >
+                            {business.subcategory}
+                          </span>
+                        )}
+                      </div>
 
-                      {business.description && (
-                        <p className="text-xs mb-2.5 leading-relaxed line-clamp-2"
-                          style={{ color: "rgba(45,69,48,0.60)" }}>
-                          {business.description}
-                        </p>
-                      )}
+                      {/* min-h-[32px] reserva espacio para descripción cuando es null */}
+                      <div className="min-h-[32px]">
+                        {business.description && (
+                          <p className="text-xs mb-2.5 leading-relaxed line-clamp-2"
+                            style={{ color: "rgba(45,69,48,0.60)" }}>
+                            {business.description}
+                          </p>
+                        )}
+                      </div>
 
+                      {/* separador condicional seguro: solo agrega coma si address existe */}
                       {business.address && (
                         <div className="flex items-center gap-1.5 text-xs mb-3"
                           style={{ color: "rgba(45,69,48,0.50)" }}>

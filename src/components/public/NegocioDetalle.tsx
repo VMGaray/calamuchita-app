@@ -13,9 +13,9 @@ import {
   UtensilsCrossed,
   ArrowLeft,
   MessageCircle,
-  Share2,
   Calendar,
   Users,
+  Globe,
   X
 } from "lucide-react"
 import Link from "next/link"
@@ -23,11 +23,8 @@ import Image from "next/image"
 import CartaInteractiva from "@/components/public/CartaInteractiva"
 import { createClient } from "@/lib/supabase/client"
 
-// Importamos Swiper y sus módulos
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Pagination, Autoplay } from 'swiper/modules';
-
-// Importamos los estilos de Swiper
 import 'swiper/css';
 import 'swiper/css/pagination';
 
@@ -38,16 +35,11 @@ interface Props {
 }
 
 export default function NegocioDetalle({ business }: Props) {
-  const infoRef = useRef<HTMLDivElement>(null)
   const cartaRef = useRef<HTMLDivElement>(null)
   const [showReserva, setShowReserva] = useState(false)
   const [reservaForm, setReservaForm] = useState({ name: "", date: "", time: "", people: "2", notes: "" })
 
   useEffect(() => {
-    if (infoRef.current) {
-      const y = infoRef.current.getBoundingClientRect().top + window.pageYOffset - 90
-      window.scrollTo({ top: y, behavior: "smooth" })
-    }
     createClient().rpc("increment_view", { business_id: business.id }).then()
   }, [business.id])
 
@@ -101,25 +93,187 @@ export default function NegocioDetalle({ business }: Props) {
   }
 
   const reservaValid = reservaForm.name && reservaForm.date && reservaForm.time
-  
-  // Link para abrir en Google Maps app
+
   const mapsExternalLink = business.latitude && business.longitude
     ? `https://www.google.com/maps/search/?api=1&query=${business.latitude},${business.longitude}`
-    : `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${business.name}, ${business.address}`)}`;
+    : `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${business.name}, ${business.address}`)}`
 
-  // Lógica de fotos
-  const photos = Array.isArray(business.images) && business.images.length > 0 
-    ? business.images 
-    : business.cover_url ? [business.cover_url] : [];
+  const photos = Array.isArray(business.images) && business.images.length > 0
+    ? business.images
+    : business.cover_url ? [business.cover_url] : []
 
   return (
     <div className="min-h-screen bg-[#E1DBC9]/30 pb-20">
 
-      {/* Wrapper externo: relative sin overflow-hidden para que el logo no sea recortado */}
-      <div className="relative">
-        {/* Hero / Carrusel de Fotos */}
-        <div className="relative h-72 md:h-[450px] overflow-hidden">
-          {photos.length > 0 ? (
+      {/* Volver */}
+      <div className="max-w-6xl mx-auto px-4 pt-6 pb-2">
+        <Link
+          href="/negocios"
+          className="inline-flex items-center gap-2 text-stone-500 hover:text-stone-800 text-sm font-medium transition-colors"
+        >
+          <ArrowLeft size={16} />
+          Volver
+        </Link>
+      </div>
+
+      {/* INFO DEL COMERCIO */}
+      <AnimateIn direction="up">
+        <div className="max-w-6xl mx-auto px-4 pb-4">
+          <div className="bg-white rounded-3xl border border-stone-200 shadow-sm p-6">
+
+            {/* Logo + Nombre + Badges */}
+            <div className="flex gap-4 items-start mb-6">
+              {business.logo_url && (
+                <div className="relative w-20 h-20 rounded-2xl overflow-hidden border border-stone-100 shadow-sm shrink-0">
+                  <Image src={business.logo_url} alt={business.name} fill className="object-cover" sizes="80px" quality={80} />
+                </div>
+              )}
+              <div className="flex-1 min-w-0 pt-1">
+                <h1 className="font-serif text-3xl md:text-4xl text-stone-800 mb-2 leading-tight">{business.name}</h1>
+                {/* min-h-[32px] estabiliza el bloque aunque no haya badges */}
+                <div className="flex items-center gap-2 flex-wrap min-h-[32px]">
+                  <span className="text-xs font-bold px-3 py-1 rounded-full bg-brand-pine text-white uppercase tracking-wider">
+                    {business.subcategory || business.category || "Comercio"}
+                  </span>
+                  <span className={`text-xs font-bold px-3 py-1 rounded-full ${
+                    business.is_open ? "bg-green-100 text-green-700 border border-green-200" : "bg-stone-100 text-stone-500"
+                  }`}>
+                    {business.is_open ? "Abierto ahora" : "Cerrado"}
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            {/* Datos de contacto */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              {business.phone && (
+                <a href={`tel:${business.phone}`} onClick={() => recordLead("phone")}
+                  className="flex items-center gap-3 hover:opacity-80 transition-opacity">
+                  <div className="w-9 h-9 rounded-xl bg-stone-100 flex items-center justify-center shrink-0">
+                    <Phone size={16} className="text-stone-500" />
+                  </div>
+                  <div>
+                    <p className="text-[10px] text-stone-400 font-bold uppercase tracking-wider">Teléfono</p>
+                    <p className="text-sm font-bold text-stone-800">{business.phone}</p>
+                  </div>
+                </a>
+              )}
+
+              {business.instagram && (
+                <a
+                  href={`https://instagram.com/${business.instagram.replace('@', '')}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-3 hover:opacity-80 transition-opacity"
+                >
+                  <div className="w-9 h-9 rounded-xl bg-stone-100 flex items-center justify-center shrink-0">
+                    <AtSign size={16} className="text-stone-500" />
+                  </div>
+                  <div>
+                    <p className="text-[10px] text-stone-400 font-bold uppercase tracking-wider">Instagram</p>
+                    <p className="text-sm font-bold text-stone-800">{business.instagram}</p>
+                  </div>
+                </a>
+              )}
+
+              {business.website && (
+                <a
+                  href={business.website}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-3 hover:opacity-80 transition-opacity"
+                >
+                  <div className="w-9 h-9 rounded-xl bg-stone-100 flex items-center justify-center shrink-0">
+                    <Globe size={16} className="text-stone-500" />
+                  </div>
+                  <div>
+                    <p className="text-[10px] text-stone-400 font-bold uppercase tracking-wider">Web</p>
+                    <p className="text-sm font-bold text-stone-800 truncate max-w-[160px]">{business.website}</p>
+                  </div>
+                </a>
+              )}
+
+              {business.address && (
+                <div className="flex items-start gap-3">
+                  <div className="w-9 h-9 rounded-xl bg-stone-100 flex items-center justify-center shrink-0 mt-0.5">
+                    <MapPin size={16} className="text-stone-500" />
+                  </div>
+                  <div>
+                    <p className="text-[10px] text-stone-400 font-bold uppercase tracking-wider">Dirección</p>
+                    <p className="text-sm font-bold text-stone-800 leading-tight">{business.address}</p>
+                  </div>
+                </div>
+              )}
+
+              {business.branches && (
+                <div className="flex items-start gap-3 sm:col-span-2">
+                  <div className="w-9 h-9 rounded-xl bg-stone-100 flex items-center justify-center shrink-0 mt-0.5">
+                    <MapPin size={16} className="text-brand-pine" />
+                  </div>
+                  <div>
+                    <p className="text-[10px] text-stone-400 font-bold uppercase tracking-wider">Sucursales</p>
+                    <p className="text-sm font-bold text-stone-800 leading-snug">{business.branches}</p>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Horarios */}
+            {business.business_hours?.length > 0 && (
+              <div className="mt-6 pt-5 border-t border-stone-100">
+                <div className="flex items-center gap-2 mb-3">
+                  <Clock size={13} className="text-stone-400" />
+                  <p className="text-[10px] font-black text-stone-400 uppercase tracking-[0.2em]">Horarios</p>
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-0">
+                  {business.business_hours
+                    .sort((a: any, b: any) => a.day_of_week - b.day_of_week)
+                    .map((h: any) => (
+                      <div key={h.id} className="flex justify-between items-center text-sm py-1.5 border-b border-stone-50 last:border-0">
+                        <span className="text-stone-500 font-medium">{dayNames[h.day_of_week]}</span>
+                        <span className={`font-bold ${h.is_closed ? "text-stone-300" : "text-stone-700"}`}>
+                          {h.is_closed ? "Cerrado" : `${h.opens_at.slice(0, 5)} — ${h.closes_at.slice(0, 5)}`}
+                        </span>
+                      </div>
+                    ))}
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      </AnimateIn>
+
+      {/* BOTONES: WhatsApp + Llegar — flex-wrap + min-h evita overflow en pantallas muy angostas */}
+      <div className="max-w-6xl mx-auto px-4 pb-4">
+        <div className="flex flex-wrap gap-3 min-h-[56px]">
+          {waLink && (
+            <a
+              href={waLink}
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={() => recordLead("whatsapp")}
+              className="flex-1 min-w-[140px] flex items-center justify-center gap-2 bg-[#25D366] text-white py-4 rounded-2xl font-black text-sm shadow-md hover:brightness-110 transition-all active:scale-95"
+            >
+              <MessageCircle size={18} fill="currentColor" />
+              WhatsApp
+            </a>
+          )}
+          <a
+            href={mapsExternalLink}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex-1 min-w-[140px] flex items-center justify-center gap-2 bg-brand-pine text-white py-4 rounded-2xl font-black text-sm shadow-md hover:bg-brand-pine/90 transition-all active:scale-95"
+          >
+            <MapPin size={18} />
+            Llegar
+          </a>
+        </div>
+      </div>
+
+      {/* CARRUSEL DE FOTOS */}
+      {photos.length > 0 && (
+        <div className="max-w-6xl mx-auto px-4 pb-8">
+          <div className="rounded-3xl overflow-hidden h-64 md:h-96 relative">
             <Swiper
               modules={[Pagination, Autoplay]}
               pagination={{ clickable: true }}
@@ -140,54 +294,17 @@ export default function NegocioDetalle({ business }: Props) {
                 </SwiperSlide>
               ))}
             </Swiper>
-          ) : (
-            <div className="w-full h-full bg-brand-pine/10" />
-          )}
-
-          <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent z-10 pointer-events-none" />
-
-          {/* Botón Volver */}
-          <Link
-            href="/negocios"
-            className="absolute top-6 left-6 z-20 flex items-center gap-2 bg-black/30 backdrop-blur-md text-white px-4 py-2 rounded-xl text-sm hover:bg-black/50 transition-colors border border-white/20"
-          >
-            <ArrowLeft size={16} />
-            Volver
-          </Link>
+          </div>
         </div>
+      )}
 
-        {/* Logo: fuera del overflow-hidden, apoyado en el borde inferior del hero */}
-        {business.logo_url && (
-          <div className="absolute bottom-0 translate-y-1/2 left-6 w-24 h-24 z-20 rounded-2xl overflow-hidden border-4 border-[#E1DBC9] shadow-2xl bg-white">
-            <Image src={business.logo_url} alt={business.name} fill className="object-cover" sizes="96px" quality={80} />
-          </div>
-        )}
-      </div>
-
-      <div ref={infoRef} className="scroll-mt-24 max-w-6xl mx-auto px-4 pt-20 pb-12">
-
-        {/* Header con Nombre */}
-        <AnimateIn direction="up">
-          <div className="mb-8">
-            <h1 className="font-serif text-4xl md:text-5xl text-stone-800 mb-2">{business.name}</h1>
-            <div className="flex items-center gap-2 flex-wrap">
-              <span className="text-xs font-bold px-3 py-1.5 rounded-full bg-brand-pine text-white uppercase tracking-wider">
-                {business.subcategory || business.category || "Comercio"}
-              </span>
-              <span className={`text-xs font-bold px-3 py-1.5 rounded-full ${
-                business.is_open ? "bg-green-100 text-green-700 border border-green-200" : "bg-stone-200 text-stone-500"
-              }`}>
-                {business.is_open ? "Abierto ahora" : "Cerrado"}
-              </span>
-            </div>
-          </div>
-        </AnimateIn>
-
+      {/* CONTENIDO PRINCIPAL */}
+      <div className="max-w-6xl mx-auto px-4 pb-12">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
 
-          {/* Columna IZQUIERDA */}
+          {/* Columna principal */}
           <div className="md:col-span-2 space-y-8">
-            
+
             {/* Descripción y Botones de Acción */}
             <div className="bg-white rounded-3xl border border-stone-200 p-4 md:p-8 shadow-sm">
               <h3 className="text-[10px] font-black text-stone-400 uppercase tracking-[0.2em] mb-4">Descripción</h3>
@@ -257,83 +374,8 @@ export default function NegocioDetalle({ business }: Props) {
             )}
           </div>
 
-          {/* Columna DERECHA */}
+          {/* Columna lateral */}
           <div className="space-y-6">
-            
-            {/* Contacto y Mapa */}
-            <div className="bg-white rounded-3xl border border-stone-200 overflow-hidden shadow-sm">
-              <div className="p-6 space-y-6">
-                <h3 className="text-[10px] font-black text-stone-400 uppercase tracking-[0.2em]">Contacto</h3>
-                
-                <div className="space-y-4">
-                  {business.phone && (
-                    <a
-                      href={`tel:${business.phone}`}
-                      onClick={() => recordLead("phone")}
-                      className="flex items-center gap-4 hover:opacity-80 transition-opacity"
-                    >
-                      <div className="w-10 h-10 rounded-xl bg-stone-100 flex items-center justify-center">
-                        <Phone size={18} className="text-stone-500" />
-                      </div>
-                      <div>
-                        <p className="text-[10px] text-stone-400 font-bold uppercase">Teléfono</p>
-                        <p className="text-sm font-bold text-stone-800">{business.phone}</p>
-                      </div>
-                    </a>
-                  )}
-
-                  {business.address && (
-                    <div className="space-y-4">
-                      <div className="flex items-start gap-4">
-                        <div className="w-10 h-10 rounded-xl bg-stone-100 flex items-center justify-center shrink-0">
-                          <MapPin size={18} className="text-stone-500" />
-                        </div>
-                        <div>
-                          <p className="text-[10px] text-stone-400 font-bold uppercase">Dirección</p>
-                          <p className="text-sm font-bold text-stone-800 leading-tight">{business.address}</p>
-                        </div>
-                      </div>
-
-                      {/* MAPA DINÁMICO CON MAPBOX */}
-                      <a 
-                        href={mapsExternalLink}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="block w-full h-40 rounded-2xl overflow-hidden relative border border-stone-200 group"
-                      >
-                        <img 
-                          src={business.latitude && business.longitude 
-                            ? `https://api.mapbox.com/styles/v1/mapbox/light-v11/static/pin-s+2D4530(${business.longitude},${business.latitude})/${business.longitude},${business.latitude},14/600x300?access_token=${process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN}`
-                            : "https://images.unsplash.com/photo-1526778548025-fa2f459cd5c1?auto=format&fit=crop&w=600&q=80"
-                          } 
-                          alt="Mapa de ubicación"
-                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                        />
-                        <div className="absolute inset-0 bg-black/10 group-hover:bg-transparent transition-colors" />
-                        <div className="absolute inset-0 flex items-center justify-center">
-                          <span className="bg-white text-stone-800 text-[10px] font-black px-3 py-1.5 rounded-lg shadow-xl uppercase">
-                            {business.latitude ? "Ver ubicación real" : "Ver dirección"}
-                          </span>
-                        </div>
-                      </a>
-                    </div>
-                  )}
-                </div>
-              </div>
-
-              {waLink && (
-                <a
-                  href={waLink}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  onClick={() => recordLead("whatsapp")}
-                  className="flex items-center justify-center gap-3 bg-[#25D366] text-white py-5 font-black text-xs uppercase tracking-widest hover:brightness-110 transition-all"
-                >
-                  <MessageCircle size={20} fill="currentColor" />
-                  Consultar por WhatsApp
-                </a>
-              )}
-            </div>
 
             {/* Servicios */}
             {(business.offers_delivery || business.offers_takeaway || business.offers_dine_in) && (
@@ -361,30 +403,11 @@ export default function NegocioDetalle({ business }: Props) {
                 </div>
               </div>
             )}
-
-            {/* Horarios */}
-            {business.business_hours?.length > 0 && (
-              <div className="bg-white rounded-3xl border border-stone-200 p-6 shadow-sm">
-                <h3 className="text-[10px] font-black text-stone-400 uppercase tracking-[0.2em] mb-4">Horarios</h3>
-                <div className="space-y-2">
-                  {business.business_hours
-                    .sort((a: any, b: any) => a.day_of_week - b.day_of_week)
-                    .map((h: any) => (
-                      <div key={h.id} className="flex justify-between items-center text-sm">
-                        <span className="text-stone-500 font-medium">{dayNames[h.day_of_week]}</span>
-                        <span className={`font-bold ${h.is_closed ? "text-stone-300" : "text-stone-700"}`}>
-                          {h.is_closed ? "Cerrado" : `${h.opens_at.slice(0,5)} — ${h.closes_at.slice(0,5)}`}
-                        </span>
-                      </div>
-                    ))}
-                </div>
-              </div>
-            )}
           </div>
         </div>
       </div>
 
-      {/* ── Modal Reservar Mesa ── */}
+      {/* Modal Reservar Mesa */}
       <AnimatePresence>
         {showReserva && (
           <>
@@ -452,7 +475,7 @@ export default function NegocioDetalle({ business }: Props) {
                       onChange={e => setReservaForm(p => ({ ...p, people: e.target.value }))}
                       className="w-full px-4 py-2.5 rounded-xl border border-stone-200 text-stone-800 text-sm outline-none focus:ring-2 focus:ring-brand-pine/20 bg-white"
                     >
-                      {[1,2,3,4,5,6,7,8,9,10].map(n => (
+                      {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(n => (
                         <option key={n} value={n}>{n} {n === 1 ? "persona" : "personas"}</option>
                       ))}
                       <option value="más de 10">Más de 10</option>

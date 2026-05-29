@@ -20,7 +20,7 @@ export default function HeroSection() {
   }
 
   return (
-    <section className="relative px-4 pt-6 md:pt-8 pb-28 md:pb-20 text-center overflow-hidden min-h-[300px] md:min-h-[480px]">
+    <section className="relative px-4 pt-6 md:pt-8 pb-28 md:pb-20 text-center overflow-hidden min-h-[300px] md:min-h-[480px]" style={{ contain: "layout style" }}>
 
       {/* Eyebrow */}
       <motion.span
@@ -68,19 +68,20 @@ export default function HeroSection() {
         Gastronomía, salud, servicios, turismo y más. Explorá lo mejor del Valle de Calamuchita.
       </motion.p>
 
-      {/* Search */}
+      {/* Search — h-14 reserves space before JS hydrates; opacity-only animation avoids y-transform layout shift */}
       <motion.div
-        className="relative z-10 flex max-w-lg mx-auto rounded-2xl overflow-hidden"
+        className="relative z-10 flex items-center max-w-lg mx-auto rounded-2xl overflow-hidden h-14"
         style={{
           background: "rgba(255,255,255,0.7)",
           backdropFilter: "blur(16px)",
           WebkitBackdropFilter: "blur(16px)",
           border: "1px solid rgba(255,255,255,0.8)",
           boxShadow: "0 4px 24px rgba(0,0,0,0.2)",
+          willChange: "opacity",
         }}
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6, delay: 1.3 }}
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.5, delay: 1.3 }}
       >
         <input
           type="text"
@@ -88,12 +89,12 @@ export default function HeroSection() {
           onChange={e => setQuery(e.target.value)}
           onKeyDown={handleKeyDown}
           placeholder="Buscar restaurantes, servicios..."
-          className="flex-1 bg-transparent border-none outline-none px-6 py-4 text-sm placeholder:text-stone-400"
+          className="flex-1 bg-transparent border-none outline-none px-6 h-full text-sm placeholder:text-stone-400"
           style={{ color: "#2D4530" }}
         />
         <MagneticButton
           onClick={handleSearch}
-          className="px-6 py-4 text-sm font-medium cursor-pointer"
+          className="px-6 h-full text-sm font-medium cursor-pointer"
           style={{ background: "#2D4530", color: "#E1DBC9" }}
         >
           Buscar

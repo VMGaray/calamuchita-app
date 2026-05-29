@@ -188,15 +188,6 @@ export default function JoyasDelValle({ businesses }: { businesses: FeaturedBusi
       {/* Marquee */}
       <div className="relative">
 
-        {/* Degradados laterales */}
-        <div
-          className="absolute left-0 top-0 bottom-0 w-16 md:w-28 z-10 pointer-events-none"
-          style={{ background: "linear-gradient(to right, #E1DBC9 30%, transparent)" }}
-        />
-        <div
-          className="absolute right-0 top-0 bottom-0 w-16 md:w-28 z-10 pointer-events-none"
-          style={{ background: "linear-gradient(to left, #E1DBC9 30%, transparent)" }}
-        />
 
         {/* Flecha izquierda */}
         <button

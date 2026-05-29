@@ -56,8 +56,8 @@ export default function StickyCategoryBar({ stickyOffset = 0 }: Props) {
     <>
       <div className="sticky z-[100] px-3 py-3" style={{ top: stickyOffset }}>
 
-        {/* ── MOBILE: grid 4 × 2 ── */}
-        <div className="md:hidden rounded-2xl p-2" style={glassContainer}>
+        {/* ── MOBILE: grid 4 × 2 — min-h reserves space before hydration ── */}
+        <div className="md:hidden rounded-2xl p-2 min-h-[104px]" style={glassContainer}>
           <div className="grid grid-cols-4 gap-1.5">
             {categories.map(({ key, label, icon: Icon }) => {
               const active = activeSection === key
@@ -111,9 +111,9 @@ export default function StickyCategoryBar({ stickyOffset = 0 }: Props) {
           </div>
         </div>
 
-        {/* ── DESKTOP: barra horizontal ── */}
+        {/* ── DESKTOP: barra horizontal — min-h-[54px] estabiliza el layout antes de hidratación ── */}
         <div className="hidden md:flex justify-center">
-          <div className="max-w-6xl w-full rounded-2xl p-2" style={glassContainer}>
+          <div className="max-w-6xl w-full rounded-2xl p-2 min-h-[54px]" style={glassContainer}>
             <div className="flex justify-evenly gap-1">
               {categories.map(({ key, label, icon: Icon }) => {
                 const active = activeSection === key

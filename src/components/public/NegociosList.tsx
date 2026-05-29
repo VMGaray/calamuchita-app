@@ -211,8 +211,8 @@ export default function NegociosList({ params }: Props) {
                       border: "1px solid rgba(255,255,255,0.20)",
                     }}
                   >
-                    {/* Cover */}
-                    <div className="h-52 md:h-36 relative" style={{ background: "rgba(255,255,255,0.08)" }}>
+                    {/* Cover — aspect-video reserva espacio antes de que cargue la imagen (anti-CLS) */}
+                    <div className="aspect-video relative" style={{ background: "rgba(255,255,255,0.08)" }}>
                       {is_premium && (
                         <div
                           className="absolute top-2.5 left-2.5 z-10 flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-tight"
@@ -248,12 +248,16 @@ export default function NegociosList({ params }: Props) {
                         {category ? categoryLabel[category] : subcategory || "Gastronomía"}
                         {address && ` · ${address.split(",").pop()?.trim()}`}
                       </p>
-                      {description && (
-                        <p className="text-sm mb-3 leading-relaxed line-clamp-2" style={{ color: "rgba(225,219,201,0.75)" }}>
-                          {description}
-                        </p>
-                      )}
-                      <div className="flex items-center gap-1.5 flex-wrap mb-3">
+                      {/* min-h-[40px] reserva espacio para la descripción aunque sea null (anti-CLS) */}
+                      <div className="min-h-[40px]">
+                        {description && (
+                          <p className="text-sm mb-3 leading-relaxed line-clamp-2" style={{ color: "rgba(225,219,201,0.75)" }}>
+                            {description}
+                          </p>
+                        )}
+                      </div>
+                      {/* min-h-[28px] evita que el card footer salte cuando badges están ausentes */}
+                      <div className="flex items-center gap-1.5 flex-wrap mb-3 min-h-[28px]">
                         {!isOpen && (
                           <span className="text-xs font-medium px-2 py-0.5 rounded-full"
                             style={{ background: "rgba(255,255,255,0.10)", color: "rgba(225,219,201,0.50)" }}>
