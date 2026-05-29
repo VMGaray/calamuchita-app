@@ -134,18 +134,18 @@ export default function CarritoDrawer({
     <AnimatePresence>
       {open && (
         <>
-          {/* Backdrop */}
+          {/* Backdrop — z-[200] supera la sticky nav (z-[100]) */}
           <motion.div
-            className="fixed inset-0 z-50 bg-black/40 backdrop-blur-sm"
+            className="fixed inset-0 z-[200] bg-black/40 backdrop-blur-sm"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={onClose}
           />
 
-          {/* Drawer */}
+          {/* Drawer — z-[210] sobre el backdrop */}
           <motion.div
-            className="fixed right-0 top-0 bottom-0 z-50 w-full max-w-md flex flex-col"
+            className="fixed right-0 top-0 bottom-0 z-[210] w-full max-w-md flex flex-col"
             style={{ background: "#E1DBC9" }}
             initial={{ x: "100%" }}
             animate={{ x: 0 }}

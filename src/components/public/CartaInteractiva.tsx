@@ -192,7 +192,7 @@ export default function CartaInteractiva({ categories, business }: Props) {
             animate={{ y: 0, opacity: 1 }}
             exit={{ y: 100, opacity: 0 }}
             onClick={() => setDrawerOpen(true)}
-            className="fixed bottom-20 left-1/2 -translate-x-1/2 md:hidden z-40 flex items-center gap-3 px-6 py-3.5 rounded-2xl shadow-lg"
+            className="fixed bottom-20 left-1/2 -translate-x-1/2 md:hidden z-[190] flex items-center gap-3 px-6 py-3.5 rounded-2xl shadow-lg"
             style={{
               background: "#2D4530",
               color: "#E1DBC9",

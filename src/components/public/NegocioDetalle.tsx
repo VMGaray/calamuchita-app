@@ -77,6 +77,20 @@ function InfoRow({ icon, sublabel, label, href, external }: { icon: React.ReactN
   return inner
 }
 
+// Verifica si el negocio está abierto AHORA según sus horarios reales.
+// Soporta horario cortado: múltiples filas para el mismo día (ej. 08–14 y 17–00).
+function calcIsOpenNow(hours: any[]): boolean {
+  if (!hours || hours.length === 0) return false
+  const now = new Date()
+  const day = now.getDay()
+  const hhmm = `${String(now.getHours()).padStart(2, "0")}:${String(now.getMinutes()).padStart(2, "0")}`
+  const todayShifts = hours.filter((h: any) => h.day_of_week === day && !h.is_closed)
+  if (todayShifts.length === 0) return false
+  return todayShifts.some(
+    (h: any) => hhmm >= h.opens_at.slice(0, 5) && hhmm <= h.closes_at.slice(0, 5),
+  )
+}
+
 interface Props {
   business: any
 }
@@ -200,7 +214,20 @@ export default function NegocioDetalle({ business }: Props) {
   const nextPhoto = () => setPhotoIdx(i => (i + 1) % photos.length)
 
   const categoryLabel = business.subcategory || business.category || "Comercio"
-  const isOpen = business.is_open
+
+  // Estado abierto/cerrado calculado en tiempo real (soporta horario cortado)
+  const isOpen = calcIsOpenNow(business.business_hours ?? [])
+
+  // Agrupar turnos por día para renderizar una sola fila por día aunque haya split-shift
+  const todayIdx = new Date().getDay()
+  const hoursByDay = new Map<number, any[]>()
+  for (const h of [...(business.business_hours ?? [])].sort(
+    (a: any, b: any) => a.day_of_week - b.day_of_week,
+  )) {
+    const arr = hoursByDay.get(h.day_of_week) ?? []
+    arr.push(h)
+    hoursByDay.set(h.day_of_week, arr)
+  }
 
   const instagramHandle = business.instagram
     ?.replace(/^@|https?:\/\/(www\.)?instagram\.com\//g, "")
@@ -257,21 +284,51 @@ export default function NegocioDetalle({ business }: Props) {
             {business.address && <InfoRow icon={<MapPin size={14} style={{ color: "#2D4530" }} />} sublabel="Dirección" label={business.address} />}
           </div>
 
-          {business.business_hours?.length > 0 && (
+          {/* Horarios: una fila por día, turnos combinados en línea para no desbordar en mobile */}
+          {hoursByDay.size > 0 && (
             <div className="px-6 pt-4 pb-6 border-t border-stone-100">
               <div className="flex items-center gap-2 mb-3">
                 <Clock size={13} style={{ color: "rgba(45,69,48,0.40)" }} />
-                <p className="text-[10px] font-black uppercase tracking-[0.2em]" style={{ color: "rgba(45,69,48,0.40)" }}>Horarios</p>
+                <p className="text-[10px] font-black uppercase tracking-[0.2em]" style={{ color: "rgba(45,69,48,0.40)" }}>
+                  Horarios
+                </p>
               </div>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-8">
-                {[...business.business_hours].sort((a: any, b: any) => a.day_of_week - b.day_of_week).map((h: any) => (
-                  <div key={h.id} className="flex justify-between items-center py-1.5 border-b border-stone-50 last:border-0 text-sm">
-                    <span className="text-stone-500 font-medium">{DAY[h.day_of_week]}</span>
-                    <span className="font-semibold" style={{ color: h.is_closed ? "#C4B9A8" : "#2D4530" }}>
-                      {h.is_closed ? "Cerrado" : `${h.opens_at.slice(0, 5)} — ${h.closes_at.slice(0, 5)}`}
-                    </span>
-                  </div>
-                ))}
+              <div className="space-y-0">
+                {Array.from(hoursByDay.entries()).map(([day, rows]) => {
+                  const isToday = day === todayIdx
+                  const first = rows[0]
+                  // Si el día tiene múltiples turnos, los combina: "08:00–15:00 · 17:00–00:00"
+                  const timeStr = first.is_closed
+                    ? "Cerrado"
+                    : rows.length > 1
+                    ? rows.map((r: any) => `${r.opens_at.slice(0, 5)}–${r.closes_at.slice(0, 5)}`).join(" · ")
+                    : `${first.opens_at.slice(0, 5)} — ${first.closes_at.slice(0, 5)}`
+                  return (
+                    <div
+                      key={day}
+                      className="flex justify-between items-center py-1.5 border-b border-stone-50 last:border-0 text-sm gap-3"
+                    >
+                      <span
+                        className="shrink-0"
+                        style={{
+                          color: isToday ? "#2D4530" : "rgba(45,69,48,0.50)",
+                          fontWeight: isToday ? 700 : 500,
+                        }}
+                      >
+                        {DAY[day]}
+                      </span>
+                      <span
+                        className="text-right"
+                        style={{
+                          color: first.is_closed ? "#C4B9A8" : "#2D4530",
+                          fontWeight: isToday ? 700 : 600,
+                        }}
+                      >
+                        {timeStr}
+                      </span>
+                    </div>
+                  )
+                })}
               </div>
             </div>
           )}
@@ -384,8 +441,9 @@ export default function NegocioDetalle({ business }: Props) {
       <AnimatePresence>
         {showReserva && (
           <>
-            <motion.div className="fixed inset-0 bg-black/40 z-40" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setShowReserva(false)} />
-            <motion.div className="fixed inset-x-4 bottom-4 top-4 z-50 max-w-md mx-auto overflow-y-auto" initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }}>
+            {/* z-[200]/z-[210]: supera la sticky nav (z-[100]) y cualquier header fijo */}
+            <motion.div className="fixed inset-0 bg-black/40 z-[200]" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setShowReserva(false)} />
+            <motion.div className="fixed inset-x-4 bottom-4 top-4 z-[210] max-w-md mx-auto overflow-y-auto" initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }}>
               <div className="bg-white rounded-3xl overflow-hidden shadow-2xl">
                 <div className="px-6 py-4 flex items-center justify-between" style={{ background: "#2D4530" }}>
                   <h2 className="font-bold text-lg" style={{ color: "#E1DBC9" }}>Reservar mesa</h2>
