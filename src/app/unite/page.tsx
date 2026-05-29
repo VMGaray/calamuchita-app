@@ -8,7 +8,7 @@ export default function UnitePage() {
 
   // Mensajes pre-armados para WhatsApp según el plan seleccionado
   const getWaLink = (planName: string) => {
-    const baseMsg = `¡Hola! Me interesa sumarme a Calamuchita App con el ${planName}.`
+    const baseMsg = `¡Hola! Me interesa sumarme a Calamuchita App con el ${planName}. ¿Me podés dar más información sobre los precios y condiciones?`
     return `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(baseMsg)}`
   }
 
@@ -42,7 +42,7 @@ export default function UnitePage() {
             </span>
             <h2 className="font-serif text-xl text-stone-800 mt-2 font-bold">Club Fundadores</h2>
             <p className="text-stone-600 text-xs mt-1 leading-relaxed">
-              Registrándote hoy congelás tus <span className="font-bold text-[#2D4530]">primeros 3 meses al 100% bonificados</span> (Gratis). Los meses 4 y 5 contarán con un 50% de descuento en cualquiera de los planes elegidos.
+              Registrándote hoy congelás tus <span className="font-bold text-[#2D4530]">primeros 2 meses al 100% bonificados</span> (Gratis). 
             </p>
           </div>
         </div>
@@ -52,21 +52,20 @@ export default function UnitePage() {
            ═══════════════════════════════════════════════════════════════════ */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6 items-stretch">
           
-          {/* PLAN 1: Gastro Básico */}
+          {/* PLAN 1: Gastronómico Básico */}
           <div className="bg-white rounded-[32px] p-6 border border-stone-200/70 shadow-sm hover:shadow-md transition-all flex flex-col justify-between h-full relative">
             <div>
               <div className="flex items-center gap-3 mb-4">
                 <div className="w-10 h-10 rounded-xl bg-stone-100 flex items-center justify-center text-stone-600">
                   <Utensils size={18} />
                 </div>
-                <h3 className="font-serif text-base font-bold text-stone-800">Gastro Básico</h3>
+                <h3 className="font-serif text-base font-bold text-stone-800">Gastronómico Básico</h3>
               </div>
               <p className="text-stone-500 text-[11px] leading-relaxed mb-4 min-h-[55px]">
                 Tu lugar en la guía gastronómica del Valle. Ideal para darte a conocer y que los clientes te encuentren rápido.
               </p>
               <div className="mb-5">
-                <span className="text-2xl font-serif font-bold text-stone-800">$15.000</span>
-                <span className="text-stone-400 text-xs font-medium"> / mes</span>
+                <span className="text-sm font-bold text-[#2D4530] bg-[#2D4530]/8 px-3 py-1.5 rounded-full">Consultar precio</span>
               </div>
               <ul className="space-y-3 border-t border-stone-100 pt-4 mb-6">
                 {["Perfil digital con logo y fotos de tu local", "Horarios de atención y ubicación en el mapa", "Botón directo a tu WhatsApp para recibir consultas"].map((item) => (
@@ -77,8 +76,8 @@ export default function UnitePage() {
                 ))}
               </ul>
             </div>
-            <a href={getWaLink("Plan Gastro Básico")} target="_blank" rel="noopener noreferrer" className="w-full py-3 bg-stone-100 text-stone-700 font-bold rounded-xl hover:bg-stone-200/70 transition-colors text-xs text-center block mt-auto">
-              Registrarme
+            <a href={getWaLink("Plan Gastronómico Básico")} target="_blank" rel="noopener noreferrer" className="w-full py-3 bg-stone-100 text-stone-700 font-bold rounded-xl hover:bg-stone-200/70 transition-colors text-xs text-center block mt-auto">
+              Consultar
             </a>
           </div>
 
@@ -92,19 +91,18 @@ export default function UnitePage() {
                 <div className="w-10 h-10 rounded-xl bg-[#2D4530]/10 flex items-center justify-center text-[#2D4530]">
                   <Utensils size={18} />
                 </div>
-                <h3 className="font-serif text-base font-bold text-stone-800">Gastro PRO</h3>
+                <h3 className="font-serif text-base font-bold text-stone-800">Gastronómico Pro</h3>
               </div>
               <p className="text-stone-500 text-[11px] leading-relaxed mb-4 min-h-[55px]">
                 Convertí tu perfil en una máquina de facturar. Herramientas avanzadas para automatizar tu atención y vender más.
               </p>
               <div className="mb-5">
-                <span className="text-2xl font-serif font-bold text-[#2D4530]">$35.000</span>
-                <span className="text-stone-400 text-xs font-medium"> / mes</span>
+                <span className="text-sm font-bold text-[#2D4530] bg-[#2D4530]/8 px-3 py-1.5 rounded-full">Consultar precio</span>
               </div>
               <ul className="space-y-3 border-t border-stone-100 pt-4 mb-6">
                 <li className="flex items-start gap-2 text-stone-500 text-[11px] font-medium italic">
                   <Check size={13} className="text-[#2D4530] mt-0.5 flex-shrink-0" />
-                  <span>Incluye todo lo del Gastro Básico.</span>
+                  <span>Incluye todo lo del Gastronómico Básico.</span>
                 </li>
                 {["📑 Menú Digital Interactivo: Carta completa con fotos y precios", "🛵 Gestión de Pedidos por WhatsApp sin comisiones", "📅 Módulo de Reservas con un solo clic de forma simple", "⭐ Publicar tu 'Menú del Día' en la pantalla de inicio"].map((item) => (
                   <li key={item} className="flex items-start gap-2 text-stone-800 text-[11px] font-semibold leading-snug">
@@ -114,8 +112,8 @@ export default function UnitePage() {
                 ))}
               </ul>
             </div>
-            <a href={getWaLink("Plan Gastro PRO")} target="_blank" rel="noopener noreferrer" className="w-full py-3 bg-[#2D4530] text-[#E1DBC9] font-bold rounded-xl hover:opacity-90 transition-all text-xs text-center block mt-auto shadow-sm">
-              Sumar Gastro PRO
+            <a href={getWaLink("Plan Gastronómico Pro")} target="_blank" rel="noopener noreferrer" className="w-full py-3 bg-[#2D4530] text-[#E1DBC9] font-bold rounded-xl hover:opacity-90 transition-all text-xs text-center block mt-auto shadow-sm">
+              Consultar
             </a>
           </div>
 
@@ -135,11 +133,10 @@ export default function UnitePage() {
                 Impulsá tu negocio en el mapa comercial y turístico de Calamuchita. Conectá de forma directa con residentes y turistas todo el año.
               </p>
               <div className="mb-5">
-                <span className="text-2xl font-serif font-bold text-stone-800">$25.000</span>
-                <span className="text-stone-400 text-xs font-medium"> / mes</span>
+                <span className="text-sm font-bold text-[#2D4530] bg-[#2D4530]/8 px-3 py-1.5 rounded-full">Consultar precio</span>
               </div>
               <ul className="space-y-3 border-t border-stone-100 pt-4 mb-6">
-                {["Perfil comercial completo y optimizado", "Galería de fotos vertical de alta calidad", "Geolocalización exacta en mapa de paseos y alojamiento", "Enlace directo a Redes (Instagram/Facebook) y Web", "Botón nativo de WhatsApp para reservas o venta directa"].map((item) => (
+                {["Perfil comercial completo y optimizado", "Galería de fotos", "Geolocalización exacta en mapa de paseos y alojamiento", "Enlace directo a Redes (Instagram/Facebook) y Web", "Botón nativo de WhatsApp para reservas o venta directa"].map((item) => (
                   <li key={item} className="flex items-start gap-2 text-stone-600 text-[11px] leading-snug">
                     <Check size={13} className="text-[#2D4530] mt-0.5 flex-shrink-0" />
                     <span>{item}</span>
@@ -148,7 +145,7 @@ export default function UnitePage() {
               </ul>
             </div>
             <a href={getWaLink("Plan Comercio & Turismo")} target="_blank" rel="noopener noreferrer" className="w-full py-3 bg-[#2D4530] text-[#E1DBC9] font-bold rounded-xl hover:opacity-90 transition-all text-xs text-center block mt-auto shadow-sm">
-              Registrar Negocio
+              Consultar
             </a>
           </div>
 
@@ -165,8 +162,7 @@ export default function UnitePage() {
                 Hacé que tu servicio esté disponible justo cuando los vecinos lo necesitan. La forma más rápida y prolija de generar confianza.
               </p>
               <div className="mb-5">
-                <span className="text-2xl font-serif font-bold text-stone-800">$17.000</span>
-                <span className="text-stone-400 text-xs font-medium"> / mes</span>
+                <span className="text-sm font-bold text-[#2D4530] bg-[#2D4530]/8 px-3 py-1.5 rounded-full">Consultar precio</span>
               </div>
               <ul className="space-y-3 border-t border-stone-100 pt-4 mb-6">
                 {["Perfil en la guía de servicios y educación del Valle", "Detalle claro de especialidades, cursos o soluciones", "Zona de cobertura explícita (Domicilio o Espacio fijo)", "Botón de llamada rápido y WhatsApp para presupuestos"].map((item) => (
@@ -178,7 +174,7 @@ export default function UnitePage() {
               </ul>
             </div>
             <a href={getWaLink("Plan Servicios & Educación")} target="_blank" rel="noopener noreferrer" className="w-full py-3 bg-stone-100 text-stone-700 font-bold rounded-xl hover:bg-stone-200/70 transition-colors text-xs text-center block mt-auto">
-              Registrarme
+              Consultar
             </a>
           </div>
 
@@ -195,8 +191,7 @@ export default function UnitePage() {
                 Digitalizá tu consultorio o estudio. Facilitá el acceso a tus servicios profesionales con información clara, ordenada y de confianza.
               </p>
               <div className="mb-5">
-                <span className="text-2xl font-serif font-bold text-stone-800">$27.000</span>
-                <span className="text-stone-400 text-xs font-medium"> / mes</span>
+                <span className="text-sm font-bold text-[#2D4530] bg-[#2D4530]/8 px-3 py-1.5 rounded-full">Consultar precio</span>
               </div>
               <ul className="space-y-3 border-t border-stone-100 pt-4 mb-6">
                 {["Perfil profesional institucional destacado", "Detalle de especialidades, matrículas y atención", "📋 Coberturas: Espacio dinámico para Obras Sociales y Prepagas", "Sistema de contacto rápido para solicitud de turnos por WhatsApp"].map((item) => (
@@ -208,7 +203,7 @@ export default function UnitePage() {
               </ul>
             </div>
             <a href={getWaLink("Plan Profesionales & Salud")} target="_blank" rel="noopener noreferrer" className="w-full py-3 bg-stone-100 text-stone-700 font-bold rounded-xl hover:bg-stone-200/70 transition-colors text-xs text-center block mt-auto">
-              Registrarme
+              Consultar
             </a>
           </div>
 
@@ -229,7 +224,7 @@ export default function UnitePage() {
               <div>
                 <div className="flex justify-between items-start gap-2 mb-2">
                   <h4 className="font-semibold text-sm text-stone-800 leading-tight">Premium Carrusel Principal</h4>
-                  <span className="text-sm font-bold text-[#2D4530] shrink-0">+$15.000<span className="text-[10px] text-stone-400 font-normal">/mes</span></span>
+                  <span className="text-xs font-bold text-[#2D4530] bg-[#2D4530]/8 px-2.5 py-1 rounded-full shrink-0">Consultar</span>
                 </div>
                 <p className="text-stone-500 text-[11px] leading-relaxed">
                   Aparecé arriba de todo. Tu marca en el banner principal de la aplicación apenas el usuario la abre. Máxima exposición garantizada frente a turistas y vecinos.
@@ -245,7 +240,7 @@ export default function UnitePage() {
               <div>
                 <div className="flex justify-between items-start gap-2 mb-2">
                   <h4 className="font-semibold text-sm text-stone-800 leading-tight">Destacado de Rubro</h4>
-                  <span className="text-sm font-bold text-[#2D4530] shrink-0">+$5.000<span className="text-[10px] text-stone-400 font-normal">/mes</span></span>
+                  <span className="text-xs font-bold text-[#2D4530] bg-[#2D4530]/8 px-2.5 py-1 rounded-full shrink-0">Consultar</span>
                 </div>
                 <p className="text-stone-500 text-[11px] leading-relaxed">
                   Subí al podio de tu categoría. Tu perfil aparecerá siempre fijo en los primeros lugares de tu rubro, diseñado con una tarjeta de color especial y una insignia dorada de "Recomendado".
