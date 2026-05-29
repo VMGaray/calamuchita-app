@@ -5,7 +5,7 @@ import Link from "next/link"
 import { createClient } from "@/lib/supabase/client"
 import AnimateIn from "@/components/ui/AnimateIn"
 import AnimatedCounter from "@/components/ui/AnimatedCounter"
-import { Eye, MessageCircle, CalendarDays } from "lucide-react" // Añadimos CalendarDays
+import { Eye, MessageCircle, CalendarDays, Newspaper } from "lucide-react"
 
 const sectionLabels: Record<string, string> = {
   gastronomy: "Gastronomía",
@@ -25,7 +25,8 @@ export default function AdminHome() {
     users: 0,
     totalViews: 0,
     totalLeads: 0,
-    eventCount: 0, // Nueva métrica
+    eventCount: 0,
+    editorialCount: 0,
     sections: {} as Record<string, number>
   })
   const [loading, setLoading] = useState(true)
@@ -40,14 +41,16 @@ export default function AdminHome() {
         { count: users },
         { data: businesses },
         { data: analytics },
-        { count: events }, // Consulta para eventos
+        { count: events },
+        { count: editorial },
       ] = await Promise.all([
         supabase.from("businesses").select("*", { count: "exact", head: true }).eq("status", "active"),
         supabase.from("businesses").select("*", { count: "exact", head: true }).eq("status", "pending"),
         supabase.from("profiles").select("*", { count: "exact", head: true }),
         supabase.from("businesses").select("section").eq("status", "active"),
         supabase.from("businesses").select("total_views, total_leads"),
-        supabase.from("events").select("*", { count: "exact", head: true }), // Nueva tabla
+        supabase.from("events").select("*", { count: "exact", head: true }),
+        supabase.from("editorial_posts").select("*", { count: "exact", head: true }),
       ])
 
       const sections: Record<string, number> = {}
@@ -64,7 +67,8 @@ export default function AdminHome() {
         users: users || 0,
         totalViews,
         totalLeads,
-        eventCount: events || 0, // Guardamos la métrica
+        eventCount: events || 0,
+        editorialCount: editorial || 0,
         sections,
       })
       setLoading(false)
@@ -81,7 +85,7 @@ export default function AdminHome() {
       </div>
 
       {/* Métricas Principales */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4"> {/* Cambiamos a 4 columnas para eventos */}
+      <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-4">
         <AnimateIn direction="up" delay={0}>
           <div className="bg-white rounded-2xl border border-stone-200 p-5">
             <p className="text-xs text-stone-400 uppercase tracking-wider mb-2">Negocios activos</p>
@@ -106,12 +110,22 @@ export default function AdminHome() {
             </p>
           </div>
         </AnimateIn>
-        {/* Nueva métrica de Eventos */}
         <AnimateIn direction="up" delay={0.12}>
           <div className="bg-white rounded-2xl border border-stone-200 p-5">
             <p className="text-xs text-stone-400 uppercase tracking-wider mb-2">Eventos en Agenda</p>
-            <p className="text-3xl font-serif text-brand-pine" style={{ color: "#2D4530" }}>
+            <p className="text-3xl font-serif" style={{ color: "#2D4530" }}>
               {loading ? "…" : <AnimatedCounter to={stats.eventCount} />}
+            </p>
+          </div>
+        </AnimateIn>
+        <AnimateIn direction="up" delay={0.15}>
+          <div className="rounded-2xl border p-5" style={{ background: "rgba(45,69,48,0.04)", borderColor: "rgba(45,69,48,0.12)" }}>
+            <div className="flex items-center gap-2 mb-2">
+              <Newspaper size={13} style={{ color: "rgba(45,69,48,0.50)" }} />
+              <p className="text-xs uppercase tracking-wider" style={{ color: "rgba(45,69,48,0.50)" }}>Identidad Calamuchitana</p>
+            </div>
+            <p className="text-3xl font-serif" style={{ color: "#2D4530" }}>
+              {loading ? "…" : <AnimatedCounter to={stats.editorialCount} />}
             </p>
           </div>
         </AnimateIn>
@@ -160,10 +174,20 @@ export default function AdminHome() {
               {/* Nuevo acceso a Gestión de Eventos */}
               <Link href="/admin/eventos" className="flex items-center justify-between p-3 rounded-xl bg-brand-pine/5 border border-brand-pine/10 hover:bg-brand-pine/10 transition-colors">
                 <div className="flex items-center gap-3">
-                  <CalendarDays size={16} className="text-brand-pine" style={{ color: "#2D4530" }} />
+                  <CalendarDays size={16} style={{ color: "#2D4530" }} />
                   <span className="text-sm text-stone-800 font-bold">Cargar y gestionar Eventos</span>
                 </div>
                 <span className="text-primary-500 text-sm">→</span>
+              </Link>
+              <Link href="/admin/identidad-calamuchitana" className="flex items-center justify-between p-3 rounded-xl border hover:bg-brand-pine/10 transition-colors" style={{ background: "rgba(45,69,48,0.04)", borderColor: "rgba(45,69,48,0.12)" }}>
+                <div className="flex items-center gap-3">
+                  <Newspaper size={16} style={{ color: "#2D4530" }} />
+                  <div>
+                    <p className="text-sm text-stone-800 font-bold leading-tight">Gestionar Identidad Calamuchitana</p>
+                    <p className="text-[11px] text-stone-400 mt-0.5">Subí entrevistas, efemérides y notas destacadas del Valle</p>
+                  </div>
+                </div>
+                <span className="text-primary-500 text-sm shrink-0">→</span>
               </Link>
               <Link href="/admin/solicitudes" className="flex items-center justify-between p-3 rounded-xl hover:bg-stone-50 transition-colors">
                 <span className="text-sm text-stone-600">Ver solicitudes pendientes</span>

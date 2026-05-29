@@ -1,6 +1,6 @@
 import JoyasDelValle from "@/components/public/JoyasDelValle"
 import CalamuchitaSale from "@/components/public/CalamuchitaSale"
-import VMGPromoSection from "@/components/public/VMGPromoSection"
+import PulsoDelValle from "@/components/public/PulsoDelValle"
 import CtaBusiness from "@/components/public/CtaBusiness"
 import LocalidadSelectorWidget from "@/components/public/LocalidadSelectorWidget"
 import WebGLBackground from "@/components/public/WebGLBackgroundLazy"
@@ -29,10 +29,20 @@ type Promotion = {
   id: string
   title: string
   description: string | null
-  discount_percentage: number | null // <--- Cambiado de discount_percent a discount_percentage
+  discount_percentage: number | null
   discount_label: string | null
   valid_until: string | null
   businesses: PromoBusiness | null
+}
+
+export type EditorialPost = {
+  id: string
+  title: string
+  type: string
+  description: string | null
+  image_url: string | null
+  expires_at: string | null
+  created_at: string
 }
 
 export default async function HomePage() {
@@ -42,6 +52,7 @@ export default async function HomePage() {
   const [
     { data: featuredData },
     { data: promotionsData },
+    { data: editorialData },
   ] = await Promise.all([
     supabase
       .from("businesses")
@@ -65,12 +76,22 @@ export default async function HomePage() {
       .gte("valid_until", today)
       .order("created_at", { ascending: false })
       .limit(6),
+
+    // Notas sin fecha de expiración, o con fecha de expiración en el futuro
+    supabase
+      .from("editorial_posts")
+      .select("id, title, type, description, image_url, expires_at, created_at")
+      .or(`expires_at.is.null,expires_at.gt.${today}`)
+      .order("created_at", { ascending: false })
+      .limit(10),
   ])
 
   const featuredBusinesses: FeaturedBusiness[] =
     (featuredData as FeaturedBusiness[] | null) ?? []
   const activePromotions: Promotion[] =
     (promotionsData as Promotion[] | null) ?? []
+  const editorialPosts: EditorialPost[] =
+    (editorialData as EditorialPost[] | null) ?? []
 
   return (
     <div>
@@ -84,7 +105,7 @@ export default async function HomePage() {
           <JoyasDelValle businesses={featuredBusinesses} />
           <CalamuchitaSale promotions={activePromotions} />
           
-          <VMGPromoSection />
+          <PulsoDelValle posts={editorialPosts} />
           <CtaBusiness />
         </div>
       </div>
