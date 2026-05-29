@@ -5,15 +5,15 @@ import { useRef } from "react"
 import { ChevronLeft, ChevronRight, FileText } from "lucide-react"
 import type { EditorialPost } from "@/app/(public)/page"
 
-// Estilos del badge por tipo — colores suaves sobre el fondo oscuro glass
+// Colores de badge para fondo blanco — contraste legible sobre tarjeta clara
 const TYPE_BADGE: Record<string, { bg: string; color: string; dot: string }> = {
-  "Entrevista":    { bg: "rgba(45,160,70,0.22)",   color: "#88EAA0", dot: "#6FD98A" },
-  "Efeméride":     { bg: "rgba(200,175,130,0.22)", color: "#D4B896", dot: "#C9A870" },
-  "Tip del Finde": { bg: "rgba(205,175,60,0.22)",  color: "#DDD07A", dot: "#C9B84B" },
-  "Novedad":       { bg: "rgba(130,150,220,0.22)", color: "#B0BFEE", dot: "#8B9FE0" },
+  "Entrevista":    { bg: "rgba(45,69,48,0.10)",   color: "#2D4530", dot: "#2D4530"  },
+  "Efeméride":     { bg: "rgba(124,92,58,0.12)",  color: "#7C5C3A", dot: "#7C5C3A"  },
+  "Tip del Finde": { bg: "rgba(180,145,30,0.13)", color: "#7A6000", dot: "#A08020"  },
+  "Novedad":       { bg: "rgba(74,85,162,0.10)",  color: "#4A55A2", dot: "#4A55A2"  },
 }
 
-const DEFAULT_BADGE = { bg: "rgba(255,255,255,0.12)", color: "rgba(255,255,255,0.70)", dot: "rgba(255,255,255,0.40)" }
+const DEFAULT_BADGE = { bg: "rgba(45,69,48,0.08)", color: "#2D4530", dot: "#2D4530" }
 
 interface Props {
   posts: EditorialPost[]
@@ -22,21 +22,20 @@ interface Props {
 export default function PulsoDelValle({ posts }: Props) {
   const scrollRef = useRef<HTMLDivElement>(null)
 
-  // Sección oculta limpiamente si no hay posts activos
   if (posts.length === 0) return null
 
   const scroll = (dir: "left" | "right") => {
     const el = scrollRef.current
     if (!el) return
-    const cardWidth = 280 + 16 // card width + gap
-    el.scrollBy({ left: dir === "left" ? -cardWidth : cardWidth, behavior: "smooth" })
+    el.scrollBy({ left: dir === "left" ? -296 : 296, behavior: "smooth" })
   }
 
   return (
-    <section className="my-8 md:my-12">
+    /* ── Sección con fondo verde pino oscuro ─────────────────────── */
+    <section className="bg-[#2D4530] rounded-3xl py-8 px-4 md:px-8 my-4 md:my-6">
 
-      {/* ── Header ───────────────────────────────────────────── */}
-      <div className="flex items-end justify-between mb-5 px-1">
+      {/* ── Header ───────────────────────────────────────────────── */}
+      <div className="flex items-end justify-between mb-6">
         <div>
           <p
             className="text-[10px] font-black uppercase tracking-[0.22em] mb-1.5"
@@ -52,53 +51,40 @@ export default function PulsoDelValle({ posts }: Props) {
           </h2>
         </div>
 
-        {/* Flechas de navegación — solo en desktop */}
+        {/* Flechas — solo desktop, visibles sobre el fondo verde */}
         {posts.length > 2 && (
           <div className="hidden md:flex items-center gap-2">
-            <button
-              onClick={() => scroll("left")}
-              aria-label="Nota anterior"
-              className="w-9 h-9 rounded-full flex items-center justify-center transition-all"
-              style={{ border: "1.5px solid rgba(225,219,201,0.28)", color: "rgba(225,219,201,0.50)" }}
-              onMouseEnter={e => {
-                const b = e.currentTarget as HTMLButtonElement
-                b.style.borderColor = "rgba(225,219,201,0.65)"
-                b.style.color = "#E1DBC9"
-              }}
-              onMouseLeave={e => {
-                const b = e.currentTarget as HTMLButtonElement
-                b.style.borderColor = "rgba(225,219,201,0.28)"
-                b.style.color = "rgba(225,219,201,0.50)"
-              }}
-            >
-              <ChevronLeft size={16} />
-            </button>
-            <button
-              onClick={() => scroll("right")}
-              aria-label="Nota siguiente"
-              className="w-9 h-9 rounded-full flex items-center justify-center transition-all"
-              style={{ border: "1.5px solid rgba(225,219,201,0.28)", color: "rgba(225,219,201,0.50)" }}
-              onMouseEnter={e => {
-                const b = e.currentTarget as HTMLButtonElement
-                b.style.borderColor = "rgba(225,219,201,0.65)"
-                b.style.color = "#E1DBC9"
-              }}
-              onMouseLeave={e => {
-                const b = e.currentTarget as HTMLButtonElement
-                b.style.borderColor = "rgba(225,219,201,0.28)"
-                b.style.color = "rgba(225,219,201,0.50)"
-              }}
-            >
-              <ChevronRight size={16} />
-            </button>
+            {(["left", "right"] as const).map(dir => (
+              <button
+                key={dir}
+                onClick={() => scroll(dir)}
+                aria-label={dir === "left" ? "Nota anterior" : "Nota siguiente"}
+                className="w-9 h-9 rounded-full flex items-center justify-center transition-all"
+                style={{ border: "1.5px solid rgba(225,219,201,0.30)", color: "rgba(225,219,201,0.55)" }}
+                onMouseEnter={e => {
+                  const b = e.currentTarget as HTMLButtonElement
+                  b.style.borderColor = "rgba(225,219,201,0.70)"
+                  b.style.color = "#E1DBC9"
+                  b.style.background = "rgba(225,219,201,0.08)"
+                }}
+                onMouseLeave={e => {
+                  const b = e.currentTarget as HTMLButtonElement
+                  b.style.borderColor = "rgba(225,219,201,0.30)"
+                  b.style.color = "rgba(225,219,201,0.55)"
+                  b.style.background = "transparent"
+                }}
+              >
+                {dir === "left" ? <ChevronLeft size={16} /> : <ChevronRight size={16} />}
+              </button>
+            ))}
           </div>
         )}
       </div>
 
-      {/* ── Carousel ─────────────────────────────────────────── */}
+      {/* ── Carousel ─────────────────────────────────────────────── */}
       <div
         ref={scrollRef}
-        className="flex gap-4 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden snap-x snap-mandatory -mx-4 px-4 pb-3 md:mx-0 md:px-0"
+        className="flex gap-4 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden snap-x snap-mandatory pb-2"
       >
         {posts.map((post, i) => {
           const badge = TYPE_BADGE[post.type] ?? DEFAULT_BADGE
@@ -106,19 +92,12 @@ export default function PulsoDelValle({ posts }: Props) {
           return (
             <article
               key={post.id}
-              className="flex-shrink-0 w-[72vw] max-w-[280px] snap-center rounded-2xl overflow-hidden flex flex-col group cursor-pointer"
-              style={{
-                background: "rgba(255,255,255,0.09)",
-                backdropFilter: "blur(16px)",
-                WebkitBackdropFilter: "blur(16px)",
-                border: "1px solid rgba(255,255,255,0.16)",
-                boxShadow: "0 6px 24px rgba(0,0,0,0.20)",
-              }}
+              className="flex-shrink-0 w-[72vw] max-w-[280px] snap-center bg-white rounded-2xl overflow-hidden flex flex-col shadow-md hover:shadow-lg transition-shadow group cursor-pointer"
             >
-              {/* ── Imagen — aspect-video fijo, anti-CLS ── */}
-              <div className="relative aspect-video overflow-hidden bg-white/8 flex-shrink-0">
-                {/* shimmer visible mientras carga la imagen */}
-                <div className="absolute inset-0 animate-pulse bg-gradient-to-r from-white/5 via-white/10 to-white/5" />
+              {/* Imagen — aspect-video fijo, anti-CLS */}
+              <div className="relative aspect-video overflow-hidden bg-stone-100 flex-shrink-0">
+                {/* shimmer sobre fondo claro */}
+                <div className="absolute inset-0 animate-pulse bg-gradient-to-r from-stone-100 via-stone-50 to-stone-100" />
 
                 {post.image_url ? (
                   <Image
@@ -131,27 +110,26 @@ export default function PulsoDelValle({ posts }: Props) {
                     priority={i < 2}
                   />
                 ) : (
-                  /* Fallback elegante cuando no hay imagen */
                   <div className="absolute inset-0 flex items-center justify-center">
-                    <FileText size={28} style={{ color: "rgba(225,219,201,0.20)" }} />
+                    <FileText size={28} className="text-stone-300" />
                   </div>
                 )}
 
-                {/* Gradiente + label de tipo sobre la imagen */}
+                {/* Gradiente oscuro en la base de la imagen con el tipo */}
                 <div
-                  className="absolute bottom-0 left-0 right-0 px-3 pb-3 pt-8"
-                  style={{ background: "linear-gradient(to top, rgba(0,0,0,0.60), transparent)" }}
+                  className="absolute bottom-0 left-0 right-0 px-3 pb-2.5 pt-8"
+                  style={{ background: "linear-gradient(to top, rgba(0,0,0,0.55), transparent)" }}
                 >
-                  <span className="text-[9px] font-black uppercase tracking-[0.18em] text-white/85">
+                  <span className="text-[9px] font-black uppercase tracking-[0.18em] text-white/90">
                     {post.type}
                   </span>
                 </div>
               </div>
 
-              {/* ── Cuerpo de la tarjeta ── */}
-              <div className="px-4 pt-3 pb-4 flex flex-col gap-2 flex-1">
+              {/* Cuerpo de la tarjeta — fondo blanco, texto oscuro de alto contraste */}
+              <div className="p-4 flex flex-col gap-2 flex-1">
 
-                {/* Badge de color por tipo — distingue visualmente la categoría */}
+                {/* Badge de categoría con color semántico sobre fondo blanco */}
                 <span
                   className="self-start text-[9px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full flex items-center gap-1.5"
                   style={{ background: badge.bg, color: badge.color }}
@@ -163,28 +141,19 @@ export default function PulsoDelValle({ posts }: Props) {
                   {post.type}
                 </span>
 
-                {/* Título */}
-                <h3
-                  className="font-serif text-sm font-bold leading-snug line-clamp-2"
-                  style={{ color: "#E1DBC9" }}
-                >
+                {/* Título — charcoal oscuro, máxima legibilidad */}
+                <h3 className="font-serif text-sm font-bold text-stone-900 leading-snug line-clamp-2">
                   {post.title}
                 </h3>
 
-                {/* Descripción */}
+                {/* Descripción — gris oscuro legible */}
                 {post.description && (
-                  <p
-                    className="text-xs leading-relaxed line-clamp-2"
-                    style={{ color: "rgba(225,219,201,0.58)" }}
-                  >
+                  <p className="text-xs text-stone-600 font-medium leading-relaxed line-clamp-2 mt-1">
                     {post.description}
                   </p>
                 )}
 
-                <span
-                  className="text-[10px] font-bold mt-auto pt-1"
-                  style={{ color: "rgba(225,219,201,0.35)" }}
-                >
+                <span className="text-[10px] font-bold text-stone-400 mt-auto pt-1">
                   Leer más →
                 </span>
               </div>

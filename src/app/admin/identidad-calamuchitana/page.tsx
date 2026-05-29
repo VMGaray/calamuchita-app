@@ -119,11 +119,17 @@ export default function IdentidadCalamuchitanaPage() {
     if (!form.title.trim()) return
     setSaving(true)
 
+    // Asegurar que image_url sea siempre un string de URL o null — nunca un objeto
+    const safeImageUrl =
+      typeof form.image_url === "string" && form.image_url.startsWith("http")
+        ? form.image_url
+        : null
+
     const payload = {
       title:       form.title.trim(),
       type:        form.type,
       description: form.description.trim() || null,
-      image_url:   form.image_url || null,
+      image_url:   safeImageUrl,
       expires_at:  form.expires_at || null,
     }
 
