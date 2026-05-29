@@ -13,7 +13,7 @@ import {
 
 // ── Tipos ─────────────────────────────────────────────────────────────────────
 
-type PostType = "Entrevista" | "Efeméride" | "Tip del Finde" | "Novedad"
+type PostType = "Entrevista" | "Efeméride" | "Tip del Finde" | "Novedad" | "Noticias" | "Nota de interés"
 
 interface EditorialPost {
   id: string
@@ -35,13 +35,15 @@ interface FormState {
 
 // ── Constantes ────────────────────────────────────────────────────────────────
 
-const POST_TYPES: PostType[] = ["Entrevista", "Efeméride", "Tip del Finde", "Novedad"]
+const POST_TYPES: PostType[] = ["Entrevista", "Efeméride", "Tip del Finde", "Novedad", "Noticias", "Nota de interés"]
 
 const TYPE_STYLES: Record<PostType, { bg: string; color: string }> = {
-  "Entrevista":    { bg: "rgba(45,69,48,0.10)",   color: "#2D4530" },
-  "Efeméride":     { bg: "rgba(124,92,58,0.12)",  color: "#7C5C3A" },
-  "Tip del Finde": { bg: "rgba(45,108,108,0.12)", color: "#2D6B6B" },
-  "Novedad":       { bg: "rgba(74,85,162,0.10)",  color: "#4A55A2" },
+  "Entrevista":      { bg: "rgba(45,69,48,0.10)",   color: "#2D4530" },
+  "Efeméride":       { bg: "rgba(124,92,58,0.12)",  color: "#7C5C3A" },
+  "Tip del Finde":   { bg: "rgba(45,108,108,0.12)", color: "#2D6B6B" },
+  "Novedad":         { bg: "rgba(74,85,162,0.10)",  color: "#4A55A2" },
+  "Noticias":        { bg: "rgba(190,30,30,0.10)",  color: "#B01E1E" },
+  "Nota de interés": { bg: "rgba(20,130,160,0.11)", color: "#0F7A96" },
 }
 
 const EMPTY_FORM: FormState = {

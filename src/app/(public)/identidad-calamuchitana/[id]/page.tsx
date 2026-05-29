@@ -5,10 +5,12 @@ import { ArrowLeft, CalendarDays } from "lucide-react"
 import { createClient } from "@/lib/supabase/server"
 
 const TYPE_STYLES: Record<string, { bg: string; color: string }> = {
-  "Entrevista":    { bg: "rgba(45,69,48,0.10)",   color: "#2D4530" },
-  "Efeméride":     { bg: "rgba(124,92,58,0.12)",  color: "#7C5C3A" },
-  "Tip del Finde": { bg: "rgba(180,145,30,0.13)", color: "#7A6000" },
-  "Novedad":       { bg: "rgba(74,85,162,0.10)",  color: "#4A55A2" },
+  "Entrevista":      { bg: "rgba(45,69,48,0.10)",   color: "#2D4530" },
+  "Efeméride":       { bg: "rgba(124,92,58,0.12)",  color: "#7C5C3A" },
+  "Tip del Finde":   { bg: "rgba(180,145,30,0.13)", color: "#7A6000" },
+  "Novedad":         { bg: "rgba(74,85,162,0.10)",  color: "#4A55A2" },
+  "Noticias":        { bg: "rgba(190,30,30,0.10)",  color: "#B01E1E" },
+  "Nota de interés": { bg: "rgba(20,130,160,0.11)", color: "#0F7A96" },
 }
 
 interface Props {
