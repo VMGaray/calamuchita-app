@@ -41,6 +41,13 @@ export default function CarritoDrawer({
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState("")
 
+  // Cierra y resetea el estado interno para que la próxima apertura empiece limpia
+  const handleClose = () => {
+    setStep("cart")
+    setError("")
+    onClose()
+  }
+
   const total = cart.reduce((sum, i) => sum + i.price * i.quantity, 0)
   const totalItems = cart.reduce((sum, i) => sum + i.quantity, 0)
 
@@ -118,9 +125,8 @@ export default function CarritoDrawer({
 
       setStep("success")
       setTimeout(() => {
-        onOrderSuccess()
-        setStep("cart")
-        setForm({ name: "", phone: "", address: "", notes: "" })
+        onOrderSuccess()   // limpia carrito y cierra drawer desde CartaInteractiva
+        // handleClose resetea el step internamente al cerrar
       }, 3000)
 
     } catch (e) {
@@ -140,7 +146,7 @@ export default function CarritoDrawer({
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            onClick={onClose}
+            onClick={handleClose}
           />
 
           {/* Drawer — z-[210] sobre el backdrop */}
@@ -166,8 +172,13 @@ export default function CarritoDrawer({
                   </span>
                 )}
               </div>
-              <button onClick={onClose} className="w-8 h-8 rounded-full flex items-center justify-center transition-colors"
-                style={{ background: "rgba(45,69,48,0.08)" }}>
+              <button
+                type="button"
+                onClick={handleClose}
+                className="w-8 h-8 rounded-full flex items-center justify-center transition-colors hover:opacity-70"
+                style={{ background: "rgba(45,69,48,0.08)" }}
+                aria-label="Cerrar pedido"
+              >
                 <X size={16} style={{ color: "#2D4530" }} />
               </button>
             </div>

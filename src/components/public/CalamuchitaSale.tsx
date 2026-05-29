@@ -208,7 +208,7 @@ export default function CalamuchitaSale({
           </span>
         </div>
         <h2 className="font-serif text-2xl md:text-3xl mb-6" style={{ color: "#2D1A0E" }}>
-          Promos exclusivas para vos
+          Promos exclusivas de Calamuchita App
         </h2>
       </AnimateIn>
 
