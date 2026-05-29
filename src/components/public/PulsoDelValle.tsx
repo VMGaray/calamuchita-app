@@ -1,6 +1,7 @@
 "use client"
 
 import Image from "next/image"
+import Link from "next/link"
 import { useRef } from "react"
 import { ChevronLeft, ChevronRight, FileText } from "lucide-react"
 import type { EditorialPost } from "@/app/(public)/page"
@@ -90,9 +91,10 @@ export default function PulsoDelValle({ posts }: Props) {
           const badge = TYPE_BADGE[post.type] ?? DEFAULT_BADGE
 
           return (
-            <article
+            <Link
               key={post.id}
-              className="flex-shrink-0 w-[72vw] max-w-[280px] snap-center bg-white rounded-2xl overflow-hidden flex flex-col shadow-md hover:shadow-lg transition-shadow group cursor-pointer"
+              href={`/identidad-calamuchitana/${post.id}`}
+              className="flex-shrink-0 w-[72vw] max-w-[280px] snap-center bg-white rounded-2xl overflow-hidden flex flex-col shadow-md hover:shadow-lg transition-shadow group"
             >
               {/* Imagen — aspect-video fijo, anti-CLS */}
               <div className="relative aspect-video overflow-hidden bg-stone-100 flex-shrink-0">
@@ -157,7 +159,7 @@ export default function PulsoDelValle({ posts }: Props) {
                   Leer más →
                 </span>
               </div>
-            </article>
+            </Link>
           )
         })}
       </div>
