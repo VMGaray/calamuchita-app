@@ -359,8 +359,8 @@ export default function IdentidadCalamuchitanaPage() {
                   <ImageUpload
                     value={form.image_url}
                     onChange={(url) => setForm(f => ({ ...f, image_url: url }))}
-                    bucket="editorial"
-                    folder="posts"
+                    bucket="event-images"
+                    folder="identidad"
                     label="Imagen de portada"
                   />
 
