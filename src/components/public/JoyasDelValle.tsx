@@ -3,6 +3,7 @@
 import { useRef, useCallback, useEffect } from "react"
 import { motion, useMotionValue, animate } from "framer-motion"
 import { ArrowRight, ChevronLeft, ChevronRight, Plus } from "lucide-react"
+import Image from "next/image"
 import Link from "next/link"
 
 type FeaturedBusiness = {
@@ -36,20 +37,27 @@ function FeaturedCard({ biz }: { biz: FeaturedBusiness }) {
     <motion.div
       whileHover={{ y: -15, scale: 1.02 }}
       className="relative flex-shrink-0 group cursor-pointer"
-      style={{ width: CARD_W, height: 420 }}
+      style={{ width: CARD_W }}
     >
       <Link
         href={biz.section === "gastronomy" ? `/negocios/${biz.slug}` : `/directorio/${biz.section}/${biz.slug}`}
-        className="block w-full h-full"
+        className="block w-full"
       >
-        <div className="w-full h-full relative overflow-hidden rounded-[40px] bg-[#2D4530] shadow-2xl">
-          {/* Imagen con zoom lento */}
+        <div className="w-full aspect-[4/3] relative overflow-hidden rounded-[40px] bg-[#2D4530] shadow-2xl">
+          {/* Imagen con zoom lento — next/image fill preserva el ratio nativo */}
           <motion.div
-            className="absolute inset-0 bg-cover bg-center"
-            style={{ backgroundImage: `url(${biz.cover_url || FALLBACK})` }}
+            className="absolute inset-0"
             animate={{ scale: [1, 1.1, 1] }}
             transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
-          />
+          >
+            <Image
+              src={biz.cover_url || FALLBACK}
+              alt={biz.name}
+              fill
+              className="object-cover object-center"
+              sizes="320px"
+            />
+          </motion.div>
 
           {/* Overlay */}
           <div className="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent opacity-80" />
@@ -58,27 +66,27 @@ function FeaturedCard({ biz }: { biz: FeaturedBusiness }) {
           <div className="absolute inset-0 opacity-0 group-hover:opacity-25 transition-opacity duration-700 bg-gradient-to-tr from-transparent via-white to-transparent -translate-x-full group-hover:translate-x-full transform" />
 
           {/* Badge Premium */}
-          <div className="absolute top-6 left-6">
+          <div className="absolute top-4 left-4">
             <div className="px-3 py-1 rounded-full bg-yellow-500 text-black text-[10px] font-black uppercase tracking-tighter">
               Premium
             </div>
           </div>
 
           {/* Info */}
-          <div className="absolute bottom-8 left-8 right-8">
-            <div className="flex items-center gap-2 mb-2">
+          <div className="absolute bottom-5 left-5 right-5">
+            <div className="flex items-center gap-2 mb-1">
               <span className="h-[1px] w-4 bg-yellow-500" />
               <p className="text-yellow-500 text-[10px] font-bold uppercase tracking-[0.3em]">{SECTION_ES[biz.section] ?? biz.section}</p>
             </div>
-            <h3 className="text-white text-3xl font-serif font-bold leading-tight group-hover:text-yellow-400 transition-colors">
+            <h3 className="text-white text-2xl font-serif font-bold leading-tight group-hover:text-yellow-400 transition-colors">
               {biz.name}
             </h3>
           </div>
 
           {/* Ícono hover */}
-          <div className="absolute bottom-6 right-6 opacity-0 group-hover:opacity-100 transition-opacity">
-            <div className="w-10 h-10 rounded-full bg-white flex items-center justify-center text-[#2D4530]">
-              <Plus size={20} />
+          <div className="absolute bottom-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity">
+            <div className="w-9 h-9 rounded-full bg-white flex items-center justify-center text-[#2D4530]">
+              <Plus size={18} />
             </div>
           </div>
         </div>

@@ -79,15 +79,16 @@ function InfoRow({ icon, sublabel, label, href, external }: { icon: React.ReactN
 
 // Verifica si el negocio está abierto AHORA según sus horarios reales.
 // Soporta horario cortado: múltiples filas para el mismo día (ej. 08–14 y 17–00).
+// Usa la zona horaria de Argentina (America/Argentina/Buenos_Aires) sin importar dónde esté el visitante.
 function calcIsOpenNow(hours: any[]): boolean {
   if (!hours || hours.length === 0) return false
-  const now = new Date()
-  const day = now.getDay()
-  const hhmm = `${String(now.getHours()).padStart(2, "0")}:${String(now.getMinutes()).padStart(2, "0")}`
+  const arDate = new Date(new Date().toLocaleString("en-US", { timeZone: "America/Argentina/Buenos_Aires" }))
+  const day = arDate.getDay()
+  const hhmm = `${String(arDate.getHours()).padStart(2, "0")}:${String(arDate.getMinutes()).padStart(2, "0")}`
   const todayShifts = hours.filter((h: any) => h.day_of_week === day && !h.is_closed)
   if (todayShifts.length === 0) return false
   return todayShifts.some(
-    (h: any) => hhmm >= h.opens_at.slice(0, 5) && hhmm <= h.closes_at.slice(0, 5),
+    (h: any) => hhmm >= h.opens_at.slice(0, 5) && hhmm < h.closes_at.slice(0, 5),
   )
 }
 
@@ -198,10 +199,17 @@ export default function NegocioDetalle({ business }: Props) {
     reservaForm.date !== "" && 
     reservaForm.time !== ""
 
-  const mapsExternalLink =
-    business.latitude && business.longitude
+  // Sólo mostrar "Llegar" si hay coordenadas GPS o una dirección específica con número de calle.
+  // Una localidad genérica ("Villa General Belgrano") no tiene dígito y no cuenta.
+  const hasLocation =
+    !!(business.latitude && business.longitude) ||
+    (typeof business.address === "string" && /\d/.test(business.address.trim()))
+
+  const mapsExternalLink = hasLocation
+    ? business.latitude && business.longitude
       ? `https://www.google.com/maps/search/?api=1&query=${business.latitude},${business.longitude}`
-      : `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${business.name}${business.address ? `, ${business.address}` : ""}`)}`
+      : `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${business.name}, ${business.address}`)}`
+    : null
 
   const photos: string[] =
     Array.isArray(business.images) && business.images.length > 0
@@ -219,7 +227,7 @@ export default function NegocioDetalle({ business }: Props) {
   const isOpen = calcIsOpenNow(business.business_hours ?? [])
 
   // Agrupar turnos por día para renderizar una sola fila por día aunque haya split-shift
-  const todayIdx = new Date().getDay()
+  const todayIdx = new Date(new Date().toLocaleString("en-US", { timeZone: "America/Argentina/Buenos_Aires" })).getDay()
   const hoursByDay = new Map<number, any[]>()
   for (const h of [...(business.business_hours ?? [])].sort(
     (a: any, b: any) => a.day_of_week - b.day_of_week,
@@ -342,9 +350,11 @@ export default function NegocioDetalle({ business }: Props) {
                 {WA_SVG} WhatsApp
               </a>
             )}
-            <a href={mapsExternalLink} target="_blank" rel="noopener noreferrer" className="flex-1 min-w-[140px] flex items-center justify-center gap-2 py-4 rounded-2xl font-bold text-sm shadow-md hover:opacity-90 transition-all active:scale-95" style={{ background: "#2D4530", color: "#E1DBC9" }}>
-              <Navigation size={16} /> Llegar
-            </a>
+            {mapsExternalLink && (
+              <a href={mapsExternalLink} target="_blank" rel="noopener noreferrer" className="flex-1 min-w-[140px] flex items-center justify-center gap-2 py-4 rounded-2xl font-bold text-sm shadow-md hover:opacity-90 transition-all active:scale-95" style={{ background: "#2D4530", color: "#E1DBC9" }}>
+                <Navigation size={16} /> Llegar
+              </a>
+            )}
           </div>
         )}
 
@@ -358,14 +368,16 @@ export default function NegocioDetalle({ business }: Props) {
         )}
 
         {business.section === "gastronomy" && (
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-            <button onClick={handleVerCarta} disabled={!hasMenu} className="flex items-center justify-center gap-2 py-4 rounded-2xl font-bold text-sm shadow-md transition-all active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed" style={{ background: "#2D4530", color: "#E1DBC9" }}>
+          <div className="flex flex-wrap gap-3">
+            <button onClick={handleVerCarta} disabled={!hasMenu} className="flex-1 min-w-[120px] flex items-center justify-center gap-2 py-4 rounded-2xl font-bold text-sm shadow-md transition-all active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed" style={{ background: "#2D4530", color: "#E1DBC9" }}>
               <UtensilsCrossed size={17} /> Ver Carta
             </button>
-            <button onClick={() => setShowReserva(true)} disabled={!waNumber} className="flex items-center justify-center gap-2 py-4 rounded-2xl font-bold text-sm shadow-md transition-all active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed" style={{ background: "#2D4530", color: "#E1DBC9" }}>
-              <Calendar size={17} /> Reservar Mesa
-            </button>
-            <button onClick={handleHacerPedido} disabled={!hasMenu && !waNumber} className="flex items-center justify-center gap-2 py-4 rounded-2xl font-bold text-sm shadow-md transition-all active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed" style={{ background: "#2D4530", color: "#E1DBC9" }}>
+            {business.has_table_service && (
+              <button onClick={() => setShowReserva(true)} disabled={!waNumber} className="flex-1 min-w-[120px] flex items-center justify-center gap-2 py-4 rounded-2xl font-bold text-sm shadow-md transition-all active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed" style={{ background: "#2D4530", color: "#E1DBC9" }}>
+                <Calendar size={17} /> Reservar Mesa
+              </button>
+            )}
+            <button onClick={handleHacerPedido} disabled={!hasMenu && !waNumber} className="flex-1 min-w-[120px] flex items-center justify-center gap-2 py-4 rounded-2xl font-bold text-sm shadow-md transition-all active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed" style={{ background: "#2D4530", color: "#E1DBC9" }}>
               <ShoppingBag size={17} /> Hacer Pedido
             </button>
           </div>

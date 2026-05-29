@@ -94,15 +94,16 @@ function FeatureBadge({ icon, label }: { icon: React.ReactNode; label: string })
   )
 }
 
-// Calcula si el negocio está abierto ahora basándose en sus horarios reales
+// Calcula si el negocio está abierto ahora basándose en sus horarios reales.
+// Usa la zona horaria de Argentina para que funcione correctamente sin importar el TZ del visitante.
 function calcIsOpenNow(hours: any[]): boolean {
   if (!hours || hours.length === 0) return false
-  const now = new Date()
-  const day = now.getDay()
-  const hhmm = `${String(now.getHours()).padStart(2, "0")}:${String(now.getMinutes()).padStart(2, "0")}`
+  const arDate = new Date(new Date().toLocaleString("en-US", { timeZone: "America/Argentina/Buenos_Aires" }))
+  const day = arDate.getDay()
+  const hhmm = `${String(arDate.getHours()).padStart(2, "0")}:${String(arDate.getMinutes()).padStart(2, "0")}`
   const todayRows = hours.filter((h: any) => h.day_of_week === day && !h.is_closed)
   if (todayRows.length === 0) return false
-  return todayRows.some((h: any) => hhmm >= h.opens_at.slice(0, 5) && hhmm <= h.closes_at.slice(0, 5))
+  return todayRows.some((h: any) => hhmm >= h.opens_at.slice(0, 5) && hhmm < h.closes_at.slice(0, 5))
 }
 
 interface Props {
@@ -129,15 +130,16 @@ export default function DirectorioDetalle({ business, section }: Props) {
     ? `https://wa.me/${waNum}?text=${encodeURIComponent(`Hola! Te consulto desde Calamuchita App — ${business.name} 🌿`)}`
     : null
 
-  // Maps: lat/lon si está disponible, sino búsqueda por dirección
+  // Maps: lat/lon si está disponible, sino dirección con número de calle.
+  // Una localidad genérica sin dígito ("Villa General Belgrano") devuelve null → no se muestra "Llegar".
   const mapsLink =
     business.latitude && business.longitude
       ? `https://www.google.com/maps/search/?api=1&query=${business.latitude},${business.longitude}`
-      : business.address?.trim()
+      : typeof business.address === "string" && /\d/.test(business.address.trim())
       ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${business.name} ${business.address.trim()}`)}`
       : null
 
-  const todayIdx = new Date().getDay()
+  const todayIdx = new Date(new Date().toLocaleString("en-US", { timeZone: "America/Argentina/Buenos_Aires" })).getDay()
   const todayRows = (business.business_hours ?? []).filter((h: any) => h.day_of_week === todayIdx)
   const todayIsClosed = todayRows.length > 0 && todayRows.every((h: any) => h.is_closed)
   const isOpenNow = calcIsOpenNow(business.business_hours ?? [])
