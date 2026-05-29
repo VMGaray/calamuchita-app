@@ -33,7 +33,6 @@ const WA_SVG = (
   </svg>
 )
 
-// ── InfoRow: fila de metadato con icono, sin posicionamiento absoluto ──────────
 function InfoRow({
   icon,
   sublabel,
@@ -167,7 +166,7 @@ export default function NegocioDetalle({ business }: Props) {
     <div className="min-h-screen pb-24" style={{ background: "#F0EBE0" }}>
       <div className="max-w-2xl mx-auto px-4 flex flex-col gap-y-4 pt-5">
 
-        {/* ── Volver ──────────────────────────────────────────────────────── */}
+        {/* 1. LINK VOLVER */}
         <Link
           href="/negocios"
           className="inline-flex items-center gap-1.5 text-sm font-medium w-fit transition-opacity hover:opacity-60"
@@ -177,19 +176,14 @@ export default function NegocioDetalle({ business }: Props) {
           Volver
         </Link>
 
-        {/* ═══════════════════════════════════════════════════════════════════
-            BLOQUE 1 — MARCA + INFORMACIÓN
-        ═══════════════════════════════════════════════════════════════════ */}
+        {/* 2. TARJETA PRINCIPAL: MARCA E INFORMACIÓN */}
         <div className="bg-white rounded-3xl border border-stone-100 shadow-sm overflow-hidden">
-
-          {/* Header: nombre izquierda · logo derecha */}
           <div className="px-6 pt-6 pb-5 border-b border-stone-100">
             <div className="flex items-start gap-4">
-
-              {/* Nombre + badges */}
+              
+              {/* Nombre y Badges */}
               <div className="flex-1 min-w-0">
-                <h1 className="text-2xl md:text-3xl font-bold leading-tight mb-3 tracking-tight"
-                  style={{ color: "#2D4530" }}>
+                <h1 className="text-2xl md:text-3xl font-bold leading-tight mb-3 tracking-tight" style={{ color: "#2D4530" }}>
                   {business.name}
                 </h1>
                 <div className="flex items-center gap-2 flex-wrap min-h-[28px]">
@@ -206,22 +200,15 @@ export default function NegocioDetalle({ business }: Props) {
                         : "text-stone-500 bg-stone-100"
                     }`}
                   >
-                    <span
-                      className={`w-1.5 h-1.5 rounded-full inline-block ${
-                        isOpen ? "bg-green-500" : "bg-stone-400"
-                      }`}
-                    />
+                    <span className={`w-1.5 h-1.5 rounded-full inline-block ${isOpen ? "bg-green-500" : "bg-stone-400"}`} />
                     {isOpen ? "Abierto ahora" : "Cerrado"}
                   </span>
                 </div>
               </div>
 
-              {/* Logo — cuadrado fijo, object-contain para logos con fondo blanco */}
+              {/* Logo Fijo */}
               {business.logo_url && (
-                <div
-                  className="w-20 h-20 rounded-xl bg-white border border-stone-100 shadow-sm p-2 shrink-0 relative overflow-hidden"
-                >
-                  {/* shimmer cubierto por la imagen al cargar */}
+                <div className="w-20 h-20 rounded-xl bg-white border border-stone-100 shadow-sm p-2 shrink-0 relative overflow-hidden">
                   <div className="absolute inset-0 animate-pulse bg-gradient-to-r from-stone-50 via-stone-100 to-stone-50" />
                   <Image
                     src={business.logo_url}
@@ -244,7 +231,7 @@ export default function NegocioDetalle({ business }: Props) {
             </div>
           )}
 
-          {/* Stack de metadata — InfoRow sin posición absoluta */}
+          {/* Datos de Contacto (Metadata) */}
           <div className="px-6 py-1">
             {business.phone && (
               <InfoRow
@@ -288,15 +275,12 @@ export default function NegocioDetalle({ business }: Props) {
             )}
           </div>
 
-          {/* Horarios */}
+          {/* Lista de Horarios Semanales */}
           {business.business_hours?.length > 0 && (
             <div className="px-6 pt-4 pb-6 border-t border-stone-100">
               <div className="flex items-center gap-2 mb-3">
                 <Clock size={13} style={{ color: "rgba(45,69,48,0.40)" }} />
-                <p
-                  className="text-[10px] font-black uppercase tracking-[0.2em]"
-                  style={{ color: "rgba(45,69,48,0.40)" }}
-                >
+                <p className="text-[10px] font-black uppercase tracking-[0.2em]" style={{ color: "rgba(45,69,48,0.40)" }}>
                   Horarios
                 </p>
               </div>
@@ -304,18 +288,10 @@ export default function NegocioDetalle({ business }: Props) {
                 {[...business.business_hours]
                   .sort((a: any, b: any) => a.day_of_week - b.day_of_week)
                   .map((h: any) => (
-                    <div
-                      key={h.id}
-                      className="flex justify-between items-center py-1.5 border-b border-stone-50 last:border-0 text-sm"
-                    >
+                    <div key={h.id} className="flex justify-between items-center py-1.5 border-b border-stone-50 last:border-0 text-sm">
                       <span className="text-stone-500 font-medium">{DAY[h.day_of_week]}</span>
-                      <span
-                        className="font-semibold"
-                        style={{ color: h.is_closed ? "#C4B9A8" : "#2D4530" }}
-                      >
-                        {h.is_closed
-                          ? "Cerrado"
-                          : `${h.opens_at.slice(0, 5)} — ${h.closes_at.slice(0, 5)}`}
+                      <span className="font-semibold" style={{ color: h.is_closed ? "#C4B9A8" : "#2D4530" }}>
+                        {h.is_closed ? "Cerrado" : `${h.opens_at.slice(0, 5)} — ${h.closes_at.slice(0, 5)}`}
                       </span>
                     </div>
                   ))}
@@ -324,9 +300,7 @@ export default function NegocioDetalle({ business }: Props) {
           )}
         </div>
 
-        {/* ═══════════════════════════════════════════════════════════════════
-            BLOQUE 2 — BOTONES CTA
-        ═══════════════════════════════════════════════════════════════════ */}
+        {/* 3. BOTONES DE ACCIÓN PRINCIPALES (CTAs) */}
         {hasActions && (
           <div className="flex flex-wrap gap-3">
             {waLink && (
@@ -366,114 +340,23 @@ export default function NegocioDetalle({ business }: Props) {
           </div>
         )}
 
-        {/* ═══════════════════════════════════════════════════════════════════
-            BLOQUE 3 — GALERÍA DE FOTOS
-        ═══════════════════════════════════════════════════════════════════ */}
-        {photos.length > 0 && (
-          <div className="flex flex-col gap-y-3">
-
-            {/* Divider con badge de categoría */}
-            <div className="flex items-center gap-3">
-              <span className="h-px flex-1 bg-stone-200" />
-              <span
-                className="text-[10px] font-bold uppercase tracking-[0.2em] px-3 py-1 rounded-full shrink-0"
-                style={{ background: "rgba(45,69,48,0.10)", color: "#2D4530" }}
-              >
-                {categoryLabel}
-              </span>
-              <span className="h-px flex-1 bg-stone-200" />
-            </div>
-
-            {/* Carousel — flechas fuera de la imagen para no cubrir el contenido */}
-            <div className="flex items-center gap-2">
-              {photos.length > 1 && (
-                <button
-                  onClick={prevPhoto}
-                  aria-label="Foto anterior"
-                  className="shrink-0 w-10 h-10 rounded-full flex items-center justify-center border-2 border-[#2D4530] text-[#2D4530] hover:bg-[#2D4530] hover:text-[#E1DBC9] transition-all active:scale-90"
-                >
-                  <ChevronLeft size={18} />
-                </button>
-              )}
-
-              {/* Imagen — aspect-video fijo anti-CLS */}
-              <div className="flex-1 aspect-video rounded-2xl overflow-hidden relative bg-stone-100">
-                {/* shimmer visible mientras carga */}
-                <div className="absolute inset-0 animate-pulse bg-gradient-to-r from-stone-100 via-stone-50 to-stone-100" />
-                <Image
-                  src={photos[photoIdx]}
-                  alt={`${business.name} — foto ${photoIdx + 1} de ${photos.length}`}
-                  fill
-                  priority={photoIdx === 0}
-                  className="object-cover"
-                  sizes="(max-width: 640px) calc(100vw - 32px), (max-width: 768px) calc(100vw - 80px), 640px"
-                  quality={85}
-                />
-              </div>
-
-              {photos.length > 1 && (
-                <button
-                  onClick={nextPhoto}
-                  aria-label="Foto siguiente"
-                  className="shrink-0 w-10 h-10 rounded-full flex items-center justify-center border-2 border-[#2D4530] text-[#2D4530] hover:bg-[#2D4530] hover:text-[#E1DBC9] transition-all active:scale-90"
-                >
-                  <ChevronRight size={18} />
-                </button>
-              )}
-            </div>
-
-            {/* Dots de navegación */}
-            {photos.length > 1 && (
-              <div className="flex items-center justify-center gap-2 h-4">
-                {photos.map((_, i) => (
-                  <button
-                    key={i}
-                    onClick={() => setPhotoIdx(i)}
-                    aria-label={`Ver foto ${i + 1}`}
-                    className="h-1.5 rounded-full transition-all duration-300"
-                    style={{
-                      width: i === photoIdx ? 20 : 6,
-                      background: i === photoIdx ? "#2D4530" : "rgba(45,69,48,0.22)",
-                    }}
-                  />
-                ))}
-              </div>
-            )}
-
-            {/* Caption del pie de galería */}
-            <p className="text-center text-xs text-stone-400 font-medium leading-snug">
-              {business.name}
-              {business.address ? ` · ${business.address}` : ""}
-            </p>
-          </div>
-        )}
-
-        {/* ── Servicios (delivery, take away, salón) ───────────────────────── */}
+        {/* 4. SECCIÓN SERVICIOS ADICIONALES */}
         {(business.offers_delivery || business.offers_takeaway || business.offers_dine_in) && (
           <div className="bg-white rounded-3xl border border-stone-100 shadow-sm p-5 flex flex-wrap gap-3">
             {business.offers_dine_in && (
-              <div
-                className="flex items-center gap-2 px-3 py-2 rounded-xl text-sm font-semibold"
-                style={{ background: "rgba(45,69,48,0.07)", color: "#2D4530" }}
-              >
+              <div className="flex items-center gap-2 px-3 py-2 rounded-xl text-sm font-semibold" style={{ background: "rgba(45,69,48,0.07)", color: "#2D4530" }}>
                 <UtensilsCrossed size={14} />
                 Salón
               </div>
             )}
             {business.offers_delivery && (
-              <div
-                className="flex items-center gap-2 px-3 py-2 rounded-xl text-sm font-semibold"
-                style={{ background: "rgba(45,69,48,0.07)", color: "#2D4530" }}
-              >
+              <div className="flex items-center gap-2 px-3 py-2 rounded-xl text-sm font-semibold" style={{ background: "rgba(45,69,48,0.07)", color: "#2D4530" }}>
                 <Truck size={14} />
                 Delivery
               </div>
             )}
             {business.offers_takeaway && (
-              <div
-                className="flex items-center gap-2 px-3 py-2 rounded-xl text-sm font-semibold"
-                style={{ background: "rgba(45,69,48,0.07)", color: "#2D4530" }}
-              >
+              <div className="flex items-center gap-2 px-3 py-2 rounded-xl text-sm font-semibold" style={{ background: "rgba(45,69,48,0.07)", color: "#2D4530" }}>
                 <ShoppingBag size={14} />
                 Take away
               </div>
@@ -481,7 +364,7 @@ export default function NegocioDetalle({ business }: Props) {
           </div>
         )}
 
-        {/* ── Acciones gastronomía ─────────────────────────────────────────── */}
+        {/* 5. MÓDULO EXCLUSIVO GASTRONOMÍA */}
         {business.section === "gastronomy" && (
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
             <button
@@ -514,7 +397,7 @@ export default function NegocioDetalle({ business }: Props) {
           </div>
         )}
 
-        {/* ── Menú del día ─────────────────────────────────────────────────── */}
+        {/* 6. MENÚ DEL DÍA */}
         {todayMenu && todayMenu.daily_menu_items?.length > 0 && (
           <div className="bg-white rounded-3xl border border-stone-100 shadow-sm p-6">
             <div className="flex items-center gap-2 mb-5">
@@ -523,10 +406,7 @@ export default function NegocioDetalle({ business }: Props) {
             </div>
             <div className="space-y-0">
               {todayMenu.daily_menu_items.map((item: any) => (
-                <div
-                  key={item.id}
-                  className="flex items-center justify-between py-3 border-b border-stone-100 last:border-0"
-                >
+                <div key={item.id} className="flex items-center justify-between py-3 border-b border-stone-100 last:border-0">
                   <div className="min-w-0 pr-4">
                     <p className="font-semibold text-stone-800 text-sm">{item.name}</p>
                     {item.description && (
@@ -542,18 +422,92 @@ export default function NegocioDetalle({ business }: Props) {
           </div>
         )}
 
-        {/* ── Carta interactiva ────────────────────────────────────────────── */}
+        {/* 7. CARTA INTERACTIVA DESPLEGADA */}
         {business.menu_categories?.length > 0 && (
           <div ref={cartaRef}>
             <CartaInteractiva categories={business.menu_categories} business={business} />
           </div>
         )}
 
+        {/* 8. GALERÍA DE FOTOS (Fijada abajo de todo por flujo dinámico) */}
+        {photos.length > 0 && (
+          <div className="flex flex-col gap-y-3 mt-2">
+            <div className="flex items-center gap-3">
+              <span className="h-px flex-1 bg-stone-200" />
+              <span
+                className="text-[10px] font-bold uppercase tracking-[0.2em] px-3 py-1 rounded-full shrink-0"
+                style={{ background: "rgba(45,69,48,0.10)", color: "#2D4530" }}
+              >
+                {categoryLabel}
+              </span>
+              <span className="h-px flex-1 bg-stone-200" />
+            </div>
+
+            {/* Carousel con flechas exteriores */}
+            <div className="flex items-center gap-2">
+              {photos.length > 1 && (
+                <button
+                  onClick={prevPhoto}
+                  aria-label="Foto anterior"
+                  className="shrink-0 w-10 h-10 rounded-full flex items-center justify-center border-2 border-[#2D4530] text-[#2D4530] hover:bg-[#2D4530] hover:text-[#E1DBC9] transition-all active:scale-90"
+                >
+                  <ChevronLeft size={18} />
+                </button>
+              )}
+
+              {/* Contenedor de Imagen Fijo Anti-CLS */}
+              <div className="flex-1 aspect-video rounded-2xl overflow-hidden relative bg-stone-100">
+                <div className="absolute inset-0 animate-pulse bg-gradient-to-r from-stone-100 via-stone-50 to-stone-100" />
+                <Image
+                  src={photos[photoIdx]}
+                  alt={`${business.name} — foto ${photoIdx + 1} de ${photos.length}`}
+                  fill
+                  priority={photoIdx === 0}
+                  className="object-cover"
+                  sizes="(max-width: 640px) calc(100vw - 32px), (max-width: 768px) calc(100vw - 80px), 640px"
+                  quality={85}
+                />
+              </div>
+
+              {photos.length > 1 && (
+                <button
+                  onClick={nextPhoto}
+                  aria-label="Foto siguiente"
+                  className="shrink-0 w-10 h-10 rounded-full flex items-center justify-center border-2 border-[#2D4530] text-[#2D4530] hover:bg-[#2D4530] hover:text-[#E1DBC9] transition-all active:scale-90"
+                >
+                  <ChevronRight size={18} />
+                </button>
+              )}
+            </div>
+
+            {/* Indicadores / Dots */}
+            {photos.length > 1 && (
+              <div className="flex items-center justify-center gap-2 h-4">
+                {photos.map((_, i) => (
+                  <button
+                    key={i}
+                    onClick={() => setPhotoIdx(i)}
+                    aria-label={`Ver foto ${i + 1}`}
+                    className="h-1.5 rounded-full transition-all duration-300"
+                    style={{
+                      width: i === photoIdx ? 20 : 6,
+                      background: i === photoIdx ? "#2D4530" : "rgba(45,69,48,0.22)",
+                    }}
+                  />
+                ))}
+              </div>
+            )}
+
+            {/* Descripción / Galería Caption */}
+            <p className="text-center text-xs text-stone-500 font-semibold leading-snug mt-1">
+              {business.gallery_caption || "Ver detalles del modelo, precio y stock."}
+            </p>
+          </div>
+        )}
+
       </div>
 
-      {/* ═══════════════════════════════════════════════════════════════════
-          MODAL — Reservar Mesa
-      ═══════════════════════════════════════════════════════════════════ */}
+      {/* MODAL RESERVAS */}
       <AnimatePresence>
         {showReserva && (
           <>
@@ -572,27 +526,15 @@ export default function NegocioDetalle({ business }: Props) {
               transition={{ type: "spring", stiffness: 350, damping: 28 }}
             >
               <div className="bg-white rounded-3xl overflow-hidden shadow-2xl">
-                <div
-                  className="px-6 py-4 flex items-center justify-between"
-                  style={{ background: "#2D4530" }}
-                >
-                  <h2 className="font-bold text-lg" style={{ color: "#E1DBC9" }}>
-                    Reservar mesa
-                  </h2>
-                  <button
-                    onClick={() => setShowReserva(false)}
-                    className="transition-opacity hover:opacity-100"
-                    style={{ color: "rgba(225,219,201,0.55)" }}
-                  >
+                <div className="px-6 py-4 flex items-center justify-between" style={{ background: "#2D4530" }}>
+                  <h2 className="font-bold text-lg" style={{ color: "#E1DBC9" }}>Reservar mesa</h2>
+                  <button onClick={() => setShowReserva(false)} className="transition-opacity hover:opacity-100" style={{ color: "rgba(225,219,201,0.55)" }}>
                     <X size={22} />
                   </button>
                 </div>
-
                 <div className="p-6 space-y-4">
                   <div>
-                    <label className="block text-sm font-medium text-stone-700 mb-1">
-                      Tu nombre *
-                    </label>
+                    <label className="block text-sm font-medium text-stone-700 mb-1">Tu nombre *</label>
                     <input
                       type="text"
                       value={reservaForm.name}
@@ -601,12 +543,9 @@ export default function NegocioDetalle({ business }: Props) {
                       className="w-full px-4 py-2.5 rounded-xl border border-stone-200 text-stone-800 text-sm outline-none focus:ring-2 focus:ring-[#2D4530]/20"
                     />
                   </div>
-
                   <div className="grid grid-cols-2 gap-3">
                     <div>
-                      <label className="block text-sm font-medium text-stone-700 mb-1">
-                        <Calendar size={12} className="inline mr-1" />Fecha *
-                      </label>
+                      <label className="block text-sm font-medium text-stone-700 mb-1"><Calendar size={12} className="inline mr-1" />Fecha *</label>
                       <input
                         type="date"
                         value={reservaForm.date}
@@ -616,9 +555,7 @@ export default function NegocioDetalle({ business }: Props) {
                       />
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-stone-700 mb-1">
-                        <Clock size={12} className="inline mr-1" />Hora *
-                      </label>
+                      <label className="block text-sm font-medium text-stone-700 mb-1"><Clock size={12} className="inline mr-1" />Hora *</label>
                       <input
                         type="time"
                         value={reservaForm.time}
@@ -627,30 +564,21 @@ export default function NegocioDetalle({ business }: Props) {
                       />
                     </div>
                   </div>
-
                   <div>
-                    <label className="block text-sm font-medium text-stone-700 mb-1">
-                      <Users size={12} className="inline mr-1" />Personas *
-                    </label>
+                    <label className="block text-sm font-medium text-stone-700 mb-1"><Users size={12} className="inline mr-1" />Personas *</label>
                     <select
                       value={reservaForm.people}
                       onChange={e => setReservaForm(p => ({ ...p, people: e.target.value }))}
                       className="w-full px-4 py-2.5 rounded-xl border border-stone-200 text-stone-800 text-sm outline-none focus:ring-2 focus:ring-[#2D4530]/20 bg-white"
                     >
                       {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(n => (
-                        <option key={n} value={n}>
-                          {n} {n === 1 ? "persona" : "personas"}
-                        </option>
+                        <option key={n} value={n}>{n} {n === 1 ? "persona" : "personas"}</option>
                       ))}
                       <option value="más de 10">Más de 10</option>
                     </select>
                   </div>
-
                   <div>
-                    <label className="block text-sm font-medium text-stone-700 mb-1">
-                      Aclaraciones{" "}
-                      <span className="text-stone-400 font-normal">(opcional)</span>
-                    </label>
+                    <label className="block text-sm font-medium text-stone-700 mb-1">Aclaraciones <span className="text-stone-400 font-normal">(opcional)</span></label>
                     <textarea
                       value={reservaForm.notes}
                       onChange={e => setReservaForm(p => ({ ...p, notes: e.target.value }))}
@@ -659,7 +587,6 @@ export default function NegocioDetalle({ business }: Props) {
                       className="w-full px-4 py-2.5 rounded-xl border border-stone-200 text-stone-800 text-sm outline-none focus:ring-2 focus:ring-[#2D4530]/20 resize-none"
                     />
                   </div>
-
                   <button
                     onClick={handleEnviarReserva}
                     disabled={!reservaValid}
@@ -669,9 +596,6 @@ export default function NegocioDetalle({ business }: Props) {
                     {WA_SVG}
                     Enviar reserva por WhatsApp
                   </button>
-                  <p className="text-xs text-stone-400 text-center">
-                    Se abrirá WhatsApp con tu reserva lista para enviar
-                  </p>
                 </div>
               </div>
             </motion.div>
