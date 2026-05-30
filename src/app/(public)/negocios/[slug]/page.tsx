@@ -69,6 +69,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 export default async function NegocioDetallePage({ params }: Props) {
   const { slug } = await params
   const supabase = await createClient()
+  const today = new Date().toISOString().split("T")[0]
 
   const { data: business } = await supabase
     .from("businesses")
@@ -90,5 +91,16 @@ export default async function NegocioDetallePage({ params }: Props) {
 
   if (!business) notFound()
 
-  return <NegocioDetalle business={business} />
+  const { data: promotionsData } = await supabase
+    .from("promotions")
+    .select("id, title, description, discount_percentage, discount_label, valid_until")
+    .eq("business_id", business.id)
+    .eq("is_active", true)
+    .gte("valid_until", today)
+    .order("created_at", { ascending: false })
+    .limit(3)
+
+  const activePromotions = promotionsData ?? []
+
+  return <NegocioDetalle business={business} promotions={activePromotions} />
 }

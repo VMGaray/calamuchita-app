@@ -17,17 +17,12 @@ const nextConfig: NextConfig = {
     remotePatterns: [
       {
         protocol: "https",
-        hostname: "mipljgnmpkkfveoaqlyx.supabase.co",
-        pathname: "/storage/v1/object/public/**",
-      },
-      {
-        protocol: "https",
-        hostname: "images.unsplash.com",
+        hostname: "**",
         pathname: "/**",
       },
       {
-        protocol: "https",
-        hostname: "api.mapbox.com",
+        protocol: "http",
+        hostname: "**",
         pathname: "/**",
       },
     ],

@@ -12,12 +12,13 @@ import {
   UtensilsCrossed,
   ArrowLeft,
   Calendar,
-  Users,
   Globe,
   Navigation,
   ChevronLeft,
   ChevronRight,
   X,
+  Tag,
+  Share2,
 } from "lucide-react"
 import Link from "next/link"
 import Image from "next/image"
@@ -92,11 +93,21 @@ function calcIsOpenNow(hours: any[]): boolean {
   )
 }
 
-interface Props {
-  business: any
+interface Promotion {
+  id: string
+  title: string
+  description: string | null
+  discount_percentage: number | null
+  discount_label: string | null
+  valid_until: string | null
 }
 
-export default function NegocioDetalle({ business }: Props) {
+interface Props {
+  business: any
+  promotions?: Promotion[]
+}
+
+export default function NegocioDetalle({ business, promotions = [] }: Props) {
   const cartaRef = useRef<HTMLDivElement>(null)
   const [photoIdx, setPhotoIdx] = useState(0)
   const [showReserva, setShowReserva] = useState(false)
@@ -247,7 +258,7 @@ export default function NegocioDetalle({ business }: Props) {
     <div className="min-h-screen pb-24" style={{ background: "#F0EBE0" }}>
       <div className="max-w-2xl mx-auto px-4 flex flex-col gap-y-4 pt-5">
 
-        <Link href="/negocios" className="inline-flex items-center gap-1.5 text-sm font-medium w-fit transition-opacity hover:opacity-60" style={{ color: "#2D4530" }}>
+        <Link href="/" className="inline-flex items-center gap-1.5 text-sm font-medium w-fit transition-opacity hover:opacity-60" style={{ color: "#2D4530" }}>
           <ArrowLeft size={15} /> Volver
         </Link>
 
@@ -342,6 +353,70 @@ export default function NegocioDetalle({ business }: Props) {
           )}
         </div>
 
+        {/* PROMOCIONES ACTIVAS */}
+        {promotions.length > 0 && (
+          <div className="flex flex-col gap-3">
+            {promotions.map(promo => {
+              const badge = promo.discount_label || (promo.discount_percentage ? `${promo.discount_percentage}% OFF` : "PROMO EXCLUSIVA")
+              const validDate = promo.valid_until
+                ? new Date(promo.valid_until + "T12:00:00").toLocaleDateString("es-AR", { day: "numeric", month: "long", year: "numeric" })
+                : null
+
+              const handleShare = async () => {
+                const url = `${window.location.origin}/negocios/${business.slug}`
+                const text = `¡Mirá esta promo en Calamuchita App! ${business.name} tiene ${badge}. Entrá acá:`
+                if (navigator.share) {
+                  await navigator.share({ title: "Calamuchita App", text, url }).catch(() => {})
+                } else {
+                  await navigator.clipboard.writeText(`${text} ${url}`)
+                }
+              }
+
+              return (
+                <div
+                  key={promo.id}
+                  className="rounded-3xl border border-[#2D4530]/40 overflow-hidden"
+                  style={{ background: "#F0F7F0" }}
+                >
+                  {/* Banner de descuento */}
+                  <div className="px-6 py-4 flex items-center gap-3" style={{ background: "#2D4530" }}>
+                    <Tag size={16} className="text-yellow-400 shrink-0" />
+                    <span className="font-black text-xl tracking-tight text-yellow-400">{badge}</span>
+                    <span className="ml-auto text-xs font-semibold uppercase tracking-widest" style={{ color: "rgba(225,219,201,0.70)" }}>
+                      Promo activa
+                    </span>
+                  </div>
+
+                  {/* Cuerpo */}
+                  <div className="px-6 py-5">
+                    <h3 className="font-bold text-base mb-2" style={{ color: "#2D4530" }}>{promo.title}</h3>
+                    {promo.description && (
+                      <p className="text-sm leading-relaxed whitespace-pre-line" style={{ color: "rgba(45,69,48,0.75)" }}>
+                        {promo.description}
+                      </p>
+                    )}
+
+                    <div className="flex items-center justify-between mt-4 pt-4 border-t border-[#2D4530]/10">
+                      {validDate && (
+                        <span className="text-xs font-medium" style={{ color: "rgba(45,69,48,0.50)" }}>
+                          Válido hasta el <strong style={{ color: "#2D4530" }}>{validDate}</strong>
+                        </span>
+                      )}
+                      <button
+                        onClick={handleShare}
+                        className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold transition-opacity hover:opacity-70 ml-auto"
+                        style={{ background: "rgba(45,69,48,0.08)", color: "#2D4530" }}
+                      >
+                        <Share2 size={12} /> Compartir
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              )
+            })}
+          </div>
+        )}
+
         {/* ACCIONES ESTÁNDAR */}
         {hasActions && (
           <div className="flex flex-wrap gap-3">
@@ -421,7 +496,7 @@ export default function NegocioDetalle({ business }: Props) {
               )}
               <div className="flex-1 aspect-video rounded-2xl overflow-hidden relative bg-stone-100">
                 <div className="absolute inset-0 animate-pulse bg-gradient-to-r from-stone-100 via-stone-50 to-stone-100" />
-                <Image src={photos[photoIdx]} alt={`${business.name} — foto ${photoIdx + 1}`} fill priority={photoIdx === 0} className="object-cover" sizes="(max-width: 640px) calc(100vw - 32px), 640px" quality={85} />
+                <Image src={photos[photoIdx]} alt={`${business.name} — foto ${photoIdx + 1}`} fill priority={photoIdx === 0} className="object-cover" sizes="(max-width: 640px) calc(100vw - 32px), 640px" quality={85} onError={e => { (e.target as HTMLImageElement).src = "/valle.jpg" }} />
               </div>
               {photos.length > 1 && (
                 <button onClick={nextPhoto} aria-label="Foto siguiente" className="shrink-0 w-10 h-10 rounded-full flex items-center justify-center border-2 border-[#2D4530] text-[#2D4530] hover:bg-[#2D4530] hover:text-[#E1DBC9] transition-all active:scale-90">

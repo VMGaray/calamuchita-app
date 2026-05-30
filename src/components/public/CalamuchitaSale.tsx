@@ -44,11 +44,10 @@ function TicketCard({
   onShare: () => void
 }) {
   const biz = promo.businesses
-  
-  // Usamos discount_percentage para generar el label si no existe discount_label
-  const discountLabel =
-    promo.discount_label ||
-    (promo.discount_percentage ? `${promo.discount_percentage}% OFF` : "Oferta especial")
+
+  const percentageLabel = promo.discount_percentage ? `${promo.discount_percentage}% OFF` : null
+  // Si hay porcentaje lo mostramos grande; si solo hay etiqueta, la mostramos grande
+  const bigLabel = percentageLabel ?? promo.discount_label ?? "Oferta especial"
 
   const validDate = promo.valid_until
     ? new Date(promo.valid_until + "T12:00:00").toLocaleDateString("es-AR", {
@@ -63,53 +62,44 @@ function TicketCard({
       whileHover={{ y: -5, boxShadow: "0 16px 40px rgba(45,26,14,0.14)" }}
       transition={{ type: "spring", stiffness: 350, damping: 22 }}
       className="rounded-2xl overflow-hidden border-2 border-dashed"
-      style={{
-        ...ticketMask,
-        borderColor: "#C4A480",
-        background: "#FFFAF4",
-      }}
+      style={{ ...ticketMask, borderColor: "#C4A480", background: "#FFFAF4" }}
     >
-      {/* Discount banner */}
+      {/* Banner de descuento */}
       <div
-        className="flex flex-col items-center justify-center py-6 px-4 text-center"
-        style={{
-          background: "linear-gradient(135deg, #B85C38 0%, #D47A56 100%)",
-        }}
+        className="flex flex-col items-center justify-center py-6 px-4 text-center gap-1.5"
+        style={{ background: "linear-gradient(135deg, #B85C38 0%, #D47A56 100%)" }}
       >
         <p
           className="font-black text-4xl md:text-5xl text-white tracking-tight leading-none"
           style={{ textShadow: "0 2px 8px rgba(0,0,0,0.20)" }}
         >
-          {discountLabel}
+          {bigLabel}
         </p>
-        <p className="text-xs font-semibold mt-2 uppercase tracking-widest" style={{ color: "rgba(255,255,255,0.78)" }}>
+        {/* Etiqueta personalizada como badge secundario (solo si también hay porcentaje) */}
+        {percentageLabel && promo.discount_label && (
+          <span
+            className="text-[10px] font-black uppercase tracking-widest px-3 py-1 rounded-full"
+            style={{ background: "rgba(255,255,255,0.20)", color: "rgba(255,255,255,0.95)" }}
+          >
+            {promo.discount_label}
+          </span>
+        )}
+        <p className="text-xs font-semibold uppercase tracking-widest" style={{ color: "rgba(255,255,255,0.78)" }}>
           {promo.title}
         </p>
       </div>
 
-      {/* Dashed divider */}
-      <div
-        className="mx-4"
-        style={{ borderTop: "2px dashed #D4B896", margin: "0 16px" }}
-      />
+      {/* Separador estilo ticket */}
+      <div style={{ borderTop: "2px dashed #D4B896", margin: "0 16px" }} />
 
-      {/* Details */}
-      <div className="px-4 py-4">
+      {/* Detalles reducidos — sin descripción */}
+      <div className="px-4 py-4 flex flex-col gap-2">
         {biz && (
-          <p className="font-bold text-sm mb-1" style={{ color: "#2D1A0E" }}>
-            {biz.name}
-          </p>
+          <p className="font-bold text-sm" style={{ color: "#2D1A0E" }}>{biz.name}</p>
         )}
-        {promo.description && (
-          <p
-            className="text-xs leading-relaxed mb-3"
-            style={{ color: "rgba(45,26,14,0.58)" }}
-          >
-            {promo.description}
-          </p>
-        )}
+
         {validDate && (
-          <div className="flex items-center gap-1.5 mb-4">
+          <div className="flex items-center gap-1.5">
             <Calendar size={11} style={{ color: "rgba(45,26,14,0.42)" }} />
             <span className="text-xs" style={{ color: "rgba(45,26,14,0.42)" }}>
               Válido hasta: {validDate}
@@ -117,19 +107,14 @@ function TicketCard({
           </div>
         )}
 
-        <div className="flex items-center justify-between gap-2">
+        <div className="flex items-center justify-between gap-2 pt-1">
           <button
             onClick={onShare}
             className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium transition-opacity hover:opacity-70 active:opacity-50"
-            style={{
-              background: "rgba(45,26,14,0.07)",
-              color: "#2D1A0E",
-            }}
+            style={{ background: "rgba(45,26,14,0.07)", color: "#2D1A0E" }}
           >
-            <Share2 size={12} />
-            Compartir
+            <Share2 size={12} /> Compartir
           </button>
-
           {biz && (
             <Link
               href={`/negocios/${biz.slug}`}
