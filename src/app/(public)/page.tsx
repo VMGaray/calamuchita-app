@@ -3,10 +3,7 @@ import CalamuchitaSale from "@/components/public/CalamuchitaSale"
 import PulsoDelValle from "@/components/public/PulsoDelValle"
 import CtaBusiness from "@/components/public/CtaBusiness"
 import LocalidadSelectorWidget from "@/components/public/LocalidadSelectorWidget"
-import WebGLBackground from "@/components/public/WebGLBackgroundLazy"
 import { createClient } from "@/lib/supabase/server"
-
-const BODY_BG = "#E1DBC9"
 
 type FeaturedBusiness = {
   id: string
@@ -94,20 +91,40 @@ export default async function HomePage() {
     (editorialData as EditorialPost[] | null) ?? []
 
   return (
-    <div>
-      <div className="max-w-6xl mx-auto px-4 pt-10 pb-4">
-        <LocalidadSelectorWidget />
-      </div>
+    <div className="bg-[#F5F2EB]">
+      <div className="max-w-6xl mx-auto px-4 pt-4 pb-12">
 
-      <div className="relative overflow-hidden" style={{ background: BODY_BG }}>
-        <WebGLBackground />
-        <div className="relative z-10 max-w-6xl mx-auto px-4 pt-2 pb-10">
-          <JoyasDelValle businesses={featuredBusinesses} />
-          <CalamuchitaSale promotions={activePromotions} />
-          
-          <PulsoDelValle posts={editorialPosts} />
+        {/* 1 — Localidades */}
+        <div className="rounded-3xl border border-[#2D4530]/40 bg-white p-6 md:p-8 my-6 shadow-sm">
+          <LocalidadSelectorWidget />
+        </div>
+
+        {/* 2 — Destacados (sin padding: el carrusel ocupa todo el ancho) */}
+        {featuredBusinesses.length > 0 && (
+          <div className="rounded-3xl border border-[#2D4530]/40 bg-[#E6EBE4] my-6 shadow-sm overflow-hidden">
+            <JoyasDelValle businesses={featuredBusinesses} />
+          </div>
+        )}
+
+        {/* 3 — Promos */}
+        {activePromotions.length > 0 && (
+          <div className="rounded-3xl border border-[#2D4530]/40 bg-[#fdeee6] p-6 md:p-8 my-6 shadow-sm overflow-hidden">
+            <CalamuchitaSale promotions={activePromotions} />
+          </div>
+        )}
+
+        {/* 4 — Editorial */}
+        {editorialPosts.length > 0 && (
+          <div className="rounded-3xl border border-[#2D4530]/40 bg-[#2D4530] p-6 md:p-8 my-6 shadow-sm overflow-hidden">
+            <PulsoDelValle posts={editorialPosts} />
+          </div>
+        )}
+
+        {/* 5 — CTA suscripción */}
+        <div className="rounded-3xl border border-[#2D4530]/40 bg-[#FAF8F5] my-6 shadow-sm overflow-hidden">
           <CtaBusiness />
         </div>
+
       </div>
     </div>
   )

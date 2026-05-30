@@ -34,8 +34,7 @@ export default function PulsoDelValle({ posts }: Props) {
   }
 
   return (
-    /* ── Sección con fondo verde pino oscuro ─────────────────────── */
-    <section className="bg-[#2D4530] rounded-3xl py-8 px-4 md:px-8 my-4 md:my-6">
+    <section>
 
       {/* ── Header ───────────────────────────────────────────────── */}
       <div className="flex items-end justify-between mb-6">
@@ -54,7 +53,7 @@ export default function PulsoDelValle({ posts }: Props) {
           </h2>
         </div>
 
-        {/* Flechas — solo desktop, visibles sobre el fondo verde */}
+        {/* Flechas — solo desktop */}
         {posts.length > 2 && (
           <div className="hidden md:flex items-center gap-2">
             {(["left", "right"] as const).map(dir => (

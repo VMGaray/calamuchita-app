@@ -1,22 +1,21 @@
 "use client"
 
-import { useEffect, useState } from "react"
-import { motion, useSpring } from "framer-motion"
+import { useEffect } from "react"
+import { motion, useMotionValue, useSpring } from "framer-motion"
 
 export default function ScrollProgress() {
-  const [progress, setProgress] = useState(0)
+  const progress = useMotionValue(0)
   const smoothProgress = useSpring(progress, { stiffness: 200, damping: 30 })
 
   useEffect(() => {
     const handleScroll = () => {
       const total = document.documentElement.scrollHeight - window.innerHeight
-      const current = window.scrollY
-      setProgress(total > 0 ? current / total : 0)
+      progress.set(total > 0 ? window.scrollY / total : 0)
     }
 
     window.addEventListener("scroll", handleScroll, { passive: true })
     return () => window.removeEventListener("scroll", handleScroll)
-  }, [])
+  }, [progress])
 
   return (
     <motion.div

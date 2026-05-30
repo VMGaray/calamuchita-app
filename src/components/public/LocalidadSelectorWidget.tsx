@@ -13,13 +13,7 @@ export default function LocalidadSelectorWidget() {
   const shown = showAll ? LOCALIDADES : MAIN_LOCALIDADES
 
   return (
-    <div
-      className="rounded-3xl px-6 py-7 md:px-8"
-      style={{
-        background: "rgba(45,69,48,0.06)",
-        border: "1px solid rgba(45,69,48,0.10)",
-      }}
-    >
+    <div>
       {/* Header */}
       <div className="flex items-center gap-3 mb-5">
         <div className="flex items-center gap-3">

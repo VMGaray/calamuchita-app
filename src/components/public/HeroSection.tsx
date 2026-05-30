@@ -94,7 +94,7 @@ export default function HeroSection() {
         />
         <MagneticButton
           onClick={handleSearch}
-          className="px-6 h-full text-sm font-medium cursor-pointer"
+          className="flex items-center justify-center px-6 h-full text-sm font-medium cursor-pointer"
           style={{ background: "#2D4530", color: "#E1DBC9" }}
         >
           Buscar

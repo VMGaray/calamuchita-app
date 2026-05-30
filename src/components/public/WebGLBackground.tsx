@@ -36,9 +36,9 @@ export default function WebGLBackground() {
       float fbm(vec2 p){float v=0.,a=0.5;for(int i=0;i<3;i++){v+=a*noise(p);p=p*2.1+vec2(1.7,9.2);a*=0.5;}return v;}
       void main(){
         vec2 uv=gl_FragCoord.xy/res; uv.y=1.-uv.y;
-        vec3 base=vec3(0.945,0.898,0.847);
-        vec3 warm=vec3(0.925,0.820,0.745);
-        vec3 accent=vec3(0.900,0.710,0.620);
+        vec3 base=vec3(0.933,0.949,0.933);
+        vec3 warm=vec3(0.910,0.929,0.910);
+        vec3 accent=vec3(0.882,0.910,0.878);
         float n1=fbm(uv*2.2+vec2(t*0.05,0.));
         float n2=fbm(uv*1.6-vec2(0.,t*0.035)+vec2(2.3,1.1));
         vec3 col=mix(base,warm,n1*0.7);
@@ -46,7 +46,7 @@ export default function WebGLBackground() {
         float vig=1.-length((uv-0.5)*1.4);
         col=mix(col*0.93,col,smoothstep(0.,1.,vig));
         vec2 m=mouse/res; m.y=1.-m.y;
-        col+=vec3(0.05,0.02,0.01)*exp(-length(uv-m)*2.5)*0.4;
+        col+=vec3(0.01,0.04,0.01)*exp(-length(uv-m)*2.5)*0.4;
         gl_FragColor=vec4(clamp(col,0.,1.),1.);
       }
     `
@@ -110,10 +110,10 @@ export default function WebGLBackground() {
         if (p.y < 0) p.y = pc!.height; if (p.y > pc!.height) p.y = 0
         const o = p.o * (0.4 + 0.6 * Math.sin(p.tw))
         ctx!.beginPath(); ctx!.arc(p.x, p.y, p.r, 0, Math.PI * 2)
-        ctx!.fillStyle = `rgba(255,240,220,${o})`; ctx!.fill()
+        ctx!.fillStyle = `rgba(200,230,200,${o})`; ctx!.fill()
         if (Math.sin(p.tw * 2) > 0.85) {
           ctx!.beginPath(); ctx!.arc(p.x, p.y, p.r * 4, 0, Math.PI * 2)
-          ctx!.fillStyle = `rgba(255,220,190,${o * 0.15})`; ctx!.fill()
+          ctx!.fillStyle = `rgba(180,220,180,${o * 0.15})`; ctx!.fill()
         }
       })
     }

@@ -23,8 +23,6 @@ type Promotion = {
   businesses: PromoBusiness | null
 }
 
-const SECTION_BG = "#EBE3D5"
-
 const ticketMask: React.CSSProperties = {
   maskImage: [
     "radial-gradient(circle 15px at 0px 50%, transparent 14px, black 15px)",
@@ -196,10 +194,7 @@ export default function CalamuchitaSale({
   }
 
   return (
-    <section
-      className="mb-12 rounded-3xl px-6 md:px-8 py-8"
-      style={{ background: SECTION_BG }}
-    >
+    <section>
       <AnimateIn direction="left">
         <div className="flex items-center gap-2 mb-1">
           <Tag size={14} style={{ color: "#B85C38" }} />
