@@ -17,6 +17,7 @@ import {
   ChevronLeft,
   ChevronRight,
   X,
+  Users,
   Tag,
   Share2,
 } from "lucide-react"
