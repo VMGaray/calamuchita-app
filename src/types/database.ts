@@ -167,9 +167,11 @@ export interface UsefulContact {
   description: string | null
   phone: string | null
   phone_2: string | null
+  phones: ServicePhone[]
   address: string | null
   schedule: string | null
   category: string
+  locality_id: string | null
   sort_order: number
   is_active: boolean
   created_at: string
@@ -192,6 +194,12 @@ export interface Locality {
   created_at: string
 }
 
+export interface ServicePhone {
+  label: string
+  phone: string
+  is_whatsapp: boolean
+}
+
 export interface UtilityService {
   id: string
   locality_id: string
@@ -199,6 +207,7 @@ export interface UtilityService {
   category: string
   phone: string | null
   phone_2: string | null
+  phones: ServicePhone[]
   address: string | null
   description: string | null
   hours: string | null
