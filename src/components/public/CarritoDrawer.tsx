@@ -237,14 +237,14 @@ export default function CarritoDrawer({
                             {business.offers_takeaway && (
                               <button
                                 onClick={() => setOrderType("takeaway")}
-                                className="flex flex-col items-center gap-1.5 p-3 rounded-xl border-2 transition-all bg-white"
+                                className="flex flex-col items-center gap-1.5 p-3 rounded-xl border-2 transition-all"
                                 style={{
-                                  borderColor: orderType === "takeaway" ? "#2D4530" : "transparent",
-                                  background: orderType === "takeaway" ? "rgba(45,69,48,0.06)" : "white",
+                                  borderColor: orderType === "takeaway" ? "#2D4530" : "#D1D5DB",
+                                  background: orderType === "takeaway" ? "#2D4530" : "white",
                                 }}
                               >
-                                <ShoppingBag size={18} style={{ color: orderType === "takeaway" ? "#2D4530" : "#6B7B84" }} />
-                                <span className="text-xs font-medium" style={{ color: orderType === "takeaway" ? "#2D4530" : "#6B7B84" }}>
+                                <ShoppingBag size={18} style={{ color: orderType === "takeaway" ? "white" : "#6B7B84" }} />
+                                <span className="text-xs font-semibold" style={{ color: orderType === "takeaway" ? "white" : "#6B7B84" }}>
                                   Take away
                                 </span>
                               </button>
@@ -254,12 +254,12 @@ export default function CarritoDrawer({
                                 onClick={() => setOrderType("delivery")}
                                 className="flex flex-col items-center gap-1.5 p-3 rounded-xl border-2 transition-all"
                                 style={{
-                                  borderColor: orderType === "delivery" ? "#2D4530" : "transparent",
-                                  background: orderType === "delivery" ? "rgba(45,69,48,0.06)" : "white",
+                                  borderColor: orderType === "delivery" ? "#2D4530" : "#D1D5DB",
+                                  background: orderType === "delivery" ? "#2D4530" : "white",
                                 }}
                               >
-                                <Truck size={18} style={{ color: orderType === "delivery" ? "#2D4530" : "#6B7B84" }} />
-                                <span className="text-xs font-medium" style={{ color: orderType === "delivery" ? "#2D4530" : "#6B7B84" }}>
+                                <Truck size={18} style={{ color: orderType === "delivery" ? "white" : "#6B7B84" }} />
+                                <span className="text-xs font-semibold" style={{ color: orderType === "delivery" ? "white" : "#6B7B84" }}>
                                   Delivery
                                 </span>
                               </button>

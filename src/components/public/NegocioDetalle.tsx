@@ -224,8 +224,8 @@ export default function NegocioDetalle({ business, promotions = [] }: Props) {
     : null
 
   const photos: string[] =
-    Array.isArray(business.images) && business.images.length > 0
-      ? business.images
+    Array.isArray(business.business_photos) && business.business_photos.length > 0
+      ? business.business_photos.map((p: { url: string }) => p.url)
       : business.cover_url
       ? [business.cover_url]
       : []

@@ -57,7 +57,7 @@ export default async function PublicLayout({
             <ContextBar />
           </div>
 
-          <main className="flex-1 relative z-10">
+          <main className="flex-1 relative">
             {children}
           </main>
 

@@ -76,6 +76,7 @@ export default async function NegocioDetallePage({ params }: Props) {
     .select(`
       *,
       business_hours (*),
+      business_photos (*),
       menu_categories (
         *,
         menu_items (*)
