@@ -85,9 +85,11 @@ export default function AdminEventosPage() {
       if (imageUrls.length > 0) payload.image_url = imageUrls
 
       if (editingId) {
-        await supabase.from("events").update(payload).eq("id", editingId)
+        const { error: updateError } = await supabase.from("events").update(payload).eq("id", editingId)
+        if (updateError) throw updateError
       } else {
-        await supabase.from("events").insert([payload])
+        const { error: insertError } = await supabase.from("events").insert([payload])
+        if (insertError) throw insertError
       }
 
       handleCancel()

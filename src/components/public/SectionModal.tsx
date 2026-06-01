@@ -10,7 +10,7 @@ import { ShoppingBag, MapPin, Check } from "lucide-react"
 import {
   Utensils, Coffee, Beer, Bike, Clock, Package,
   Wrench, Zap, Flame, Car, Building, Paintbrush, Hammer, KeyRound, Leaf, Waves, Home, Bug, Droplets, Sparkles,
-  Stethoscope, Pill, Brain, Smile, Eye, PawPrint, AlertCircle,
+  Stethoscope, Pill, Brain, Smile, Eye, PawPrint, AlertCircle, Ambulance,
   GraduationCap, BookOpen, Languages, Users, Music, Trophy,
   Hotel, Map, Tent, Activity, Compass, Plane,
   PartyPopper, ChefHat, Mic, Medal, Palette, Baby,
@@ -28,7 +28,7 @@ const categoryIcons: Record<string, any> = {
   "Pintor": Paintbrush, "Plomería": Wrench, "Zinguero": Home,
   "Clínicas": Building, "Especialidades": Stethoscope,
   "Hospitales y Dispensarios": AlertCircle, "Laboratorios": FlaskConical,
-  "Psicología": Brain, "Terapias alternativas": Leaf,
+  "Psicología": Brain, "Terapias alternativas": Leaf, "Traslado de pacientes": Ambulance,
   "Arte y Música": Music, "Colegios": GraduationCap, "Deporte": Trophy,
   "Idiomas": Languages, "Maestras/os Particulares": Users,
   "Actividades y Paseos": Activity, "Agencia de Viajes": Plane,

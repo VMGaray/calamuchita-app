@@ -34,6 +34,7 @@ export const sectionCategories = {
     { label: "Laboratorios", desc: "Análisis clínicos y diagnóstico", href: "/directorio/health?cat=laboratorios", bg: "bg-brand-slate/10", color: "text-brand-slate" },
     { label: "Psicología", desc: "Psicólogos y salud mental", href: "/directorio/health?cat=psicologia", bg: "bg-brand-slate/10", color: "text-brand-slate" },
     { label: "Terapias alternativas", desc: "Kinesiología, acupuntura y más", href: "/directorio/health?cat=terapias", bg: "bg-brand-pine/10", color: "text-brand-pine" },
+    { label: "Traslado de pacientes", desc: "Ambulancias y traslados", href: "/directorio/health?cat=traslado", bg: "bg-brand-slate/10", color: "text-brand-slate" },
     { label: "Todos", desc: "Ver todos los servicios de salud", href: "/directorio/health", bg: "bg-brand-sand/50", color: "text-brand-charcoal" },
   ],
   education: [
