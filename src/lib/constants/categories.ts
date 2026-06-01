@@ -1,7 +1,7 @@
 import {
   Wrench, Zap, Flame, Car, Building, Paintbrush, Hammer, KeyRound, Leaf, Waves, Home, Bug, Sparkles, Droplets,
   Store, Shirt, Gem, HardHat, Baby, Smartphone, Armchair, Dog, HeartPulse,
-  Brain, AlertCircle, FlaskConical,
+  Brain, AlertCircle, FlaskConical, Stethoscope,
   GraduationCap, BookOpen, Languages, Users, Music, Trophy, Palette,
   Hotel, Map, Tent, Activity, Compass, Bike, Plane,
   Utensils, Coffee, Beer, ShoppingBag, Clock
@@ -57,7 +57,7 @@ export const MASTER_CATEGORIES = {
     label: "Salud",
     subcategories: [
       { label: "Clínicas", icon: Building, bg: "bg-blue-50", color: "text-blue-600" },
-      { label: "Especialidades", icon: Brain, bg: "bg-purple-50", color: "text-purple-600" },
+      { label: "Especialidades", icon: Stethoscope, bg: "bg-purple-50", color: "text-purple-600" },
       { label: "Hospitales y Dispensarios", icon: AlertCircle, bg: "bg-red-50", color: "text-red-600" },
       { label: "Laboratorios", icon: FlaskConical, bg: "bg-cyan-50", color: "text-cyan-600" },
       { label: "Psicología", icon: Brain, bg: "bg-indigo-50", color: "text-indigo-600" },

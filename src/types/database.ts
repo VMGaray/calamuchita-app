@@ -174,6 +174,9 @@ export interface UsefulContact {
   locality_id: string | null
   sort_order: number
   is_active: boolean
+  specialties: string | null
+  has_guardia: boolean
+  is_on_duty: boolean
   created_at: string
   updated_at: string
 }

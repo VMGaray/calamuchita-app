@@ -26,7 +26,7 @@ const categoryIcons: Record<string, any> = {
   "Electricidad": Zap, "Gasista": Flame, "Herrero": Hammer, "Jardinero": Leaf,
   "Limpieza": Sparkles, "Mecánica": Car, "Perforaciones": Droplets, "Piletero": Waves,
   "Pintor": Paintbrush, "Plomería": Wrench, "Zinguero": Home,
-  "Clínicas": Building, "Especialidades": Brain,
+  "Clínicas": Building, "Especialidades": Stethoscope,
   "Hospitales y Dispensarios": AlertCircle, "Laboratorios": FlaskConical,
   "Psicología": Brain, "Terapias alternativas": Leaf,
   "Arte y Música": Music, "Colegios": GraduationCap, "Deporte": Trophy,
