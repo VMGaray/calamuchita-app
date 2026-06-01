@@ -3,7 +3,7 @@
 import { Download, Printer, QrCode } from "lucide-react"
 import { QRCodeCanvas } from "qrcode.react"
 
-const APP_URL = "https://calamuchita.app"
+const APP_URL = "https://www.calamuchita-app.com.ar"
 const QR_ID = "qr-app-main"
 
 const PIN_SVG = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="-3 -3 30 30">
@@ -94,7 +94,7 @@ function buildStickerCanvas(qrCanvas: HTMLCanvasElement): HTMLCanvasElement {
   // URL — very small
   ctx.fillStyle = "rgba(245,240,232,0.45)"
   ctx.font = "22px Arial, Helvetica, sans-serif"
-  ctx.fillText("calamuchita.app", S / 2, S - 68)
+  ctx.fillText("calamuchita-app.com.ar", S / 2, S - 68)
 
   return c
 }

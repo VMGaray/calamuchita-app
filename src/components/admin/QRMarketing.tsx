@@ -9,7 +9,7 @@ interface Props {
   section: string
 }
 
-const BASE_URL = "https://calamuchita.app"
+const BASE_URL = "https://www.calamuchita-app.com.ar"
 const QR_ID = "qr-mkt-canvas"
 
 // Inline PIN icon — white rounded bg so it's visible against the green QR dots
