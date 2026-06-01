@@ -89,38 +89,74 @@ function PhonesEditor({ phones, onChange }: { phones: ServicePhone[]; onChange: 
 // ── Main component ────────────────────────────────────────────────────────────
 
 export default function AdminServiciosUtiles() {
-  const [localities, setLocalities]       = useState<Locality[]>([])
-  const [entries, setEntries]             = useState<UsefulContact[]>([])
-  const [loading, setLoading]             = useState(true)
-  const [filterLocality, setFilterLocality] = useState<string>("")
+  const [localities, setLocalities]     = useState<Locality[]>([])
+  const [selectedLocality, setSelected] = useState<string>("")
+  const [entries, setEntries]           = useState<UsefulContact[]>([])
+  const [allEntries, setAllEntries]     = useState<Pick<UsefulContact, "id" | "locality_id" | "category">[]>([])
+  const [loadingLocs, setLoadingLocs]   = useState(true)
+  const [loadingEntries, setLoadingEntries] = useState(false)
   const [filterCategory, setFilterCategory] = useState<string>("")
-  const [showForm, setShowForm]           = useState(false)
-  const [editing, setEditing]             = useState<UsefulContact | null>(null)
-  const [form, setForm]                   = useState({ ...EMPTY_FORM })
-  const [phones, setPhones]               = useState<ServicePhone[]>([])
-  const [saving, setSaving]               = useState(false)
-  const [saveError, setSaveError]         = useState<string | null>(null)
+  const [showForm, setShowForm]         = useState(false)
+  const [editing, setEditing]           = useState<UsefulContact | null>(null)
+  const [form, setForm]                 = useState({ ...EMPTY_FORM })
+  const [phones, setPhones]             = useState<ServicePhone[]>([])
+  const [saving, setSaving]             = useState(false)
+  const [saveError, setSaveError]       = useState<string | null>(null)
 
-  const fetchAll = async () => {
-    setLoading(true)
+  // Cargar localidades y TODOS los entries (para contar por pueblo)
+  useEffect(() => {
+    const supabase = createClient()
+    Promise.all([
+      supabase.from("localities").select("*").order("sort_order"),
+      supabase.from("useful_contacts").select("id, locality_id, category"),
+    ]).then(([{ data: locs }, { data: all }]) => {
+      const locList = locs || []
+      setLocalities(locList)
+      setAllEntries(all || [])
+      if (locList.length > 0) setSelected(locList[0].id)
+      setLoadingLocs(false)
+    })
+  }, [])
+
+  // Cargar entries cuando cambia la localidad seleccionada
+  useEffect(() => {
+    if (!selectedLocality) return
+    setLoadingEntries(true)
+    setFilterCategory("")
+    createClient()
+      .from("useful_contacts")
+      .select("*")
+      .eq("locality_id", selectedLocality)
+      .order("sort_order", { ascending: true })
+      .then(({ data }) => {
+        setEntries(data || [])
+        setLoadingEntries(false)
+      })
+  }, [selectedLocality])
+
+  const refreshEntries = async () => {
+    if (!selectedLocality) return
     const { data } = await createClient()
       .from("useful_contacts")
       .select("*")
+      .eq("locality_id", selectedLocality)
       .order("sort_order", { ascending: true })
     setEntries(data || [])
-    setLoading(false)
+    // Refrescar conteos globales
+    const { data: all } = await createClient()
+      .from("useful_contacts")
+      .select("id, locality_id, category")
+    setAllEntries(all || [])
   }
 
-  useEffect(() => {
-    fetchAll()
-    createClient().from("localities").select("*").order("sort_order")
-      .then(({ data }) => setLocalities(data || []))
-  }, [])
+  const countFor = (localityId: string) =>
+    allEntries.filter(e => e.locality_id === localityId).length
 
   const openNew = () => {
     setEditing(null)
-    setForm({ ...EMPTY_FORM })
+    setForm({ ...EMPTY_FORM, locality_id: selectedLocality })
     setPhones([])
+    setSaveError(null)
     setShowForm(true)
   }
 
@@ -135,7 +171,7 @@ export default function AdminServiciosUtiles() {
       specialties: e.specialties  || "",
       has_guardia: e.has_guardia  ?? false,
       is_on_duty:  e.is_on_duty   ?? false,
-      locality_id: e.locality_id  || "",
+      locality_id: e.locality_id  || selectedLocality,
       sort_order:  e.sort_order,
     })
     const existing: ServicePhone[] = e.phones?.length
@@ -145,6 +181,7 @@ export default function AdminServiciosUtiles() {
           ...(e.phone_2 ? [{ label: "Secundario", phone: e.phone_2, is_whatsapp: false }] : []),
         ]
     setPhones(existing)
+    setSaveError(null)
     setShowForm(true)
   }
 
@@ -180,7 +217,7 @@ export default function AdminServiciosUtiles() {
     if (error) { setSaveError(error.message); return }
     setShowForm(false)
     setEditing(null)
-    await fetchAll()
+    await refreshEntries()
   }
 
   const handleToggle = async (id: string, current: boolean) => {
@@ -190,13 +227,14 @@ export default function AdminServiciosUtiles() {
 
   const handleDuty = async (id: string, current: boolean) => {
     await createClient().from("useful_contacts").update({ is_on_duty: !current }).eq("id", id)
-    await fetchAll()
+    await refreshEntries()
   }
 
   const handleDelete = async (id: string) => {
     if (!confirm("¿Eliminar esta entrada?")) return
     await createClient().from("useful_contacts").delete().eq("id", id)
     setEntries(prev => prev.filter(e => e.id !== id))
+    setAllEntries(prev => prev.filter(e => e.id !== id))
   }
 
   const set = (k: string, v: string | number | boolean) => setForm(p => ({ ...p, [k]: v }))
@@ -204,26 +242,57 @@ export default function AdminServiciosUtiles() {
   const isDutyCategory   = DUTY_CATEGORIES.has(form.category)
   const isHealthCategory = HEALTH_CATEGORIES.has(form.category)
   const usedCategories   = [...new Set(entries.map(e => e.category))]
+  const filtered = filterCategory ? entries.filter(e => e.category === filterCategory) : entries
+  const selectedLocalityName = localities.find(l => l.id === selectedLocality)?.name ?? ""
 
-  const filtered = entries.filter(e => {
-    if (filterLocality && e.locality_id !== filterLocality) return false
-    if (filterCategory && e.category !== filterCategory) return false
-    return true
-  })
+  if (loadingLocs) {
+    return <div className="space-y-2">{[1,2,3].map(i => <div key={i} className="bg-white rounded-xl h-10 animate-pulse border border-stone-200" />)}</div>
+  }
 
   return (
     <div className="space-y-5">
-      {/* Filters + New button */}
+
+      {/* ── Selector de pueblo ── */}
+      <div>
+        <p className="text-xs font-medium text-stone-500 mb-2 flex items-center gap-1.5">
+          <MapPin size={12} /> Seleccioná un pueblo
+        </p>
+        <div className="flex flex-wrap gap-2">
+          {localities.map(loc => {
+            const count = countFor(loc.id)
+            const active = loc.id === selectedLocality
+            return (
+              <button
+                key={loc.id}
+                onClick={() => setSelected(loc.id)}
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-medium transition-all border"
+                style={active
+                  ? { background: "#2D4530", color: "white", borderColor: "#2D4530" }
+                  : { background: "white", color: "#3C3C3C", borderColor: "rgba(45,69,48,0.15)" }}
+              >
+                {loc.name}
+                {count > 0 && (
+                  <span
+                    className="text-[10px] font-bold px-1.5 py-0.5 rounded-full"
+                    style={active
+                      ? { background: "rgba(255,255,255,0.2)", color: "white" }
+                      : { background: "rgba(45,69,48,0.10)", color: "#2D4530" }}
+                  >
+                    {count}
+                  </span>
+                )}
+              </button>
+            )
+          })}
+        </div>
+      </div>
+
+      {/* ── Filtros de categoría + botón Nuevo ── */}
       <div className="flex flex-wrap items-start gap-3">
         <div className="flex flex-wrap gap-1.5 flex-1">
-          <select value={filterLocality} onChange={e => setFilterLocality(e.target.value)}
-            className="px-3 py-1.5 rounded-xl border border-stone-200 text-xs text-stone-800 bg-white outline-none focus:ring-2 focus:ring-[#A3B18A]/50">
-            <option value="">Todas las localidades</option>
-            {localities.map(l => <option key={l.id} value={l.id}>{l.name}</option>)}
-          </select>
           <button onClick={() => setFilterCategory("")}
             className={`px-3 py-1.5 rounded-xl text-xs border transition-colors ${filterCategory === "" ? "bg-[#2D4530] text-white border-[#2D4530]" : "bg-white text-stone-600 border-stone-200 hover:border-stone-300"}`}>
-            Todos
+            Todas
           </button>
           {usedCategories.map(cat => (
             <button key={cat} onClick={() => setFilterCategory(cat)}
@@ -234,25 +303,31 @@ export default function AdminServiciosUtiles() {
         </div>
         <button onClick={openNew}
           className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-[#2D4530] text-white text-sm font-medium hover:bg-[#3a5a3e] transition-colors flex-shrink-0">
-          <Plus size={14} /> Nuevo
+          <Plus size={14} /> Nuevo en {selectedLocalityName}
         </button>
       </div>
 
-      {/* List */}
-      {loading ? (
-        <div className="space-y-2">
-          {[1,2,3].map(i => <div key={i} className="bg-white rounded-xl h-14 animate-pulse border border-stone-200" />)}
-        </div>
+      {/* ── Lista ── */}
+      {loadingEntries ? (
+        <div className="space-y-2">{[1,2,3].map(i => <div key={i} className="bg-white rounded-xl h-14 animate-pulse border border-stone-200" />)}</div>
       ) : filtered.length === 0 ? (
-        <div className="bg-white rounded-2xl border border-stone-200 p-12 text-center">
-          <p className="text-sm text-stone-400">Sin entradas cargadas</p>
+        <div className="bg-white rounded-2xl border border-stone-200 p-10 text-center">
+          <MapPin size={20} className="mx-auto mb-2 text-stone-300" />
+          <p className="text-sm text-stone-400">
+            {entries.length === 0
+              ? `Sin entradas para ${selectedLocalityName}`
+              : "Sin entradas en esta categoría"}
+          </p>
+          <button onClick={openNew}
+            className="mt-4 flex items-center gap-1.5 px-4 py-2 rounded-xl bg-[#2D4530] text-white text-sm font-medium hover:bg-[#3a5a3e] transition-colors mx-auto">
+            <Plus size={14} /> Agregar primera entrada
+          </button>
         </div>
       ) : (
         <div className="bg-white rounded-2xl border border-stone-200 overflow-hidden">
           {filtered.map((entry, i) => {
-            const catLabel   = CATEGORIES.find(c => c.value === entry.category)?.label ?? entry.category
-            const isDuty     = DUTY_CATEGORIES.has(entry.category)
-            const locName    = localities.find(l => l.id === entry.locality_id)?.name
+            const catLabel  = CATEGORIES.find(c => c.value === entry.category)?.label ?? entry.category
+            const isDuty    = DUTY_CATEGORIES.has(entry.category)
             const phoneCount = entry.phones?.length || (entry.phone ? 1 : 0) + (entry.phone_2 ? 1 : 0)
             return (
               <div key={entry.id}
@@ -261,10 +336,6 @@ export default function AdminServiciosUtiles() {
                   <div className="flex items-center gap-2 flex-wrap">
                     <p className="text-sm font-medium text-stone-800">{entry.title}</p>
                     <span className="text-[10px] px-2 py-0.5 rounded-full bg-stone-100 text-stone-500">{catLabel}</span>
-                    {locName
-                      ? <span className="text-[10px] px-2 py-0.5 rounded-full bg-green-50 text-green-600 flex items-center gap-1"><MapPin size={8} />{locName}</span>
-                      : <span className="text-[10px] px-2 py-0.5 rounded-full bg-stone-100 text-stone-400">Global</span>
-                    }
                     {isDuty && entry.is_on_duty && (
                       <span className="text-[10px] px-2 py-0.5 rounded-full font-semibold" style={{ background: "rgba(234,179,8,0.15)", color: "#854d0e" }}>
                         ⚡ De turno
@@ -277,7 +348,6 @@ export default function AdminServiciosUtiles() {
                     {entry.address && <p className="text-xs text-stone-400 truncate max-w-[200px]">{entry.address}</p>}
                   </div>
                 </div>
-
                 {isDuty && (
                   <button onClick={() => handleDuty(entry.id, entry.is_on_duty)}
                     className="flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-medium transition-colors"
@@ -303,13 +373,13 @@ export default function AdminServiciosUtiles() {
         </div>
       )}
 
-      {/* Form modal */}
+      {/* ── Form modal ── */}
       {showForm && (
         <div className="fixed inset-0 z-50 flex items-end md:items-center justify-center p-4 bg-black/40 backdrop-blur-sm">
           <div className="bg-white rounded-2xl w-full max-w-md shadow-xl max-h-[92vh] overflow-y-auto">
             <div className="sticky top-0 bg-white px-6 pt-5 pb-3 border-b border-stone-100 z-10">
               <h3 className="text-base font-semibold text-stone-800">
-                {editing ? "Editar entrada" : "Nueva entrada"}
+                {editing ? "Editar entrada" : `Nueva entrada — ${localities.find(l => l.id === form.locality_id)?.name ?? "Global"}`}
               </h3>
             </div>
 
@@ -388,7 +458,7 @@ export default function AdminServiciosUtiles() {
                 </label>
               )}
 
-              {/* De turno (farmacia / veterinaria) */}
+              {/* De turno */}
               {isDutyCategory && (
                 <label className="flex items-center gap-2.5 cursor-pointer rounded-xl p-2.5"
                   style={{ background: form.is_on_duty ? "rgba(234,179,8,0.10)" : "rgba(45,69,48,0.04)", border: "1px solid", borderColor: form.is_on_duty ? "rgba(234,179,8,0.3)" : "rgba(45,69,48,0.1)" }}>
