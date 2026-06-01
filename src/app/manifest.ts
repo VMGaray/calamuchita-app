@@ -48,7 +48,6 @@ export default function manifest(): MetadataRoute.Manifest {
         src: "/valle.jpg",
         sizes: "1280x720",
         type: "image/jpeg",
-        // @ts-expect-error — form_factor is valid W3C spec but not yet in Next.js types
         form_factor: "wide",
         label: "Calamuchita App — Vista principal",
       },

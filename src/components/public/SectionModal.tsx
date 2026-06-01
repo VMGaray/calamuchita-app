@@ -14,9 +14,9 @@ import {
   GraduationCap, BookOpen, Languages, Users, Music, Trophy,
   Hotel, Map, Tent, Activity, Compass, Plane,
   PartyPopper, ChefHat, Mic, Medal, Palette, Baby,
-  Store, Salad, Shirt, Gem, HardHat, MoreHorizontal,
+  Store, Salad, Shirt, Gem, MoreHorizontal,
   Clock3, Landmark, Lightbulb, Bus, Info,
-  Armchair, Dog, Smartphone, FlaskConical, Package
+  Armchair, Dog, Smartphone, FlaskConical
 } from "lucide-react"
 
 const categoryIcons: Record<string, any> = {
