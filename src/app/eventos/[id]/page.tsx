@@ -35,8 +35,8 @@ export default function EventoDetalle() {
       {images.length > 0 ? (
         <div className="flex gap-4 overflow-x-auto p-6 pt-24 snap-x">
           {images.map((url, index) => (
-            <div key={index} className="relative h-[400px] min-w-[85%] md:min-w-[400px] rounded-[40px] overflow-hidden snap-center shadow-xl flex-shrink-0">
-              <img src={url} className="w-full h-full object-cover" alt={`${event.title} - ${index + 1}`} />
+            <div key={index} className="relative h-[400px] min-w-[85%] md:min-w-[400px] rounded-[40px] overflow-hidden snap-center shadow-xl flex-shrink-0 bg-[#2D4530]">
+              <img src={url} className="w-full h-full object-contain" alt={`${event.title} - ${index + 1}`} />
             </div>
           ))}
         </div>

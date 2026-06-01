@@ -207,7 +207,7 @@ export default function AdminEventosPage() {
                   {/* Miniatura */}
                   <div className="w-16 h-16 rounded-xl overflow-hidden flex-shrink-0 bg-stone-100 flex items-center justify-center">
                     {images[0] ? (
-                      <Image src={images[0]} alt={event.title} width={64} height={64} className="w-full h-full object-cover" />
+                      <Image src={images[0]} alt={event.title} width={64} height={64} className="w-full h-full object-contain" />
                     ) : (
                       <ImageIcon size={20} className="text-stone-300" />
                     )}

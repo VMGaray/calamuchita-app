@@ -22,13 +22,13 @@ export default function EventCard({ event }: EventCardProps) {
   return (
     <div className="bg-white rounded-[32px] overflow-hidden border border-stone-100 shadow-sm hover:shadow-md transition-all group">
       {/* Imagen del Evento */}
-      <div className="relative h-56 w-full overflow-hidden">
+      <div className="relative h-56 w-full overflow-hidden bg-stone-100">
         {mainImage ? (
-          <Image 
+          <Image
             src={mainImage}
             alt={event.title}
             fill
-            className="object-cover group-hover:scale-105 transition-transform duration-500"
+            className="object-contain"
           />
         ) : (
           <div className="w-full h-full bg-stone-100 flex items-center justify-center">
