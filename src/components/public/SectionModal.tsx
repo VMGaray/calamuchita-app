@@ -28,7 +28,7 @@ const categoryIcons: Record<string, any> = {
   "Pintor": Paintbrush, "Plomería": Wrench, "Zinguero": Home,
   "Clínicas": Building, "Especialidades": Brain,
   "Hospitales y Dispensarios": AlertCircle, "Laboratorios": FlaskConical,
-  "Terapias alternativas": Leaf,
+  "Psicología": Brain, "Terapias alternativas": Leaf,
   "Arte y Música": Music, "Colegios": GraduationCap, "Deporte": Trophy,
   "Idiomas": Languages, "Maestras/os Particulares": Users,
   "Actividades y Paseos": Activity, "Agencia de Viajes": Plane,
