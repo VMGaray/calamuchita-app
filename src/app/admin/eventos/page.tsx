@@ -19,6 +19,8 @@ export default function AdminEventosPage() {
     description: "",
     localidad: "Villa General Belgrano",
     date_description: "",
+    start_date: "",
+    end_date: "",
     category: "festival",
   })
 
@@ -38,6 +40,8 @@ export default function AdminEventosPage() {
       description: event.description ?? "",
       localidad: event.localidad ?? "Villa General Belgrano",
       date_description: event.date_description ?? "",
+      start_date: event.start_date ?? "",
+      end_date: event.end_date ?? "",
       category: event.category ?? "festival",
     })
     setFiles(null)
@@ -46,7 +50,7 @@ export default function AdminEventosPage() {
 
   const handleCancel = () => {
     setEditingId(null)
-    setFormData({ title: "", description: "", localidad: "Villa General Belgrano", date_description: "", category: "festival" })
+    setFormData({ title: "", description: "", localidad: "Villa General Belgrano", date_description: "", start_date: "", end_date: "", category: "festival" })
     setFiles(null)
   }
 
@@ -81,7 +85,10 @@ export default function AdminEventosPage() {
         }
       }
 
-      const payload: any = { ...formData }
+      const payload: any = {
+        ...formData,
+        end_date: formData.end_date || null,
+      }
       if (imageUrls.length > 0) payload.image_url = imageUrls
 
       if (editingId) {
@@ -130,6 +137,25 @@ export default function AdminEventosPage() {
             className="w-full px-4 py-3 rounded-2xl border border-stone-100 bg-stone-50 outline-none text-sm"
             onChange={e => setFormData({ ...formData, date_description: e.target.value })}
           />
+
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <label className="block text-xs font-medium text-stone-400 uppercase tracking-wide mb-1">Fecha inicio *</label>
+              <input
+                type="date" required value={formData.start_date}
+                className="w-full px-4 py-3 rounded-2xl border border-stone-100 bg-stone-50 outline-none text-sm"
+                onChange={e => setFormData({ ...formData, start_date: e.target.value })}
+              />
+            </div>
+            <div>
+              <label className="block text-xs font-medium text-stone-400 uppercase tracking-wide mb-1">Fecha fin</label>
+              <input
+                type="date" value={formData.end_date}
+                className="w-full px-4 py-3 rounded-2xl border border-stone-100 bg-stone-50 outline-none text-sm"
+                onChange={e => setFormData({ ...formData, end_date: e.target.value })}
+              />
+            </div>
+          </div>
 
           <select
             value={formData.localidad}
