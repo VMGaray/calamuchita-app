@@ -7,7 +7,7 @@ import {
   Flame, Shield, Stethoscope, Zap,
   MapPin, Phone, ChevronDown,
   AlertCircle, Lightbulb, Pill, Landmark, Bus, Info, MoreHorizontal,
-  ArrowLeft, RefreshCw, ExternalLink, Clock, Dog,
+  ArrowLeft, RefreshCw, ExternalLink, Clock, Dog, CreditCard,
 } from "lucide-react"
 import Link from "next/link"
 import { LOCALIDADES, MAIN_LOCALIDADES } from "@/lib/constants/telefonos"
@@ -38,6 +38,7 @@ const CATEGORIA_TO_DB: Record<string, string> = {
   salud:         "health",
   farmacias:     "pharmacy",
   municipalidad: "municipal",
+  centropagos:   "payment",
   turismo:       "tourism",
   veterinarias:  "veterinary",
   transporte:    "transport",
@@ -51,6 +52,7 @@ const SERVICE_CAT_ICONS: Record<string, { Icon: React.ElementType; color: string
   municipal:  { Icon: Landmark,    color: "#2D4530", bg: "rgba(45,69,48,0.10)"    },
   security:   { Icon: Shield,      color: "#1C4680", bg: "rgba(28,70,128,0.10)"   },
   utility:    { Icon: Zap,         color: "#A06B0A", bg: "rgba(160,107,10,0.10)"  },
+  payment:    { Icon: CreditCard,  color: "#1C4680", bg: "rgba(28,70,128,0.10)"   },
   transport:  { Icon: Bus,         color: "#2D4530", bg: "rgba(45,69,48,0.10)"    },
   tourism:    { Icon: Info,        color: "#5E4B3B", bg: "rgba(94,75,59,0.10)"    },
   other:      { Icon: Phone,       color: "#6B7B84", bg: "rgba(107,123,132,0.10)" },
@@ -64,6 +66,7 @@ const CATEGORIAS = [
   { key: "farmacias",     label: "Farmacias de turno",    Icon: Pill           },
   { key: "veterinarias",  label: "Veterinarias de turno", Icon: Dog            },
   { key: "municipalidad", label: "Municipalidad",         Icon: Landmark       },
+  { key: "centropagos",   label: "Centro de Pagos",       Icon: CreditCard     },
   { key: "transporte",    label: "Transporte",            Icon: Bus            },
   { key: "turismo",       label: "Turismo oficial",       Icon: Info           },
 ]

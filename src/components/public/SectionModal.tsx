@@ -16,7 +16,7 @@ import {
   PartyPopper, ChefHat, Mic, Medal, Palette, Baby,
   Store, Salad, Shirt, Gem, MoreHorizontal,
   Clock3, Landmark, Lightbulb, Bus, Info,
-  Armchair, Dog, Smartphone, FlaskConical
+  Armchair, Dog, Smartphone, FlaskConical, Printer
 } from "lucide-react"
 
 const categoryIcons: Record<string, any> = {
@@ -34,7 +34,7 @@ const categoryIcons: Record<string, any> = {
   "Idiomas": Languages, "Maestras/os Particulares": Users,
   "Actividades y Paseos": Activity, "Agencia de Viajes": Plane,
   "Alojamiento": Hotel, "Alquiler": Compass, "Excursiones": Map,
-  "Forrajería": Package, "Hogar": Armchair, "Indumentaria": Shirt, "Mascotas": Dog, "Niños": Baby,
+  "Forrajería": Package, "Hogar": Armchair, "Imprenta": Printer, "Indumentaria": Shirt, "Mascotas": Dog, "Niños": Baby,
   "Tecnología": Smartphone, "Vehículos": Car,
   "Culturales": Palette, "Deportivos": Medal, "Festivales": PartyPopper,
   "Gastronomía": ChefHat, "Infantiles": Baby, "Música": Mic,

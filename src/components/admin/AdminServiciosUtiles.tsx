@@ -11,6 +11,7 @@ const CATEGORIES = [
   { value: "pharmacy",   label: "Farmacia"            },
   { value: "veterinary", label: "Veterinaria"         },
   { value: "municipal",  label: "Municipal"           },
+  { value: "payment",    label: "Centro de Pagos"     },
   { value: "utility",    label: "Cooperativa"         },
   { value: "tourism",    label: "Turismo"             },
   { value: "security",   label: "Seguridad"           },

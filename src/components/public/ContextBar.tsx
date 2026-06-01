@@ -67,6 +67,7 @@ const SUBCAT_LABELS: Record<string, string> = {
   // commerce
   forrajeria:    "Forrajería",
   hogar:         "Hogar",
+  imprenta:      "Imprenta",
   indumentaria:  "Indumentaria",
   mascotas:      "Mascotas",
   ninos:         "Niños",

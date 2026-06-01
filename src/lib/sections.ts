@@ -60,6 +60,7 @@ export const sectionCategories = {
   commerce: [
     { label: "Forrajería", desc: "Alimentos y productos rurales", href: "/directorio/commerce?cat=forrajeria", bg: "bg-brand-earth/10", color: "text-brand-earth" },
     { label: "Hogar", desc: "Muebles y decoración", href: "/directorio/commerce?cat=hogar", bg: "bg-brand-earth/10", color: "text-brand-earth" },
+    { label: "Imprenta", desc: "Impresión y diseño gráfico", href: "/directorio/commerce?cat=imprenta", bg: "bg-brand-slate/10", color: "text-brand-slate" },
     { label: "Indumentaria", desc: "Ropa y calzado", href: "/directorio/commerce?cat=indumentaria", bg: "bg-brand-slate/10", color: "text-brand-slate" },
     { label: "Inmobiliarias", desc: "Propiedades y alquileres", href: "/directorio/commerce?cat=inmobiliarias", bg: "bg-brand-pine/10", color: "text-brand-pine" },
     { label: "Mascotas", desc: "Tiendas para mascotas", href: "/directorio/commerce?cat=mascotas", bg: "bg-brand-pine/10", color: "text-brand-pine" },

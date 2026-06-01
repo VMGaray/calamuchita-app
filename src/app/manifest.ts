@@ -1,12 +1,15 @@
 import type { MetadataRoute } from "next"
 
-export default function manifest(): MetadataRoute.Manifest {
+// purpose: "any maskable" is valid W3C spec but Next.js types only accept the
+// individual literals. Removing the explicit return type lets TypeScript infer
+// `string` for purpose, avoiding a compile error while emitting the correct JSON.
+export default function manifest() {
   return {
     id: "/",
     name: "Calamuchita App",
     short_name: "Calamuchita",
     description: "Todo el Valle de Calamuchita en un solo lugar. Gastronomía, servicios, turismo y más.",
-    start_url: "/?source=pwa",
+    start_url: "/",
     scope: "/",
     display: "standalone",
     display_override: ["window-controls-overlay", "standalone", "minimal-ui"],
@@ -22,25 +25,13 @@ export default function manifest(): MetadataRoute.Manifest {
         src: "/icons/icon-192.png",
         sizes: "192x192",
         type: "image/png",
-        purpose: "any",
-      },
-      {
-        src: "/icons/icon-192.png",
-        sizes: "192x192",
-        type: "image/png",
-        purpose: "maskable",
+        purpose: "any maskable",
       },
       {
         src: "/icons/icon-512.png",
         sizes: "512x512",
         type: "image/png",
-        purpose: "any",
-      },
-      {
-        src: "/icons/icon-512.png",
-        sizes: "512x512",
-        type: "image/png",
-        purpose: "maskable",
+        purpose: "any maskable",
       },
     ],
     screenshots: [
@@ -50,6 +41,13 @@ export default function manifest(): MetadataRoute.Manifest {
         type: "image/jpeg",
         form_factor: "wide",
         label: "Calamuchita App — Guía del Valle",
+      },
+      {
+        src: "/icons/icon-512.png",
+        sizes: "512x512",
+        type: "image/png",
+        form_factor: "narrow",
+        label: "Calamuchita App — Ícono móvil",
       },
     ],
   }
