@@ -9,20 +9,21 @@ import { sectionCategories, SectionKey } from "@/lib/sections"
 import { ShoppingBag, MapPin, Check } from "lucide-react"
 import {
   Utensils, Coffee, Beer, Bike, Clock, Package,
-  Wrench, Zap, Flame, Car, Building, Paintbrush, Hammer, KeyRound, Leaf, Waves, Home, Bug, Droplets, Sparkles,
+  Wrench, Zap, Flame, Car, Building, Paintbrush, Hammer, KeyRound, Leaf, Waves, Home, Bug, Droplets, Sparkles, Shield, Truck, Mountain, HardHat,
   Stethoscope, Pill, Brain, Smile, Eye, PawPrint, AlertCircle, Ambulance,
   GraduationCap, BookOpen, Languages, Users, Music, Trophy,
   Hotel, Map, Tent, Activity, Compass, Plane,
   PartyPopper, ChefHat, Mic, Medal, Palette, Baby,
   Store, Salad, Shirt, Gem, HardHat, MoreHorizontal,
   Clock3, Landmark, Lightbulb, Bus, Info,
-  Armchair, Dog, Smartphone, FlaskConical
+  Armchair, Dog, Smartphone, FlaskConical, Package
 } from "lucide-react"
 
 const categoryIcons: Record<string, any> = {
   "Restaurantes": Utensils, "Bar/Café": Coffee, "Viandas": ShoppingBag,
   "Delivery": Bike, "Take Away": Package, "Abierto ahora": Clock,
-  "Cerrajero": KeyRound, "Construcción": Building, "Desinfecciones": Bug,
+  "Alarmas-Seguridad": Shield, "Cerrajero": KeyRound, "Construcción": Building,
+  "Fletes": Truck, "Movimiento de suelos": HardHat, "Venta de áridos": Mountain, "Desinfecciones": Bug,
   "Electricidad": Zap, "Gasista": Flame, "Herrero": Hammer, "Jardinero": Leaf,
   "Limpieza": Sparkles, "Mecánica": Car, "Perforaciones": Droplets, "Piletero": Waves,
   "Pintor": Paintbrush, "Plomería": Wrench, "Zinguero": Home,
@@ -33,7 +34,7 @@ const categoryIcons: Record<string, any> = {
   "Idiomas": Languages, "Maestras/os Particulares": Users,
   "Actividades y Paseos": Activity, "Agencia de Viajes": Plane,
   "Alojamiento": Hotel, "Alquiler": Compass, "Excursiones": Map,
-  "Hogar": Armchair, "Indumentaria": Shirt, "Mascotas": Dog, "Niños": Baby,
+  "Forrajería": Package, "Hogar": Armchair, "Indumentaria": Shirt, "Mascotas": Dog, "Niños": Baby,
   "Tecnología": Smartphone, "Vehículos": Car,
   "Culturales": Palette, "Deportivos": Medal, "Festivales": PartyPopper,
   "Gastronomía": ChefHat, "Infantiles": Baby, "Música": Mic,

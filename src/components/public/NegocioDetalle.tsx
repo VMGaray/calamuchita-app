@@ -497,7 +497,7 @@ export default function NegocioDetalle({ business, promotions = [] }: Props) {
               )}
               <div className="flex-1 aspect-video rounded-2xl overflow-hidden relative bg-stone-100">
                 <div className="absolute inset-0 animate-pulse bg-gradient-to-r from-stone-100 via-stone-50 to-stone-100" />
-                <Image src={photos[photoIdx]} alt={`${business.name} — foto ${photoIdx + 1}`} fill priority={photoIdx === 0} className="object-cover" sizes="(max-width: 640px) calc(100vw - 32px), 640px" quality={85} onError={e => { (e.target as HTMLImageElement).src = "/valle.jpg" }} />
+                <Image src={photos[photoIdx]} alt={`${business.name} — foto ${photoIdx + 1}`} fill priority={photoIdx === 0} className="object-contain" sizes="(max-width: 640px) calc(100vw - 32px), 640px" quality={85} onError={e => { (e.target as HTMLImageElement).src = "/valle.jpg" }} />
               </div>
               {photos.length > 1 && (
                 <button onClick={nextPhoto} aria-label="Foto siguiente" className="shrink-0 w-10 h-10 rounded-full flex items-center justify-center border-2 border-[#2D4530] text-[#2D4530] hover:bg-[#2D4530] hover:text-[#E1DBC9] transition-all active:scale-90">

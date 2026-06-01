@@ -359,7 +359,7 @@ export default function DirectorioList({ section, filters }: Props) {
                     style={{ background: "#FFFFFF", border: "1px solid rgba(45,69,48,0.09)" }}
                   >
                     {/* ── Image area ── */}
-                    <div className="relative overflow-hidden aspect-[4/3]">
+                    <div className="relative overflow-hidden aspect-[4/3] bg-stone-50">
                       {business.is_premium && (
                         <div
                           className="absolute top-2.5 left-2.5 z-10 flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-tight"
@@ -373,7 +373,7 @@ export default function DirectorioList({ section, filters }: Props) {
                           src={business.cover_url}
                           alt={business.name}
                           fill
-                          className="object-cover"
+                          className="object-contain"
                           sizes="(max-width: 768px) 82vw, (max-width: 1024px) 50vw, 33vw"
                           quality={70}
                         />

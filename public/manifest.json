@@ -1,21 +1,40 @@
 {
+  "id": "/",
   "name": "Calamuchita App",
-  "short_name": "CalamuchitaApp",
-  "description": "La guía comercial y de servicios del Valle",
+  "short_name": "Calamuchita",
+  "description": "Todo el Valle de Calamuchita en un solo lugar. Gastronomía, servicios, turismo y más.",
   "start_url": "/",
+  "scope": "/",
   "display": "standalone",
-  "background_color": "#1C352D", 
-  "theme_color": "#1C352D",
+  "orientation": "portrait",
+  "background_color": "#E1DBC9",
+  "theme_color": "#2D4530",
+  "lang": "es",
+  "prefer_related_applications": false,
   "icons": [
     {
-      "src": "/icon-192x192.png",
+      "src": "/icons/icon-192.png",
       "sizes": "192x192",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any"
     },
     {
-      "src": "/icon-512x512.png",
+      "src": "/icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "/icons/icon-512.png",
       "sizes": "512x512",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
     }
   ]
 }

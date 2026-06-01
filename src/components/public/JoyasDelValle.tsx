@@ -54,7 +54,7 @@ function FeaturedCard({ biz }: { biz: FeaturedBusiness }) {
               src={biz.cover_url || FALLBACK}
               alt={biz.name}
               fill
-              className="object-cover object-center"
+              className="object-contain"
               sizes="320px"
             />
           </motion.div>

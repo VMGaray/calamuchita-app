@@ -1,10 +1,11 @@
 import {
-  Wrench, Zap, Flame, Car, Building, Paintbrush, Hammer, KeyRound, Leaf, Waves, Home, Bug, Sparkles, Droplets,
-  Store, Shirt, Gem, HardHat, Baby, Smartphone, Armchair, Dog, HeartPulse,
+  Wrench, Zap, Flame, Car, Building, Paintbrush, Hammer, KeyRound, Leaf, Waves, Home, Bug, Sparkles, Droplets, Shield,
+  Store, Shirt, Gem, HardHat, Baby, Smartphone, Armchair, Dog, HeartPulse, Package,
   Brain, AlertCircle, FlaskConical, Stethoscope, Ambulance,
   GraduationCap, BookOpen, Languages, Users, Music, Trophy, Palette,
   Hotel, Map, Tent, Activity, Compass, Bike, Plane,
-  Utensils, Coffee, Beer, ShoppingBag, Clock
+  Utensils, Coffee, Beer, ShoppingBag, Clock,
+  Truck, Mountain
 } from "lucide-react"
 
 export const MASTER_CATEGORIES = {
@@ -22,19 +23,23 @@ export const MASTER_CATEGORIES = {
   services: {
     label: "Servicios",
     subcategories: [
+      { label: "Alarmas-Seguridad", icon: Shield, bg: "bg-blue-50", color: "text-blue-600" },
       { label: "Cerrajero", icon: KeyRound, bg: "bg-gray-50", color: "text-gray-600" },
       { label: "Construcción", icon: Building, bg: "bg-amber-50", color: "text-amber-600" },
       { label: "Desinfecciones", icon: Bug, bg: "bg-lime-50", color: "text-lime-600" },
       { label: "Electricidad", icon: Zap, bg: "bg-yellow-50", color: "text-yellow-600" },
+      { label: "Fletes", icon: Truck, bg: "bg-orange-50", color: "text-orange-700" },
       { label: "Gasista", icon: Flame, bg: "bg-orange-50", color: "text-orange-600" },
       { label: "Herrero", icon: Hammer, bg: "bg-zinc-50", color: "text-zinc-600" },
       { label: "Jardinero", icon: Leaf, bg: "bg-green-50", color: "text-green-600" },
       { label: "Limpieza", icon: Sparkles, bg: "bg-teal-50", color: "text-teal-600" },
       { label: "Mecánica", icon: Car, bg: "bg-stone-50", color: "text-stone-600" },
+      { label: "Movimiento de suelos", icon: HardHat, bg: "bg-yellow-50", color: "text-yellow-700" },
       { label: "Perforaciones", icon: Droplets, bg: "bg-cyan-50", color: "text-cyan-600" },
       { label: "Piletero", icon: Waves, bg: "bg-sky-50", color: "text-sky-600" },
       { label: "Pintor", icon: Paintbrush, bg: "bg-purple-50", color: "text-purple-600" },
       { label: "Plomería", icon: Wrench, bg: "bg-blue-50", color: "text-blue-600" },
+      { label: "Venta de áridos", icon: Mountain, bg: "bg-stone-50", color: "text-stone-600" },
       { label: "Zinguero", icon: Home, bg: "bg-slate-50", color: "text-slate-600" },
       { label: "Otro", icon: Sparkles, bg: "bg-stone-50", color: "text-stone-400" },
     ]
@@ -42,6 +47,7 @@ export const MASTER_CATEGORIES = {
   commerce: {
     label: "Comercios",
     subcategories: [
+      { label: "Forrajería", icon: Package, bg: "bg-amber-50", color: "text-amber-700" },
       { label: "Hogar", icon: Armchair, bg: "bg-orange-50", color: "text-orange-700" },
       { label: "Indumentaria", icon: Shirt, bg: "bg-pink-50", color: "text-pink-600" },
       { label: "Inmobiliarias", icon: Building, bg: "bg-blue-50", color: "text-blue-600" },
