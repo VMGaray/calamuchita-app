@@ -65,6 +65,7 @@ export default function IdentidadCalamuchitanaPage() {
   const [posts, setPosts] = useState<EditorialPost[]>([])
   const [fetching, setFetching] = useState(true)
   const [saving, setSaving] = useState(false)
+  const [saveError, setSaveError] = useState<string | null>(null)
   const [deletingId, setDeletingId] = useState<string | null>(null)
 
   const [showForm, setShowForm] = useState(false)
@@ -109,6 +110,7 @@ export default function IdentidadCalamuchitanaPage() {
     setShowForm(false)
     setEditing(null)
     setForm(EMPTY_FORM)
+    setSaveError(null)
   }
 
   const set = <K extends keyof FormState>(key: K) =>
@@ -135,13 +137,19 @@ export default function IdentidadCalamuchitanaPage() {
       expires_at:  form.expires_at || null,
     }
 
+    setSaveError(null)
+    let error
     if (editing) {
-      await supabase.from("editorial_posts").update(payload).eq("id", editing.id)
+      ;({ error } = await supabase.from("editorial_posts").update(payload).eq("id", editing.id))
     } else {
-      await supabase.from("editorial_posts").insert([payload])
+      ;({ error } = await supabase.from("editorial_posts").insert([payload]))
     }
 
     setSaving(false)
+    if (error) {
+      setSaveError(error.message)
+      return
+    }
     closeForm()
     fetchPosts()
   }
@@ -453,6 +461,11 @@ export default function IdentidadCalamuchitanaPage() {
                   className="px-6 py-4 border-t border-stone-200 sticky bottom-0"
                   style={{ background: "#FDFCF9" }}
                 >
+                  {saveError && (
+                    <div className="mb-3 px-3 py-2 rounded-xl bg-red-50 border border-red-200 text-xs text-red-700">
+                      Error al guardar: {saveError}
+                    </div>
+                  )}
                   <div className="flex gap-3">
                     <button
                       type="button"
