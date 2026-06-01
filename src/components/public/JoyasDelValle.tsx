@@ -164,6 +164,18 @@ export default function JoyasDelValle({ businesses }: { businesses: FeaturedBusi
     pauseTimerRef.current = setTimeout(() => { isPausedRef.current = false }, 3000)
   }
 
+  const navigate2 = (dir: 1 | -1) => {
+    const current = x2.get()
+    const snapped = Math.round(current / STEP) * STEP
+    let next = snapped + dir * -STEP
+    next = next % SET_W2
+    if (next >= 0) next -= SET_W2
+    animate(x2, next, { type: "spring", stiffness: 300, damping: 35 })
+    isPausedRef.current = true
+    if (pauseTimerRef.current) clearTimeout(pauseTimerRef.current)
+    pauseTimerRef.current = setTimeout(() => { isPausedRef.current = false }, 3000)
+  }
+
   if (row1.length === 0 && row2.length === 0) return null
 
   const items1 = [...row1, ...row1, ...row1]
@@ -247,15 +259,42 @@ export default function JoyasDelValle({ businesses }: { businesses: FeaturedBusi
 
       {/* Fila 2 — comercios, salud, educación y más, izquierda → derecha */}
       {items2.length > 0 && (
-        <div className="overflow-hidden pb-4 md:pb-6">
-          <motion.div
-            className="flex"
-            style={{ x: x2, gap: GAP, marginLeft: `calc(50% - ${CARD_W / 2}px)` }}
+        <div className="relative">
+          <button
+            onClick={() => navigate2(-1)}
+            aria-label="Anterior"
+            className="absolute left-3 md:left-5 top-1/2 -translate-y-1/2 z-20
+                       w-10 h-10 md:w-12 md:h-12 rounded-full
+                       flex items-center justify-center
+                       bg-white/80 backdrop-blur-sm border border-white/60 shadow-lg
+                       text-[#2D4530] hover:bg-white transition-all
+                       opacity-100 md:opacity-0 md:group-hover/jdv:opacity-100 md:duration-300"
           >
-            {items2.map((biz, idx) => (
-              <FeaturedCard key={`r2-${biz.id}-${idx}`} biz={biz} />
-            ))}
-          </motion.div>
+            <ChevronLeft size={20} />
+          </button>
+          <button
+            onClick={() => navigate2(1)}
+            aria-label="Siguiente"
+            className="absolute right-3 md:right-5 top-1/2 -translate-y-1/2 z-20
+                       w-10 h-10 md:w-12 md:h-12 rounded-full
+                       flex items-center justify-center
+                       bg-white/80 backdrop-blur-sm border border-white/60 shadow-lg
+                       text-[#2D4530] hover:bg-white transition-all
+                       opacity-100 md:opacity-0 md:group-hover/jdv:opacity-100 md:duration-300"
+          >
+            <ChevronRight size={20} />
+          </button>
+
+          <div className="overflow-hidden py-4 md:py-6">
+            <motion.div
+              className="flex"
+              style={{ x: x2, gap: GAP, marginLeft: `calc(50% - ${CARD_W / 2}px)` }}
+            >
+              {items2.map((biz, idx) => (
+                <FeaturedCard key={`r2-${biz.id}-${idx}`} biz={biz} />
+              ))}
+            </motion.div>
+          </div>
         </div>
       )}
     </section>
