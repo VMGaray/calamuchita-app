@@ -19,20 +19,23 @@ export default function EventosPage() {
   const [events, setEvents] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
   const [filter, setFilter] = useState("Todas")
-  const supabase = createClient()
 
   useEffect(() => {
-    supabase
+    setLoading(true)
+    const query = createClient()
       .from("events")
       .select("*")
       .order("created_at", { ascending: false })
-      .then(({ data }) => {
-        setEvents(data || [])
-        setLoading(false)
-      })
-  }, [])
 
-  const filtered = filter === "Todas" ? events : events.filter(e => e.localidad === filter)
+    const req = filter === "Todas" ? query : query.eq("localidad", filter)
+
+    req.then(({ data }) => {
+      setEvents(data || [])
+      setLoading(false)
+    })
+  }, [filter])
+
+  const filtered = events
 
   return (
     <main className="min-h-screen bg-[#FDFCF9] pb-20">

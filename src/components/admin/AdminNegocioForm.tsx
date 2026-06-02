@@ -83,7 +83,7 @@ export default function AdminNegocioForm() {
     description: "",
     section: "services" as BusinessSection,
     category: "other" as BusinessCategory,
-    subcategory: "",
+    categories: [] as string[],
     address: "",
     pueblo: "",
     phone: "",
@@ -129,6 +129,15 @@ export default function AdminNegocioForm() {
     }))
   }
 
+  const toggleCategory = (cat: string) => {
+    setForm(prev => ({
+      ...prev,
+      categories: prev.categories.includes(cat)
+        ? prev.categories.filter(c => c !== cat)
+        : [...prev.categories, cat],
+    }))
+  }
+
   const toggleHealthArray = (field: "medical_specialties" | "health_coverages", value: string) => {
     setForm(prev => ({
       ...prev,
@@ -160,7 +169,8 @@ export default function AdminNegocioForm() {
       section: form.section,
       type: form.section === "gastronomy" ? "gastronomy" : "directory",
       category: form.section === "gastronomy" ? form.category : null,
-      subcategory: form.subcategory || null,
+      categories: form.categories,
+      subcategory: form.categories[0] || null,
       address: form.pueblo ? `${form.address}, ${form.pueblo}` : form.address || null,
       phone: form.phone || null,
       whatsapp: form.whatsapp || null,
@@ -266,33 +276,67 @@ export default function AdminNegocioForm() {
             </div>
           )}
 
-          {/* Subcategoría con sugerencias */}
+          {/* Rubros — multi-select */}
           {!isGastronomy && (
             <div className="mt-4">
-              <label className="block text-sm font-medium text-stone-700 mb-2">
-                Subcategoría <span className="text-stone-400 font-normal">(rubro)</span>
+              <label className="block text-sm font-medium text-stone-700 mb-1">
+                Rubros <span className="text-stone-400 font-normal">(podés elegir más de uno)</span>
               </label>
+
               {subcategoryOptions[form.section] && (
-                <div className="flex gap-2 flex-wrap mb-3">
-                  {subcategoryOptions[form.section].map(opt => (
-                    <button key={opt} onClick={() => handleChange("subcategory", opt)}
-                      className={`py-1.5 px-3 rounded-xl text-xs font-medium border transition-colors ${
-                        form.subcategory === opt
-                          ? "bg-primary-500 text-white border-primary-500"
-                          : "bg-white text-stone-600 border-stone-200 hover:border-primary-300"
-                      }`}>
-                      {opt}
-                    </button>
+                <div className="flex gap-2 flex-wrap mt-2 mb-3">
+                  {subcategoryOptions[form.section].map(opt => {
+                    const selected = form.categories.includes(opt)
+                    return (
+                      <button
+                        key={opt}
+                        type="button"
+                        onClick={() => toggleCategory(opt)}
+                        className={`py-1.5 px-3 rounded-xl text-xs font-medium border transition-colors ${
+                          selected
+                            ? "bg-primary-500 text-white border-primary-500"
+                            : "bg-white text-stone-600 border-stone-200 hover:border-primary-300"
+                        }`}
+                      >
+                        {opt}
+                      </button>
+                    )
+                  })}
+                </div>
+              )}
+
+              <input
+                type="text"
+                placeholder="Escribí un rubro personalizado y presioná Enter…"
+                className="w-full px-4 py-2.5 rounded-xl border border-stone-200 text-stone-800 text-sm outline-none focus:ring-2 focus:ring-primary-300"
+                onKeyDown={e => {
+                  if (e.key === "Enter" && e.currentTarget.value.trim()) {
+                    toggleCategory(e.currentTarget.value.trim())
+                    e.currentTarget.value = ""
+                    e.preventDefault()
+                  }
+                }}
+              />
+
+              {form.categories.length > 0 && (
+                <div className="flex gap-2 flex-wrap mt-2.5">
+                  {form.categories.map(cat => (
+                    <span
+                      key={cat}
+                      className="flex items-center gap-1 py-1 px-2.5 rounded-full text-xs bg-primary-50 text-primary-600 border border-primary-100"
+                    >
+                      {cat}
+                      <button
+                        type="button"
+                        onClick={() => toggleCategory(cat)}
+                        className="hover:text-red-400 ml-0.5 leading-none font-bold"
+                      >
+                        ×
+                      </button>
+                    </span>
                   ))}
                 </div>
               )}
-              <input
-                type="text"
-                value={form.subcategory}
-                onChange={e => handleChange("subcategory", e.target.value)}
-                placeholder="O escribí una subcategoría personalizada..."
-                className="w-full px-4 py-2.5 rounded-xl border border-stone-200 text-stone-800 text-sm outline-none focus:ring-2 focus:ring-primary-300"
-              />
             </div>
           )}
         </div>
