@@ -6,10 +6,31 @@ import { motion } from "framer-motion"
 import { MapPin } from "lucide-react"
 import AnimateIn from "@/components/ui/AnimateIn"
 import { createClient } from "@/lib/supabase/client"
+import { Playfair_Display } from "next/font/google"
+
+const playfair = Playfair_Display({
+  subsets: ["latin"],
+  style: ["italic"],
+  weight: ["400"],
+})
 
 const FALLBACK_PUEBLOS = [
-  "Villa General Belgrano", "Los Reartes", "Santa Rosa de Calamuchita",
-  "La Cumbrecita", "Yacanto", "Amboy", "Embalse", "Villa del Dique",
+  "Villa General Belgrano",
+  "Santa Rosa de Calamuchita",
+  "La Cumbrecita",
+  "Los Reartes",
+  "Embalse",
+  "Amboy",
+  "Villa del Dique",
+  "Villa Rumipal",
+  "Potrero de Garay",
+  "Villa Yacanto",
+  "Villa Alpina",
+  "Villa Berna",
+  "Villa Ciudad Parque",
+  "Villa Quillinzo",
+  "La Cruz",
+  "Intiyaco",
 ]
 
 const sections = [
@@ -40,17 +61,20 @@ export default function Footer() {
     <footer style={{ background: "#0e1a10", borderTop: "1px solid rgba(225,219,201,0.08)" }}>
 
       {/* Marquee pueblos */}
-      <div className="py-3 overflow-hidden" style={{ borderBottom: "1px solid rgba(225,219,201,0.06)" }}>
+      <div className="py-4 overflow-hidden" style={{ borderBottom: "1px solid rgba(225,219,201,0.06)" }}>
         <motion.div
-          className="flex gap-8 whitespace-nowrap"
+          className="flex gap-10 whitespace-nowrap"
           animate={{ x: ["0%", "-50%"] }}
-          transition={{ duration: 45, repeat: Infinity, ease: "linear" }}
+          transition={{ duration: 80, repeat: Infinity, ease: "linear" }}
         >
           {[...pueblos, ...pueblos].map((pueblo, i) => (
-            <span key={i} className="text-xs font-medium tracking-widest uppercase flex items-center gap-8"
-              style={{ color: "rgba(225,219,201,0.45)" }}>
+            <span
+              key={i}
+              className={`${playfair.className} text-base flex items-center gap-10`}
+              style={{ color: "rgba(225,219,201,0.55)" }}
+            >
               {pueblo}
-              <span style={{ color: "rgba(225,219,201,0.25)" }}>✦</span>
+              <span className="text-xs" style={{ color: "rgba(225,219,201,0.22)" }}>✦</span>
             </span>
           ))}
         </motion.div>

@@ -91,6 +91,7 @@ function PhonesEditor({ phones, onChange }: { phones: ServicePhone[]; onChange: 
 
 export default function AdminServiciosUtiles() {
   const [localities, setLocalities]     = useState<Locality[]>([])
+  const [localitiesError, setLocalitiesError] = useState<string | null>(null)
   const [selectedLocality, setSelected] = useState<string>("")
   const [entries, setEntries]           = useState<UsefulContact[]>([])
   const [allEntries, setAllEntries]     = useState<Pick<UsefulContact, "id" | "locality_id" | "category">[]>([])
@@ -107,15 +108,21 @@ export default function AdminServiciosUtiles() {
   // Cargar localidades y TODOS los entries (para contar por pueblo)
   useEffect(() => {
     const supabase = createClient()
-    Promise.all([
-      supabase.from("localities").select("*").order("sort_order"),
-      supabase.from("useful_contacts").select("id, locality_id, category"),
-    ]).then(([{ data: locs }, { data: all }]) => {
-      const locList = locs || []
+
+    supabase.from("localities").select("*").order("sort_order").then(({ data: locs, error: locsErr }) => {
+      if (locsErr) {
+        console.error("[AdminServiciosUtiles] Error fetching localities:", locsErr.message)
+        setLocalitiesError(locsErr.message)
+      }
+      const locList = locs ?? []
       setLocalities(locList)
-      setAllEntries(all || [])
       if (locList.length > 0) setSelected(locList[0].id)
       setLoadingLocs(false)
+    })
+
+    supabase.from("useful_contacts").select("id, locality_id, category").then(({ data: all, error: allErr }) => {
+      if (allErr) console.error("[AdminServiciosUtiles] Error fetching contacts summary:", allErr.message)
+      setAllEntries(all ?? [])
     })
   }, [])
 
@@ -404,10 +411,19 @@ export default function AdminServiciosUtiles() {
                 </div>
                 <div>
                   <label className="block text-xs font-medium text-stone-600 mb-1">Localidad *</label>
-                  <select value={form.locality_id} onChange={e => set("locality_id", e.target.value)}
-                    className="w-full px-3 py-2 rounded-xl border border-stone-200 text-sm bg-white outline-none focus:ring-2 focus:ring-[#A3B18A]/50">
-                    {localities.map(l => <option key={l.id} value={l.id}>{l.name}</option>)}
-                  </select>
+                  {localitiesError ? (
+                    <p className="text-xs text-red-500 px-3 py-2 rounded-xl border border-red-200 bg-red-50">
+                      Error: {localitiesError}
+                    </p>
+                  ) : (
+                    <select value={form.locality_id} onChange={e => set("locality_id", e.target.value)}
+                      className="w-full px-3 py-2 rounded-xl border border-stone-200 text-sm bg-white outline-none focus:ring-2 focus:ring-[#A3B18A]/50">
+                      {localities.length === 0 && (
+                        <option value="" disabled>Sin localidades</option>
+                      )}
+                      {localities.map(l => <option key={l.id} value={l.id}>{l.name}</option>)}
+                    </select>
+                  )}
                 </div>
               </div>
 
