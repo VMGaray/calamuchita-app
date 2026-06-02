@@ -1,11 +1,11 @@
 "use client"
 
-import { useState } from "react"
+import { Suspense, useState } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
 import { createClient } from "@/lib/supabase/client"
 import { MapPin } from "lucide-react"
 
-export default function GastronomicosPage() {
+function GastronomicosContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const linkExpired = searchParams.get("error") === "link_expired"
@@ -173,5 +173,13 @@ export default function GastronomicosPage() {
 
       </div>
     </main>
+  )
+}
+
+export default function GastronomicosPage() {
+  return (
+    <Suspense>
+      <GastronomicosContent />
+    </Suspense>
   )
 }
