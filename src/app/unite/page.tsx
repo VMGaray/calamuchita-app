@@ -32,18 +32,52 @@ export default function UnitePage() {
 
       <div className="max-w-7xl mx-auto px-6 mt-12">
         {/* Banner de Bienvenida / Club Fundadores */}
-        <div className="mb-12 bg-[#2D4530]/5 border border-[#2D4530]/10 rounded-[32px] p-6 md:p-8 flex flex-col md:flex-row items-center gap-6 shadow-sm">
-          <div className="w-12 h-12 rounded-2xl bg-[#2D4530]/10 flex items-center justify-center text-[#2D4530] flex-shrink-0">
+        <div className="mb-12 bg-[#2D4530]/5 border border-[#2D4530]/10 rounded-[32px] p-6 md:p-10 flex flex-col md:flex-row items-start gap-6 shadow-sm">
+          <div className="w-12 h-12 rounded-2xl bg-[#2D4530]/10 flex items-center justify-center text-[#2D4530] flex-shrink-0 mt-0.5">
             <Sparkles size={24} />
           </div>
-          <div>
-            <span className="text-[10px] font-black uppercase tracking-widest text-[#2D4530] bg-[#2D4530]/10 px-2.5 py-1 rounded-full font-bold">
+          <div className="flex-1 min-w-0">
+            <span className="text-[10px] font-black uppercase tracking-widest text-[#2D4530] bg-[#2D4530]/10 px-2.5 py-1 rounded-full inline-block">
               Beneficio Exclusivo de Lanzamiento
             </span>
-            <h2 className="font-serif text-xl text-stone-800 mt-2 font-bold">Club Fundadores</h2>
-            <p className="text-stone-600 text-xs mt-1 leading-relaxed">
-              Registrándote hoy congelás tus <span className="font-bold text-[#2D4530]">primeros 2 meses al 100% bonificados</span> (Gratis). 
+            <h2 className="font-serif text-2xl text-stone-800 mt-2.5 mb-3 font-bold">Club Fundadores</h2>
+
+            <p className="text-stone-600 text-[13px] leading-relaxed">
+              Registrándote{" "}
+              <strong className="text-[#2D4530] font-bold">del 1 al 30 de junio</strong>{" "}
+              congelás tus{" "}
+              <strong className="text-[#2D4530] font-bold">primeros 2 meses al 100% bonificados (Gratis)</strong>.
+              Tu negocio va a estar activo, visible y captando clientes durante{" "}
+              <strong className="text-[#2D4530] font-bold">todo julio y agosto sin costo</strong>{" "}
+              y formando parte por esos dos meses de{" "}
+              <strong className="text-[#2D4530] font-bold tracking-wide">DESTACADOS</strong>.{" "}
+              Vos empezás a pagar tu plan{" "}
+              <strong className="text-[#2D4530] font-bold">recién en septiembre</strong>.
             </p>
+
+            {/* Timeline visual */}
+            <div className="flex items-start gap-2 mt-5 flex-wrap sm:flex-nowrap">
+              <div className="flex flex-col items-center gap-1 flex-shrink-0">
+                <span className="text-[10px] font-black uppercase tracking-wider text-[#2D4530] bg-[#2D4530]/12 px-3 py-1 rounded-full">
+                  Junio
+                </span>
+                <span className="text-[10px] text-stone-400">Te registrás</span>
+              </div>
+              <div className="flex-1 h-px border-t-2 border-dashed border-[#2D4530]/20 mt-3 min-w-[20px]" />
+              <div className="flex flex-col items-center gap-1 flex-shrink-0">
+                <span className="text-[10px] font-black uppercase tracking-wider text-emerald-700 bg-emerald-50 border border-emerald-100 px-3 py-1 rounded-full">
+                  Jul · Ago
+                </span>
+                <span className="text-[10px] text-stone-400">100% gratis ✦ Destacado</span>
+              </div>
+              <div className="flex-1 h-px border-t-2 border-dashed border-[#2D4530]/20 mt-3 min-w-[20px]" />
+              <div className="flex flex-col items-center gap-1 flex-shrink-0">
+                <span className="text-[10px] font-black uppercase tracking-wider text-stone-500 bg-stone-100 px-3 py-1 rounded-full">
+                  Septiembre
+                </span>
+                <span className="text-[10px] text-stone-400">Recién pagás</span>
+              </div>
+            </div>
           </div>
         </div>
 
