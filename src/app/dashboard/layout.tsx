@@ -12,7 +12,7 @@ export default async function DashboardLayout({
   const { data: { user } } = await supabase.auth.getUser()
 
   if (!user) {
-    redirect("/login")
+    redirect("/gastronomicos")
   }
 
   const isBusiness = user.user_metadata?.role === "business"

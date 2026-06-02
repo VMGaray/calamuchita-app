@@ -184,23 +184,7 @@ export default function Header() {
                   )}
                 </AnimatePresence>
               </div>
-            ) : (
-              <>
-                <Link href="/login" className="text-sm transition-colors"
-                  style={{ color: "rgba(255,255,255,0.75)" }}>
-                  Ingresar
-                </Link>
-                <Link href="/registro"
-                  className="text-sm px-4 py-2 rounded-xl transition-colors hidden sm:block"
-                  style={{
-                    background: "rgba(225,219,201,0.18)",
-                    color: "rgba(255,255,255,0.95)",
-                    border: "1px solid rgba(225,219,201,0.3)",
-                  }}>
-                  Registrate
-                </Link>
-              </>
-            )}
+            ) : null}
           </div>
 
         </div>

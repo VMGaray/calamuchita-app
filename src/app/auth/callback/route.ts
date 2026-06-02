@@ -14,5 +14,5 @@ export async function GET(request: Request) {
     }
   }
 
-  return NextResponse.redirect(`${origin}/login?error=link_expired`)
+  return NextResponse.redirect(`${origin}/gastronomicos?error=link_expired`)
 }
