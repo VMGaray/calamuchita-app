@@ -380,7 +380,7 @@ export default function AdminServiciosUtiles() {
           <div className="bg-white rounded-2xl w-full max-w-md shadow-xl max-h-[92vh] overflow-y-auto">
             <div className="sticky top-0 bg-white px-6 pt-5 pb-3 border-b border-stone-100 z-10">
               <h3 className="text-base font-semibold text-stone-800">
-                {editing ? "Editar entrada" : `Nueva entrada — ${localities.find(l => l.id === form.locality_id)?.name ?? "Global"}`}
+                {editing ? "Editar entrada" : `Nueva entrada — ${localities.find(l => l.id === form.locality_id)?.name ?? ""}`}
               </h3>
             </div>
 
@@ -403,10 +403,9 @@ export default function AdminServiciosUtiles() {
                   </select>
                 </div>
                 <div>
-                  <label className="block text-xs font-medium text-stone-600 mb-1">Localidad</label>
+                  <label className="block text-xs font-medium text-stone-600 mb-1">Localidad *</label>
                   <select value={form.locality_id} onChange={e => set("locality_id", e.target.value)}
                     className="w-full px-3 py-2 rounded-xl border border-stone-200 text-sm bg-white outline-none focus:ring-2 focus:ring-[#A3B18A]/50">
-                    <option value="">Global (todos)</option>
                     {localities.map(l => <option key={l.id} value={l.id}>{l.name}</option>)}
                   </select>
                 </div>

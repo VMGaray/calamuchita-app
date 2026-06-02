@@ -239,8 +239,7 @@ export default function InfoUtilPage({ initialCategoria, initialPueblo }: Props)
   const [showAll, setShowAll] = useState(false)
   const syncedRef = useRef(false)
 
-  const [utilityServices, setUtilityServices] = useState<DBService[]>([])
-  const [localContacts, setLocalContacts] = useState<DBService[]>([])
+  const [contacts, setContacts] = useState<DBService[]>([])
   const [dbLocalities, setDbLocalities] = useState<DBLocality[]>([])
   const [loading, setLoading] = useState(false)
 
@@ -253,53 +252,35 @@ export default function InfoUtilPage({ initialCategoria, initialPueblo }: Props)
       .then(({ data }) => setDbLocalities(data || []))
   }, [])
 
-  // Fetch utility_services when locality changes
+  // Fetch useful_contacts filtered strictly by the selected locality
   useEffect(() => {
     const loc = dbLocalities.find(l => l.name === localidad)
-    if (!loc) { setUtilityServices([]); return }
+    if (!loc) { setContacts([]); return }
     setLoading(true)
     createClient()
-      .from("utility_services")
-      .select("id, name, category, phone, phone_2, phones, address, description, hours, specialties, has_guardia, is_on_duty")
-      .eq("locality_id", loc.id)
+      .from("useful_contacts")
+      .select("id, title, category, phone, phone_2, phones, address, description, schedule, is_on_duty, has_guardia, specialties")
       .eq("is_active", true)
+      .eq("locality_id", loc.id)
       .order("sort_order")
       .then(({ data }) => {
-        setUtilityServices((data || []).map(s => ({ ...s, phones: s.phones ?? [] })))
+        const normalized: DBService[] = (data || []).map(c => ({
+          id:          c.id,
+          name:        c.title,
+          category:    c.category,
+          phone:       c.phone       ?? null,
+          phone_2:     c.phone_2     ?? null,
+          phones:      c.phones      ?? [],
+          address:     c.address     ?? null,
+          description: c.description ?? null,
+          hours:       c.schedule    ?? null,
+          specialties: c.specialties ?? null,
+          has_guardia: c.has_guardia ?? false,
+          is_on_duty:  c.is_on_duty  ?? false,
+        }))
+        setContacts(normalized)
         setLoading(false)
       })
-  }, [localidad, dbLocalities])
-
-  // Fetch useful_contacts: los de la localidad activa + los globales (locality_id IS NULL)
-  useEffect(() => {
-    const loc = dbLocalities.find(l => l.name === localidad)
-    const base = createClient()
-      .from("useful_contacts")
-      .select("id, title, category, phone, phone_2, phones, address, description, schedule")
-      .eq("is_active", true)
-      .order("sort_order")
-
-    const query = loc
-      ? base.or(`locality_id.is.null,locality_id.eq.${loc.id}`)
-      : base.is("locality_id", null)
-
-    query.then(({ data }) => {
-      const normalized: DBService[] = (data || []).map(c => ({
-        id: c.id,
-        name: c.title,
-        category: c.category,
-        phone: c.phone ?? null,
-        phone_2: c.phone_2 ?? null,
-        phones: c.phones ?? [],
-        address: c.address ?? null,
-        description: c.description ?? null,
-        hours: c.schedule ?? null,
-        specialties: null,
-        has_guardia: false,
-        is_on_duty: false,
-      }))
-      setLocalContacts(normalized)
-    })
   }, [localidad, dbLocalities])
 
   // Sync URL pueblo → context on first render
@@ -342,7 +323,7 @@ export default function InfoUtilPage({ initialCategoria, initialPueblo }: Props)
   const categoria = searchParams.get("categoria") ?? initialCategoria ?? "todos"
   const visibleLocalidades = showAll ? LOCALIDADES : MAIN_LOCALIDADES
 
-  const allServices = [...utilityServices, ...localContacts]
+  const allServices = contacts
   const dbCatFilter = categoria && categoria !== "todos" ? CATEGORIA_TO_DB[categoria] : null
   const filteredServices = dbCatFilter
     ? allServices.filter(s => s.category === dbCatFilter)
