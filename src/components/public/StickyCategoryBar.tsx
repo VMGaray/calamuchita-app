@@ -9,6 +9,7 @@ import {
   ShoppingBag,
   Heart,
   GraduationCap,
+  Dumbbell,
   Compass,
   CalendarDays,
   Info,
@@ -16,18 +17,20 @@ import {
 import SectionModal from "@/components/public/SectionModal"
 import { SectionKey } from "@/lib/sections"
 
-const categories: { key: SectionKey; label: string; icon: React.ElementType }[] = [
+type NavKey = SectionKey | "sports"
+
+const categories: { key: NavKey; label: string; icon: React.ElementType }[] = [
   { key: "gastronomy", label: "Gastronomía", icon: UtensilsCrossed },
   { key: "services",   label: "Servicios",   icon: Wrench         },
   { key: "commerce",   label: "Comercios",   icon: ShoppingBag    },
   { key: "health",     label: "Salud",       icon: Heart          },
   { key: "education",  label: "Educación",   icon: GraduationCap  },
+  { key: "sports",     label: "Deporte",     icon: Dumbbell       },
   { key: "tourism",    label: "Turismo",     icon: Compass        },
   { key: "events",     label: "Eventos",     icon: CalendarDays   },
   { key: "info",       label: "Info útil",   icon: Info           },
 ]
 
-// Verde pino oscuro + cristal — mayor contraste, texto crema legible en mobile
 const glassContainer: React.CSSProperties = {
   background: "rgba(28,48,30,0.93)",
   backdropFilter: "blur(20px)",
@@ -44,23 +47,65 @@ export default function StickyCategoryBar({ stickyOffset = 0 }: Props) {
   const router = useRouter()
   const [activeSection, setActiveSection] = useState<SectionKey | null>(null)
 
-  const handleClick = (key: SectionKey) => {
+  const handleClick = (key: NavKey) => {
     if (key === "events") {
       router.push("/eventos")
+    } else if (key === "sports") {
+      router.push("/directorio/education?cat=deporte")
     } else {
       setActiveSection(prev => (prev === key ? null : key))
     }
   }
 
+  const gastronomy = categories[0]
+  const rest       = categories.slice(1) // 8 items → two rows of 4
+
   return (
     <>
       <div className="sticky z-[100] px-3 py-3" style={{ top: stickyOffset }}>
 
-        {/* ── MOBILE: grid 4 × 2 — min-h reserves space before hydration ── */}
-        <div className="md:hidden rounded-2xl p-2 min-h-[104px]" style={glassContainer}>
+        {/* ── MOBILE ── */}
+        <div className="md:hidden rounded-2xl p-2" style={glassContainer}>
           <div className="grid grid-cols-4 gap-1.5">
-            {categories.map(({ key, label, icon: Icon }) => {
-              const active = activeSection === key
+
+            {/* Gastronomía — full-width top row */}
+            {(() => {
+              const active = activeSection === "gastronomy"
+              const Icon   = gastronomy.icon
+              return (
+                <motion.button
+                  key="gastronomy"
+                  onClick={() => handleClick("gastronomy")}
+                  whileTap={{ scale: 0.95 }}
+                  transition={{ type: "spring", stiffness: 500, damping: 28 }}
+                  className="col-span-4 flex flex-row items-center justify-center gap-3 py-3 px-4 rounded-xl cursor-pointer"
+                  style={{
+                    background: active
+                      ? "rgba(225,219,201,0.22)"
+                      : "rgba(225,219,201,0.09)",
+                    border: active
+                      ? "1px solid rgba(225,219,201,0.50)"
+                      : "1px solid rgba(225,219,201,0.18)",
+                  }}
+                >
+                  <Icon
+                    size={20}
+                    strokeWidth={active ? 2.2 : 1.8}
+                    style={{ color: active ? "#E1DBC9" : "rgba(225,219,201,0.85)", flexShrink: 0 }}
+                  />
+                  <span
+                    className={`text-sm leading-tight text-center tracking-wide ${active ? "font-bold" : "font-semibold"}`}
+                    style={{ color: active ? "#E1DBC9" : "rgba(225,219,201,0.85)" }}
+                  >
+                    Gastronomía
+                  </span>
+                </motion.button>
+              )
+            })()}
+
+            {/* Remaining 8 categories — two rows of 4 */}
+            {rest.map(({ key, label, icon: Icon }) => {
+              const active = key !== "sports" && activeSection === key
               const isInfo = key === "info"
               return (
                 <motion.button
@@ -111,12 +156,12 @@ export default function StickyCategoryBar({ stickyOffset = 0 }: Props) {
           </div>
         </div>
 
-        {/* ── DESKTOP: barra horizontal — min-h-[54px] estabiliza el layout antes de hidratación ── */}
+        {/* ── DESKTOP: barra horizontal ── */}
         <div className="hidden md:flex justify-center">
           <div className="max-w-6xl w-full rounded-2xl p-2 min-h-[54px]" style={glassContainer}>
             <div className="flex justify-evenly gap-1">
               {categories.map(({ key, label, icon: Icon }) => {
-                const active = activeSection === key
+                const active = key !== "sports" && activeSection === key
                 const isInfo = key === "info"
                 return (
                   <motion.button
