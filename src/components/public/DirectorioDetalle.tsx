@@ -130,12 +130,10 @@ export default function DirectorioDetalle({ business, section }: Props) {
     ? `https://wa.me/${waNum}?text=${encodeURIComponent(`Hola! Te consulto desde Calamuchita App — ${business.name} 🌿`)}`
     : null
 
-  // Maps: lat/lon si está disponible, sino dirección con número de calle.
-  // Una localidad genérica sin dígito ("Villa General Belgrano") devuelve null → no se muestra "Llegar".
   const mapsLink =
     business.latitude && business.longitude
       ? `https://www.google.com/maps/search/?api=1&query=${business.latitude},${business.longitude}`
-      : typeof business.address === "string" && /\d/.test(business.address.trim())
+      : typeof business.address === "string" && business.address.trim()
       ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${business.name} ${business.address.trim()}`)}`
       : null
 

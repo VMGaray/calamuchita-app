@@ -54,6 +54,24 @@ const pueblos = [
   "Potrero de Garay", "Villa Quillinzo",
 ]
 
+async function geocodeAddress(address: string): Promise<{ lat: number; lng: number } | null> {
+  const token = process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN
+  if (!token || !address.trim()) return null
+  try {
+    const res = await fetch(
+      `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(address)}.json?access_token=${token}&country=AR&limit=1&proximity=-64.5622,-31.9791`
+    )
+    if (!res.ok) return null
+    const data = await res.json()
+    const feature = data.features?.[0]
+    if (!feature) return null
+    const [lng, lat] = feature.center
+    return { lat, lng }
+  } catch {
+    return null
+  }
+}
+
 const generateUniqueSlug = async (baseSlug: string, supabase: any): Promise<string> => {
   let slug = baseSlug
   let counter = 1
@@ -162,6 +180,9 @@ export default function AdminNegocioForm() {
 
     const uniqueSlug = await generateUniqueSlug(baseSlug, supabase)
 
+    const fullAddress = form.pueblo ? `${form.address}, ${form.pueblo}` : form.address
+    const coords = fullAddress ? await geocodeAddress(fullAddress) : null
+
     const { error: insertError } = await supabase.from("businesses").insert({
       name: form.name,
       slug: uniqueSlug,
@@ -171,7 +192,9 @@ export default function AdminNegocioForm() {
       category: form.section === "gastronomy" ? form.category : null,
       categories: form.categories,
       subcategory: form.categories[0] || null,
-      address: form.pueblo ? `${form.address}, ${form.pueblo}` : form.address || null,
+      address: fullAddress || null,
+      latitude: coords?.lat ?? null,
+      longitude: coords?.lng ?? null,
       phone: form.phone || null,
       whatsapp: form.whatsapp || null,
       instagram: form.instagram || null,

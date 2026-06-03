@@ -211,17 +211,12 @@ export default function NegocioDetalle({ business, promotions = [] }: Props) {
     reservaForm.date !== "" && 
     reservaForm.time !== ""
 
-  // Sólo mostrar "Llegar" si hay coordenadas GPS o una dirección específica con número de calle.
-  // Una localidad genérica ("Villa General Belgrano") no tiene dígito y no cuenta.
-  const hasLocation =
-    !!(business.latitude && business.longitude) ||
-    (typeof business.address === "string" && /\d/.test(business.address.trim()))
-
-  const mapsExternalLink = hasLocation
-    ? business.latitude && business.longitude
+  const mapsExternalLink =
+    business.latitude && business.longitude
       ? `https://www.google.com/maps/search/?api=1&query=${business.latitude},${business.longitude}`
-      : `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${business.name}, ${business.address}`)}`
-    : null
+      : typeof business.address === "string" && business.address.trim()
+      ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${business.name}, ${business.address}`)}`
+      : null
 
   const photos: string[] =
     Array.isArray(business.business_photos) && business.business_photos.length > 0
