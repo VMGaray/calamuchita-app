@@ -1,7 +1,8 @@
 "use client"
 
+import { useRouter } from "next/navigation"
 import { useLocalidad } from "@/lib/context/LocalidadContext"
-import { MapPin } from "lucide-react"
+import { MapPin, ArrowLeft } from "lucide-react"
 
 interface Props {
   title: string
@@ -10,18 +11,27 @@ interface Props {
 
 export default function CategoryPageHeader({ title, description }: Props) {
   const { localidad } = useLocalidad()
+  const router = useRouter()
 
   return (
-    /* Reduje pt-10 a pt-4 y pb-8 a pb-2 para que todo el bloque suba */
     <div className="px-4 pt-4 pb-2 max-w-6xl mx-auto">
+      {/* Botón volver */}
+      <button
+        onClick={() => router.back()}
+        className="inline-flex items-center gap-1.5 mb-3 text-xs font-semibold uppercase tracking-wider transition-opacity hover:opacity-70 active:opacity-50"
+        style={{ color: "rgba(255,255,255,0.80)" }}
+      >
+        <ArrowLeft size={14} />
+        Volver
+      </button>
+
       <div
-        /* Reduje mb-4 a mb-2 para que el chip de localidad esté pegado al título */
         className="inline-flex items-center gap-1.5 mb-2 px-3 py-1 rounded-full text-xs font-medium"
-        style={{ 
-          background: "rgba(255,255,255,0.15)", 
-          color: "rgba(255,255,255,0.90)", 
-          backdropFilter: "blur(8px)", 
-          WebkitBackdropFilter: "blur(8px)" 
+        style={{
+          background: "rgba(255,255,255,0.15)",
+          color: "rgba(255,255,255,0.90)",
+          backdropFilter: "blur(8px)",
+          WebkitBackdropFilter: "blur(8px)"
         }}
       >
         <MapPin size={11} />

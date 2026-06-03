@@ -113,13 +113,13 @@ export default function BusinessesGrid() {
                 <Card3D className="h-full">
                   <Link href={`/negocios/${business.slug}`} className="block h-full">
                     <div className="bg-white rounded-2xl overflow-hidden border border-stone-200 h-full flex flex-col">
-                      <div className="h-24 relative bg-brand-pine/10">
+                      <div className="h-24 relative bg-white">
                         {business.cover_url ? (
                           <Image
                             src={business.cover_url}
                             alt={business.name}
                             fill
-                            className="object-cover"
+                            className="object-contain"
                             sizes="(max-width: 768px) 50vw, 25vw"
                             quality={70}
                           />

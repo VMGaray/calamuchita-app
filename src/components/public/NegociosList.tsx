@@ -212,7 +212,7 @@ export default function NegociosList({ params }: Props) {
                     }}
                   >
                     {/* Cover — aspect-video anti-CLS; shimmer debajo de la imagen durante la carga */}
-                    <div className="aspect-video relative bg-white/5">
+                    <div className="aspect-video relative bg-white/10">
                       {/* shimmer: queda cubierto por la imagen una vez que carga */}
                       <div className="absolute inset-0 animate-pulse bg-gradient-to-r from-white/0 via-white/[0.07] to-white/0" />
 
@@ -230,7 +230,7 @@ export default function NegociosList({ params }: Props) {
                           src={cover_url}
                           alt={name}
                           fill
-                          className="object-cover"
+                          className="object-contain"
                           sizes="(max-width: 768px) 88vw, (max-width: 1024px) 50vw, 33vw"
                           quality={70}
                           priority={i < 3}

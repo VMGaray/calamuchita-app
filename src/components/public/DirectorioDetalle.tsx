@@ -554,14 +554,14 @@ export default function DirectorioDetalle({ business, section, promotions = [] }
               )}
 
               {/* aspect-video fijo — CLS = 0.00 garantizado */}
-              <div className="flex-1 aspect-video rounded-2xl overflow-hidden relative bg-stone-100">
+              <div className="flex-1 aspect-video rounded-2xl overflow-hidden relative bg-white">
                 <div className="absolute inset-0 animate-pulse bg-gradient-to-r from-stone-100 via-stone-50 to-stone-100" />
                 <Image
                   src={photos[photoIdx]}
                   alt={`${business.name} — foto ${photoIdx + 1} de ${photos.length}`}
                   fill
                   priority={photoIdx === 0}
-                  className="object-cover"
+                  className="object-contain"
                   sizes="(max-width: 640px) calc(100vw - 32px), (max-width: 768px) calc(100vw - 80px), 640px"
                   quality={85}
                 />
