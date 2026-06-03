@@ -25,6 +25,7 @@ import Link from "next/link"
 import Image from "next/image"
 import CartaInteractiva from "@/components/public/CartaInteractiva"
 import { createClient } from "@/lib/supabase/client"
+import BackButton from "@/components/ui/BackButton"
 
 const DAY = ["Domingo", "Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado"]
 const GUEST_KEY = "calamuchita_app_guest"
@@ -254,9 +255,12 @@ export default function NegocioDetalle({ business, promotions = [] }: Props) {
     <div className="min-h-screen pb-24" style={{ background: "#F0EBE0" }}>
       <div className="max-w-2xl mx-auto px-4 flex flex-col gap-y-4 pt-5">
 
-        <Link href="/" className="inline-flex items-center gap-1.5 text-sm font-medium w-fit transition-opacity hover:opacity-60" style={{ color: "#2D4530" }}>
-          <ArrowLeft size={15} /> Volver
-        </Link>
+        <BackButton
+          fallbackHref="/negocios"
+          label="Volver"
+          className="text-sm font-medium w-fit"
+          style={{ color: "#2D4530" }}
+        />
 
         {/* CONTENEDOR INFORMACIÓN */}
         <div className="bg-white rounded-3xl border border-stone-100 shadow-sm overflow-hidden">

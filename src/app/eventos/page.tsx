@@ -2,8 +2,9 @@
 
 import { useEffect, useState } from "react"
 import { createClient } from "@/lib/supabase/client"
-import { Calendar, ArrowLeft } from "lucide-react"
+import { Calendar } from "lucide-react"
 import Link from "next/link"
+import BackButton from "@/components/ui/BackButton"
 import EventCard from "@/components/events/EventCard"
 import { DATA_TELEFONOS } from "@/lib/constants/telefonos"
 
@@ -42,9 +43,12 @@ export default function EventosPage() {
 
       {/* Header */}
       <div className="bg-[#2D4530] pt-16 pb-10 px-6 rounded-b-[40px] shadow-lg">
-        <Link href="/" className="inline-flex items-center gap-2 text-white/60 text-xs font-bold uppercase tracking-widest mb-6 hover:text-white transition-colors">
-          <ArrowLeft size={14} /> Volver
-        </Link>
+        <BackButton
+          fallbackHref="/"
+          label="Volver"
+          className="text-xs font-bold uppercase tracking-widest mb-6"
+          style={{ color: "rgba(255,255,255,0.60)" }}
+        />
         <h1 className="font-serif text-4xl text-[#E1DBC9] font-bold">Agenda<br />del Valle</h1>
         <p className="text-white/50 text-sm mt-2 font-medium">Los mejores momentos de Calamuchita en un solo lugar.</p>
       </div>

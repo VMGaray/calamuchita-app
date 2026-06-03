@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react"
 import Image from "next/image"
 import Link from "next/link"
+import BackButton from "@/components/ui/BackButton"
 import {
   Phone, AtSign, MapPin, Clock, ArrowLeft,
   Globe, CreditCard, PawPrint, Truck, ShoppingBag,
@@ -196,14 +197,12 @@ export default function DirectorioDetalle({ business, section, promotions = [] }
       <div className="max-w-2xl mx-auto px-4 flex flex-col gap-y-4 pt-5">
 
         {/* 1 ── Volver ──────────────────────────────────────────────────── */}
-        <Link
-          href={`/directorio/${section}`}
-          className="inline-flex items-center gap-1.5 text-sm font-medium w-fit transition-opacity hover:opacity-60"
+        <BackButton
+          fallbackHref={`/directorio/${section}`}
+          label={SECTION_TITLES[section] ?? "Volver"}
+          className="text-sm font-medium w-fit"
           style={{ color: "#2D4530" }}
-        >
-          <ArrowLeft size={15} />
-          {SECTION_TITLES[section] ?? "Volver"}
-        </Link>
+        />
 
         {/* 2 ═══════════════════════════════════════════════════════════════
             BLOQUE 1 — MARCA + INFORMACIÓN

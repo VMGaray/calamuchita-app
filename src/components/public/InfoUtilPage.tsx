@@ -10,6 +10,7 @@ import {
   ArrowLeft, RefreshCw, ExternalLink, Clock, Dog, CreditCard,
 } from "lucide-react"
 import Link from "next/link"
+import BackButton from "@/components/ui/BackButton"
 import { LOCALIDADES, MAIN_LOCALIDADES } from "@/lib/constants/telefonos"
 import { useLocalidad } from "@/lib/context/LocalidadContext"
 import { createClient } from "@/lib/supabase/client"
@@ -339,14 +340,12 @@ export default function InfoUtilPage({ initialCategoria, initialPueblo }: Props)
     <div className="max-w-6xl mx-auto px-4 md:px-6 py-8">
 
       {/* Breadcrumb */}
-      <Link
-        href="/"
-        className="inline-flex items-center gap-1.5 text-sm mb-6 transition-opacity hover:opacity-70"
+      <BackButton
+        fallbackHref="/"
+        label="Volver"
+        className="text-sm mb-6"
         style={{ color: "rgba(45,69,48,0.55)" }}
-      >
-        <ArrowLeft size={14} />
-        Volver al inicio
-      </Link>
+      />
 
       {/* Page header */}
       <div className="flex items-center gap-3 mb-8">
