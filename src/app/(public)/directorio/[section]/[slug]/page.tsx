@@ -71,6 +71,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 export default async function DirectorioDetallePage({ params }: Props) {
   const { slug, section } = await params
   const supabase = await createClient()
+  const today = new Date().toISOString().split("T")[0]
 
   const { data: business } = await supabase
     .from("businesses")
@@ -86,9 +87,18 @@ export default async function DirectorioDetallePage({ params }: Props) {
 
   if (!business) notFound()
 
+  const { data: promotionsData } = await supabase
+    .from("promotions")
+    .select("id, title, description, discount_percentage, discount_label, valid_until")
+    .eq("business_id", business.id)
+    .eq("is_active", true)
+    .gte("valid_until", today)
+    .order("created_at", { ascending: false })
+    .limit(3)
+
   return (
     <BackgroundManager>
-      <DirectorioDetalle business={business} section={section} />
+      <DirectorioDetalle business={business} section={section} promotions={promotionsData ?? []} />
     </BackgroundManager>
   )
 }

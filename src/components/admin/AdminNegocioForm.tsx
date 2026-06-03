@@ -27,6 +27,11 @@ const gastronomyCategories: { value: BusinessCategory; label: string }[] = [
   { value: "other",      label: "Otro" },
 ]
 
+const PROFESIONALES_OPTIONS = [
+  "Contador", "Abogado", "Geólogo", "Arquitecto",
+  "Desarrollador/a web", "Ingeniero", "Diseño gráfico", "Fotógrafo", "Traductor",
+]
+
 const subcategoryOptions: Record<string, string[]> = {
   services: MASTER_CATEGORIES.services.subcategories.map(s => s.label),
   commerce: MASTER_CATEGORIES.commerce.subcategories.map(s => s.label),
@@ -94,6 +99,7 @@ export default function AdminNegocioForm() {
   const [horarios, setHorarios] = useState<HorarioDay[]>(defaultHorarios)
   const [galleryPhotos, setGalleryPhotos] = useState<(string | null)[]>([null, null, null])
   const [branches, setBranches] = useState<Array<{ address: string; pueblo: string }>>([])
+  const [professionalType, setProfessionalType] = useState("")
 
   const [form, setForm] = useState({
     name: "",
@@ -183,6 +189,11 @@ export default function AdminNegocioForm() {
     const fullAddress = form.pueblo ? `${form.address}, ${form.pueblo}` : form.address
     const coords = fullAddress ? await geocodeAddress(fullAddress) : null
 
+    const hasProfesionales = form.categories.includes("Profesionales")
+    const finalCategories = hasProfesionales && professionalType
+      ? [...new Set([...form.categories, professionalType])]
+      : form.categories
+
     const { error: insertError } = await supabase.from("businesses").insert({
       name: form.name,
       slug: uniqueSlug,
@@ -190,8 +201,8 @@ export default function AdminNegocioForm() {
       section: form.section,
       type: form.section === "gastronomy" ? "gastronomy" : "directory",
       category: form.section === "gastronomy" ? form.category : null,
-      categories: form.categories,
-      subcategory: form.categories[0] || null,
+      categories: finalCategories,
+      subcategory: finalCategories[0] || null,
       address: fullAddress || null,
       latitude: coords?.lat ?? null,
       longitude: coords?.lng ?? null,
@@ -325,6 +336,29 @@ export default function AdminNegocioForm() {
                       </button>
                     )
                   })}
+                </div>
+              )}
+
+              {/* Selector de tipo de profesional */}
+              {form.section === "services" && form.categories.includes("Profesionales") && (
+                <div className="mt-3 p-4 bg-violet-50 rounded-xl border border-violet-100">
+                  <label className="block text-xs font-semibold text-violet-700 mb-2">Tipo de profesional</label>
+                  <div className="flex gap-2 flex-wrap">
+                    {PROFESIONALES_OPTIONS.map(opt => (
+                      <button
+                        key={opt}
+                        type="button"
+                        onClick={() => setProfessionalType(prev => prev === opt ? "" : opt)}
+                        className={`py-1.5 px-3 rounded-xl text-xs font-medium border transition-colors ${
+                          professionalType === opt
+                            ? "bg-violet-600 text-white border-violet-600"
+                            : "bg-white text-stone-600 border-stone-200 hover:border-violet-300"
+                        }`}
+                      >
+                        {opt}
+                      </button>
+                    ))}
+                  </div>
                 </div>
               )}
 

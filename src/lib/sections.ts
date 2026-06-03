@@ -26,6 +26,7 @@ export const sectionCategories = {
     { label: "Piletero", desc: "Piletas y mantenimiento", href: "/directorio/services?cat=piletero", bg: "bg-brand-slate/10", color: "text-brand-slate" },
     { label: "Pintor", desc: "Pintura interior y exterior", href: "/directorio/services?cat=pintor", bg: "bg-brand-earth/10", color: "text-brand-earth" },
     { label: "Plomería", desc: "Instalaciones y reparaciones", href: "/directorio/services?cat=plomeria", bg: "bg-brand-slate/10", color: "text-brand-slate" },
+    { label: "Profesionales", desc: "Contadores, abogados, arquitectos y más", href: "/directorio/services?cat=profesionales", bg: "bg-violet-100", color: "text-violet-700" },
     { label: "Venta de áridos", desc: "Arena, piedra y materiales", href: "/directorio/services?cat=aridos", bg: "bg-brand-slate/10", color: "text-brand-slate" },
     { label: "Zinguero", desc: "Techos y canaletas", href: "/directorio/services?cat=zinguero", bg: "bg-brand-slate/10", color: "text-brand-slate" },
     { label: "Varios", desc: "Otros servicios del valle", href: "/directorio/services?cat=varios", bg: "bg-brand-sand/50", color: "text-brand-charcoal" },

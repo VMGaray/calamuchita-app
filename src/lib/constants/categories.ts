@@ -5,7 +5,7 @@ import {
   GraduationCap, BookOpen, Languages, Users, Music, Trophy, Palette,
   Hotel, Map, Tent, Activity, Compass, Bike, Plane,
   Utensils, Coffee, Beer, ShoppingBag, Clock,
-  Truck, Mountain, Printer, CreditCard
+  Truck, Mountain, Printer, CreditCard, Briefcase
 } from "lucide-react"
 
 export const MASTER_CATEGORIES = {
@@ -40,6 +40,7 @@ export const MASTER_CATEGORIES = {
       { label: "Pintor", icon: Paintbrush, bg: "bg-purple-50", color: "text-purple-600" },
       { label: "Plomería", icon: Wrench, bg: "bg-blue-50", color: "text-blue-600" },
       { label: "Venta de áridos", icon: Mountain, bg: "bg-stone-50", color: "text-stone-600" },
+      { label: "Profesionales", icon: Briefcase, bg: "bg-violet-50", color: "text-violet-600" },
       { label: "Zinguero", icon: Home, bg: "bg-slate-50", color: "text-slate-600" },
       { label: "Otro", icon: Sparkles, bg: "bg-stone-50", color: "text-stone-400" },
     ]

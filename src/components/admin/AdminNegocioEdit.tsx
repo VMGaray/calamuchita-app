@@ -28,6 +28,11 @@ const gastronomyCategories: { value: BusinessCategory; label: string }[] = [
   { value: "viandas",    label: "Viandas" },
   { value: "other",      label: "Otro" },
 ]
+const PROFESIONALES_OPTIONS = [
+  "Contador", "Abogado", "Geólogo", "Arquitecto",
+  "Desarrollador/a web", "Ingeniero", "Diseño gráfico", "Fotógrafo", "Traductor",
+]
+
 const subcategoryOptions: Record<string, string[]> = {
   services: MASTER_CATEGORIES.services.subcategories.map(s => s.label),
   commerce: MASTER_CATEGORIES.commerce.subcategories.map(s => s.label),
@@ -73,6 +78,7 @@ export default function AdminNegocioEdit({ id }: Props) {
   const [horarios, setHorarios] = useState<HorarioDay[]>(defaultHorarios)
   const [galleryPhotos, setGalleryPhotos] = useState<(string | null)[]>([null, null, null])
   const [branches, setBranches] = useState<Array<{ address: string; pueblo: string }>>([])
+  const [professionalType, setProfessionalType] = useState("")
 
   const [form, setForm] = useState({
     name: "",
@@ -138,6 +144,9 @@ export default function AdminNegocioEdit({ id }: Props) {
           is_premium: business.is_premium || false,
         })
         setBranches(business.branches || [])
+        const cats: string[] = business.categories || []
+        const profType = cats.find((c: string) => PROFESIONALES_OPTIONS.includes(c)) || ""
+        setProfessionalType(profType)
       }
 
       const { data: horariosData } = await supabase
@@ -177,6 +186,13 @@ export default function AdminNegocioEdit({ id }: Props) {
     const fullAddress = form.pueblo ? `${form.address}, ${form.pueblo}` : form.address
     const coords = fullAddress ? await geocodeAddress(fullAddress) : null
 
+    const isProfesionales = form.section === "services" && form.subcategory === "Profesionales"
+    const updatedCategories = isProfesionales && professionalType
+      ? ["Profesionales", professionalType]
+      : isProfesionales
+      ? ["Profesionales"]
+      : [form.subcategory].filter(Boolean)
+
     const { error: updateError } = await supabase
       .from("businesses")
       .update({
@@ -186,6 +202,7 @@ export default function AdminNegocioEdit({ id }: Props) {
         section: form.section,
         category: form.section === "gastronomy" ? form.category : null,
         subcategory: form.subcategory || null,
+        categories: updatedCategories,
         address: fullAddress || null,
         ...(coords ? { latitude: coords.lat, longitude: coords.lng } : {}),
         phone: form.phone || null,
@@ -342,6 +359,27 @@ export default function AdminNegocioEdit({ id }: Props) {
             {opt}
           </button>
         ))}
+      </div>
+    )}
+    {form.section === "services" && form.subcategory === "Profesionales" && (
+      <div className="mt-3 p-4 bg-violet-50 rounded-xl border border-violet-100">
+        <label className="block text-xs font-semibold text-violet-700 mb-2">Tipo de profesional</label>
+        <div className="flex gap-2 flex-wrap">
+          {PROFESIONALES_OPTIONS.map(opt => (
+            <button
+              key={opt}
+              type="button"
+              onClick={() => setProfessionalType(prev => prev === opt ? "" : opt)}
+              className={`py-1.5 px-3 rounded-xl text-xs font-medium border transition-colors ${
+                professionalType === opt
+                  ? "bg-violet-600 text-white border-violet-600"
+                  : "bg-white text-stone-600 border-stone-200 hover:border-violet-300"
+              }`}
+            >
+              {opt}
+            </button>
+          ))}
+        </div>
       </div>
     )}
     <input type="text" value={form.subcategory}
