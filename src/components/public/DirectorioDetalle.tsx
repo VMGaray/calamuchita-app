@@ -522,7 +522,64 @@ export default function DirectorioDetalle({ business, section, promotions = [] }
           </div>
         )}
 
-        {/* 6 ═══════════════════════════════════════════════════════════════
+        {/* 6 ── Profesionales del establecimiento (clínicas y salud) ───── */}
+        {Array.isArray(business.professionals) && business.professionals.length > 0 && (() => {
+          const groups = business.professionals.reduce((acc: Record<string, any[]>, pro: any) => {
+            const key = pro.specialty_group || "Otros"
+            if (!acc[key]) acc[key] = []
+            acc[key].push(pro)
+            return acc
+          }, {})
+          return (
+            <div className="bg-white rounded-3xl border border-stone-100 shadow-sm p-5 space-y-5">
+              <p className="text-[10px] font-black uppercase tracking-[0.2em]" style={{ color: "rgba(45,69,48,0.40)" }}>
+                Profesionales
+              </p>
+              {business.appointment_system && (
+                <p className="text-xs text-stone-500 -mt-3">{business.appointment_system}</p>
+              )}
+              {business.has_24h_guard && (
+                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold -mt-2"
+                  style={{ background: "rgba(45,69,48,0.08)", color: "#2D4530" }}>
+                  ✦ Guardia 24 hs
+                </span>
+              )}
+              {Object.entries(groups).map(([group, members]) => (
+                <div key={group}>
+                  <p className="text-[10px] font-black uppercase tracking-[0.15em] mb-2 pb-1 border-b border-stone-100"
+                    style={{ color: "#2D4530" }}>
+                    ✨ {group}
+                  </p>
+                  <div className="space-y-3">
+                    {(members as any[]).map((pro: any, i: number) => (
+                      <div key={i} className="text-sm">
+                        <p className="font-semibold" style={{ color: "#2D4530" }}>
+                          {pro.name}
+                          {pro.specialty && <span className="font-normal text-stone-500"> · {pro.specialty}</span>}
+                        </p>
+                        {pro.description && <p className="text-xs text-stone-500 mt-0.5">{pro.description}</p>}
+                        {pro.schedule && <p className="text-xs text-stone-400 mt-0.5">🕐 {pro.schedule}</p>}
+                        {pro.contact && (
+                          <a
+                            href={pro.contact.startsWith("http") ? pro.contact : `tel:${pro.contact.replace(/\D/g, "")}`}
+                            target={pro.contact.startsWith("http") ? "_blank" : undefined}
+                            rel="noopener noreferrer"
+                            className="text-xs font-medium mt-1 inline-block"
+                            style={{ color: "#2D4530" }}
+                          >
+                            {pro.contact.startsWith("http") ? "📅 Sacar turno" : `📞 ${pro.contact}`}
+                          </a>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </div>
+          )
+        })()}
+
+        {/* 7 ═══════════════════════════════════════════════════════════════
             BLOQUE 3 — GALERÍA DE FOTOS (al final del flujo)
         ════════════════════════════════════════════════════════════════ */}
         {photos.length > 0 && (

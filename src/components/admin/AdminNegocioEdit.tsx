@@ -45,6 +45,21 @@ const subcategoryOptions: Record<string, string[]> = {
   info:      ["Cooperativas", "Emergencias", "Farmacias", "Municipalidad", "Transporte", "Turismo oficial", "Otro"],
 }
 
+const SPECIALTY_GROUPS = [
+  "Medicina", "Pediatría", "Psicología", "Kinesiología / Fisioterapia",
+  "Nutrición", "Fonoaudiología", "Cosmiatría", "Reflexología",
+  "Odontología", "Farmacia", "Laboratorio", "Otros",
+]
+
+interface Professional {
+  name: string
+  specialty_group: string
+  specialty: string
+  description: string
+  schedule: string
+  contact: string
+}
+
 const pueblos = [
   "Villa General Belgrano", "Los Reartes", "Santa Rosa de Calamuchita",
   "La Cumbrecita", "Yacanto", "Amboy", "Villa Ciudad de América",
@@ -83,6 +98,7 @@ export default function AdminNegocioEdit({ id }: Props) {
   const [galleryPhotos, setGalleryPhotos] = useState<(string | null)[]>([null, null, null])
   const [branches, setBranches] = useState<Array<{ address: string; pueblo: string }>>([])
   const [professionalType, setProfessionalType] = useState("")
+  const [professionals, setProfessionals] = useState<Professional[]>([])
 
   const [form, setForm] = useState({
     name: "",
@@ -108,6 +124,8 @@ export default function AdminNegocioEdit({ id }: Props) {
     pet_friendly: false,
     payment_methods: [] as string[],
     is_premium: false,
+    has_24h_guard: false,
+    appointment_system: "",
   })
 
   useEffect(() => {
@@ -146,8 +164,11 @@ export default function AdminNegocioEdit({ id }: Props) {
           pet_friendly: business.pet_friendly || false,
           payment_methods: business.payment_methods || [],
           is_premium: business.is_premium || false,
+          has_24h_guard: business.has_24h_guard || false,
+          appointment_system: business.appointment_system || "",
         })
         setBranches(business.branches || [])
+        setProfessionals(Array.isArray(business.professionals) ? business.professionals : [])
         const cats: string[] = business.categories || []
         const profType = cats.find((c: string) => PROFESIONALES_OPTIONS.includes(c)) || ""
         setProfessionalType(profType)
@@ -224,6 +245,9 @@ export default function AdminNegocioEdit({ id }: Props) {
         pet_friendly: form.pet_friendly,
         payment_methods: form.payment_methods,
         is_premium: form.is_premium,
+        professionals: form.section === "health" ? professionals : [],
+        has_24h_guard: form.section === "health" ? form.has_24h_guard : false,
+        appointment_system: form.section === "health" ? form.appointment_system || null : null,
       })
       .eq("id", id)
 
@@ -653,6 +677,102 @@ export default function AdminNegocioEdit({ id }: Props) {
             </button>
           </div>
         </div>
+
+        {/* Salud — profesionales */}
+        {form.section === "health" && (
+          <div className="bg-white rounded-2xl border border-stone-200 p-6 space-y-5">
+            <h2 className="text-sm font-medium text-stone-700">Profesionales del establecimiento</h2>
+
+            <div className="space-y-3">
+              <label className="flex items-center gap-3 cursor-pointer">
+                <input type="checkbox" checked={form.has_24h_guard}
+                  onChange={e => handleChange("has_24h_guard", e.target.checked)}
+                  className="w-4 h-4 accent-primary-500" />
+                <div>
+                  <span className="text-sm text-stone-700">Guardia de 24 hs</span>
+                  <p className="text-xs text-stone-400">Atención de emergencias las 24 horas</p>
+                </div>
+              </label>
+              <div>
+                <label className="block text-sm font-medium text-stone-700 mb-1">Sistema de turnos</label>
+                <input type="text" value={form.appointment_system}
+                  onChange={e => handleChange("appointment_system", e.target.value)}
+                  placeholder="Ej: Cada profesional administra su agenda"
+                  className="w-full px-4 py-2.5 rounded-xl border border-stone-200 text-stone-800 text-sm outline-none focus:ring-2 focus:ring-primary-300" />
+              </div>
+            </div>
+
+            <div className="pt-2 border-t border-stone-100">
+              <div className="flex items-center justify-between mb-3">
+                <span className="text-sm font-medium text-stone-700">Profesionales</span>
+                <button type="button"
+                  onClick={() => setProfessionals(prev => [...prev, { name: "", specialty_group: "Medicina", specialty: "", description: "", schedule: "", contact: "" }])}
+                  className="text-xs font-medium px-3 py-1.5 rounded-xl border border-primary-300 text-primary-600 hover:bg-primary-50 transition-colors">
+                  + Agregar
+                </button>
+              </div>
+              {professionals.length === 0 && (
+                <p className="text-xs text-stone-400">Sin profesionales cargados.</p>
+              )}
+              <div className="space-y-3">
+                {professionals.map((pro, i) => (
+                  <div key={i} className="p-4 rounded-xl border border-stone-200 bg-stone-50 space-y-3">
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs font-semibold text-stone-600">Profesional {i + 1}</span>
+                      <button type="button" onClick={() => setProfessionals(prev => prev.filter((_, idx) => idx !== i))}
+                        className="text-xs text-red-400 hover:text-red-500">Eliminar</button>
+                    </div>
+                    <div className="grid grid-cols-2 gap-3">
+                      <div className="col-span-2">
+                        <label className="block text-xs text-stone-500 mb-1">Nombre completo</label>
+                        <input type="text" value={pro.name}
+                          onChange={e => setProfessionals(prev => prev.map((p, idx) => idx === i ? { ...p, name: e.target.value } : p))}
+                          placeholder="Ej: Dra. Carolina Pereira"
+                          className="w-full px-3 py-2 rounded-lg border border-stone-200 text-stone-800 text-sm outline-none focus:ring-2 focus:ring-primary-300" />
+                      </div>
+                      <div>
+                        <label className="block text-xs text-stone-500 mb-1">Área</label>
+                        <select value={pro.specialty_group}
+                          onChange={e => setProfessionals(prev => prev.map((p, idx) => idx === i ? { ...p, specialty_group: e.target.value } : p))}
+                          className="w-full px-3 py-2 rounded-lg border border-stone-200 text-stone-800 text-sm outline-none focus:ring-2 focus:ring-primary-300 bg-white">
+                          {SPECIALTY_GROUPS.map(g => <option key={g} value={g}>{g}</option>)}
+                        </select>
+                      </div>
+                      <div>
+                        <label className="block text-xs text-stone-500 mb-1">Especialidad específica</label>
+                        <input type="text" value={pro.specialty}
+                          onChange={e => setProfessionals(prev => prev.map((p, idx) => idx === i ? { ...p, specialty: e.target.value } : p))}
+                          placeholder="Ej: Médica Clínica, Diabetóloga"
+                          className="w-full px-3 py-2 rounded-lg border border-stone-200 text-stone-800 text-sm outline-none focus:ring-2 focus:ring-primary-300" />
+                      </div>
+                      <div className="col-span-2">
+                        <label className="block text-xs text-stone-500 mb-1">Descripción / Enfoque</label>
+                        <input type="text" value={pro.description}
+                          onChange={e => setProfessionals(prev => prev.map((p, idx) => idx === i ? { ...p, description: e.target.value } : p))}
+                          placeholder="Ej: Sobrepeso, obesidad"
+                          className="w-full px-3 py-2 rounded-lg border border-stone-200 text-stone-800 text-sm outline-none focus:ring-2 focus:ring-primary-300" />
+                      </div>
+                      <div>
+                        <label className="block text-xs text-stone-500 mb-1">Días y horarios</label>
+                        <input type="text" value={pro.schedule}
+                          onChange={e => setProfessionals(prev => prev.map((p, idx) => idx === i ? { ...p, schedule: e.target.value } : p))}
+                          placeholder="Ej: Lunes y miércoles de 8 a 14 hs"
+                          className="w-full px-3 py-2 rounded-lg border border-stone-200 text-stone-800 text-sm outline-none focus:ring-2 focus:ring-primary-300" />
+                      </div>
+                      <div>
+                        <label className="block text-xs text-stone-500 mb-1">Contacto / Turnos</label>
+                        <input type="text" value={pro.contact}
+                          onChange={e => setProfessionals(prev => prev.map((p, idx) => idx === i ? { ...p, contact: e.target.value } : p))}
+                          placeholder="Teléfono o link de turnos"
+                          className="w-full px-3 py-2 rounded-lg border border-stone-200 text-stone-800 text-sm outline-none focus:ring-2 focus:ring-primary-300" />
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* QR Marketing */}
         <QRMarketing name={form.name} slug={form.slug} section={form.section} />
