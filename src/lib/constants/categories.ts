@@ -87,6 +87,8 @@ export const MASTER_CATEGORIES = {
     label: "Deportes",
     subcategories: [
       { label: "Fútbol", icon: Trophy, bg: "bg-green-50", color: "text-green-600" },
+      { label: "Pádel", icon: Activity, bg: "bg-blue-50", color: "text-blue-600" },
+      { label: "Vóley", icon: Users, bg: "bg-indigo-50", color: "text-indigo-600" },
       { label: "Tenis", icon: Activity, bg: "bg-yellow-50", color: "text-yellow-600" },
       { label: "Natación", icon: Waves, bg: "bg-sky-50", color: "text-sky-600" },
       { label: "Ciclismo", icon: Bike, bg: "bg-orange-50", color: "text-orange-600" },

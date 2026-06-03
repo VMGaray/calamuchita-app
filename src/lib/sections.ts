@@ -51,6 +51,8 @@ export const sectionCategories = {
   ],
   sports: [
     { label: "Fútbol", desc: "Escuelas y clubs", href: "/directorio/sports?cat=futbol", bg: "bg-brand-pine/10", color: "text-brand-pine" },
+    { label: "Pádel", desc: "Canchas y escuelas de pádel", href: "/directorio/sports?cat=padel", bg: "bg-brand-slate/10", color: "text-brand-slate" },
+    { label: "Vóley", desc: "Clubes y escuelas de vóley", href: "/directorio/sports?cat=voley", bg: "bg-brand-pine/10", color: "text-brand-pine" },
     { label: "Tenis", desc: "Escuelas y clubes de tenis", href: "/directorio/sports?cat=tenis", bg: "bg-brand-earth/10", color: "text-brand-earth" },
     { label: "Natación", desc: "Piletas y escuelas de natación", href: "/directorio/sports?cat=natacion", bg: "bg-brand-slate/10", color: "text-brand-slate" },
     { label: "Ciclismo", desc: "Cicloturismo y escuelas", href: "/directorio/sports?cat=ciclismo", bg: "bg-brand-earth/10", color: "text-brand-earth" },
