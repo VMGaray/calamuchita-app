@@ -11,6 +11,7 @@ export type BusinessSection =
   | 'events'
   | 'info'
   | 'education'
+  | 'sports'
 export type OrderType = 'takeaway' | 'delivery'
 export type OrderStatus = 'pending' | 'confirmed' | 'ready' | 'completed' | 'cancelled'
 export type ReservationStatus = 'pending' | 'confirmed' | 'rejected' | 'completed' | 'no_show'

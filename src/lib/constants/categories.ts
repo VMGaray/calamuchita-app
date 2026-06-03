@@ -5,7 +5,8 @@ import {
   GraduationCap, BookOpen, Languages, Users, Music, Trophy, Palette,
   Hotel, Map, Tent, Activity, Compass, Bike, Plane,
   Utensils, Coffee, Beer, ShoppingBag, Clock,
-  Truck, Mountain, Printer, CreditCard, Briefcase
+  Truck, Mountain, Printer, CreditCard, Briefcase,
+  Dumbbell, PersonStanding, Timer, Wind
 } from "lucide-react"
 
 export const MASTER_CATEGORIES = {
@@ -78,9 +79,23 @@ export const MASTER_CATEGORIES = {
     subcategories: [
       { label: "Arte y Música", icon: Music, bg: "bg-pink-50", color: "text-pink-600" },
       { label: "Colegios", icon: GraduationCap, bg: "bg-indigo-50", color: "text-indigo-600" },
-      { label: "Deporte", icon: Trophy, bg: "bg-yellow-50", color: "text-yellow-600" },
       { label: "Idiomas", icon: Languages, bg: "bg-violet-50", color: "text-violet-600" },
       { label: "Maestras/os Particulares", icon: Users, bg: "bg-orange-50", color: "text-orange-600" },
+    ]
+  },
+  sports: {
+    label: "Deportes",
+    subcategories: [
+      { label: "Fútbol", icon: Trophy, bg: "bg-green-50", color: "text-green-600" },
+      { label: "Tenis", icon: Activity, bg: "bg-yellow-50", color: "text-yellow-600" },
+      { label: "Natación", icon: Waves, bg: "bg-sky-50", color: "text-sky-600" },
+      { label: "Ciclismo", icon: Bike, bg: "bg-orange-50", color: "text-orange-600" },
+      { label: "Trekking / Montaña", icon: Mountain, bg: "bg-stone-50", color: "text-stone-600" },
+      { label: "Yoga / Pilates", icon: PersonStanding, bg: "bg-purple-50", color: "text-purple-600" },
+      { label: "Gimnasio", icon: Dumbbell, bg: "bg-red-50", color: "text-red-600" },
+      { label: "Artes marciales", icon: Wind, bg: "bg-zinc-50", color: "text-zinc-600" },
+      { label: "Running", icon: Timer, bg: "bg-amber-50", color: "text-amber-600" },
+      { label: "Otro", icon: Sparkles, bg: "bg-stone-50", color: "text-stone-400" },
     ]
   },
   tourism: {

@@ -14,6 +14,7 @@ const sections: { value: BusinessSection; label: string }[] = [
   { value: "services",   label: "Servicios" },
   { value: "health",     label: "Salud" },
   { value: "education",  label: "Educación" },
+  { value: "sports",     label: "Deportes" },
   { value: "tourism",    label: "Turismo" },
   { value: "commerce",   label: "Comercios" },
   { value: "events",     label: "Eventos" },
@@ -33,11 +34,14 @@ const PROFESIONALES_OPTIONS = [
 ]
 
 const subcategoryOptions: Record<string, string[]> = {
-  services: MASTER_CATEGORIES.services.subcategories.map(s => s.label),
-  commerce: MASTER_CATEGORIES.commerce.subcategories.map(s => s.label),
-  health: MASTER_CATEGORIES.health.subcategories.map(s => s.label),
+  services:  MASTER_CATEGORIES.services.subcategories.map(s => s.label),
+  commerce:  MASTER_CATEGORIES.commerce.subcategories.map(s => s.label),
+  health:    MASTER_CATEGORIES.health.subcategories.map(s => s.label),
   education: MASTER_CATEGORIES.education.subcategories.map(s => s.label),
-  tourism: MASTER_CATEGORIES.tourism.subcategories.map(s => s.label),
+  tourism:   MASTER_CATEGORIES.tourism.subcategories.map(s => s.label),
+  sports:    MASTER_CATEGORIES.sports.subcategories.map(s => s.label),
+  events:    ["Culturales", "Deportivos", "Festivales", "Gastronómicos", "Infantiles", "Música", "Otro"],
+  info:      ["Cooperativas", "Emergencias", "Farmacias", "Municipalidad", "Transporte", "Turismo oficial", "Otro"],
 }
 
 const COBERTURAS = [
@@ -260,7 +264,7 @@ export default function AdminNegocioForm() {
 
   const isGastronomy = form.section === "gastronomy"
   const isHealth = form.section === "health"
-  const isServicesOrCommerce = ["services", "commerce", "health", "tourism", "education"].includes(form.section)
+  const isServicesOrCommerce = ["services", "commerce", "health", "tourism", "education", "sports", "events", "info"].includes(form.section)
 
   return (
     <div className="max-w-2xl">

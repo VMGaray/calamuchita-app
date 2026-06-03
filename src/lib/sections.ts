@@ -45,10 +45,21 @@ export const sectionCategories = {
   education: [
     { label: "Arte y Música", desc: "Talleres y conservatorios", href: "/directorio/education?cat=arte", bg: "bg-brand-earth/10", color: "text-brand-earth" },
     { label: "Colegios", desc: "Escuelas primarias y secundarias", href: "/directorio/education?cat=colegios", bg: "bg-brand-pine/10", color: "text-brand-pine" },
-    { label: "Deporte", desc: "Escuelas deportivas", href: "/directorio/education?cat=deporte", bg: "bg-brand-slate/10", color: "text-brand-slate" },
     { label: "Idiomas", desc: "Inglés, portugués y más", href: "/directorio/education?cat=idiomas", bg: "bg-brand-slate/10", color: "text-brand-slate" },
     { label: "Maestras/os Particulares", desc: "Apoyo escolar y tutorías", href: "/directorio/education?cat=maestras", bg: "bg-brand-earth/10", color: "text-brand-earth" },
     { label: "Todos", desc: "Ver toda la oferta educativa", href: "/directorio/education", bg: "bg-brand-sand/50", color: "text-brand-charcoal" },
+  ],
+  sports: [
+    { label: "Fútbol", desc: "Escuelas y clubs", href: "/directorio/sports?cat=futbol", bg: "bg-brand-pine/10", color: "text-brand-pine" },
+    { label: "Tenis", desc: "Escuelas y clubes de tenis", href: "/directorio/sports?cat=tenis", bg: "bg-brand-earth/10", color: "text-brand-earth" },
+    { label: "Natación", desc: "Piletas y escuelas de natación", href: "/directorio/sports?cat=natacion", bg: "bg-brand-slate/10", color: "text-brand-slate" },
+    { label: "Ciclismo", desc: "Cicloturismo y escuelas", href: "/directorio/sports?cat=ciclismo", bg: "bg-brand-earth/10", color: "text-brand-earth" },
+    { label: "Trekking / Montaña", desc: "Senderismo y escalada", href: "/directorio/sports?cat=trekking", bg: "bg-brand-slate/10", color: "text-brand-slate" },
+    { label: "Yoga / Pilates", desc: "Clases y estudios", href: "/directorio/sports?cat=yoga", bg: "bg-brand-pine/10", color: "text-brand-pine" },
+    { label: "Gimnasio", desc: "Fitness y musculación", href: "/directorio/sports?cat=gimnasio", bg: "bg-brand-slate/10", color: "text-brand-slate" },
+    { label: "Artes marciales", desc: "Judo, karate, box y más", href: "/directorio/sports?cat=artes-marciales", bg: "bg-brand-charcoal/10", color: "text-brand-charcoal" },
+    { label: "Running", desc: "Grupos y entrenadores", href: "/directorio/sports?cat=running", bg: "bg-brand-earth/10", color: "text-brand-earth" },
+    { label: "Todos", desc: "Ver todos los deportes", href: "/directorio/sports", bg: "bg-brand-sand/50", color: "text-brand-charcoal" },
   ],
   tourism: [
     { label: "Actividades y Paseos", desc: "Deportes y recreación", href: "/directorio/tourism?cat=actividades", bg: "bg-brand-pine/10", color: "text-brand-pine" },
