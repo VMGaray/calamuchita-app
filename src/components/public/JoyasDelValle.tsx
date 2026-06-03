@@ -207,7 +207,7 @@ export default function JoyasDelValle({ businesses }: { businesses: FeaturedBusi
           </p>
           <div className="flex justify-end items-end gap-4">
             <Link
-              href="/negocios"
+              href="/destacados"
               className="group flex items-center gap-2 text-xs font-black text-[#2D4530] uppercase border-b-2 border-[#2D4530] pb-1 flex-shrink-0"
             >
               Explorar <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform" />
