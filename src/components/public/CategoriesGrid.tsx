@@ -65,7 +65,7 @@ export default function CategoriesGrid({ section }: Props) {
         <h2 className="font-serif text-2xl text-stone-900 mb-6">Categorías</h2>
       </AnimateIn>
 
-      <div className="grid gap-3 grid-cols-2 md:grid-cols-4 auto-rows-[100px] md:auto-rows-[120px]">
+      <div className="grid gap-1.5 grid-cols-3 md:grid-cols-4 auto-rows-[62px] md:auto-rows-[96px]">
         {displayed.map(({ label, desc, href, bg, color }, i) => {
           const Icon = categoryIcons[label] || ShoppingBag
           const size = bentoSizes[i] || "col-span-1 row-span-1"
@@ -121,13 +121,13 @@ export default function CategoriesGrid({ section }: Props) {
 
                   {/* Content */}
                   <div className={`relative z-10 flex h-full ${
-                    isWide ? "flex-row items-center gap-4 px-5"
-                    : "flex-col justify-between p-4"
+                    isWide ? "flex-row items-center gap-3 px-3 md:px-4"
+                    : "flex-col justify-between p-1.5 md:p-3"
                   }`}>
 
                     <motion.div
-                      className={`flex items-center justify-center rounded-2xl ${bg} ${
-                        isWide ? "w-11 h-11 flex-shrink-0" : "w-11 h-11"
+                      className={`flex items-center justify-center rounded-xl ${bg} ${
+                        isWide ? "w-8 h-8 md:w-11 md:h-11 flex-shrink-0" : "w-8 h-8 md:w-11 md:h-11"
                       }`}
                       variants={{
                         rest: { y: 0, scale: 1, rotate: 0 },
