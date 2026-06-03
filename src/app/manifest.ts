@@ -9,7 +9,7 @@ export default function manifest() {
     name: "Calamuchita App",
     short_name: "Calamuchita",
     description: "Todo el Valle de Calamuchita en un solo lugar. Gastronomía, servicios, turismo y más.",
-    start_url: "/",
+    start_url: "/?utm_source=pwa&utm_medium=homescreen&utm_campaign=launch",
     scope: "/",
     display: "standalone",
     display_override: ["window-controls-overlay", "standalone", "minimal-ui"],

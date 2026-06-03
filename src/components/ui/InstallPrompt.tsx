@@ -1,34 +1,62 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
+import { createClient } from '@/lib/supabase/client';
+
+async function recordInstall() {
+  try {
+    const supabase = createClient()
+    const ua = navigator.userAgent
+    const platform = /iPhone|iPad|iPod/.test(ua)
+      ? 'iOS'
+      : /Android/.test(ua)
+      ? 'Android'
+      : 'Desktop'
+
+    await supabase.from('pwa_installs').insert({ user_agent: ua, platform })
+  } catch {
+    // non-blocking — tracking failure should never affect the UI
+  }
+}
 
 export default function InstallPrompt() {
   const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
   const [isVisible, setIsVisible] = useState(false);
+  const recorded = useRef(false); // prevent double-counting if both events fire
 
   useEffect(() => {
-    const handler = (e: Event) => {
-      // Previene que el navegador tire su cartel genérico
+    const onBeforeInstall = (e: Event) => {
       e.preventDefault();
-      // Guarda el evento para dispararlo cuando el usuario haga clic
       setDeferredPrompt(e);
-      // Muestra nuestro cartel personalizado
       setIsVisible(true);
     };
 
-    window.addEventListener('beforeinstallprompt', handler);
+    const onAppInstalled = () => {
+      if (recorded.current) return;
+      recorded.current = true;
+      recordInstall();
+      setIsVisible(false);
+      setDeferredPrompt(null);
+    };
 
-    return () => window.removeEventListener('beforeinstallprompt', handler);
+    window.addEventListener('beforeinstallprompt', onBeforeInstall);
+    window.addEventListener('appinstalled', onAppInstalled);
+
+    return () => {
+      window.removeEventListener('beforeinstallprompt', onBeforeInstall);
+      window.removeEventListener('appinstalled', onAppInstalled);
+    };
   }, []);
 
   const handleInstallClick = async () => {
     if (!deferredPrompt) return;
-    // Muestra el prompt nativo
     deferredPrompt.prompt();
-    // Espera la respuesta del usuario
     const { outcome } = await deferredPrompt.userChoice;
-    if (outcome === 'accepted') {
-      console.log('El usuario instaló la app 🎉');
+    // appinstalled will fire and handle tracking if accepted.
+    // Only track here as fallback for browsers that don't emit appinstalled.
+    if (outcome === 'accepted' && !recorded.current) {
+      recorded.current = true;
+      recordInstall();
     }
     setDeferredPrompt(null);
     setIsVisible(false);

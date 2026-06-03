@@ -5,7 +5,7 @@ import Link from "next/link"
 import { createClient } from "@/lib/supabase/client"
 import AnimateIn from "@/components/ui/AnimateIn"
 import AnimatedCounter from "@/components/ui/AnimatedCounter"
-import { Eye, MessageCircle, CalendarDays, Newspaper } from "lucide-react"
+import { Eye, MessageCircle, CalendarDays, Newspaper, Smartphone } from "lucide-react"
 
 const sectionLabels: Record<string, string> = {
   gastronomy: "Gastronomía",
@@ -27,6 +27,7 @@ export default function AdminHome() {
     totalLeads: 0,
     eventCount: 0,
     editorialCount: 0,
+    pwaInstalls: 0,
     sections: {} as Record<string, number>
   })
   const [loading, setLoading] = useState(true)
@@ -43,6 +44,7 @@ export default function AdminHome() {
         { data: analytics },
         { count: events },
         { count: editorial },
+        { count: pwaInstalls },
       ] = await Promise.all([
         supabase.from("businesses").select("*", { count: "exact", head: true }).eq("status", "active"),
         supabase.from("businesses").select("*", { count: "exact", head: true }).eq("status", "pending"),
@@ -51,6 +53,7 @@ export default function AdminHome() {
         supabase.from("businesses").select("total_views, total_leads"),
         supabase.from("events").select("*", { count: "exact", head: true }),
         supabase.from("editorial_posts").select("*", { count: "exact", head: true }),
+        supabase.from("pwa_installs").select("*", { count: "exact", head: true }),
       ])
 
       const sections: Record<string, number> = {}
@@ -69,6 +72,7 @@ export default function AdminHome() {
         totalLeads,
         eventCount: events || 0,
         editorialCount: editorial || 0,
+        pwaInstalls: pwaInstalls || 0,
         sections,
       })
       setLoading(false)
@@ -132,7 +136,7 @@ export default function AdminHome() {
       </div>
 
       {/* Analytics totales */}
-      <div className="grid grid-cols-2 gap-4 mb-8">
+      <div className="grid grid-cols-3 gap-4 mb-8">
         <AnimateIn direction="up" delay={0.15}>
           <div className="rounded-2xl border p-5 flex items-center gap-4" style={{ background: "rgba(45,69,48,0.06)", borderColor: "rgba(45,69,48,0.15)" }}>
             <div className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0" style={{ background: "rgba(45,69,48,0.12)" }}>
@@ -155,6 +159,19 @@ export default function AdminHome() {
               <p className="text-xs uppercase tracking-wider mb-0.5" style={{ color: "rgba(18,140,126,0.7)" }}>Contactos WA</p>
               <p className="text-2xl font-serif" style={{ color: "#128C7E" }}>
                 {loading ? "…" : <AnimatedCounter to={stats.totalLeads} />}
+              </p>
+            </div>
+          </div>
+        </AnimateIn>
+        <AnimateIn direction="up" delay={0.25}>
+          <div className="rounded-2xl border p-5 flex items-center gap-4" style={{ background: "rgba(45,69,48,0.05)", borderColor: "rgba(45,69,48,0.15)" }}>
+            <div className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0" style={{ background: "rgba(45,69,48,0.10)" }}>
+              <Smartphone size={16} style={{ color: "#2D4530" }} />
+            </div>
+            <div>
+              <p className="text-xs uppercase tracking-wider mb-0.5" style={{ color: "rgba(45,69,48,0.55)" }}>Instalaciones PWA</p>
+              <p className="text-2xl font-serif" style={{ color: "#2D4530" }}>
+                {loading ? "…" : <AnimatedCounter to={stats.pwaInstalls} />}
               </p>
             </div>
           </div>

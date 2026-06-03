@@ -44,14 +44,14 @@ export default async function DestacadosPage() {
           <Link
             href="/"
             className="inline-flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider mb-6"
-            style={{ color: "rgba(45,69,48,0.55)" }}
+            style={{ color: "rgba(255,255,255,0.7)" }}
           >
             <ArrowLeft size={14} /> Inicio
           </Link>
-          <h1 className="text-5xl sm:text-7xl font-black tracking-tighter leading-none text-[#2D4530] mb-1">
+          <h1 className="text-5xl sm:text-7xl font-black tracking-tighter leading-none text-white mb-1">
             DESTACADOS
           </h1>
-          <p className="text-[#2D4530] font-bold text-sm uppercase tracking-[0.4em] border-l-4 border-[#C9A44B] pl-4 mt-3">
+          <p className="text-white font-bold text-sm uppercase tracking-[0.4em] border-l-4 border-[#C9A44B] pl-4 mt-3">
             Del Valle de Calamuchita
           </p>
         </div>
