@@ -140,10 +140,19 @@ function VerTodosBtn({ onClick }: { onClick: () => void }) {
   )
 }
 
+// Detecta si un negocio no tiene pueblo asignado en su dirección.
+// Un negocio sin pueblo debe aparecer en cualquier localidad seleccionada.
+function hasNoPueblo(address: string | null): boolean {
+  if (!address) return true
+  const lower = address.toLowerCase()
+  return !pueblos.some(p => lower.includes(p.toLowerCase()))
+}
+
 export default function DirectorioList({ section, filters }: Props) {
   const router = useRouter()
   const searchParams = useSearchParams()
   const { setLocalidad } = useLocalidad()
+  const [allBusinesses, setAllBusinesses] = useState<Business[]>([])
   const [businesses, setBusinesses] = useState<Business[]>([])
   const [loading, setLoading] = useState(true)
   const [search, setSearch] = useState(filters.q || "")
@@ -159,6 +168,7 @@ export default function DirectorioList({ section, filters }: Props) {
   useScrollLock(showPueblos || showCategories)
   useEffect(() => { setMounted(true) }, [])
 
+  // Fetch sin filtro de pueblo — el filtro de pueblo se aplica client-side
   useEffect(() => {
     const fetchBusinesses = async () => {
       setLoading(true)
@@ -170,8 +180,6 @@ export default function DirectorioList({ section, filters }: Props) {
         .eq("section", section)
 
       if (activeCategory && activeCategory !== "varios") {
-        // Usar el label real de la categoría (con tildes) para que el ilike haga match
-        // con lo que se guarda desde el admin (ej: "vehiculos" → "Vehículos")
         const catLabel = (sectionCategories[section] ?? []).find(c => {
           const key = c.href.includes("cat=") ? c.href.split("cat=")[1] : ""
           return key === activeCategory
@@ -179,20 +187,32 @@ export default function DirectorioList({ section, filters }: Props) {
         query = query.ilike("subcategory", `%${catLabel}%`)
       }
       if (filters.q) query = query.ilike("name", `%${filters.q}%`)
-      const pueblosFilter = filters.pueblo ? filters.pueblo.split(',').filter(Boolean) : []
-      if (pueblosFilter.length > 0) {
-        const orParts = [...pueblosFilter.map(p => `address.ilike.%${p}%`), 'address.is.null'].join(',')
-        query = query.or(orParts)
-      }
 
       const { data } = await query
         .order("is_premium", { ascending: false })
         .order("name")
-      setBusinesses(data || [])
+      setAllBusinesses(data || [])
       setLoading(false)
     }
     fetchBusinesses()
-  }, [section, activeCategory, filters.q, filters.pueblo])
+  }, [section, activeCategory, filters.q])
+
+  // Filtro de pueblo client-side: negocios sin pueblo aparecen en cualquier localidad
+  useEffect(() => {
+    const pueblosFilter = filters.pueblo ? filters.pueblo.split(',').filter(Boolean) : []
+    if (pueblosFilter.length === 0) {
+      setBusinesses(allBusinesses)
+    } else {
+      setBusinesses(
+        allBusinesses.filter(b => {
+          const matchesPueblo = pueblosFilter.some(p =>
+            b.address?.toLowerCase().includes(p.toLowerCase())
+          )
+          return matchesPueblo || hasNoPueblo(b.address)
+        })
+      )
+    }
+  }, [allBusinesses, filters.pueblo])
 
   useEffect(() => {
     if (isFirstRender.current) { isFirstRender.current = false; return }
