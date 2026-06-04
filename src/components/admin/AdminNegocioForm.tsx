@@ -82,8 +82,11 @@ async function geocodeAddress(address: string): Promise<{ lat: number; lng: numb
   const token = process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN
   if (!token || !address.trim()) return null
   try {
+    const fullQuery = `${address}, Córdoba, Argentina`
+    // bbox restringe al Valle de Calamuchita — evita falsos positivos en otras provincias
+    const bbox = "-65.5,-33.2,-63.5,-31.4"
     const res = await fetch(
-      `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(address)}.json?access_token=${token}&country=AR&limit=1&proximity=-64.5622,-31.9791`
+      `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(fullQuery)}.json?access_token=${token}&country=AR&limit=1&proximity=-64.5622,-31.9791&bbox=${bbox}`
     )
     if (!res.ok) return null
     const data = await res.json()
@@ -94,6 +97,28 @@ async function geocodeAddress(address: string): Promise<{ lat: number; lng: numb
   } catch {
     return null
   }
+}
+
+function parseManualCoords(input: string): { lat: number; lng: number } | null {
+  const trimmed = input.trim()
+  if (!trimmed) return null
+  // Formato URL de Google Maps: @-31.9809,-64.5594,15z
+  const urlMatch = trimmed.match(/@(-?\d+\.?\d*),(-?\d+\.?\d*)/)
+  if (urlMatch) {
+    const lat = parseFloat(urlMatch[1])
+    const lng = parseFloat(urlMatch[2])
+    if (!isNaN(lat) && !isNaN(lng)) return { lat, lng }
+  }
+  // Formato decimal: "-31.9809, -64.5594" o "-31.9809,-64.5594"
+  const parts = trimmed.split(/[,\s]+/).filter(Boolean)
+  if (parts.length >= 2) {
+    const lat = parseFloat(parts[0])
+    const lng = parseFloat(parts[1])
+    if (!isNaN(lat) && !isNaN(lng) && Math.abs(lat) <= 90 && Math.abs(lng) <= 180) {
+      return { lat, lng }
+    }
+  }
+  return null
 }
 
 const generateUniqueSlug = async (baseSlug: string, supabase: any): Promise<string> => {
@@ -120,6 +145,7 @@ export default function AdminNegocioForm() {
   const [branches, setBranches] = useState<Array<{ address: string; pueblo: string }>>([])
   const [professionalType, setProfessionalType] = useState("")
   const [professionals, setProfessionals] = useState<Professional[]>([])
+  const [coordsInput, setCoordsInput] = useState("")
 
   const [form, setForm] = useState({
     name: "",
@@ -209,7 +235,8 @@ export default function AdminNegocioForm() {
     const uniqueSlug = await generateUniqueSlug(baseSlug, supabase)
 
     const fullAddress = form.pueblo ? `${form.address}, ${form.pueblo}` : form.address
-    const coords = fullAddress ? await geocodeAddress(fullAddress) : null
+    const manualCoords = parseManualCoords(coordsInput)
+    const coords = manualCoords ?? (fullAddress ? await geocodeAddress(fullAddress) : null)
 
     const hasProfesionales = form.categories.includes("Profesionales")
     const finalCategories = hasProfesionales && professionalType
@@ -492,6 +519,36 @@ export default function AdminNegocioForm() {
             <input type="text" value={form.address} onChange={e => handleChange("address", e.target.value)}
               placeholder="Calle y número"
               className="w-full px-4 py-2.5 rounded-xl border border-stone-200 text-stone-800 text-sm outline-none focus:ring-2 focus:ring-primary-300" />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-stone-700 mb-1">
+              Coordenadas <span className="text-stone-400 font-normal">(opcional — tiene prioridad sobre la dirección)</span>
+            </label>
+            <input
+              type="text"
+              value={coordsInput}
+              onChange={e => setCoordsInput(e.target.value)}
+              placeholder="-31.9809, -64.5594  o pegá el enlace de Google Maps"
+              className={`w-full px-4 py-2.5 rounded-xl border text-stone-800 text-sm outline-none focus:ring-2 focus:ring-primary-300 ${
+                coordsInput && !parseManualCoords(coordsInput)
+                  ? "border-red-300 focus:ring-red-200"
+                  : coordsInput && parseManualCoords(coordsInput)
+                  ? "border-green-300 focus:ring-green-200"
+                  : "border-stone-200"
+              }`}
+            />
+            {coordsInput && parseManualCoords(coordsInput) && (
+              <p className="text-xs text-green-600 mt-1">
+                lat {parseManualCoords(coordsInput)!.lat.toFixed(6)}, lng {parseManualCoords(coordsInput)!.lng.toFixed(6)}
+              </p>
+            )}
+            {coordsInput && !parseManualCoords(coordsInput) && (
+              <p className="text-xs text-red-500 mt-1">Formato no reconocido. Usá "-31.9809, -64.5594" o el enlace de Google Maps.</p>
+            )}
+            <p className="text-xs text-stone-400 mt-1">
+              En Google Maps: clic derecho en el punto → copiar las coordenadas que aparecen.
+            </p>
           </div>
 
           {/* Sucursales */}
