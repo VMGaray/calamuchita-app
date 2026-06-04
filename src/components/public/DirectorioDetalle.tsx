@@ -9,8 +9,9 @@ import {
   Globe, CreditCard, PawPrint, Truck, ShoppingBag,
   UtensilsCrossed, Star, Navigation,
   Wifi, Car, ChevronLeft, ChevronRight,
-  Tag, Share2,
+  Tag, Share2, X,
 } from "lucide-react"
+import { motion, AnimatePresence } from "framer-motion"
 import { createClient } from "@/lib/supabase/client"
 
 // Nombres cortos para el grid de horarios (permite mostrar 2 columnas sin overflow)
@@ -136,6 +137,14 @@ export default function DirectorioDetalle({ business, section, promotions = [] }
     : business.cover_url ? [business.cover_url] : []
 
   const [photoIdx, setPhotoIdx] = useState(0)
+  const [lightboxSrc, setLightboxSrc] = useState<string | null>(null)
+
+  useEffect(() => {
+    if (!lightboxSrc) return
+    const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") setLightboxSrc(null) }
+    window.addEventListener("keydown", onKey)
+    return () => window.removeEventListener("keydown", onKey)
+  }, [lightboxSrc])
 
   const waNum = (business.whatsapp || business.phone || "").replace(/\D/g, "")
   const waLink = waNum
@@ -251,7 +260,11 @@ export default function DirectorioDetalle({ business, section, promotions = [] }
 
               {/* Logo — cuadrado fijo, object-contain para logos con fondo blanco */}
               {business.logo_url && (
-                <div className="w-20 h-20 rounded-xl bg-white border border-stone-100 shadow-sm p-2 shrink-0 relative overflow-hidden">
+                <button
+                  onClick={() => setLightboxSrc(business.logo_url)}
+                  className="w-20 h-20 rounded-xl bg-white border border-stone-100 shadow-sm p-2 shrink-0 relative overflow-hidden cursor-zoom-in hover:ring-2 hover:ring-[#2D4530]/30 transition-all"
+                  aria-label="Ampliar logo"
+                >
                   <div className="absolute inset-0 animate-pulse bg-gradient-to-r from-stone-50 via-stone-100 to-stone-50" />
                   <Image
                     src={business.logo_url}
@@ -262,7 +275,7 @@ export default function DirectorioDetalle({ business, section, promotions = [] }
                     sizes="80px"
                     quality={85}
                   />
-                </div>
+                </button>
               )}
             </div>
           </div>
@@ -610,7 +623,11 @@ export default function DirectorioDetalle({ business, section, promotions = [] }
               )}
 
               {/* aspect-video fijo — CLS = 0.00 garantizado */}
-              <div className="flex-1 aspect-video rounded-2xl overflow-hidden relative bg-white">
+              <button
+                onClick={() => setLightboxSrc(photos[photoIdx])}
+                className="flex-1 aspect-video rounded-2xl overflow-hidden relative bg-white cursor-zoom-in block"
+                aria-label="Ampliar foto"
+              >
                 <div className="absolute inset-0 animate-pulse bg-gradient-to-r from-stone-100 via-stone-50 to-stone-100" />
                 <Image
                   src={photos[photoIdx]}
@@ -621,7 +638,7 @@ export default function DirectorioDetalle({ business, section, promotions = [] }
                   sizes="(max-width: 640px) calc(100vw - 32px), (max-width: 768px) calc(100vw - 80px), 640px"
                   quality={85}
                 />
-              </div>
+              </button>
 
               {photos.length > 1 && (
                 <button
@@ -661,6 +678,47 @@ export default function DirectorioDetalle({ business, section, promotions = [] }
         )}
 
       </div>
+
+      {/* LIGHTBOX */}
+      <AnimatePresence>
+        {lightboxSrc && (
+          <motion.div
+            className="fixed inset-0 z-[300] flex items-center justify-center p-4"
+            style={{ background: "rgba(0,0,0,0.92)" }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={() => setLightboxSrc(null)}
+          >
+            <motion.div
+              className="relative"
+              style={{ width: "min(92vw, 900px)", height: "min(82vh, 700px)" }}
+              initial={{ scale: 0.88, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.88, opacity: 0 }}
+              transition={{ type: "spring", stiffness: 320, damping: 28 }}
+              onClick={e => e.stopPropagation()}
+            >
+              <Image
+                src={lightboxSrc}
+                alt="Foto ampliada"
+                fill
+                className="object-contain"
+                sizes="92vw"
+                quality={90}
+              />
+            </motion.div>
+            <button
+              onClick={() => setLightboxSrc(null)}
+              aria-label="Cerrar"
+              className="absolute top-4 right-4 w-10 h-10 rounded-full flex items-center justify-center transition-colors"
+              style={{ background: "rgba(255,255,255,0.12)", color: "#fff" }}
+            >
+              <X size={20} />
+            </button>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   )
 }

@@ -112,8 +112,16 @@ interface Props {
 export default function NegocioDetalle({ business, promotions = [] }: Props) {
   const cartaRef = useRef<HTMLDivElement>(null)
   const [photoIdx, setPhotoIdx] = useState(0)
+  const [lightboxSrc, setLightboxSrc] = useState<string | null>(null)
   const [showReserva, setShowReserva] = useState(false)
   const [reservaForm, setReservaForm] = useState<ReservaForm>(EMPTY_FORM)
+
+  useEffect(() => {
+    if (!lightboxSrc) return
+    const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") setLightboxSrc(null) }
+    window.addEventListener("keydown", onKey)
+    return () => window.removeEventListener("keydown", onKey)
+  }, [lightboxSrc])
 
   // 1. Cargar desde localStorage en Mount de forma segura para SSR
   useEffect(() => {
@@ -282,10 +290,14 @@ export default function NegocioDetalle({ business, promotions = [] }: Props) {
               </div>
 
               {business.logo_url && (
-                <div className="w-20 h-20 rounded-xl bg-white border border-stone-100 shadow-sm p-2 shrink-0 relative overflow-hidden">
+                <button
+                  onClick={() => setLightboxSrc(business.logo_url)}
+                  className="w-20 h-20 rounded-xl bg-white border border-stone-100 shadow-sm p-2 shrink-0 relative overflow-hidden cursor-zoom-in hover:ring-2 hover:ring-[#2D4530]/30 transition-all"
+                  aria-label="Ampliar logo"
+                >
                   <div className="absolute inset-0 animate-pulse bg-gradient-to-r from-stone-50 via-stone-100 to-stone-50" />
                   <Image src={business.logo_url} alt={`Logo de ${business.name}`} fill priority className="object-contain p-1.5" sizes="80px" quality={85} />
-                </div>
+                </button>
               )}
             </div>
           </div>
@@ -494,10 +506,14 @@ export default function NegocioDetalle({ business, promotions = [] }: Props) {
                   <ChevronLeft size={18} />
                 </button>
               )}
-              <div className="flex-1 aspect-video rounded-2xl overflow-hidden relative bg-stone-100">
+              <button
+                onClick={() => setLightboxSrc(photos[photoIdx])}
+                className="flex-1 aspect-video rounded-2xl overflow-hidden relative bg-stone-100 cursor-zoom-in block"
+                aria-label="Ampliar foto"
+              >
                 <div className="absolute inset-0 animate-pulse bg-gradient-to-r from-stone-100 via-stone-50 to-stone-100" />
                 <Image src={photos[photoIdx]} alt={`${business.name} — foto ${photoIdx + 1}`} fill priority={photoIdx === 0} className="object-contain" sizes="(max-width: 640px) calc(100vw - 32px), 640px" quality={85} onError={e => { (e.target as HTMLImageElement).src = "/valle.jpg" }} />
-              </div>
+              </button>
               {photos.length > 1 && (
                 <button onClick={nextPhoto} aria-label="Foto siguiente" className="shrink-0 w-10 h-10 rounded-full flex items-center justify-center border-2 border-[#2D4530] text-[#2D4530] hover:bg-[#2D4530] hover:text-[#E1DBC9] transition-all active:scale-90">
                   <ChevronRight size={18} />
@@ -523,6 +539,47 @@ export default function NegocioDetalle({ business, promotions = [] }: Props) {
           </div>
         )}
       </div>
+
+      {/* LIGHTBOX */}
+      <AnimatePresence>
+        {lightboxSrc && (
+          <motion.div
+            className="fixed inset-0 z-[300] flex items-center justify-center p-4"
+            style={{ background: "rgba(0,0,0,0.92)" }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={() => setLightboxSrc(null)}
+          >
+            <motion.div
+              className="relative"
+              style={{ width: "min(92vw, 900px)", height: "min(82vh, 700px)" }}
+              initial={{ scale: 0.88, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.88, opacity: 0 }}
+              transition={{ type: "spring", stiffness: 320, damping: 28 }}
+              onClick={e => e.stopPropagation()}
+            >
+              <Image
+                src={lightboxSrc}
+                alt="Foto ampliada"
+                fill
+                className="object-contain"
+                sizes="92vw"
+                quality={90}
+              />
+            </motion.div>
+            <button
+              onClick={() => setLightboxSrc(null)}
+              aria-label="Cerrar"
+              className="absolute top-4 right-4 w-10 h-10 rounded-full flex items-center justify-center transition-colors"
+              style={{ background: "rgba(255,255,255,0.12)", color: "#fff" }}
+            >
+              <X size={20} />
+            </button>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* MODAL RESERVAS (CON PRE-RELLENADO DESDE LOCALSTORAGE) */}
       <AnimatePresence>
