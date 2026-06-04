@@ -50,6 +50,7 @@ export const MASTER_CATEGORIES = {
   commerce: {
     label: "Comercios",
     subcategories: [
+      { label: "Accesorios", icon: Gem, bg: "bg-pink-50", color: "text-pink-600" },
       { label: "Forrajería", icon: Package, bg: "bg-amber-50", color: "text-amber-700" },
       { label: "Hogar", icon: Armchair, bg: "bg-orange-50", color: "text-orange-700" },
       { label: "Imprenta", icon: Printer, bg: "bg-slate-50", color: "text-slate-600" },

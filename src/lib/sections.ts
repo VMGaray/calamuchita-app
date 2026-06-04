@@ -78,6 +78,7 @@ export const sectionCategories = {
     { label: "Todos", desc: "Ver todo el turismo", href: "/directorio/tourism", bg: "bg-brand-sand/50", color: "text-brand-charcoal" },
   ],
   commerce: [
+    { label: "Accesorios", desc: "Bijouterie, bolsos y complementos", href: "/directorio/commerce?cat=accesorios", bg: "bg-brand-earth/10", color: "text-brand-earth" },
     { label: "Forrajería", desc: "Alimentos y productos rurales", href: "/directorio/commerce?cat=forrajeria", bg: "bg-brand-earth/10", color: "text-brand-earth" },
     { label: "Hogar", desc: "Muebles y decoración", href: "/directorio/commerce?cat=hogar", bg: "bg-brand-earth/10", color: "text-brand-earth" },
     { label: "Imprenta", desc: "Impresión y diseño gráfico", href: "/directorio/commerce?cat=imprenta", bg: "bg-brand-slate/10", color: "text-brand-slate" },
