@@ -57,7 +57,7 @@ export default async function HomePage() {
       .eq("status", "active")
       .eq("is_premium", true)
       .order("created_at", { ascending: false })
-      .limit(20),
+      .limit(100),
 
     supabase
       .from("promotions")
