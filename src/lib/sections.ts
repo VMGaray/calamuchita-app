@@ -18,6 +18,7 @@ export const sectionCategories = {
     { label: "Fletes", desc: "Transporte de cargas y mudanzas", href: "/directorio/services?cat=fletes", bg: "bg-brand-earth/10", color: "text-brand-earth" },
     { label: "Gasista", desc: "Instalaciones de gas", href: "/directorio/services?cat=gasista", bg: "bg-brand-earth/10", color: "text-brand-earth" },
     { label: "Herrero", desc: "Herrería y soldadura", href: "/directorio/services?cat=herrero", bg: "bg-brand-charcoal/10", color: "text-brand-charcoal" },
+    { label: "Impermeabilizaciones", desc: "Techos, paredes y terrazas", href: "/directorio/services?cat=impermeabilizaciones", bg: "bg-brand-pine/10", color: "text-brand-pine" },
     { label: "Jardinero", desc: "Diseño y mantenimiento", href: "/directorio/services?cat=jardinero", bg: "bg-brand-pine/10", color: "text-brand-pine" },
     { label: "Limpieza", desc: "Servicio doméstico", href: "/directorio/services?cat=limpieza", bg: "bg-brand-slate/10", color: "text-brand-slate" },
     { label: "Mecánica", desc: "Talleres y gomería", href: "/directorio/services?cat=mecanica", bg: "bg-brand-charcoal/10", color: "text-brand-charcoal" },
