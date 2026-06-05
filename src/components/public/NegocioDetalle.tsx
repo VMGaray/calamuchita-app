@@ -112,16 +112,18 @@ interface Props {
 export default function NegocioDetalle({ business, promotions = [] }: Props) {
   const cartaRef = useRef<HTMLDivElement>(null)
   const [photoIdx, setPhotoIdx] = useState(0)
+  const [lightboxIdx, setLightboxIdx] = useState<number | null>(null)
   const [lightboxSrc, setLightboxSrc] = useState<string | null>(null)
+  const [lightboxTouchX, setLightboxTouchX] = useState<number | null>(null)
   const [showReserva, setShowReserva] = useState(false)
   const [reservaForm, setReservaForm] = useState<ReservaForm>(EMPTY_FORM)
 
   useEffect(() => {
-    if (!lightboxSrc) return
-    const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") setLightboxSrc(null) }
+    if (lightboxIdx === null && !lightboxSrc) return
+    const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") { setLightboxIdx(null); setLightboxSrc(null) } }
     window.addEventListener("keydown", onKey)
     return () => window.removeEventListener("keydown", onKey)
-  }, [lightboxSrc])
+  }, [lightboxIdx, lightboxSrc])
 
   // 1. Cargar desde localStorage en Mount de forma segura para SSR
   useEffect(() => {
@@ -292,11 +294,11 @@ export default function NegocioDetalle({ business, promotions = [] }: Props) {
               {business.logo_url && (
                 <button
                   onClick={() => setLightboxSrc(business.logo_url)}
-                  className="w-20 h-20 rounded-xl bg-white border border-stone-100 shadow-sm p-2 shrink-0 relative overflow-hidden cursor-zoom-in hover:ring-2 hover:ring-[#2D4530]/30 transition-all"
+                  className="w-24 h-24 rounded-xl bg-white border border-stone-100 shadow-sm p-2 shrink-0 relative overflow-hidden cursor-zoom-in hover:ring-2 hover:ring-[#2D4530]/30 transition-all"
                   aria-label="Ampliar logo"
                 >
                   <div className="absolute inset-0 animate-pulse bg-gradient-to-r from-stone-50 via-stone-100 to-stone-50" />
-                  <Image src={business.logo_url} alt={`Logo de ${business.name}`} fill priority className="object-contain p-1.5" sizes="80px" quality={85} />
+                  <Image src={business.logo_url} alt={`Logo de ${business.name}`} fill priority className="object-contain p-1.5" sizes="96px" quality={85} />
                 </button>
               )}
             </div>
@@ -507,8 +509,8 @@ export default function NegocioDetalle({ business, promotions = [] }: Props) {
                 </button>
               )}
               <button
-                onClick={() => setLightboxSrc(photos[photoIdx])}
-                className="flex-1 aspect-video rounded-2xl overflow-hidden relative bg-stone-100 cursor-zoom-in block"
+                onClick={() => setLightboxIdx(photoIdx)}
+                className="flex-1 aspect-[4/3] sm:aspect-video rounded-2xl overflow-hidden relative bg-stone-100 cursor-zoom-in block"
                 aria-label="Ampliar foto"
               >
                 <div className="absolute inset-0 animate-pulse bg-gradient-to-r from-stone-100 via-stone-50 to-stone-100" />
@@ -540,7 +542,109 @@ export default function NegocioDetalle({ business, promotions = [] }: Props) {
         )}
       </div>
 
-      {/* LIGHTBOX */}
+      {/* LIGHTBOX — galería con navegación y swipe */}
+      <AnimatePresence>
+        {lightboxIdx !== null && (
+          <motion.div
+            className="fixed inset-0 z-[300] flex items-center justify-center"
+            style={{ background: "rgba(0,0,0,0.95)" }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={() => setLightboxIdx(null)}
+            onTouchStart={e => setLightboxTouchX(e.touches[0].clientX)}
+            onTouchEnd={e => {
+              if (lightboxTouchX === null || lightboxIdx === null) return
+              const diff = lightboxTouchX - e.changedTouches[0].clientX
+              if (Math.abs(diff) > 50) {
+                const next = diff > 0
+                  ? (lightboxIdx + 1) % photos.length
+                  : (lightboxIdx - 1 + photos.length) % photos.length
+                setLightboxIdx(next)
+                setPhotoIdx(next)
+              }
+              setLightboxTouchX(null)
+            }}
+          >
+            {/* Botón cerrar */}
+            <button
+              onClick={e => { e.stopPropagation(); setLightboxIdx(null) }}
+              aria-label="Cerrar"
+              className="absolute top-4 right-4 z-20 w-12 h-12 rounded-full flex items-center justify-center"
+              style={{ background: "rgba(255,255,255,0.25)", color: "#fff" }}
+            >
+              <X size={22} />
+            </button>
+
+            {/* Contador */}
+            {photos.length > 1 && (
+              <div className="absolute top-5 left-4 z-20 px-3 py-1 rounded-full text-xs font-bold text-white" style={{ background: "rgba(0,0,0,0.45)" }}>
+                {lightboxIdx + 1} / {photos.length}
+              </div>
+            )}
+
+            {/* Imagen */}
+            <motion.div
+              className="relative"
+              style={{ width: "min(96vw, 900px)", height: "min(82vh, 700px)" }}
+              initial={{ scale: 0.88, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.88, opacity: 0 }}
+              transition={{ type: "spring", stiffness: 320, damping: 28 }}
+              onClick={e => e.stopPropagation()}
+            >
+              <Image src={photos[lightboxIdx]} alt="Foto ampliada" fill className="object-contain" sizes="96vw" quality={90} />
+            </motion.div>
+
+            {/* Flechas de navegación */}
+            {photos.length > 1 && (
+              <>
+                <button
+                  onClick={e => {
+                    e.stopPropagation()
+                    const next = (lightboxIdx - 1 + photos.length) % photos.length
+                    setLightboxIdx(next); setPhotoIdx(next)
+                  }}
+                  aria-label="Foto anterior"
+                  className="absolute left-3 top-1/2 -translate-y-1/2 z-20 w-12 h-12 rounded-full flex items-center justify-center"
+                  style={{ background: "rgba(255,255,255,0.20)", color: "#fff" }}
+                >
+                  <ChevronLeft size={22} />
+                </button>
+                <button
+                  onClick={e => {
+                    e.stopPropagation()
+                    const next = (lightboxIdx + 1) % photos.length
+                    setLightboxIdx(next); setPhotoIdx(next)
+                  }}
+                  aria-label="Foto siguiente"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 z-20 w-12 h-12 rounded-full flex items-center justify-center"
+                  style={{ background: "rgba(255,255,255,0.20)", color: "#fff" }}
+                >
+                  <ChevronRight size={22} />
+                </button>
+              </>
+            )}
+
+            {/* Dots */}
+            {photos.length > 1 && (
+              <div className="absolute bottom-6 left-0 right-0 flex justify-center gap-2 z-20">
+                {photos.map((_, i) => (
+                  <button
+                    key={i}
+                    onClick={e => { e.stopPropagation(); setLightboxIdx(i); setPhotoIdx(i) }}
+                    aria-label={`Ver foto ${i + 1}`}
+                    className="h-1.5 rounded-full transition-all duration-300"
+                    style={{ width: i === lightboxIdx ? 20 : 6, background: i === lightboxIdx ? "#fff" : "rgba(255,255,255,0.40)" }}
+                  />
+                ))}
+              </div>
+            )}
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* LIGHTBOX logo */}
       <AnimatePresence>
         {lightboxSrc && (
           <motion.div
@@ -553,29 +657,22 @@ export default function NegocioDetalle({ business, promotions = [] }: Props) {
           >
             <motion.div
               className="relative"
-              style={{ width: "min(92vw, 900px)", height: "min(82vh, 700px)" }}
+              style={{ width: "min(80vw, 500px)", height: "min(60vh, 500px)" }}
               initial={{ scale: 0.88, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.88, opacity: 0 }}
               transition={{ type: "spring", stiffness: 320, damping: 28 }}
               onClick={e => e.stopPropagation()}
             >
-              <Image
-                src={lightboxSrc}
-                alt="Foto ampliada"
-                fill
-                className="object-contain"
-                sizes="92vw"
-                quality={90}
-              />
+              <Image src={lightboxSrc} alt="Logo" fill className="object-contain" sizes="80vw" quality={90} />
             </motion.div>
             <button
               onClick={e => { e.stopPropagation(); setLightboxSrc(null) }}
               aria-label="Cerrar"
-              className="absolute top-4 right-4 z-10 w-10 h-10 rounded-full flex items-center justify-center transition-colors"
-              style={{ background: "rgba(255,255,255,0.12)", color: "#fff" }}
+              className="absolute top-4 right-4 z-20 w-12 h-12 rounded-full flex items-center justify-center"
+              style={{ background: "rgba(255,255,255,0.25)", color: "#fff" }}
             >
-              <X size={20} />
+              <X size={22} />
             </button>
           </motion.div>
         )}

@@ -12,7 +12,7 @@ import {
   GraduationCap, BookOpen, Languages, Users, Music, Trophy,
   Hotel, Map, Tent, Activity, Compass, PartyPopper, ChefHat,
   Mic, Medal, Palette, Baby, Store, Salad, Shirt, Gem,
-  HardHat, MoreHorizontal, Clock3, Landmark, Lightbulb, Bus, Info
+  HardHat, MoreHorizontal, Clock3, Landmark, Lightbulb, Bus, Info, Tag
 } from "lucide-react"
 
 const categoryIcons: Record<string, any> = {
@@ -35,7 +35,7 @@ const categoryIcons: Record<string, any> = {
   "Festivales": PartyPopper, "Gastronomía": ChefHat, "Música": Mic,
   "Deportivos": Medal, "Culturales": Palette, "Infantiles": Baby,
   "Almacenes": Store, "Dietéticas": Salad, "Ropa": Shirt,
-  "Artesanías": Gem, "Ferreterías": HardHat,
+  "Artesanías": Gem, "Ferreterías": HardHat, "Carteles tallados": Tag,
   "Farmacias de turno": Clock3, "Municipalidad": Landmark,
   "Cooperativas": Lightbulb, "Transporte": Bus, "Turismo oficial": Info,
 }
