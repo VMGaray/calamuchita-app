@@ -1,8 +1,5 @@
 import type { MetadataRoute } from "next"
 
-// purpose: "any maskable" is valid W3C spec but Next.js types only accept the
-// individual literals. Removing the explicit return type lets TypeScript infer
-// `string` for purpose, avoiding a compile error while emitting the correct JSON.
 export default function manifest() {
   return {
     id: "/",
@@ -25,13 +22,25 @@ export default function manifest() {
         src: "/icons/icon-192.png",
         sizes: "192x192",
         type: "image/png",
-        purpose: "any maskable",
+        purpose: "any",
+      },
+      {
+        src: "/icons/icon-192.png",
+        sizes: "192x192",
+        type: "image/png",
+        purpose: "maskable",
       },
       {
         src: "/icons/icon-512.png",
         sizes: "512x512",
         type: "image/png",
-        purpose: "any maskable",
+        purpose: "any",
+      },
+      {
+        src: "/icons/icon-512.png",
+        sizes: "512x512",
+        type: "image/png",
+        purpose: "maskable",
       },
     ],
     screenshots: [

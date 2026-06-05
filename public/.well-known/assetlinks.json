@@ -1,0 +1,8 @@
+[{
+  "relation": ["delegate_permission/common.handle_all_urls"],
+  "target": {
+    "namespace": "android_app",
+    "package_name": "com.calamuchita.app",
+    "sha256_cert_fingerprints": ["CC:EE:DC:75:DC:F2:EB:89:35:18:D8:BA:EB:19:4C:B4:C0:3A:52:72:7E:4C:81:E5:ED:AF:C2:81:B6:CA:84:AD"]
+  }
+}]
