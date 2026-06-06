@@ -19,8 +19,10 @@ export default function BackButton({
   const router = useRouter()
 
   const handleBack = () => {
-    // If there's history within the app, go back. Otherwise navigate to fallback.
-    if (window.history.length > 1) {
+    const cameFromApp =
+      document.referrer !== "" &&
+      new URL(document.referrer).origin === window.location.origin
+    if (cameFromApp) {
       router.back()
     } else {
       router.push(fallbackHref)
