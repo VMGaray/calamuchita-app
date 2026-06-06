@@ -1,6 +1,7 @@
 "use client"
 
 import { useEffect, useRef, useState } from "react"
+import { useSearchParams } from "next/navigation"
 import { motion, AnimatePresence } from "framer-motion"
 import {
   Phone,
@@ -110,6 +111,8 @@ interface Props {
 }
 
 export default function NegocioDetalle({ business, promotions = [] }: Props) {
+  const searchParams = useSearchParams()
+  const from = searchParams.get("from")
   const cartaRef = useRef<HTMLDivElement>(null)
   const [photoIdx, setPhotoIdx] = useState(0)
   const [lightboxIdx, setLightboxIdx] = useState<number | null>(null)
@@ -266,8 +269,8 @@ export default function NegocioDetalle({ business, promotions = [] }: Props) {
       <div className="max-w-2xl mx-auto px-4 flex flex-col gap-y-4 pt-5">
 
         <BackButton
-          fallbackHref="/negocios"
-          label="Volver"
+          fallbackHref={from ?? "/negocios"}
+          label={from === "/destacados" ? "Destacados" : "Volver"}
           className="text-sm font-medium w-fit"
           style={{ color: "#2D4530" }}
         />

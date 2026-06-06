@@ -1,6 +1,7 @@
 "use client"
 
 import { useEffect, useState } from "react"
+import { useSearchParams } from "next/navigation"
 import Image from "next/image"
 import Link from "next/link"
 import BackButton from "@/components/ui/BackButton"
@@ -125,6 +126,8 @@ interface Props {
 }
 
 export default function DirectorioDetalle({ business, section, promotions = [] }: Props) {
+  const searchParams = useSearchParams()
+  const from = searchParams.get("from")
 
   // Fotos desde business_photos (tabla relacionada), ordenadas por sort_order, máx 3
   // Fallback a cover_url si no hay fotos cargadas
@@ -209,8 +212,8 @@ export default function DirectorioDetalle({ business, section, promotions = [] }
 
         {/* 1 ── Volver ──────────────────────────────────────────────────── */}
         <BackButton
-          fallbackHref={`/directorio/${section}`}
-          label={SECTION_TITLES[section] ?? "Volver"}
+          fallbackHref={from ?? `/directorio/${section}`}
+          label={from === "/destacados" ? "Destacados" : (SECTION_TITLES[section] ?? "Volver")}
           className="text-sm font-medium w-fit"
           style={{ color: "#2D4530" }}
         />

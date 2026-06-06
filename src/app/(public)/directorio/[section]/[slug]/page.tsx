@@ -1,4 +1,5 @@
 import type { Metadata } from "next"
+import { Suspense } from "react"
 import DirectorioDetalle from "@/components/public/DirectorioDetalle"
 import BackgroundManager from "@/components/public/BackgroundManager"
 import { createClient } from "@/lib/supabase/server"
@@ -98,7 +99,9 @@ export default async function DirectorioDetallePage({ params }: Props) {
 
   return (
     <BackgroundManager>
-      <DirectorioDetalle business={business} section={section} promotions={promotionsData ?? []} />
+      <Suspense>
+        <DirectorioDetalle business={business} section={section} promotions={promotionsData ?? []} />
+      </Suspense>
     </BackgroundManager>
   )
 }

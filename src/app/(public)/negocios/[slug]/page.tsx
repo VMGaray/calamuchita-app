@@ -1,4 +1,5 @@
 import type { Metadata } from "next"
+import { Suspense } from "react"
 import NegocioDetalle from "@/components/public/NegocioDetalle"
 import { createClient } from "@/lib/supabase/server"
 import { notFound } from "next/navigation"
@@ -103,5 +104,9 @@ export default async function NegocioDetallePage({ params }: Props) {
 
   const activePromotions = promotionsData ?? []
 
-  return <NegocioDetalle business={business} promotions={activePromotions} />
+  return (
+    <Suspense>
+      <NegocioDetalle business={business} promotions={activePromotions} />
+    </Suspense>
+  )
 }

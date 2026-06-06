@@ -63,8 +63,8 @@ export default async function DestacadosPage() {
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
             {businesses.map(biz => {
               const href = biz.section === "gastronomy"
-                ? `/negocios/${biz.slug}`
-                : `/directorio/${biz.section}/${biz.slug}`
+                ? `/negocios/${biz.slug}?from=/destacados`
+                : `/directorio/${biz.section}/${biz.slug}?from=/destacados`
 
               return (
                 <Link key={biz.id} href={href} className="group block">
