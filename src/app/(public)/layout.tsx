@@ -16,7 +16,9 @@ export default async function PublicLayout({
   const pathname = headersList.get("x-pathname") || ""
   const isSearchPage = pathname.startsWith("/buscar")
   const isCategoryPage = pathname.startsWith("/negocios") || pathname.startsWith("/directorio")
-  const isDetailPage = /^\/directorio\/[^/]+\/[^/]+/.test(pathname)
+  const isDetailPage =
+    /^\/directorio\/[^/]+\/[^/]+/.test(pathname) ||
+    /^\/negocios\/[^/?]+/.test(pathname)
   const showFloatingButton = isCategoryPage && !isDetailPage
 
   return (
@@ -51,11 +53,13 @@ export default async function PublicLayout({
         <div className={`relative flex flex-col flex-1 ${!isCategoryPage ? "-mt-20" : ""}`}>
           
           {/* La barra de categorías DEBE tener un z-index alto para ser clickeable */}
-          <div className="sticky top-0 z-[150]">
-            <StickyCategoryBar stickyOffset={isCategoryPage ? 64 : 0} />
-            {/* Barra de contexto: solo visible en mobile, siempre sticky junto a la barra de categorías */}
-            <ContextBar />
-          </div>
+          {!isDetailPage && (
+            <div className="sticky top-0 z-[150]">
+              <StickyCategoryBar stickyOffset={isCategoryPage ? 64 : 0} />
+              {/* Barra de contexto: solo visible en mobile, siempre sticky junto a la barra de categorías */}
+              <ContextBar />
+            </div>
+          )}
 
           <main className="flex-1 relative">
             {children}
