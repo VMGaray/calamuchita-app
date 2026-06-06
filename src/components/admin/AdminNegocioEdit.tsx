@@ -316,7 +316,7 @@ export default function AdminNegocioEdit({ id }: Props) {
   return (
     <div className="max-w-2xl">
       <div className="flex items-center gap-3 mb-8">
-        <button onClick={() => window.history.length > 1 ? router.back() : router.push("/dashboard")} className="w-9 h-9 flex items-center justify-center rounded-xl hover:bg-stone-100 transition-colors">
+        <button onClick={() => router.push("/dashboard")} className="w-9 h-9 flex items-center justify-center rounded-xl hover:bg-stone-100 transition-colors">
           <ArrowLeft size={18} className="text-stone-600" />
         </button>
         <div>
@@ -838,7 +838,7 @@ export default function AdminNegocioEdit({ id }: Props) {
 
         {/* Botones */}
         <div className="flex gap-3">
-          <button onClick={() => window.history.length > 1 ? router.back() : router.push("/dashboard")}
+          <button onClick={() => router.push("/dashboard")}
             className="flex-1 py-3 rounded-xl border border-stone-200 text-stone-600 text-sm font-medium hover:bg-stone-50 transition-colors">
             Cancelar
           </button>
