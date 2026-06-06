@@ -709,10 +709,10 @@ export default function DirectorioDetalle({ business, section, promotions = [] }
             <button
               onClick={e => { e.stopPropagation(); setLightboxIdx(null) }}
               aria-label="Cerrar"
-              className="absolute top-4 right-4 z-20 w-12 h-12 rounded-full flex items-center justify-center"
-              style={{ background: "rgba(255,255,255,0.25)", color: "#fff" }}
+              className="absolute top-4 right-4 z-20 w-12 h-12 rounded-full flex items-center justify-center shadow-lg"
+              style={{ background: "rgba(0,0,0,0.70)", color: "#fff", border: "1.5px solid rgba(255,255,255,0.30)" }}
             >
-              <X size={22} />
+              <X size={24} strokeWidth={2.5} />
             </button>
 
             {/* Contador */}
@@ -808,10 +808,10 @@ export default function DirectorioDetalle({ business, section, promotions = [] }
             <button
               onClick={e => { e.stopPropagation(); setLightboxSrc(null) }}
               aria-label="Cerrar"
-              className="absolute top-4 right-4 z-20 w-12 h-12 rounded-full flex items-center justify-center"
-              style={{ background: "rgba(255,255,255,0.25)", color: "#fff" }}
+              className="absolute top-4 right-4 z-20 w-12 h-12 rounded-full flex items-center justify-center shadow-lg"
+              style={{ background: "rgba(0,0,0,0.70)", color: "#fff", border: "1.5px solid rgba(255,255,255,0.30)" }}
             >
-              <X size={22} />
+              <X size={24} strokeWidth={2.5} />
             </button>
           </motion.div>
         )}
