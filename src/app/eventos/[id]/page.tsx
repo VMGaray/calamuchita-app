@@ -26,7 +26,7 @@ export default function EventoDetalle() {
   return (
     <main className="min-h-screen bg-[#FDFCF9] pb-20">
       <button
-        onClick={() => router.back()}
+        onClick={() => window.history.length > 1 ? router.back() : router.push("/eventos")}
         className="fixed top-6 left-6 z-50 bg-white/80 backdrop-blur-md p-3 rounded-full shadow-lg text-[#2D4530]"
       >
         <ChevronLeft size={24} />

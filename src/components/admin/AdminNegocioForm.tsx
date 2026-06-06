@@ -900,7 +900,7 @@ export default function AdminNegocioForm() {
 
         {/* Botones */}
         <div className="flex gap-3">
-          <button onClick={() => router.back()}
+          <button onClick={() => window.history.length > 1 ? router.back() : router.push("/dashboard")}
             className="flex-1 py-3 rounded-xl border border-stone-200 text-stone-600 text-sm font-medium hover:bg-stone-50 transition-colors">
             Cancelar
           </button>

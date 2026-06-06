@@ -158,7 +158,7 @@ export default function AdminMenuDelDia({ businessId }: Props) {
   return (
     <div className="max-w-2xl">
       <div className="flex items-center gap-3 mb-8">
-        <button onClick={() => router.back()} className="w-9 h-9 flex items-center justify-center rounded-xl hover:bg-stone-100 transition-colors">
+        <button onClick={() => window.history.length > 1 ? router.back() : router.push("/dashboard")} className="w-9 h-9 flex items-center justify-center rounded-xl hover:bg-stone-100 transition-colors">
           <ArrowLeft size={18} className="text-stone-600" />
         </button>
         <div>
