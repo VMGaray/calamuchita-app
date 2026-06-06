@@ -41,6 +41,7 @@ const categoryLabel: Record<string, string> = {
   restaurant: "Restaurante",
   cafe: "Café",
   viandas: "Viandas",
+  panaderia: "Panadería",
   bar: "Bar",
   other: "Gastronomía",
 }

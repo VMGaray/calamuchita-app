@@ -6,6 +6,7 @@ export const sectionCategories = {
     { label: "Take Away", desc: "Pedí y retirá en el local", href: "/negocios?takeaway=true", bg: "bg-brand-slate/10", color: "text-brand-slate" },
     { label: "Restaurantes", desc: "Cocina regional y menú del día", href: "/negocios?categoria=restaurant", bg: "bg-brand-earth/10", color: "text-brand-earth" },
     { label: "Viandas", desc: "Comida casera para llevar", href: "/negocios?categoria=viandas", bg: "bg-brand-slate/10", color: "text-brand-slate" },
+    { label: "Panadería", desc: "Pan, facturas y productos de horno", href: "/negocios?categoria=panaderia", bg: "bg-brand-earth/10", color: "text-brand-earth" },
     { label: "Varios", desc: "Otros locales gastronómicos", href: "/negocios?categoria=other", bg: "bg-brand-sand/50", color: "text-brand-charcoal" },
     { label: "Todos", desc: "Ver toda la gastronomía", href: "/negocios", bg: "bg-brand-sand/50", color: "text-brand-charcoal" },
   ],

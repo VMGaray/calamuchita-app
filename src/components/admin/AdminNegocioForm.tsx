@@ -25,6 +25,7 @@ const gastronomyCategories: { value: BusinessCategory; label: string }[] = [
   { value: "restaurant", label: "Restaurante" },
   { value: "cafe_bar",   label: "Bar/Café" },
   { value: "viandas",    label: "Viandas" },
+  { value: "panaderia",  label: "Panadería" },
   { value: "other",      label: "Otro" },
 ]
 
