@@ -281,7 +281,7 @@ export default function AdminNegocioForm() {
     })
 
     if (insertError) {
-      setError("Error al guardar. Intentá de nuevo.")
+      setError(`Error al guardar: ${insertError.message}`)
       setLoading(false)
       return
     }
