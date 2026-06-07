@@ -4,7 +4,7 @@ import { useState, useEffect } from "react"
 import { createClient } from "@/lib/supabase/client"
 import ImageUpload from "@/components/ui/ImageUpload"
 import PdfUpload from "@/components/ui/PdfUpload"
-import HorariosEditor, { HorarioDay } from "@/components/ui/HorariosEditor"
+import HorariosEditor, { HorarioDay, mergeHorariosFromDB, expandHorariosForSave } from "@/components/ui/HorariosEditor"
 
 const categoryOptions = [
   { value: "restaurant", label: "Restaurante" },
@@ -149,7 +149,7 @@ export default function ConfiguracionLocal() {
           .eq("business_id", business.id)
           .order("day_of_week")
 
-        if (horariosData) setHorarios(horariosData)
+        if (horariosData) setHorarios(mergeHorariosFromDB(horariosData))
 
         if (business.latitude && business.longitude) {
           setCoordsInput(`${business.latitude}, ${business.longitude}`)
@@ -271,7 +271,7 @@ export default function ConfiguracionLocal() {
     if (businessId && horarios.length > 0) {
       await supabase.from("business_hours").delete().eq("business_id", businessId)
       await supabase.from("business_hours").insert(
-        horarios.map(h => ({ ...h, business_id: businessId }))
+        expandHorariosForSave(horarios).map(h => ({ ...h, business_id: businessId }))
       )
     }
 
