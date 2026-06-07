@@ -188,7 +188,7 @@ export default function MenuDelDia() {
 
   return (
     <div className="max-w-2xl">
-      <div className="flex items-start justify-between mb-8">
+      <div className="flex items-start justify-between gap-3 mb-8">
         <div>
           <h1 className="text-2xl text-stone-800 mb-1">Menú del día</h1>
           <p className="text-stone-500 capitalize">{todayLabel}</p>
@@ -213,14 +213,14 @@ export default function MenuDelDia() {
 
       {/* Precargar de ayer */}
       {yesterdayItems.length > 0 && items.length === 0 && (
-        <div className="bg-primary-50 border border-primary-100 rounded-2xl p-4 mb-6 flex items-center justify-between">
+        <div className="bg-primary-50 border border-primary-100 rounded-2xl p-4 mb-6 flex flex-col sm:flex-row sm:items-center gap-3 sm:justify-between">
           <div>
             <p className="text-sm font-medium text-primary-700">Tenés el menú de ayer guardado</p>
             <p className="text-xs text-primary-500 mt-0.5">Podés usarlo como punto de partida</p>
           </div>
           <button
             onClick={loadYesterday}
-            className="text-sm font-medium text-primary-600 hover:text-primary-700 bg-white border border-primary-200 px-4 py-2 rounded-xl transition-colors"
+            className="self-start sm:self-auto text-sm font-medium text-primary-600 hover:text-primary-700 bg-white border border-primary-200 px-4 py-2 rounded-xl transition-colors whitespace-nowrap"
           >
             Usar menú de ayer
           </button>

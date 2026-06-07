@@ -22,7 +22,6 @@ export interface HorarioDay {
   closes_at_2?: string
 }
 
-/** Expande HorarioDay[] en filas limpias para guardar en business_hours. */
 export function expandHorariosForSave(
   horarios: HorarioDay[],
 ): { day_of_week: number; opens_at: string; closes_at: string; is_closed: boolean }[] {
@@ -36,7 +35,6 @@ export function expandHorariosForSave(
   return rows
 }
 
-/** Fusiona las filas crudas de business_hours (puede haber 2 por día) en HorarioDay[]. */
 export function mergeHorariosFromDB(rows: any[]): HorarioDay[] {
   const byDay = new Map<number, any[]>()
   for (const row of rows) {
@@ -109,12 +107,12 @@ export default function HorariosEditor({ value, onChange }: Props) {
     })))
   }
 
-  const timeInput = (val: string, onChange: (v: string) => void, accent = false) => (
+  const timeInput = (val: string, onChangeFn: (v: string) => void, accent = false) => (
     <input
       type="time"
       value={val}
-      onChange={e => onChange(e.target.value)}
-      className={`w-full px-2 py-1.5 rounded-lg border text-stone-800 text-xs outline-none focus:ring-2 focus:ring-primary-300 ${
+      onChange={e => onChangeFn(e.target.value)}
+      className={`flex-1 min-w-0 px-2 py-1.5 rounded-lg border text-stone-800 text-sm outline-none focus:ring-2 focus:ring-primary-300 ${
         accent ? "border-primary-200 bg-primary-50" : "border-stone-200"
       }`}
     />
@@ -131,71 +129,70 @@ export default function HorariosEditor({ value, onChange }: Props) {
         return (
           <div
             key={dayValue}
-            className={`p-3 rounded-xl border transition-colors ${
+            className={`px-3 py-2.5 rounded-xl border transition-colors ${
               h.is_closed ? "bg-stone-50 border-stone-100" : "bg-white border-stone-200"
             }`}
           >
-            {/* ── Fila principal ── */}
-            <div className="flex items-center gap-2">
-              <span className="w-24 flex-shrink-0 text-sm font-medium text-stone-700">{label}</span>
+            {/* Fila superior: día + acciones + cerrado */}
+            <div className="flex items-center justify-between gap-2">
+              <span className="text-sm font-medium text-stone-700 w-24 flex-shrink-0">{label}</span>
 
-              <label className="flex items-center gap-1.5 cursor-pointer flex-shrink-0">
-                <input
-                  type="checkbox"
-                  checked={h.is_closed}
-                  onChange={e => updateDay(dayValue, "is_closed", e.target.checked)}
-                  className="w-3.5 h-3.5 accent-primary-500"
-                />
-                <span className="text-xs text-stone-400">Cerrado</span>
-              </label>
+              <div className="flex items-center gap-2 ml-auto">
+                {!h.is_closed && (
+                  <>
+                    <button
+                      type="button"
+                      onClick={() => copyToAll(dayValue)}
+                      className="text-xs text-primary-400 hover:text-primary-600 whitespace-nowrap"
+                    >
+                      Copiar a todos
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => toggleSplit(dayValue)}
+                      title={hasSplit ? "Quitar 2do turno" : "Agregar 2do turno"}
+                      className={`w-6 h-6 rounded-full flex items-center justify-center transition-colors flex-shrink-0 ${
+                        hasSplit
+                          ? "bg-red-100 text-red-400 hover:bg-red-200"
+                          : "bg-primary-50 text-primary-500 hover:bg-primary-100"
+                      }`}
+                    >
+                      {hasSplit ? <X size={11} /> : <Plus size={11} />}
+                    </button>
+                  </>
+                )}
 
-              {!h.is_closed && (
-                <>
-                  <div className="flex items-center gap-1 flex-1 min-w-0">
-                    {timeInput(h.opens_at, v => updateDay(dayValue, "opens_at", v))}
-                    <span className="text-xs text-stone-400 flex-shrink-0">a</span>
-                    {timeInput(h.closes_at, v => updateDay(dayValue, "closes_at", v))}
-                  </div>
-
-                  {/* Botón agregar / quitar 2do turno */}
-                  <button
-                    type="button"
-                    onClick={() => toggleSplit(dayValue)}
-                    title={hasSplit ? "Quitar 2do turno" : "Agregar 2do turno"}
-                    className={`flex-shrink-0 w-6 h-6 rounded-full flex items-center justify-center transition-colors ${
-                      hasSplit
-                        ? "bg-red-100 text-red-400 hover:bg-red-200"
-                        : "bg-primary-50 text-primary-500 hover:bg-primary-100"
-                    }`}
-                  >
-                    {hasSplit ? <X size={11} /> : <Plus size={11} />}
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={() => copyToAll(dayValue)}
-                    className="text-xs text-primary-400 hover:text-primary-600 flex-shrink-0 whitespace-nowrap"
-                  >
-                    Copiar
-                  </button>
-                </>
-              )}
-
-              {h.is_closed && (
-                <span className="text-xs text-stone-400 italic">No abre este día</span>
-              )}
+                <label className="flex items-center gap-1.5 cursor-pointer flex-shrink-0">
+                  <input
+                    type="checkbox"
+                    checked={h.is_closed}
+                    onChange={e => updateDay(dayValue, "is_closed", e.target.checked)}
+                    className="w-3.5 h-3.5 accent-primary-500"
+                  />
+                  <span className="text-xs text-stone-400">Cerrado</span>
+                </label>
+              </div>
             </div>
 
-            {/* ── 2do turno ── */}
-            {hasSplit && (
-              <div className="flex items-center gap-1 mt-2 pl-[6.5rem]">
-                <div className="flex items-center gap-1 flex-1 min-w-0">
-                  {timeInput(h.opens_at_2 ?? "15:00", v => updateDay(dayValue, "opens_at_2", v), true)}
+            {/* Fila inferior: inputs de hora (solo si abierto) */}
+            {!h.is_closed && (
+              <div className="mt-2 space-y-1.5">
+                {/* Primer turno */}
+                <div className="flex items-center gap-2">
+                  {timeInput(h.opens_at, v => updateDay(dayValue, "opens_at", v))}
                   <span className="text-xs text-stone-400 flex-shrink-0">a</span>
-                  {timeInput(h.closes_at_2 ?? "20:00", v => updateDay(dayValue, "closes_at_2", v), true)}
+                  {timeInput(h.closes_at, v => updateDay(dayValue, "closes_at", v))}
                 </div>
-                <span className="text-[10px] text-primary-400 flex-shrink-0 whitespace-nowrap w-6 text-center">2°</span>
-                <span className="text-xs text-stone-400 flex-shrink-0 whitespace-nowrap">2do turno</span>
+
+                {/* Segundo turno */}
+                {hasSplit && (
+                  <div className="flex items-center gap-2">
+                    {timeInput(h.opens_at_2 ?? "15:00", v => updateDay(dayValue, "opens_at_2", v), true)}
+                    <span className="text-xs text-stone-400 flex-shrink-0">a</span>
+                    {timeInput(h.closes_at_2 ?? "20:00", v => updateDay(dayValue, "closes_at_2", v), true)}
+                    <span className="text-[10px] text-primary-400 flex-shrink-0 whitespace-nowrap">2° turno</span>
+                  </div>
+                )}
               </div>
             )}
           </div>
