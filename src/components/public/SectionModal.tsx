@@ -34,7 +34,7 @@ const categoryIcons: Record<string, any> = {
   "Natación": Waves, "Ciclismo": Bike,
   "Trekking / Montaña": Mountain, "Yoga / Pilates": Sparkles, "Gimnasio": Dumbbell,
   "Artes marciales": Shield, "Running": Timer,
-  "Clínicas": Building, "Especialidades": Stethoscope,
+  "Clínicas y Consultorios": Building, "Especialidades": Stethoscope,
   "Hospitales y Dispensarios": AlertCircle, "Laboratorios": FlaskConical,
   "Psicología": Brain, "Terapias alternativas": Leaf, "Traslado de pacientes": Ambulance,
   "Arte y Música": Music, "Colegios": GraduationCap, "Deporte": Trophy,

@@ -71,7 +71,7 @@ export const MASTER_CATEGORIES = {
   health: {
     label: "Salud",
     subcategories: [
-      { label: "Clínicas", icon: Building, bg: "bg-blue-50", color: "text-blue-600" },
+      { label: "Clínicas y Consultorios", icon: Building, bg: "bg-blue-50", color: "text-blue-600" },
       { label: "Especialidades", icon: Stethoscope, bg: "bg-purple-50", color: "text-purple-600" },
       { label: "Hospitales y Dispensarios", icon: AlertCircle, bg: "bg-red-50", color: "text-red-600" },
       { label: "Laboratorios", icon: FlaskConical, bg: "bg-cyan-50", color: "text-cyan-600" },

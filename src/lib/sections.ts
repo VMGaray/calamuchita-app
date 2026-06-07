@@ -38,7 +38,7 @@ export const sectionCategories = {
     { label: "Todos", desc: "Ver todos los servicios", href: "/directorio/services", bg: "bg-brand-sand/50", color: "text-brand-charcoal" },
   ],
   health: [
-    { label: "Clínicas", desc: "Atención médica general", href: "/directorio/health?cat=clinicas", bg: "bg-brand-pine/10", color: "text-brand-pine" },
+    { label: "Clínicas y Consultorios", desc: "Atención médica general", href: "/directorio/health?cat=clinicas", bg: "bg-brand-pine/10", color: "text-brand-pine" },
     { label: "Especialidades", desc: "Médicos especializados", href: "/directorio/health?cat=especialidades", bg: "bg-brand-slate/10", color: "text-brand-slate" },
     { label: "Hospitales y Dispensarios", desc: "Guardias y urgencias", href: "/directorio/health?cat=hospitales", bg: "bg-brand-earth/10", color: "text-brand-earth" },
     { label: "Laboratorios", desc: "Análisis clínicos y diagnóstico", href: "/directorio/health?cat=laboratorios", bg: "bg-brand-slate/10", color: "text-brand-slate" },

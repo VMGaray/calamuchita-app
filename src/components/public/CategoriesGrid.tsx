@@ -24,7 +24,7 @@ const categoryIcons: Record<string, any> = {
   "Herrero": Hammer, "Cerrajero": KeyRound, "Jardinero": Leaf,
   "Piletero": Waves, "Zinguero": Home, "Desinfecciones": Bug,
   "Perforaciones": Droplets, "Limpieza": Sparkles,
-  "Clínicas y consultorios": Stethoscope, "Farmacias": Pill,
+  "Clínicas y Consultorios": Stethoscope, "Farmacias": Pill,
   "Psicología": Brain, "Odontología": Smile, "Oftalmología": Eye,
   "Veterinarias": PawPrint, "Emergencias": AlertCircle,
   "Colegios": GraduationCap, "Institutos": BookOpen,
