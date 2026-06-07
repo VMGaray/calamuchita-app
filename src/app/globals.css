@@ -8,15 +8,15 @@
   --color-brand-earth: #5E4B3B;
   --color-brand-charcoal: #3C3C3C;
 
-  /* Legado – conservados para compatibilidad con dashboard/admin */
-  --color-primary-50: #fdf8f3;
-  --color-primary-100: #f8eede;
-  --color-primary-200: #f0d9be;
-  --color-primary-300: #e0b898;
-  --color-primary-400: #c8875a;
-  --color-primary-500: #b06a3a;
-  --color-primary-600: #8a4e28;
-  --color-primary-700: #5a3018;
+  /* Paleta primaria — verde Calamuchita */
+  --color-primary-50: #f0f5f0;
+  --color-primary-100: #E1DBC9;
+  --color-primary-200: #c8d4c0;
+  --color-primary-300: #A3B18A;
+  --color-primary-400: #6B8F70;
+  --color-primary-500: #2D4530;
+  --color-primary-600: #253a28;
+  --color-primary-700: #1a2b1d;
 
   --color-accent-50: #fdf5f0;
   --color-accent-100: #fae0d0;

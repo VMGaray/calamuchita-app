@@ -1,4 +1,4 @@
-"use client"
+﻿"use client"
 
 import { useState, useEffect, useCallback } from "react"
 import { createClient } from "@/lib/supabase/client"
@@ -38,7 +38,7 @@ const STATUS_CONFIG = {
   },
 }
 
-const DAYS = ["Dom", "Lun", "Mar", "Mié", "Jue", "Vie", "Sáb"]
+const DAYS = ["Dom", "Lun", "Mar", "MiÃ©", "Jue", "Vie", "SÃ¡b"]
 const MONTHS = ["ene", "feb", "mar", "abr", "may", "jun", "jul", "ago", "sep", "oct", "nov", "dic"]
 
 export default function ReservasDashboard() {
@@ -125,7 +125,7 @@ export default function ReservasDashboard() {
     const isToday = dateStr === today
     const isTomorrow = dateStr === new Date(Date.now() + 86400000).toISOString().split("T")[0]
     if (isToday) return "Hoy"
-    if (isTomorrow) return "Mañana"
+    if (isTomorrow) return "MaÃ±ana"
     return `${DAYS[date.getDay()]} ${date.getDate()} ${MONTHS[date.getMonth()]}`
   }
 
@@ -159,7 +159,7 @@ export default function ReservasDashboard() {
       {/* Filtros */}
       <div className="flex gap-2 mb-6">
         {[
-          { key: "upcoming", label: "Próximas" },
+          { key: "upcoming", label: "PrÃ³ximas" },
           { key: "today", label: "Hoy" },
           { key: "past", label: "Pasadas" },
           { key: "all", label: "Todas" },
@@ -170,8 +170,8 @@ export default function ReservasDashboard() {
             className="px-4 py-2 rounded-xl text-sm font-medium transition-all"
             style={
               filter === f.key
-                ? { background: "#c8603a", color: "white" }
-                : { background: "white", color: "rgba(42,26,8,0.5)", border: "1px solid rgba(200,96,58,0.15)" }
+                ? { background: "#2D4530", color: "white" }
+                : { background: "white", color: "rgba(45,69,48,0.6)", border: "1px solid rgba(45,69,48,0.15)" }
             }
           >
             {f.label}
@@ -184,7 +184,7 @@ export default function ReservasDashboard() {
         <div className="bg-white rounded-2xl border border-stone-200 p-12 text-center">
           <CalendarDays size={40} className="mx-auto text-stone-300 mb-3" />
           <p className="text-stone-500 text-sm">
-            {filter === "upcoming" ? "No hay reservas próximas" : "No hay reservas"}
+            {filter === "upcoming" ? "No hay reservas prÃ³ximas" : "No hay reservas"}
           </p>
         </div>
       ) : (
@@ -206,7 +206,7 @@ export default function ReservasDashboard() {
                   className="bg-white rounded-2xl border border-stone-200 overflow-hidden"
                   style={
                     res.status === "pending" && !isPast
-                      ? { borderColor: "rgba(200,96,58,0.3)", boxShadow: "0 0 0 3px rgba(200,96,58,0.06)" }
+                      ? { borderColor: "rgba(45,69,48,0.3)", boxShadow: "0 0 0 3px rgba(45,69,48,0.06)" }
                       : {}
                   }
                 >
@@ -218,12 +218,12 @@ export default function ReservasDashboard() {
                     {/* Fecha */}
                     <div
                       className="w-12 h-12 rounded-xl flex flex-col items-center justify-center flex-shrink-0"
-                      style={{ background: isPast ? "rgba(120,113,108,0.08)" : "rgba(200,96,58,0.08)" }}
+                      style={{ background: isPast ? "rgba(120,113,108,0.08)" : "rgba(45,69,48,0.08)" }}
                     >
-                      <span className="text-xs font-medium" style={{ color: isPast ? "#78716c" : "#c8603a" }}>
+                      <span className="text-xs font-medium" style={{ color: isPast ? "#78716c" : "#2D4530" }}>
                         {new Date(res.date + "T00:00:00").getDate()}
                       </span>
-                      <span className="text-[10px]" style={{ color: isPast ? "#a8a29e" : "rgba(200,96,58,0.7)" }}>
+                      <span className="text-[10px]" style={{ color: isPast ? "#a8a29e" : "rgba(45,69,48,0.7)" }}>
                         {MONTHS[new Date(res.date + "T00:00:00").getMonth()]}
                       </span>
                     </div>
@@ -270,7 +270,7 @@ export default function ReservasDashboard() {
                             <div className="flex flex-col gap-0.5 p-3 rounded-xl bg-stone-50">
                               <span className="text-xs text-stone-400">Fecha y hora</span>
                               <span className="text-sm font-medium text-stone-700">
-                                {formatDate(res.date)} · {formatTime(res.time)}
+                                {formatDate(res.date)} Â· {formatTime(res.time)}
                               </span>
                             </div>
                             <div className="flex flex-col gap-0.5 p-3 rounded-xl bg-stone-50">
@@ -284,7 +284,7 @@ export default function ReservasDashboard() {
                                 href={`tel:${res.profiles.phone}`}
                                 className="flex flex-col gap-0.5 p-3 rounded-xl bg-stone-50 hover:bg-stone-100 transition-colors col-span-2"
                               >
-                                <span className="text-xs text-stone-400">Teléfono</span>
+                                <span className="text-xs text-stone-400">TelÃ©fono</span>
                                 <span className="text-sm font-medium text-stone-700">{res.profiles.phone}</span>
                               </a>
                             )}
@@ -305,7 +305,7 @@ export default function ReservasDashboard() {
                                 onClick={() => handleUpdateStatus(res.id, "confirmed")}
                                 disabled={updatingStatus === res.id}
                                 className="flex-1 py-2.5 rounded-xl text-sm font-medium transition-all disabled:opacity-50"
-                                style={{ background: "#c8603a", color: "white" }}
+                                style={{ background: "#2D4530", color: "white" }}
                               >
                                 {updatingStatus === res.id ? "..." : "Confirmar"}
                               </button>
@@ -336,7 +336,7 @@ export default function ReservasDashboard() {
                             <a
                               href={`https://wa.me/${res.profiles.phone.replace(/\D/g, "")}?text=${encodeURIComponent(
                                 res.status === "confirmed"
-                                  ? `Hola ${res.profiles.full_name}, tu reserva para el ${formatDate(res.date)} a las ${formatTime(res.time)} está confirmada! Te esperamos 🙌`
+                                  ? `Hola ${res.profiles.full_name}, tu reserva para el ${formatDate(res.date)} a las ${formatTime(res.time)} estÃ¡ confirmada! Te esperamos ðŸ™Œ`
                                   : `Hola ${res.profiles.full_name}, te contactamos por tu reserva del ${formatDate(res.date)}.`
                               )}`}
                               target="_blank"

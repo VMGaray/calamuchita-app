@@ -1,4 +1,4 @@
-"use client"
+﻿"use client"
 
 import { useState, useEffect } from "react"
 import { createClient } from "@/lib/supabase/client"
@@ -10,7 +10,7 @@ interface Stats {
   ordersMonth: number
   revenueMonth: number
   reservasMonth: number
-  // últimos 30 días — leads por tipo
+  // Ãºltimos 30 dÃ­as â€” leads por tipo
   leadsWhatsapp: number
   leadsPhone: number
   leadsReserva: number
@@ -125,7 +125,7 @@ export default function EstadisticasDashboard() {
   if (!stats) {
     return (
       <div className="max-w-3xl">
-        <p className="text-stone-400 text-sm">No se encontró el negocio vinculado a tu cuenta.</p>
+        <p className="text-stone-400 text-sm">No se encontrÃ³ el negocio vinculado a tu cuenta.</p>
       </div>
     )
   }
@@ -133,13 +133,13 @@ export default function EstadisticasDashboard() {
   return (
     <div className="max-w-3xl">
       <div className="mb-8">
-        <h1 className="text-2xl text-stone-800 mb-1">Estadísticas</h1>
+        <h1 className="text-2xl text-stone-800 mb-1">EstadÃ­sticas</h1>
         <p className="text-stone-500 text-sm">Resumen de la actividad de tu negocio</p>
       </div>
 
       {/* Perfil */}
       <div className="mb-2">
-        <p className="text-xs font-semibold uppercase tracking-widest text-stone-400 mb-3">Perfil público — histórico</p>
+        <p className="text-xs font-semibold uppercase tracking-widest text-stone-400 mb-3">Perfil pÃºblico â€” histÃ³rico</p>
       </div>
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8">
         <StatCard
@@ -153,15 +153,15 @@ export default function EstadisticasDashboard() {
           icon={Users}
           label="Contactos generados"
           value={(stats.leadsWhatsapp + stats.leadsPhone + stats.leadsReserva).toLocaleString("es-AR")}
-          sub="Últimos 30 días"
-          color="#c8603a"
+          sub="Ãšltimos 30 dÃ­as"
+          color="#2D4530"
         />
       </div>
 
       {/* Este mes */}
       <div className="mb-2">
         <p className="text-xs font-semibold uppercase tracking-widest text-stone-400 mb-3 capitalize">
-          Este mes — {monthLabel}
+          Este mes â€” {monthLabel}
         </p>
       </div>
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
@@ -170,11 +170,11 @@ export default function EstadisticasDashboard() {
           label="Pedidos"
           value={stats.ordersMonth}
           sub={stats.revenueMonth > 0 ? `$${stats.revenueMonth.toLocaleString("es-AR")} facturado` : undefined}
-          color="#c8603a"
+          color="#2D4530"
         />
         <StatCard
           icon={TrendingUp}
-          label="Facturación"
+          label="FacturaciÃ³n"
           value={`$${stats.revenueMonth.toLocaleString("es-AR")}`}
           sub="Solo pedidos activos"
           color="#2D4530"
@@ -189,21 +189,21 @@ export default function EstadisticasDashboard() {
 
       {/* Contactos */}
       <div className="mb-2">
-        <p className="text-xs font-semibold uppercase tracking-widest text-stone-400 mb-3">Contactos — últimos 30 días</p>
+        <p className="text-xs font-semibold uppercase tracking-widest text-stone-400 mb-3">Contactos â€” Ãºltimos 30 dÃ­as</p>
       </div>
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <StatCard
           icon={MessageCircle}
           label="Clicks a WhatsApp"
           value={stats.leadsWhatsapp}
-          sub="Desde tu página pública"
+          sub="Desde tu pÃ¡gina pÃºblica"
           color="#25D366"
         />
         <StatCard
           icon={Phone}
-          label="Clicks al teléfono"
+          label="Clicks al telÃ©fono"
           value={stats.leadsPhone}
-          sub="Desde tu página pública"
+          sub="Desde tu pÃ¡gina pÃºblica"
           color="#6B7B84"
         />
         <StatCard
@@ -211,7 +211,7 @@ export default function EstadisticasDashboard() {
           label="Pedidos de reserva"
           value={stats.leadsReserva}
           sub="Formulario de reserva enviado"
-          color="#c8603a"
+          color="#2D4530"
         />
       </div>
     </div>

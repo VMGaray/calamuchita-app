@@ -1,4 +1,4 @@
-"use client"
+﻿"use client"
 
 import { useState, useEffect, useCallback } from "react"
 import { createClient } from "@/lib/supabase/client"
@@ -105,7 +105,7 @@ export default function PedidosDashboard() {
       await fetchOrders(business.id)
       setLoading(false)
 
-      // Realtime — escuchar nuevos pedidos
+      // Realtime â€” escuchar nuevos pedidos
       const channel = supabase
         .channel("orders-channel")
         .on("postgres_changes", {
@@ -192,8 +192,8 @@ export default function PedidosDashboard() {
             className="px-4 py-2 rounded-xl text-sm font-medium transition-all"
             style={
               filter === f.key
-                ? { background: "#c8603a", color: "white" }
-                : { background: "white", color: "rgba(42,26,8,0.5)", border: "1px solid rgba(200,96,58,0.15)" }
+                ? { background: "#2D4530", color: "white" }
+                : { background: "white", color: "rgba(45,69,48,0.6)", border: "1px solid rgba(45,69,48,0.15)" }
             }
           >
             {f.label}
@@ -228,7 +228,7 @@ export default function PedidosDashboard() {
                   className="bg-white rounded-2xl border border-stone-200 overflow-hidden"
                   style={
                     order.status === "pending"
-                      ? { borderColor: "rgba(200,96,58,0.3)", boxShadow: "0 0 0 3px rgba(200,96,58,0.06)" }
+                      ? { borderColor: "rgba(45,69,48,0.3)", boxShadow: "0 0 0 3px rgba(45,69,48,0.06)" }
                       : {}
                   }
                 >
@@ -237,14 +237,14 @@ export default function PedidosDashboard() {
                     onClick={() => setExpandedOrder(isExpanded ? null : order.id)}
                     className="w-full flex items-center gap-4 px-5 py-4 text-left"
                   >
-                    {/* Ícono tipo */}
+                    {/* Ãcono tipo */}
                     <div
                       className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0"
-                      style={{ background: "rgba(200,96,58,0.08)" }}
+                      style={{ background: "rgba(45,69,48,0.08)" }}
                     >
                       {order.type === "delivery"
-                        ? <Truck size={18} style={{ color: "#c8603a" }} />
-                        : <ShoppingBag size={18} style={{ color: "#c8603a" }} />
+                        ? <Truck size={18} style={{ color: "#2D4530" }} />
+                        : <ShoppingBag size={18} style={{ color: "#2D4530" }} />
                       }
                     </div>
 
@@ -259,14 +259,14 @@ export default function PedidosDashboard() {
                       </div>
                       <div className="flex items-center gap-2">
                         <span className="text-xs text-stone-400">
-                          {order.type === "delivery" ? "Delivery" : "Take away"} ·{" "}
+                          {order.type === "delivery" ? "Delivery" : "Take away"} Â·{" "}
                           {order.order_items?.length} producto{order.order_items?.length !== 1 ? "s" : ""}
                         </span>
                       </div>
                     </div>
 
                     <div className="flex items-center gap-2 flex-shrink-0">
-                      <p className="text-sm font-semibold" style={{ color: "#c8603a" }}>
+                      <p className="text-sm font-semibold" style={{ color: "#2D4530" }}>
                         ${order.total.toLocaleString("es-AR")}
                       </p>
                       <span className={`flex items-center gap-1 text-xs px-2.5 py-1 rounded-full font-medium ${config.color}`}>
@@ -295,13 +295,13 @@ export default function PedidosDashboard() {
                                 href={`tel:${order.customer_phone}`}
                                 className="flex flex-col gap-0.5 p-3 rounded-xl bg-stone-50 hover:bg-stone-100 transition-colors"
                               >
-                                <span className="text-xs text-stone-400">Teléfono</span>
+                                <span className="text-xs text-stone-400">TelÃ©fono</span>
                                 <span className="text-sm font-medium text-stone-700">{order.customer_phone}</span>
                               </a>
                             )}
                             {order.delivery_address && (
                               <div className="flex flex-col gap-0.5 p-3 rounded-xl bg-stone-50">
-                                <span className="text-xs text-stone-400">Dirección</span>
+                                <span className="text-xs text-stone-400">DirecciÃ³n</span>
                                 <span className="text-sm font-medium text-stone-700">{order.delivery_address}</span>
                               </div>
                             )}
@@ -323,7 +323,7 @@ export default function PedidosDashboard() {
                               ))}
                               <div className="flex justify-between text-sm font-semibold pt-2 border-t border-stone-100 mt-2">
                                 <span style={{ color: "#2a1a08" }}>Total</span>
-                                <span style={{ color: "#c8603a" }}>${order.total.toLocaleString("es-AR")}</span>
+                                <span style={{ color: "#2D4530" }}>${order.total.toLocaleString("es-AR")}</span>
                               </div>
                             </div>
                           </div>
@@ -348,7 +348,7 @@ export default function PedidosDashboard() {
                                   style={
                                     nextStatus === "cancelled"
                                       ? { background: "rgba(239,68,68,0.1)", color: "#ef4444", border: "1px solid rgba(239,68,68,0.2)" }
-                                      : { background: "#c8603a", color: "white" }
+                                      : { background: "#2D4530", color: "white" }
                                   }
                                 >
                                   {updatingStatus === order.id ? "..." : STATUS_LABELS[nextStatus]}
@@ -360,7 +360,7 @@ export default function PedidosDashboard() {
                           {/* WhatsApp directo al cliente */}
                           {order.customer_phone && (
                             <a
-                              href={`https://wa.me/${order.customer_phone.replace(/\D/g, "")}?text=${encodeURIComponent(`Hola ${order.customer_name}, tu pedido está ${STATUS_CONFIG[order.status].label.toLowerCase()}! 🙌`)}`}
+                              href={`https://wa.me/${order.customer_phone.replace(/\D/g, "")}?text=${encodeURIComponent(`Hola ${order.customer_name}, tu pedido estÃ¡ ${STATUS_CONFIG[order.status].label.toLowerCase()}! ðŸ™Œ`)}`}
                               target="_blank"
                               rel="noopener noreferrer"
                               className="flex items-center justify-center gap-2 w-full py-2.5 rounded-xl text-sm font-medium transition-colors"

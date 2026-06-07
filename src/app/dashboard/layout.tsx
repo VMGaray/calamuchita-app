@@ -17,7 +17,17 @@ export default async function DashboardLayout({
 
   const isBusiness = user.user_metadata?.role === "business"
 
-  if (isBusiness) {
+  if (!isBusiness) {
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("role")
+      .eq("id", user.id)
+      .single()
+
+    if (profile?.role !== "admin") {
+      redirect("/")
+    }
+  } else {
     const { data: business } = await supabase
       .from("businesses")
       .select("id")

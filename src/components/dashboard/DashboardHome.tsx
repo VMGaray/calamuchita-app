@@ -1,4 +1,4 @@
-"use client"
+﻿"use client"
 
 import { useState, useEffect } from "react"
 import { createClient } from "@/lib/supabase/client"
@@ -44,7 +44,7 @@ export default function DashboardHome() {
 
   const greeting = () => {
     const h = new Date().getHours()
-    if (h < 12) return "Buenos días"
+    if (h < 12) return "Buenos dÃ­as"
     if (h < 19) return "Buenas tardes"
     return "Buenas noches"
   }
@@ -92,7 +92,7 @@ export default function DashboardHome() {
         .eq("business_id", business.id)
         .eq("date", today)
 
-      // Menú del día
+      // MenÃº del dÃ­a
       const { data: menu } = await supabase
         .from("daily_menus")
         .select("is_published")
@@ -156,7 +156,7 @@ export default function DashboardHome() {
       {/* Header */}
       <div className="mb-8">
         <h1 className="text-2xl text-stone-800 mb-1">
-          {greeting()} 👋
+          {greeting()} ðŸ‘‹
         </h1>
         <p className="text-stone-500 text-sm">
           {businessName ? `Resumen de ${businessName} hoy` : "Resumen de tu local hoy"}
@@ -181,14 +181,14 @@ export default function DashboardHome() {
             )}
             <div className="flex items-center gap-2 mb-4">
               <div className="w-8 h-8 rounded-xl flex items-center justify-center"
-                style={{ background: "rgba(200,96,58,0.1)" }}>
-                <ShoppingBag size={16} style={{ color: "#c8603a" }} />
+                style={{ background: "rgba(45,69,48,0.1)" }}>
+                <ShoppingBag size={16} style={{ color: "#2D4530" }} />
               </div>
               <p className="text-xs text-stone-400 uppercase tracking-wider">Pedidos hoy</p>
             </div>
             <p className="text-3xl font-serif text-stone-800">{stats.ordersToday}</p>
             {stats.revenueToday > 0 && (
-              <p className="text-xs mt-1" style={{ color: "#c8603a" }}>
+              <p className="text-xs mt-1" style={{ color: "#2D4530" }}>
                 ${stats.revenueToday.toLocaleString("es-AR")} en ventas
               </p>
             )}
@@ -210,8 +210,8 @@ export default function DashboardHome() {
             )}
             <div className="flex items-center gap-2 mb-4">
               <div className="w-8 h-8 rounded-xl flex items-center justify-center"
-                style={{ background: "rgba(200,96,58,0.1)" }}>
-                <CalendarDays size={16} style={{ color: "#c8603a" }} />
+                style={{ background: "rgba(45,69,48,0.1)" }}>
+                <CalendarDays size={16} style={{ color: "#2D4530" }} />
               </div>
               <p className="text-xs text-stone-400 uppercase tracking-wider">Reservas hoy</p>
             </div>
@@ -219,7 +219,7 @@ export default function DashboardHome() {
           </motion.div>
         </Link>
 
-        {/* Menú del día */}
+        {/* MenÃº del dÃ­a */}
         <Link href="/dashboard/menu-del-dia">
           <motion.div
             whileHover={{ y: -2 }}
@@ -227,10 +227,10 @@ export default function DashboardHome() {
           >
             <div className="flex items-center gap-2 mb-4">
               <div className="w-8 h-8 rounded-xl flex items-center justify-center"
-                style={{ background: "rgba(200,96,58,0.1)" }}>
-                <UtensilsCrossed size={16} style={{ color: "#c8603a" }} />
+                style={{ background: "rgba(45,69,48,0.1)" }}>
+                <UtensilsCrossed size={16} style={{ color: "#2D4530" }} />
               </div>
-              <p className="text-xs text-stone-400 uppercase tracking-wider">Menú del día</p>
+              <p className="text-xs text-stone-400 uppercase tracking-wider">MenÃº del dÃ­a</p>
             </div>
             <div className="flex items-center gap-2">
               <div className={`w-2 h-2 rounded-full ${stats.menuPublished ? "bg-green-400" : "bg-stone-300"}`} />
@@ -245,7 +245,7 @@ export default function DashboardHome() {
       {/* Stat del mes */}
       <div className="bg-white rounded-2xl border border-stone-200 p-6 mb-6">
         <div className="flex items-center gap-2 mb-2">
-          <TrendingUp size={16} style={{ color: "#c8603a" }} />
+          <TrendingUp size={16} style={{ color: "#2D4530" }} />
           <p className="text-xs text-stone-400 uppercase tracking-wider">Este mes</p>
         </div>
         <p className="text-2xl font-serif text-stone-800">
@@ -260,7 +260,7 @@ export default function DashboardHome() {
           <div>
             <p className="text-sm font-medium text-stone-700">Estado del local</p>
             <p className="text-xs text-stone-400 mt-0.5">
-              Los clientes pueden ver si estás abierto
+              Los clientes pueden ver si estÃ¡s abierto
             </p>
           </div>
           <div className="flex items-center gap-3">
@@ -269,7 +269,7 @@ export default function DashboardHome() {
               onClick={handleToggleOpen}
               disabled={togglingOpen}
               className="relative w-12 h-6 rounded-full transition-all duration-300 disabled:opacity-50"
-              style={{ background: isOpen ? "#c8603a" : "#d1d5db" }}
+              style={{ background: isOpen ? "#2D4530" : "#d1d5db" }}
             >
               <motion.div
                 className="absolute top-1 w-4 h-4 bg-white rounded-full shadow-sm"
@@ -291,8 +291,8 @@ export default function DashboardHome() {
             </div>
             <Link href="/dashboard/pedidos"
               className="text-xs font-medium transition-colors"
-              style={{ color: "#c8603a" }}>
-              Ver todos →
+              style={{ color: "#2D4530" }}>
+              Ver todos â†’
             </Link>
           </div>
           <div className="space-y-3">
@@ -303,11 +303,11 @@ export default function DashboardHome() {
                     {order.customer_name || "Cliente"}
                   </p>
                   <p className="text-xs text-stone-400 mt-0.5">
-                    {order.type === "delivery" ? "🚚 Delivery" : "🏃 Take away"} · {formatTime(order.created_at)}
+                    {order.type === "delivery" ? "ðŸšš Delivery" : "ðŸƒ Take away"} Â· {formatTime(order.created_at)}
                   </p>
                 </div>
                 <div className="text-right">
-                  <p className="text-sm font-semibold" style={{ color: "#c8603a" }}>
+                  <p className="text-sm font-semibold" style={{ color: "#2D4530" }}>
                     ${order.total.toLocaleString("es-AR")}
                   </p>
                   <p className="text-xs text-stone-400 mt-0.5 capitalize">{order.status}</p>
