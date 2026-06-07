@@ -1,5 +1,5 @@
 import {
-  Wrench, Zap, Flame, Car, Building, Paintbrush, Hammer, KeyRound, Leaf, Waves, Home, Bug, Sparkles, Droplets, Shield,
+  Wrench, Zap, Flame, Car, Building, Paintbrush, Hammer, KeyRound, Leaf, Waves, Home, Bug, Sparkles, Droplets, Shield, Scissors,
   Store, Shirt, Gem, HardHat, Baby, Smartphone, Armchair, Dog, HeartPulse, Package,
   Brain, AlertCircle, FlaskConical, Stethoscope, Ambulance,
   GraduationCap, BookOpen, Languages, Users, Music, Trophy, Palette,
@@ -46,6 +46,8 @@ export const MASTER_CATEGORIES = {
       { label: "Profesionales", icon: Briefcase, bg: "bg-violet-50", color: "text-violet-600" },
       { label: "Zinguero", icon: Home, bg: "bg-slate-50", color: "text-slate-600" },
       { label: "Carteles tallados", icon: Tag, bg: "bg-amber-50", color: "text-amber-700" },
+      { label: "Costurera/Modista", icon: Scissors, bg: "bg-pink-50", color: "text-pink-600" },
+      { label: "Traslados", icon: Car, bg: "bg-blue-50", color: "text-blue-600" },
       { label: "Otro", icon: Sparkles, bg: "bg-stone-50", color: "text-stone-400" },
     ]
   },
