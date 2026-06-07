@@ -1,4 +1,4 @@
-﻿"use client"
+"use client"
 
 import { useState, useEffect } from "react"
 import { createClient } from "@/lib/supabase/client"
@@ -6,11 +6,9 @@ import { Eye, MessageCircle, Phone, CalendarDays, ShoppingBag, TrendingUp, Users
 
 interface Stats {
   totalViews: number
-  // este mes
   ordersMonth: number
   revenueMonth: number
   reservasMonth: number
-  // Ãºltimos 30 dÃ­as â€” leads por tipo
   leadsWhatsapp: number
   leadsPhone: number
   leadsReserva: number
@@ -125,7 +123,7 @@ export default function EstadisticasDashboard() {
   if (!stats) {
     return (
       <div className="max-w-3xl">
-        <p className="text-stone-400 text-sm">No se encontrÃ³ el negocio vinculado a tu cuenta.</p>
+        <p className="text-stone-400 text-sm">No se encontró el negocio vinculado a tu cuenta.</p>
       </div>
     )
   }
@@ -133,13 +131,12 @@ export default function EstadisticasDashboard() {
   return (
     <div className="max-w-3xl">
       <div className="mb-8">
-        <h1 className="text-2xl text-stone-800 mb-1">EstadÃ­sticas</h1>
+        <h1 className="text-2xl text-stone-800 mb-1">Estadísticas</h1>
         <p className="text-stone-500 text-sm">Resumen de la actividad de tu negocio</p>
       </div>
 
-      {/* Perfil */}
       <div className="mb-2">
-        <p className="text-xs font-semibold uppercase tracking-widest text-stone-400 mb-3">Perfil pÃºblico â€” histÃ³rico</p>
+        <p className="text-xs font-semibold uppercase tracking-widest text-stone-400 mb-3">Perfil público — histórico</p>
       </div>
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8">
         <StatCard
@@ -153,15 +150,14 @@ export default function EstadisticasDashboard() {
           icon={Users}
           label="Contactos generados"
           value={(stats.leadsWhatsapp + stats.leadsPhone + stats.leadsReserva).toLocaleString("es-AR")}
-          sub="Ãšltimos 30 dÃ­as"
+          sub="Últimos 30 días"
           color="#2D4530"
         />
       </div>
 
-      {/* Este mes */}
       <div className="mb-2">
         <p className="text-xs font-semibold uppercase tracking-widest text-stone-400 mb-3 capitalize">
-          Este mes â€” {monthLabel}
+          Este mes — {monthLabel}
         </p>
       </div>
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
@@ -174,7 +170,7 @@ export default function EstadisticasDashboard() {
         />
         <StatCard
           icon={TrendingUp}
-          label="FacturaciÃ³n"
+          label="Facturación"
           value={`$${stats.revenueMonth.toLocaleString("es-AR")}`}
           sub="Solo pedidos activos"
           color="#2D4530"
@@ -187,23 +183,22 @@ export default function EstadisticasDashboard() {
         />
       </div>
 
-      {/* Contactos */}
       <div className="mb-2">
-        <p className="text-xs font-semibold uppercase tracking-widest text-stone-400 mb-3">Contactos â€” Ãºltimos 30 dÃ­as</p>
+        <p className="text-xs font-semibold uppercase tracking-widest text-stone-400 mb-3">Contactos — últimos 30 días</p>
       </div>
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <StatCard
           icon={MessageCircle}
           label="Clicks a WhatsApp"
           value={stats.leadsWhatsapp}
-          sub="Desde tu pÃ¡gina pÃºblica"
+          sub="Desde tu página pública"
           color="#25D366"
         />
         <StatCard
           icon={Phone}
-          label="Clicks al telÃ©fono"
+          label="Clicks al teléfono"
           value={stats.leadsPhone}
-          sub="Desde tu pÃ¡gina pÃºblica"
+          sub="Desde tu página pública"
           color="#6B7B84"
         />
         <StatCard

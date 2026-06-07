@@ -1,4 +1,4 @@
-﻿"use client"
+"use client"
 
 import { useState, useEffect, useCallback } from "react"
 import { createClient } from "@/lib/supabase/client"
@@ -38,7 +38,7 @@ const STATUS_CONFIG = {
   },
 }
 
-const DAYS = ["Dom", "Lun", "Mar", "MiÃ©", "Jue", "Vie", "SÃ¡b"]
+const DAYS = ["Dom", "Lun", "Mar", "Mié", "Jue", "Vie", "Sáb"]
 const MONTHS = ["ene", "feb", "mar", "abr", "may", "jun", "jul", "ago", "sep", "oct", "nov", "dic"]
 
 export default function ReservasDashboard() {
@@ -78,7 +78,6 @@ export default function ReservasDashboard() {
       await fetchReservations(business.id)
       setLoading(false)
 
-      // Realtime
       const channel = supabase
         .channel("reservations-channel")
         .on("postgres_changes", {
@@ -125,7 +124,7 @@ export default function ReservasDashboard() {
     const isToday = dateStr === today
     const isTomorrow = dateStr === new Date(Date.now() + 86400000).toISOString().split("T")[0]
     if (isToday) return "Hoy"
-    if (isTomorrow) return "MaÃ±ana"
+    if (isTomorrow) return "Mañana"
     return `${DAYS[date.getDay()]} ${date.getDate()} ${MONTHS[date.getMonth()]}`
   }
 
@@ -135,7 +134,6 @@ export default function ReservasDashboard() {
 
   return (
     <div className="max-w-2xl">
-      {/* Header */}
       <div className="mb-8 flex items-center justify-between">
         <div>
           <div className="flex items-center gap-3 mb-1">
@@ -159,7 +157,7 @@ export default function ReservasDashboard() {
       {/* Filtros */}
       <div className="flex gap-2 mb-6">
         {[
-          { key: "upcoming", label: "PrÃ³ximas" },
+          { key: "upcoming", label: "Próximas" },
           { key: "today", label: "Hoy" },
           { key: "past", label: "Pasadas" },
           { key: "all", label: "Todas" },
@@ -179,12 +177,11 @@ export default function ReservasDashboard() {
         ))}
       </div>
 
-      {/* Lista */}
       {filteredReservations.length === 0 ? (
         <div className="bg-white rounded-2xl border border-stone-200 p-12 text-center">
           <CalendarDays size={40} className="mx-auto text-stone-300 mb-3" />
           <p className="text-stone-500 text-sm">
-            {filter === "upcoming" ? "No hay reservas prÃ³ximas" : "No hay reservas"}
+            {filter === "upcoming" ? "No hay reservas próximas" : "No hay reservas"}
           </p>
         </div>
       ) : (
@@ -210,12 +207,10 @@ export default function ReservasDashboard() {
                       : {}
                   }
                 >
-                  {/* Header */}
                   <button
                     onClick={() => setExpandedRes(isExpanded ? null : res.id)}
                     className="w-full flex items-center gap-4 px-5 py-4 text-left"
                   >
-                    {/* Fecha */}
                     <div
                       className="w-12 h-12 rounded-xl flex flex-col items-center justify-center flex-shrink-0"
                       style={{ background: isPast ? "rgba(120,113,108,0.08)" : "rgba(45,69,48,0.08)" }}
@@ -253,7 +248,6 @@ export default function ReservasDashboard() {
                     </span>
                   </button>
 
-                  {/* Detalle expandido */}
                   <AnimatePresence>
                     {isExpanded && (
                       <motion.div
@@ -265,12 +259,11 @@ export default function ReservasDashboard() {
                       >
                         <div className="border-t border-stone-100 px-5 py-4 space-y-4">
 
-                          {/* Info */}
                           <div className="grid grid-cols-2 gap-3">
                             <div className="flex flex-col gap-0.5 p-3 rounded-xl bg-stone-50">
                               <span className="text-xs text-stone-400">Fecha y hora</span>
                               <span className="text-sm font-medium text-stone-700">
-                                {formatDate(res.date)} Â· {formatTime(res.time)}
+                                {formatDate(res.date)} · {formatTime(res.time)}
                               </span>
                             </div>
                             <div className="flex flex-col gap-0.5 p-3 rounded-xl bg-stone-50">
@@ -284,13 +277,12 @@ export default function ReservasDashboard() {
                                 href={`tel:${res.profiles.phone}`}
                                 className="flex flex-col gap-0.5 p-3 rounded-xl bg-stone-50 hover:bg-stone-100 transition-colors col-span-2"
                               >
-                                <span className="text-xs text-stone-400">TelÃ©fono</span>
+                                <span className="text-xs text-stone-400">Teléfono</span>
                                 <span className="text-sm font-medium text-stone-700">{res.profiles.phone}</span>
                               </a>
                             )}
                           </div>
 
-                          {/* Notas */}
                           {res.notes && (
                             <div className="p-3 rounded-xl bg-amber-50 border border-amber-100">
                               <p className="text-xs text-amber-600 font-medium mb-0.5">Nota</p>
@@ -298,7 +290,6 @@ export default function ReservasDashboard() {
                             </div>
                           )}
 
-                          {/* Acciones */}
                           {res.status === "pending" && !isPast && (
                             <div className="flex gap-2">
                               <button
@@ -331,12 +322,11 @@ export default function ReservasDashboard() {
                             </button>
                           )}
 
-                          {/* WhatsApp */}
                           {res.profiles?.phone && (
                             <a
                               href={`https://wa.me/${res.profiles.phone.replace(/\D/g, "")}?text=${encodeURIComponent(
                                 res.status === "confirmed"
-                                  ? `Hola ${res.profiles.full_name}, tu reserva para el ${formatDate(res.date)} a las ${formatTime(res.time)} estÃ¡ confirmada! Te esperamos ðŸ™Œ`
+                                  ? `Hola ${res.profiles.full_name}, tu reserva para el ${formatDate(res.date)} a las ${formatTime(res.time)} está confirmada! Te esperamos 🙌`
                                   : `Hola ${res.profiles.full_name}, te contactamos por tu reserva del ${formatDate(res.date)}.`
                               )}`}
                               target="_blank"

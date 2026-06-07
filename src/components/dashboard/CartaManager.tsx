@@ -1,4 +1,4 @@
-﻿"use client"
+"use client"
 
 import { useState, useEffect } from "react"
 import { createClient } from "@/lib/supabase/client"
@@ -31,15 +31,12 @@ export default function CartaManager() {
   const [loading, setLoading] = useState(true)
   const [expandedCat, setExpandedCat] = useState<string | null>(null)
 
-  // Estados para nueva categorÃ­a
   const [newCatName, setNewCatName] = useState("")
   const [addingCat, setAddingCat] = useState(false)
 
-  // Estados para nuevo item
   const [addingItemTo, setAddingItemTo] = useState<string | null>(null)
   const [newItem, setNewItem] = useState({ name: "", description: "", price: "" })
 
-  // Estado para ediciÃ³n inline
   const [editingItem, setEditingItem] = useState<string | null>(null)
   const [editForm, setEditForm] = useState({ name: "", description: "", price: "" })
 
@@ -73,7 +70,7 @@ export default function CartaManager() {
     setLoading(false)
   }
 
-  // â”€â”€ CATEGORÃAS â”€â”€
+  // CATEGORÍAS
 
   const handleAddCategory = async () => {
     if (!newCatName.trim() || !businessId) return
@@ -97,7 +94,7 @@ export default function CartaManager() {
   }
 
   const handleDeleteCategory = async (catId: string) => {
-    if (!confirm("Â¿EliminÃ¡s esta categorÃ­a y todos sus platos?")) return
+    if (!confirm("¿Eliminás esta categoría y todos sus platos?")) return
     const supabase = createClient()
     await supabase.from("menu_categories").delete().eq("id", catId)
     setCategories(prev => prev.filter(c => c.id !== catId))
@@ -114,7 +111,7 @@ export default function CartaManager() {
     )
   }
 
-  // â”€â”€ ITEMS â”€â”€
+  // ITEMS
 
   const handleAddItem = async (categoryId: string) => {
     if (!newItem.name.trim() || !newItem.price || !businessId) return
@@ -197,7 +194,7 @@ export default function CartaManager() {
   if (!businessId) return (
     <div className="max-w-2xl">
       <div className="bg-amber-50 border border-amber-200 rounded-2xl p-6 text-sm text-amber-700">
-        Primero completÃ¡ la informaciÃ³n de tu local en <strong>Mi local</strong>.
+        Primero completá la información de tu local en <strong>Mi local</strong>.
       </div>
     </div>
   )
@@ -207,7 +204,7 @@ export default function CartaManager() {
       <div className="mb-8 flex items-center justify-between">
         <div>
           <h1 className="text-2xl text-stone-800 mb-1">Carta</h1>
-          <p className="text-stone-500 text-sm">AdministrÃ¡ las categorÃ­as y platos de tu menÃº</p>
+          <p className="text-stone-500 text-sm">Administrá las categorías y platos de tu menú</p>
         </div>
         <button
           onClick={() => setAddingCat(true)}
@@ -215,11 +212,11 @@ export default function CartaManager() {
           style={{ background: "#2D4530", color: "white" }}
         >
           <Plus size={16} />
-          Nueva categorÃ­a
+          Nueva categoría
         </button>
       </div>
 
-      {/* Formulario nueva categorÃ­a */}
+      {/* Formulario nueva categoría */}
       <AnimatePresence>
         {addingCat && (
           <motion.div
@@ -234,7 +231,7 @@ export default function CartaManager() {
               value={newCatName}
               onChange={e => setNewCatName(e.target.value)}
               onKeyDown={e => e.key === "Enter" && handleAddCategory()}
-              placeholder="Nombre de la categorÃ­a (ej: Entradas, Platos principales...)"
+              placeholder="Nombre de la categoría (ej: Entradas, Platos principales...)"
               className="flex-1 px-4 py-2.5 rounded-xl border border-stone-200 text-stone-800 text-sm outline-none focus:border-stone-400"
             />
             <button
@@ -254,19 +251,19 @@ export default function CartaManager() {
         )}
       </AnimatePresence>
 
-      {/* Lista de categorÃ­as */}
+      {/* Lista de categorías */}
       {categories.length === 0 ? (
         <div className="bg-white rounded-2xl border border-stone-200 p-12 text-center">
-          <div className="text-4xl mb-3">ðŸ½ï¸</div>
-          <p className="text-stone-500 text-sm mb-1">Tu carta estÃ¡ vacÃ­a</p>
-          <p className="text-stone-400 text-xs">CreÃ¡ una categorÃ­a para empezar a agregar platos</p>
+          <div className="text-4xl mb-3">🍽️</div>
+          <p className="text-stone-500 text-sm mb-1">Tu carta está vacía</p>
+          <p className="text-stone-400 text-xs">Creá una categoría para empezar a agregar platos</p>
         </div>
       ) : (
         <div className="space-y-3">
           {categories.map(cat => (
             <div key={cat.id} className="bg-white rounded-2xl border border-stone-200 overflow-hidden">
 
-              {/* Header categorÃ­a */}
+              {/* Header categoría */}
               <div className="flex items-center gap-3 px-5 py-4">
                 <GripVertical size={16} className="text-stone-300 flex-shrink-0" />
                 <button
@@ -283,7 +280,6 @@ export default function CartaManager() {
                   }
                 </button>
 
-                {/* Toggle activo */}
                 <button
                   onClick={() => handleToggleCategory(cat)}
                   className={`text-xs px-2.5 py-1 rounded-full font-medium transition-colors ${
@@ -303,7 +299,7 @@ export default function CartaManager() {
                 </button>
               </div>
 
-              {/* Items de la categorÃ­a */}
+              {/* Items de la categoría */}
               <AnimatePresence>
                 {expandedCat === cat.id && (
                   <motion.div
@@ -315,7 +311,6 @@ export default function CartaManager() {
                   >
                     <div className="border-t border-stone-100">
 
-                      {/* Lista de items */}
                       {cat.menu_items?.length > 0 && (
                         <div className="divide-y divide-stone-100">
                           {cat.menu_items
@@ -323,7 +318,6 @@ export default function CartaManager() {
                             .map(item => (
                               <div key={item.id} className="px-5 py-3">
                                 {editingItem === item.id ? (
-                                  // Modo ediciÃ³n
                                   <div className="space-y-2">
                                     <input
                                       autoFocus
@@ -337,7 +331,7 @@ export default function CartaManager() {
                                       type="text"
                                       value={editForm.description}
                                       onChange={e => setEditForm(f => ({ ...f, description: e.target.value }))}
-                                      placeholder="DescripciÃ³n (opcional)"
+                                      placeholder="Descripción (opcional)"
                                       className="w-full px-3 py-2 rounded-lg border border-stone-200 text-sm outline-none focus:border-stone-400"
                                     />
                                     <div className="flex gap-2">
@@ -364,7 +358,6 @@ export default function CartaManager() {
                                     </div>
                                   </div>
                                 ) : (
-                                  // Modo visualizaciÃ³n
                                   <div className="flex items-center gap-3">
                                     <div className="flex-1 min-w-0">
                                       <div className="flex items-center gap-2">
@@ -380,7 +373,6 @@ export default function CartaManager() {
                                       ${item.price.toLocaleString("es-AR")}
                                     </p>
 
-                                    {/* Disponible toggle */}
                                     <button
                                       onClick={() => handleToggleItem(cat.id, item)}
                                       className={`text-xs px-2 py-1 rounded-full font-medium flex-shrink-0 transition-colors ${
@@ -441,7 +433,7 @@ export default function CartaManager() {
                                 type="text"
                                 value={newItem.description}
                                 onChange={e => setNewItem(f => ({ ...f, description: e.target.value }))}
-                                placeholder="DescripciÃ³n (opcional)"
+                                placeholder="Descripción (opcional)"
                                 className="w-full px-3 py-2.5 rounded-xl border border-stone-200 text-sm outline-none focus:border-stone-400"
                               />
                               <div className="flex gap-2">

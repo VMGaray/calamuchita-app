@@ -1,4 +1,4 @@
-﻿"use client"
+"use client"
 
 import { useState, useEffect, useCallback } from "react"
 import { createClient } from "@/lib/supabase/client"
@@ -105,7 +105,6 @@ export default function PedidosDashboard() {
       await fetchOrders(business.id)
       setLoading(false)
 
-      // Realtime â€” escuchar nuevos pedidos
       const channel = supabase
         .channel("orders-channel")
         .on("postgres_changes", {
@@ -158,7 +157,6 @@ export default function PedidosDashboard() {
 
   return (
     <div className="max-w-2xl">
-      {/* Header */}
       <div className="mb-8 flex items-center justify-between">
         <div>
           <div className="flex items-center gap-3 mb-1">
@@ -201,7 +199,6 @@ export default function PedidosDashboard() {
         ))}
       </div>
 
-      {/* Lista de pedidos */}
       {filteredOrders.length === 0 ? (
         <div className="bg-white rounded-2xl border border-stone-200 p-12 text-center">
           <ShoppingBag size={40} className="mx-auto text-stone-300 mb-3" />
@@ -232,12 +229,10 @@ export default function PedidosDashboard() {
                       : {}
                   }
                 >
-                  {/* Header del pedido */}
                   <button
                     onClick={() => setExpandedOrder(isExpanded ? null : order.id)}
                     className="w-full flex items-center gap-4 px-5 py-4 text-left"
                   >
-                    {/* Ãcono tipo */}
                     <div
                       className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0"
                       style={{ background: "rgba(45,69,48,0.08)" }}
@@ -259,7 +254,7 @@ export default function PedidosDashboard() {
                       </div>
                       <div className="flex items-center gap-2">
                         <span className="text-xs text-stone-400">
-                          {order.type === "delivery" ? "Delivery" : "Take away"} Â·{" "}
+                          {order.type === "delivery" ? "Delivery" : "Take away"} ·{" "}
                           {order.order_items?.length} producto{order.order_items?.length !== 1 ? "s" : ""}
                         </span>
                       </div>
@@ -276,7 +271,6 @@ export default function PedidosDashboard() {
                     </div>
                   </button>
 
-                  {/* Detalle expandido */}
                   <AnimatePresence>
                     {isExpanded && (
                       <motion.div
@@ -288,26 +282,24 @@ export default function PedidosDashboard() {
                       >
                         <div className="border-t border-stone-100 px-5 py-4 space-y-4">
 
-                          {/* Datos del cliente */}
                           <div className="grid grid-cols-2 gap-3">
                             {order.customer_phone && (
                               <a
                                 href={`tel:${order.customer_phone}`}
                                 className="flex flex-col gap-0.5 p-3 rounded-xl bg-stone-50 hover:bg-stone-100 transition-colors"
                               >
-                                <span className="text-xs text-stone-400">TelÃ©fono</span>
+                                <span className="text-xs text-stone-400">Teléfono</span>
                                 <span className="text-sm font-medium text-stone-700">{order.customer_phone}</span>
                               </a>
                             )}
                             {order.delivery_address && (
                               <div className="flex flex-col gap-0.5 p-3 rounded-xl bg-stone-50">
-                                <span className="text-xs text-stone-400">DirecciÃ³n</span>
+                                <span className="text-xs text-stone-400">Dirección</span>
                                 <span className="text-sm font-medium text-stone-700">{order.delivery_address}</span>
                               </div>
                             )}
                           </div>
 
-                          {/* Items */}
                           <div>
                             <p className="text-xs text-stone-400 uppercase tracking-wider mb-2">Productos</p>
                             <div className="space-y-1.5">
@@ -322,13 +314,12 @@ export default function PedidosDashboard() {
                                 </div>
                               ))}
                               <div className="flex justify-between text-sm font-semibold pt-2 border-t border-stone-100 mt-2">
-                                <span style={{ color: "#2a1a08" }}>Total</span>
+                                <span className="text-stone-700">Total</span>
                                 <span style={{ color: "#2D4530" }}>${order.total.toLocaleString("es-AR")}</span>
                               </div>
                             </div>
                           </div>
 
-                          {/* Notas */}
                           {order.notes && (
                             <div className="p-3 rounded-xl bg-amber-50 border border-amber-100">
                               <p className="text-xs text-amber-600 font-medium mb-0.5">Nota del cliente</p>
@@ -336,7 +327,6 @@ export default function PedidosDashboard() {
                             </div>
                           )}
 
-                          {/* Acciones de estado */}
                           {nextStatuses.length > 0 && (
                             <div className="flex gap-2 pt-1">
                               {nextStatuses.map(nextStatus => (
@@ -357,10 +347,9 @@ export default function PedidosDashboard() {
                             </div>
                           )}
 
-                          {/* WhatsApp directo al cliente */}
                           {order.customer_phone && (
                             <a
-                              href={`https://wa.me/${order.customer_phone.replace(/\D/g, "")}?text=${encodeURIComponent(`Hola ${order.customer_name}, tu pedido estÃ¡ ${STATUS_CONFIG[order.status].label.toLowerCase()}! ðŸ™Œ`)}`}
+                              href={`https://wa.me/${order.customer_phone.replace(/\D/g, "")}?text=${encodeURIComponent(`Hola ${order.customer_name}, tu pedido está ${STATUS_CONFIG[order.status].label.toLowerCase()}! 🙌`)}`}
                               target="_blank"
                               rel="noopener noreferrer"
                               className="flex items-center justify-center gap-2 w-full py-2.5 rounded-xl text-sm font-medium transition-colors"

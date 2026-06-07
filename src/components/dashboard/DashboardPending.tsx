@@ -1,4 +1,4 @@
-﻿"use client"
+"use client"
 
 import { useEffect } from "react"
 import { useRouter } from "next/navigation"
@@ -13,7 +13,6 @@ interface Props {
 export default function DashboardPending({ userName, userEmail, userId }: Props) {
   const router = useRouter()
 
-  // Cuando el admin aprueba y crea el negocio, el layout se re-renderiza automÃ¡ticamente
   useEffect(() => {
     if (!userId) return
     const supabase = createClient()
@@ -29,7 +28,7 @@ export default function DashboardPending({ userName, userEmail, userId }: Props)
   }, [userId, router])
 
   const waMsg = encodeURIComponent(
-    `Hola! Me registrÃ© en Calamuchita App como gastronÃ³mico y mi cuenta lleva mÃ¡s de 24hs pendiente de aprobaciÃ³n.\n\nNombre: ${userName || "â€”"}\nEmail: ${userEmail || "â€”"}`
+    `Hola! Me registré en Calamuchita App como gastronómico y mi cuenta lleva más de 24hs pendiente de aprobación.\n\nNombre: ${userName || "—"}\nEmail: ${userEmail || "—"}`
   )
   const waLink = `https://wa.me/541145311047?text=${waMsg}`
 
@@ -40,18 +39,18 @@ export default function DashboardPending({ userName, userEmail, userId }: Props)
           className="w-16 h-16 rounded-2xl flex items-center justify-center mb-5 text-3xl"
           style={{ background: "rgba(45,69,48,0.08)" }}
         >
-          â³
+          ⏳
         </div>
-        <h2 className="text-xl font-medium text-stone-800 mb-2">Tu cuenta estÃ¡ pendiente de aprobaciÃ³n</h2>
+        <h2 className="text-xl font-medium text-stone-800 mb-2">Tu cuenta está pendiente de aprobación</h2>
         <p className="text-sm text-stone-500 max-w-xs">
-          Enviamos tu solicitud al equipo de Calamuchita App. En cuanto sea aprobada, esta pantalla se actualizarÃ¡ automÃ¡ticamente y podrÃ¡s gestionar tu negocio.
+          Enviamos tu solicitud al equipo de Calamuchita App. En cuanto sea aprobada, esta pantalla se actualizará automáticamente y podrás gestionar tu negocio.
         </p>
-        <p className="text-xs text-stone-400 mt-3">No hace falta que recargues la pÃ¡gina.</p>
+        <p className="text-xs text-stone-400 mt-3">No hace falta que recargues la página.</p>
 
         <div className="mt-8 p-4 rounded-2xl border border-stone-200 bg-white w-full text-left">
-          <p className="text-xs font-medium text-stone-600 mb-1">Â¿Ya pasaron las 24hs y no hay cambios?</p>
+          <p className="text-xs font-medium text-stone-600 mb-1">¿Ya pasaron las 24hs y no hay cambios?</p>
           <p className="text-xs text-stone-400 mb-3">
-            Si tu solicitud sigue pendiente despuÃ©s de 24 horas, podÃ©s contactarnos directamente por WhatsApp.
+            Si tu solicitud sigue pendiente después de 24 horas, podés contactarnos directamente por WhatsApp.
           </p>
           <a
             href={waLink}

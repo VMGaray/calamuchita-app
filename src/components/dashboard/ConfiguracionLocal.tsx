@@ -26,23 +26,51 @@ const pueblos = [
   "Villa del Dique",
 ]
 
+function isShortMapsUrl(input: string): boolean {
+  return /maps\.app\.goo\.gl|goo\.gl\/maps/i.test(input)
+}
+
 function parseManualCoords(input: string): { lat: number; lng: number } | null {
   const trimmed = input.trim()
   if (!trimmed) return null
-  const urlMatch = trimmed.match(/@(-?\d+\.?\d*),(-?\d+\.?\d*)/)
-  if (urlMatch) {
-    const lat = parseFloat(urlMatch[1])
-    const lng = parseFloat(urlMatch[2])
+
+  // @lat,lng — URLs completas de Google Maps (/maps/@lat,lng o /place/.../@lat,lng)
+  const atMatch = trimmed.match(/@(-?\d+\.\d+),(-?\d+\.\d+)/)
+  if (atMatch) {
+    const lat = parseFloat(atMatch[1]), lng = parseFloat(atMatch[2])
     if (!isNaN(lat) && !isNaN(lng)) return { lat, lng }
   }
+
+  // ?q=lat,lng o ?q=lat%2Clng
+  const qMatch = trimmed.match(/[?&]q=(-?\d+\.\d+)[,%2C]+(-?\d+\.\d+)/i)
+  if (qMatch) {
+    const lat = parseFloat(qMatch[1]), lng = parseFloat(qMatch[2])
+    if (!isNaN(lat) && !isNaN(lng)) return { lat, lng }
+  }
+
+  // ll=lat,lng
+  const llMatch = trimmed.match(/[?&]ll=(-?\d+\.\d+),(-?\d+\.\d+)/)
+  if (llMatch) {
+    const lat = parseFloat(llMatch[1]), lng = parseFloat(llMatch[2])
+    if (!isNaN(lat) && !isNaN(lng)) return { lat, lng }
+  }
+
+  // /search/lat,lng o /search/lat,+lng
+  const searchMatch = trimmed.match(/\/search\/(-?\d+\.\d+)[,+\s]+(-?\d+\.\d+)/)
+  if (searchMatch) {
+    const lat = parseFloat(searchMatch[1]), lng = parseFloat(searchMatch[2])
+    if (!isNaN(lat) && !isNaN(lng)) return { lat, lng }
+  }
+
+  // Coordenadas sueltas: "-31.9809, -64.5594" o "-31.9809 -64.5594"
   const parts = trimmed.split(/[,\s]+/).filter(Boolean)
   if (parts.length >= 2) {
-    const lat = parseFloat(parts[0])
-    const lng = parseFloat(parts[1])
+    const lat = parseFloat(parts[0]), lng = parseFloat(parts[1])
     if (!isNaN(lat) && !isNaN(lng) && Math.abs(lat) <= 90 && Math.abs(lng) <= 180) {
       return { lat, lng }
     }
   }
+
   return null
 }
 
@@ -399,10 +427,18 @@ export default function ConfiguracionLocal() {
               </p>
             )}
             {coordsInput && !parseManualCoords(coordsInput) && (
-              <p className="text-xs text-red-500 mt-1">Formato no reconocido. Usá "-31.9809, -64.5594" o el link de Google Maps.</p>
+              isShortMapsUrl(coordsInput) ? (
+                <p className="text-xs text-amber-600 mt-1">
+                  Este es un link corto de Google Maps. Abrilo en el navegador, copiá el link de la barra de dirección y pegalo acá.
+                </p>
+              ) : (
+                <p className="text-xs text-red-500 mt-1">
+                  Formato no reconocido. Pegá las coordenadas (-31.9809, -64.5594) o el link completo de Google Maps.
+                </p>
+              )
             )}
             <p className="text-xs text-stone-400 mt-1">
-              En Google Maps: presioná el punto en el mapa → copiá las coordenadas que aparecen abajo.
+              Podés pegar las coordenadas (-31.98, -64.55) o el link de Google Maps desde el navegador.
             </p>
           </div>
         </div>
