@@ -254,14 +254,13 @@ export default function ConfiguracionLocal() {
       pet_friendly: form.pet_friendly,
       payment_methods: form.payment_methods,
       owner_id: user.id,
-      status: "pending",
     }
 
     if (businessId) {
       const { error } = await supabase.from("businesses").update(data).eq("id", businessId)
       if (error) { setError(error.message); setSaving(false); return }
     } else {
-      const { error } = await supabase.from("businesses").insert(data)
+      const { error } = await supabase.from("businesses").insert({ ...data, status: "pending" })
       if (error) {
         setError("Hubo un error al guardar. Intentá con un nombre diferente.")
         setSaving(false)
