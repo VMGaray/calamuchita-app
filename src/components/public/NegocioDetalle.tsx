@@ -26,6 +26,7 @@ import Link from "next/link"
 import Image from "next/image"
 import CartaInteractiva from "@/components/public/CartaInteractiva"
 import { createClient } from "@/lib/supabase/client"
+import { normalizeArgPhone } from "@/lib/phone"
 import BackButton from "@/components/ui/BackButton"
 
 const DAY = ["Domingo", "Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado"]
@@ -150,7 +151,7 @@ export default function NegocioDetalle({ business, promotions = [] }: Props) {
   const recordLead = (type: string) =>
     createClient().from("business_leads").insert({ business_id: business.id, type }).then()
 
-  const waNumber = (business.whatsapp || business.phone)?.replace(/\D/g, "")
+  const waNumber = normalizeArgPhone(business.whatsapp || business.phone || "")
   const waLink = waNumber
     ? `https://wa.me/${waNumber}?text=${encodeURIComponent(`Hola! Me contacto desde Calamuchita App por el negocio ${business.name}.`)}`
     : null
@@ -187,8 +188,7 @@ export default function NegocioDetalle({ business, promotions = [] }: Props) {
       console.error(e)
     }
 
-    const phoneTarget = (business.whatsapp || business.phone)?.replace(/\D/g, "") || ""
-    const fullPhone = phoneTarget.startsWith("54") ? phoneTarget : `54${phoneTarget}`
+    const fullPhone = normalizeArgPhone((business.whatsapp || business.phone) || "")
     
     const numPeople = parseInt(reservaForm.people, 10)
     const labelPeople = isNaN(numPeople) ? "más de 10" : numPeople === 1 ? "1 persona" : `${numPeople} personas`

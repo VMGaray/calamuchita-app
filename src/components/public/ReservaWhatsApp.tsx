@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from "react"
+import { normalizeArgPhone } from "@/lib/phone"
 import { motion, AnimatePresence } from "framer-motion"
 import { Calendar, Clock, Users, X } from "lucide-react"
 
@@ -20,8 +21,7 @@ export default function ReservaWhatsApp({ whatsapp, businessName }: Props) {
   })
 
   const handleReservar = () => {
-    const phone = whatsapp.replace(/\D/g, "")
-    const fullPhone = phone.startsWith("54") ? phone : `54${phone}`
+    const fullPhone = normalizeArgPhone(whatsapp)
 
     const message = encodeURIComponent(
       `Hola ${businessName}! 👋\n\n` +

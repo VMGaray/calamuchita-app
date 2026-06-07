@@ -14,6 +14,7 @@ import {
 } from "lucide-react"
 import { motion, AnimatePresence } from "framer-motion"
 import { createClient } from "@/lib/supabase/client"
+import { normalizeArgPhone } from "@/lib/phone"
 
 // Nombres cortos para el grid de horarios (permite mostrar 2 columnas sin overflow)
 const DAY_SHORT = ["Dom", "Lun", "Mar", "Mié", "Jue", "Vie", "Sáb"]
@@ -151,7 +152,7 @@ export default function DirectorioDetalle({ business, section, promotions = [] }
     return () => window.removeEventListener("keydown", onKey)
   }, [lightboxIdx, lightboxSrc])
 
-  const waNum = (business.whatsapp || business.phone || "").replace(/\D/g, "")
+  const waNum = normalizeArgPhone(business.whatsapp || business.phone || "")
   const waLink = waNum
     ? `https://wa.me/${waNum}?text=${encodeURIComponent(`Hola! Te consulto desde Calamuchita App — ${business.name} 🌿`)}`
     : null

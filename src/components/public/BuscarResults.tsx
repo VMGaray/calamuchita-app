@@ -4,6 +4,7 @@ import Link from "next/link"
 import Image from "next/image"
 import AnimateIn from "@/components/ui/AnimateIn"
 import { Search, MapPin } from "lucide-react"
+import { normalizeArgPhone } from "@/lib/phone"
 
 const sectionLabels: Record<string, string> = {
   gastronomy: "Gastronomía",
@@ -175,7 +176,7 @@ export default function BuscarResults({ query, results }: Props) {
                     {/* WhatsApp rápido */}
                     {business.whatsapp && (
                       <a
-                        href={`https://wa.me/${business.whatsapp.replace(/\D/g, "")}`}
+                        href={`https://wa.me/${normalizeArgPhone(business.whatsapp)}`}
                         target="_blank"
                         rel="noopener noreferrer"
                         onClick={e => e.stopPropagation()}

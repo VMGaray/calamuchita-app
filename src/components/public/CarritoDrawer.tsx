@@ -4,6 +4,7 @@ import { useState } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import { X, Minus, Plus, ShoppingBag, Truck, CheckCircle } from "lucide-react"
 import { createClient } from "@/lib/supabase/client"
+import { normalizeArgPhone } from "@/lib/phone"
 
 interface CartItem {
   id: string
@@ -116,7 +117,7 @@ export default function CarritoDrawer({
       ].filter(Boolean).join("\n")
 
       if (business.whatsapp) {
-        const phone = business.whatsapp.replace(/\D/g, "")
+        const phone = normalizeArgPhone(business.whatsapp)
         window.open(
           `https://wa.me/${phone}?text=${encodeURIComponent(msg)}`,
           "_blank"

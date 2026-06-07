@@ -1,6 +1,7 @@
 "use client"
 
 import { createClient } from "@/lib/supabase/client"
+import { normalizeArgPhone } from "@/lib/phone"
 
 function WaIcon({ size = 20 }: { size?: number }) {
   return (
@@ -11,10 +12,7 @@ function WaIcon({ size = 20 }: { size?: number }) {
 }
 
 function buildWhatsAppUrl(rawNumber: string, businessName: string): string {
-  const digits = rawNumber.replace(/\D/g, "")
-  const normalized = digits.startsWith("54")
-    ? digits
-    : `54${digits.startsWith("0") ? digits.slice(1) : digits}`
+  const normalized = normalizeArgPhone(rawNumber)
   const message = encodeURIComponent(
     `Hola! Vi tu negocio ${businessName} en Calamuchita App y quería hacerles una consulta.`
   )
