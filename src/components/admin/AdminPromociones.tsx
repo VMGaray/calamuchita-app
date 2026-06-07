@@ -343,7 +343,7 @@ export default function AdminPromociones() {
             return (
               <div
                 key={promo.id}
-                className={`flex items-start gap-4 px-6 py-4 ${i !== filtered.length - 1 ? "border-b border-stone-100" : ""}`}
+                className={`flex items-start gap-3 px-4 sm:px-6 py-4 ${i !== filtered.length - 1 ? "border-b border-stone-100" : ""}`}
               >
                 <div className={`w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0 mt-0.5 ${
                   effectivelyActive ? "bg-emerald-50" : "bg-stone-100"
@@ -387,7 +387,7 @@ export default function AdminPromociones() {
                     : <ToggleLeft size={22} className="text-stone-300" />}
                 </button>
 
-                <span className={`flex-shrink-0 text-[10px] font-semibold px-2.5 py-1 rounded-full mt-1 ${
+                <span className={`hidden sm:inline-flex flex-shrink-0 text-[10px] font-semibold px-2.5 py-1 rounded-full mt-1 ${
                   expired ? "bg-stone-100 text-stone-400"
                   : effectivelyActive ? "bg-emerald-50 text-emerald-700"
                   : "bg-stone-100 text-stone-400"

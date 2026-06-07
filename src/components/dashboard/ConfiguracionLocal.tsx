@@ -26,6 +26,26 @@ const pueblos = [
   "Villa del Dique",
 ]
 
+function parseManualCoords(input: string): { lat: number; lng: number } | null {
+  const trimmed = input.trim()
+  if (!trimmed) return null
+  const urlMatch = trimmed.match(/@(-?\d+\.?\d*),(-?\d+\.?\d*)/)
+  if (urlMatch) {
+    const lat = parseFloat(urlMatch[1])
+    const lng = parseFloat(urlMatch[2])
+    if (!isNaN(lat) && !isNaN(lng)) return { lat, lng }
+  }
+  const parts = trimmed.split(/[,\s]+/).filter(Boolean)
+  if (parts.length >= 2) {
+    const lat = parseFloat(parts[0])
+    const lng = parseFloat(parts[1])
+    if (!isNaN(lat) && !isNaN(lng) && Math.abs(lat) <= 90 && Math.abs(lng) <= 180) {
+      return { lat, lng }
+    }
+  }
+  return null
+}
+
 export default function ConfiguracionLocal() {
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
@@ -34,6 +54,7 @@ export default function ConfiguracionLocal() {
   const [businessId, setBusinessId] = useState<string | null>(null)
   const [photos, setPhotos] = useState<string[]>([])
   const [horarios, setHorarios] = useState<HorarioDay[]>([])
+  const [coordsInput, setCoordsInput] = useState("")
 
   const [form, setForm] = useState({
     name: "",
@@ -101,6 +122,10 @@ export default function ConfiguracionLocal() {
           .order("day_of_week")
 
         if (horariosData) setHorarios(horariosData)
+
+        if (business.latitude && business.longitude) {
+          setCoordsInput(`${business.latitude}, ${business.longitude}`)
+        }
       }
       setLoading(false)
     }
@@ -175,6 +200,7 @@ export default function ConfiguracionLocal() {
     if (!user) return
 
     const uniqueSlug = businessId ? form.slug : await generateUniqueSlug(form.slug, supabase)
+    const manualCoords = parseManualCoords(coordsInput)
     const data = {
       name: form.name,
       slug: uniqueSlug,
@@ -184,6 +210,8 @@ export default function ConfiguracionLocal() {
       category: form.categories[0] || "other",
       categories: form.categories,
       address: form.pueblo ? `${form.address}, ${form.pueblo}` : form.address || null,
+      latitude: manualCoords?.lat ?? null,
+      longitude: manualCoords?.lng ?? null,
       phone: form.phone || null,
       whatsapp: form.whatsapp || null,
       instagram: form.instagram || null,
@@ -346,6 +374,36 @@ export default function ConfiguracionLocal() {
               placeholder="Calle y número"
               className="w-full px-4 py-2.5 rounded-xl border border-stone-200 text-stone-800 text-sm outline-none focus:ring-2 focus:ring-primary-300"
             />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-stone-700 mb-1">
+              Coordenadas{" "}
+              <span className="text-stone-400 font-normal">(opcional)</span>
+            </label>
+            <input
+              type="text"
+              value={coordsInput}
+              onChange={e => setCoordsInput(e.target.value)}
+              placeholder="-31.9809, -64.5594  o pegá el link de Google Maps"
+              className={`w-full px-4 py-2.5 rounded-xl border text-stone-800 text-sm outline-none focus:ring-2 ${
+                coordsInput && !parseManualCoords(coordsInput)
+                  ? "border-red-300 focus:ring-red-200"
+                  : coordsInput && parseManualCoords(coordsInput)
+                  ? "border-green-300 focus:ring-green-200"
+                  : "border-stone-200 focus:ring-primary-300"
+              }`}
+            />
+            {coordsInput && parseManualCoords(coordsInput) && (
+              <p className="text-xs text-green-600 mt-1">
+                ✓ lat {parseManualCoords(coordsInput)!.lat.toFixed(6)}, lng {parseManualCoords(coordsInput)!.lng.toFixed(6)}
+              </p>
+            )}
+            {coordsInput && !parseManualCoords(coordsInput) && (
+              <p className="text-xs text-red-500 mt-1">Formato no reconocido. Usá "-31.9809, -64.5594" o el link de Google Maps.</p>
+            )}
+            <p className="text-xs text-stone-400 mt-1">
+              En Google Maps: presioná el punto en el mapa → copiá las coordenadas que aparecen abajo.
+            </p>
           </div>
         </div>
 

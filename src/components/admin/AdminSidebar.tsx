@@ -16,19 +16,21 @@ import {
   Settings,
   ExternalLink,
   UserPlus,
+  UtensilsCrossed,
 } from "lucide-react"
 
 const links = [
-  { href: "/admin",                  label: "Dashboard",      icon: LayoutDashboard },
-  { href: "/admin/negocios",         label: "Negocios",       icon: Building2       },
-  { href: "/admin/solicitudes",      label: "Solicitudes",    icon: UserPlus        },
-  { href: "/admin/eventos",                      label: "Eventos",                  icon: CalendarDays },
-  { href: "/admin/identidad-calamuchitana",   label: "Identidad Calamuchitana",  icon: Newspaper    },
-  { href: "/admin/stats",                      label: "Estadísticas",             icon: BarChart2    },
-  { href: "/admin/promociones",      label: "Promociones",    icon: BadgePercent    },
-  { href: "/admin/suscripciones",    label: "Suscripciones",  icon: CreditCard      },
-  { href: "/admin/marketing",        label: "Marketing",      icon: Megaphone       },
-  { href: "/admin/info-util",        label: "Info Útil",      icon: Phone           },
+  { href: "/admin",                        label: "Dashboard",             icon: LayoutDashboard },
+  { href: "/admin/negocios",               label: "Negocios",              icon: Building2       },
+  { href: "/admin/solicitudes",            label: "Solicitudes",           icon: UserPlus        },
+  { href: "/admin/eventos",                label: "Eventos",               icon: CalendarDays    },
+  { href: "/admin/identidad-calamuchitana",label: "Identidad Calamuchitana",icon: Newspaper      },
+  { href: "/admin/stats",                  label: "Estadísticas",          icon: BarChart2       },
+  { href: "/admin/promociones",            label: "Promociones",           icon: BadgePercent    },
+  { href: "/admin/suscripciones",          label: "Suscripciones",         icon: CreditCard      },
+  { href: "/admin/marketing",              label: "Marketing",             icon: Megaphone       },
+  { href: "/admin/info-util",              label: "Info Útil",             icon: Phone           },
+  { href: "/admin/gastronomicos",          label: "Vista gastronómico",    icon: UtensilsCrossed },
 ]
 
 export default function AdminSidebar() {

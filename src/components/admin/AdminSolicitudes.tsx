@@ -115,16 +115,16 @@ export default function AdminSolicitudes() {
         <div className="space-y-3">
           {registrations.map(reg => (
             <div key={reg.id} className="bg-white rounded-2xl border border-stone-200 p-5">
-              <div className="flex items-start justify-between gap-4">
+              <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
                 <div className="flex items-start gap-4">
                   <div className="w-10 h-10 bg-primary-50 rounded-xl flex items-center justify-center flex-shrink-0 mt-0.5">
                     <Store size={18} style={{ color: "#c8603a" }} />
                   </div>
-                  <div>
+                  <div className="min-w-0">
                     <p className="font-semibold text-stone-800">{reg.business_name}</p>
                     <div className="flex items-center gap-1.5 mt-1">
-                      <User size={11} className="text-stone-400" />
-                      <p className="text-xs text-stone-500">{reg.full_name || "Sin nombre"} · {reg.email}</p>
+                      <User size={11} className="text-stone-400 flex-shrink-0" />
+                      <p className="text-xs text-stone-500 break-all">{reg.full_name || "Sin nombre"} · {reg.email}</p>
                     </div>
                     {reg.phone && (
                       <p className="text-xs text-stone-400 mt-0.5">Tel: {reg.phone}</p>
@@ -136,11 +136,11 @@ export default function AdminSolicitudes() {
                   </div>
                 </div>
 
-                <div className="flex items-center gap-2 flex-shrink-0">
+                <div className="flex items-center gap-2 sm:flex-shrink-0">
                   <button
                     onClick={() => handleReject(reg)}
                     disabled={processing === reg.id}
-                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-medium border border-stone-200 text-stone-500 hover:border-red-200 hover:text-red-500 transition-colors disabled:opacity-40"
+                    className="flex-1 sm:flex-none flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl text-xs font-medium border border-stone-200 text-stone-500 hover:border-red-200 hover:text-red-500 transition-colors disabled:opacity-40"
                   >
                     <XCircle size={13} />
                     Rechazar
@@ -148,7 +148,7 @@ export default function AdminSolicitudes() {
                   <button
                     onClick={() => handleApprove(reg)}
                     disabled={processing === reg.id}
-                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-medium bg-primary-500 text-white hover:bg-primary-400 transition-colors disabled:opacity-40"
+                    className="flex-1 sm:flex-none flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl text-xs font-medium bg-primary-500 text-white hover:bg-primary-400 transition-colors disabled:opacity-40"
                   >
                     <CheckCircle size={13} />
                     {processing === reg.id ? "Aprobando..." : "Aprobar"}

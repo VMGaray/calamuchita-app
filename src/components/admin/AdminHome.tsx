@@ -136,7 +136,7 @@ export default function AdminHome() {
       </div>
 
       {/* Analytics totales */}
-      <div className="grid grid-cols-3 gap-4 mb-8">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
         <AnimateIn direction="up" delay={0.15}>
           <div className="rounded-2xl border p-5 flex items-center gap-4" style={{ background: "rgba(45,69,48,0.06)", borderColor: "rgba(45,69,48,0.15)" }}>
             <div className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0" style={{ background: "rgba(45,69,48,0.12)" }}>

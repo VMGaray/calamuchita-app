@@ -190,7 +190,7 @@ export default function AdminNegocios() {
           {filtered.map((business, i) => (
             <div
               key={business.id}
-              className={`flex items-center gap-4 px-6 py-4 ${i !== filtered.length - 1 ? "border-b border-stone-100" : ""}`}
+              className={`flex items-center gap-3 px-4 sm:px-6 py-4 ${i !== filtered.length - 1 ? "border-b border-stone-100" : ""}`}
             >
               {/* Logo */}
               <div className="w-12 h-12 rounded-xl bg-stone-100 overflow-hidden flex-shrink-0">
