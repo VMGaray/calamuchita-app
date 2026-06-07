@@ -1,4 +1,4 @@
-﻿"use client"
+"use client"
 
 import { useState, useEffect } from "react"
 import { createClient } from "@/lib/supabase/client"
@@ -39,12 +39,13 @@ export default function DashboardHome() {
   const [isOpen, setIsOpen] = useState(false)
   const [businessId, setBusinessId] = useState<string | null>(null)
   const [businessName, setBusinessName] = useState("")
+  const [userName, setUserName] = useState("")
   const [loading, setLoading] = useState(true)
   const [togglingOpen, setTogglingOpen] = useState(false)
 
   const greeting = () => {
     const h = new Date().getHours()
-    if (h < 12) return "Buenos dÃ­as"
+    if (h < 12) return "Buenos días"
     if (h < 19) return "Buenas tardes"
     return "Buenas noches"
   }
@@ -54,6 +55,9 @@ export default function DashboardHome() {
       const supabase = createClient()
       const { data: { user } } = await supabase.auth.getUser()
       if (!user) return
+
+      const fullName = user.user_metadata?.full_name as string | undefined
+      if (fullName) setUserName(fullName.split(" ")[0])
 
       const { data: business } = await supabase
         .from("businesses")
@@ -70,7 +74,6 @@ export default function DashboardHome() {
       const today = new Date().toISOString().split("T")[0]
       const startOfMonth = new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString()
 
-      // Pedidos de hoy
       const { data: ordersToday } = await supabase
         .from("orders")
         .select("id, customer_name, type, total, status, created_at")
@@ -78,21 +81,18 @@ export default function DashboardHome() {
         .gte("created_at", today)
         .order("created_at", { ascending: false })
 
-      // Pedidos del mes
       const { count: monthCount } = await supabase
         .from("orders")
         .select("*", { count: "exact", head: true })
         .eq("business_id", business.id)
         .gte("created_at", startOfMonth)
 
-      // Reservas de hoy
       const { data: reservationsToday } = await supabase
         .from("reservations")
         .select("id, status")
         .eq("business_id", business.id)
         .eq("date", today)
 
-      // MenÃº del dÃ­a
       const { data: menu } = await supabase
         .from("daily_menus")
         .select("is_published")
@@ -156,7 +156,7 @@ export default function DashboardHome() {
       {/* Header */}
       <div className="mb-8">
         <h1 className="text-2xl text-stone-800 mb-1">
-          {greeting()} ðŸ‘‹
+          {greeting()}{userName ? `, ${userName}` : ""} 👋
         </h1>
         <p className="text-stone-500 text-sm">
           {businessName ? `Resumen de ${businessName} hoy` : "Resumen de tu local hoy"}
@@ -219,7 +219,7 @@ export default function DashboardHome() {
           </motion.div>
         </Link>
 
-        {/* MenÃº del dÃ­a */}
+        {/* Menú del día */}
         <Link href="/dashboard/menu-del-dia">
           <motion.div
             whileHover={{ y: -2 }}
@@ -230,7 +230,7 @@ export default function DashboardHome() {
                 style={{ background: "rgba(45,69,48,0.1)" }}>
                 <UtensilsCrossed size={16} style={{ color: "#2D4530" }} />
               </div>
-              <p className="text-xs text-stone-400 uppercase tracking-wider">MenÃº del dÃ­a</p>
+              <p className="text-xs text-stone-400 uppercase tracking-wider">Menú del día</p>
             </div>
             <div className="flex items-center gap-2">
               <div className={`w-2 h-2 rounded-full ${stats.menuPublished ? "bg-green-400" : "bg-stone-300"}`} />
@@ -260,7 +260,7 @@ export default function DashboardHome() {
           <div>
             <p className="text-sm font-medium text-stone-700">Estado del local</p>
             <p className="text-xs text-stone-400 mt-0.5">
-              Los clientes pueden ver si estÃ¡s abierto
+              Los clientes pueden ver si estás abierto
             </p>
           </div>
           <div className="flex items-center gap-3">
@@ -292,7 +292,7 @@ export default function DashboardHome() {
             <Link href="/dashboard/pedidos"
               className="text-xs font-medium transition-colors"
               style={{ color: "#2D4530" }}>
-              Ver todos â†’
+              Ver todos →
             </Link>
           </div>
           <div className="space-y-3">
@@ -303,7 +303,7 @@ export default function DashboardHome() {
                     {order.customer_name || "Cliente"}
                   </p>
                   <p className="text-xs text-stone-400 mt-0.5">
-                    {order.type === "delivery" ? "ðŸšš Delivery" : "ðŸƒ Take away"} Â· {formatTime(order.created_at)}
+                    {order.type === "delivery" ? "🚚 Delivery" : "🏃 Take away"} · {formatTime(order.created_at)}
                   </p>
                 </div>
                 <div className="text-right">
