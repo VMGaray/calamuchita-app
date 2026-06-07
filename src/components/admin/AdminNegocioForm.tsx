@@ -63,6 +63,7 @@ interface Professional {
   description: string
   schedule: string
   contact: string
+  photo_url: string | null
 }
 
 const ESPECIALIDADES_SUGERIDAS = [
@@ -769,7 +770,7 @@ export default function AdminNegocioForm() {
                 <label className="text-sm font-medium text-stone-700">Profesionales del establecimiento</label>
                 <button
                   type="button"
-                  onClick={() => setProfessionals(prev => [...prev, { name: "", specialty_group: "Medicina", specialty: "", description: "", schedule: "", contact: "" }])}
+                  onClick={() => setProfessionals(prev => [...prev, { name: "", specialty_group: "Medicina", specialty: "", description: "", schedule: "", contact: "", photo_url: null }])}
                   className="text-xs font-medium px-3 py-1.5 rounded-xl border border-primary-300 text-primary-600 hover:bg-primary-50 transition-colors"
                 >
                   + Agregar profesional
@@ -830,6 +831,15 @@ export default function AdminNegocioForm() {
                           placeholder="Teléfono o link de turnos"
                           className="w-full px-3 py-2 rounded-lg border border-stone-200 text-stone-800 text-sm outline-none focus:ring-2 focus:ring-primary-300" />
                       </div>
+                    </div>
+                    <div>
+                      <label className="block text-xs text-stone-500 mb-1">Foto del profesional (opcional)</label>
+                      <ImageUpload
+                        value={pro.photo_url ?? null}
+                        onChange={url => setProfessionals(prev => prev.map((p, idx) => idx === i ? { ...p, photo_url: url } : p))}
+                        folder="professionals"
+                        label=""
+                      />
                     </div>
                   </div>
                 ))}

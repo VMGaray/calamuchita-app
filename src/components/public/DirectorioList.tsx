@@ -11,7 +11,7 @@ import Card3D from "@/components/ui/Card3D"
 import { SkeletonBusinessGrid } from "@/components/ui/Skeleton"
 import { createClient } from "@/lib/supabase/client"
 import { sectionCategories, SectionKey } from "@/lib/sections"
-import { Phone, AtSign, MapPin, X, LayoutGrid, Check, ChevronRight } from "lucide-react"
+import { Phone, AtSign, MapPin, X, LayoutGrid, Check, ChevronRight, Stethoscope } from "lucide-react"
 import Link from "next/link"
 import Image from "next/image"
 
@@ -28,6 +28,29 @@ interface Business {
   description: string | null
   is_premium: boolean
 }
+
+interface ClinicProfessional {
+  name: string
+  specialty: string
+  specialty_group: string
+  description: string
+  schedule: string
+  contact: string
+  photo_url: string | null
+  clinic_name: string
+  clinic_slug: string
+  clinic_address: string | null
+}
+
+// Mapeo: cat URL → specialty_group values del JSONB
+const SPECIALTY_TO_GROUPS: Record<string, string[]> = {
+  "especialidades": ["Medicina", "Pediatría", "Odontología", "Nutrición", "Otros"],
+  "psicologia":     ["Psicología"],
+  "terapias":       ["Kinesiología / Fisioterapia", "Cosmiatría", "Reflexología", "Fonoaudiología"],
+  "laboratorios":   ["Laboratorio", "Farmacia"],
+  "hospitales":     ["Medicina"],
+}
+const NO_PROFESSIONAL_CATS = ["traslado"]
 
 interface Props {
   section: SectionKey
@@ -155,6 +178,7 @@ export default function DirectorioList({ section, filters }: Props) {
   const [allBusinesses, setAllBusinesses] = useState<Business[]>([])
   const [businesses, setBusinesses] = useState<Business[]>([])
   const [loading, setLoading] = useState(true)
+  const [clinicProfessionals, setClinicProfessionals] = useState<ClinicProfessional[]>([])
   const [search, setSearch] = useState(filters.q || "")
   const [showPueblos, setShowPueblos] = useState(false)
   const [showCategories, setShowCategories] = useState(false)
@@ -196,6 +220,61 @@ export default function DirectorioList({ section, filters }: Props) {
     }
     fetchBusinesses()
   }, [section, activeCategory, filters.q])
+
+  // Profesionales dentro de clínicas (solo sección health)
+  useEffect(() => {
+    if (section !== "health" || NO_PROFESSIONAL_CATS.includes(activeCategory)) {
+      setClinicProfessionals([])
+      return
+    }
+    const fetchClinicPros = async () => {
+      const supabase = createClient()
+      const { data } = await supabase
+        .from("businesses")
+        .select("name, slug, address, professionals")
+        .eq("status", "active")
+        .eq("section", "health")
+        .not("professionals", "is", null)
+
+      const allowedGroups = SPECIALTY_TO_GROUPS[activeCategory] ?? null
+
+      const expanded: ClinicProfessional[] = (data || []).flatMap(clinic => {
+        const pros = (clinic.professionals as any[]) || []
+        return pros
+          .filter(p => p.name?.trim())
+          .filter(p => !allowedGroups || allowedGroups.includes(p.specialty_group))
+          .filter(p => !filters.q ||
+            p.name.toLowerCase().includes(filters.q.toLowerCase()) ||
+            (p.specialty || "").toLowerCase().includes(filters.q.toLowerCase())
+          )
+          .map(p => ({
+            name: p.name,
+            specialty: p.specialty || "",
+            specialty_group: p.specialty_group || "",
+            description: p.description || "",
+            schedule: p.schedule || "",
+            contact: p.contact || "",
+            photo_url: p.photo_url || null,
+            clinic_name: clinic.name,
+            clinic_slug: clinic.slug,
+            clinic_address: clinic.address,
+          }))
+      })
+
+      const pueblosFilter = filters.pueblo ? filters.pueblo.split(",").filter(Boolean) : []
+      setClinicProfessionals(
+        pueblosFilter.length === 0
+          ? expanded
+          : expanded.filter(p => {
+              const match = pueblosFilter.some(pueblo =>
+                p.clinic_address?.toLowerCase().includes(pueblo.toLowerCase())
+              )
+              return match || hasNoPueblo(p.clinic_address)
+            })
+      )
+    }
+    fetchClinicPros()
+  }, [section, activeCategory, filters.q, filters.pueblo])
 
   // Filtro de pueblo client-side: negocios sin pueblo aparecen en cualquier localidad
   useEffect(() => {
@@ -474,6 +553,69 @@ export default function DirectorioList({ section, filters }: Props) {
           </>
         )}
       </div>
+
+      {/* ── Profesionales en clínicas ── */}
+      {section === "health" && clinicProfessionals.length > 0 && (
+        <div className="mt-10">
+          <SectionLabel icon={<Stethoscope size={11} />} label="Profesionales en clínicas" />
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+            {clinicProfessionals.map((pro, i) => (
+              <AnimateIn key={`${pro.clinic_slug}-${i}`} direction="up" delay={i * 0.04}>
+                <Link
+                  href={`/directorio/health/${pro.clinic_slug}`}
+                  className="flex items-start gap-3 p-4 rounded-2xl hover:opacity-90 transition-opacity"
+                  style={{
+                    background: "rgba(255,255,255,0.08)",
+                    border: "1px solid rgba(255,255,255,0.13)",
+                  }}
+                >
+                  {/* Foto o inicial */}
+                  <div className="w-12 h-12 rounded-xl overflow-hidden flex-shrink-0">
+                    {pro.photo_url ? (
+                      <Image
+                        src={pro.photo_url}
+                        alt={pro.name}
+                        width={48}
+                        height={48}
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <div
+                        className="w-full h-full flex items-center justify-center font-serif text-lg font-bold"
+                        style={{ background: "rgba(45,69,48,0.30)", color: "#E1DBC9" }}
+                      >
+                        {pro.name[0]}
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-semibold leading-tight truncate" style={{ color: "#E1DBC9" }}>
+                      {pro.name}
+                    </p>
+                    {(pro.specialty || pro.specialty_group) && (
+                      <p className="text-xs mt-0.5 truncate" style={{ color: "rgba(225,219,201,0.70)" }}>
+                        {pro.specialty || pro.specialty_group}
+                      </p>
+                    )}
+                    <div className="flex items-center gap-1 mt-1.5">
+                      <MapPin size={9} className="flex-shrink-0" style={{ color: "rgba(225,219,201,0.35)" }} />
+                      <p className="text-xs truncate" style={{ color: "rgba(225,219,201,0.45)" }}>
+                        {pro.clinic_name}
+                      </p>
+                    </div>
+                    {pro.schedule && (
+                      <p className="text-xs mt-1 line-clamp-1" style={{ color: "rgba(225,219,201,0.35)" }}>
+                        {pro.schedule}
+                      </p>
+                    )}
+                  </div>
+                </Link>
+              </AnimateIn>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* ── Portals ── */}
       {mounted && createPortal(
