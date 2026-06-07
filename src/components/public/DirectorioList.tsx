@@ -11,7 +11,7 @@ import Card3D from "@/components/ui/Card3D"
 import { SkeletonBusinessGrid } from "@/components/ui/Skeleton"
 import { createClient } from "@/lib/supabase/client"
 import { sectionCategories, SectionKey } from "@/lib/sections"
-import { Phone, AtSign, MapPin, X, LayoutGrid, Check, ChevronRight, Stethoscope } from "lucide-react"
+import { Phone, AtSign, MapPin, X, LayoutGrid, Check, ChevronRight, Stethoscope, Building2 } from "lucide-react"
 import Link from "next/link"
 import Image from "next/image"
 
@@ -558,57 +558,85 @@ export default function DirectorioList({ section, filters }: Props) {
       {section === "health" && clinicProfessionals.length > 0 && (
         <div className="mt-10">
           <SectionLabel icon={<Stethoscope size={11} />} label="Profesionales en clínicas" />
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+          <div className="flex gap-4 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden snap-x snap-mandatory -mx-4 px-4 pb-6 md:mx-0 md:px-0 md:grid md:grid-cols-2 lg:grid-cols-3 md:overflow-x-visible md:pb-0 md:gap-5">
             {clinicProfessionals.map((pro, i) => (
-              <AnimateIn key={`${pro.clinic_slug}-${i}`} direction="up" delay={i * 0.04}>
+              <AnimateIn
+                key={`${pro.clinic_slug}-${i}`}
+                direction="up"
+                delay={i * 0.04}
+                className="w-[82vw] flex-shrink-0 snap-center md:w-auto"
+              >
                 <Link
                   href={`/directorio/health/${pro.clinic_slug}`}
-                  className="flex items-start gap-3 p-4 rounded-2xl hover:opacity-90 transition-opacity"
-                  style={{
-                    background: "rgba(255,255,255,0.08)",
-                    border: "1px solid rgba(255,255,255,0.13)",
-                  }}
+                  className="block rounded-2xl overflow-hidden shadow-sm transition-shadow hover:shadow-md"
+                  style={{ background: "#FFFFFF", border: "1px solid rgba(45,69,48,0.09)" }}
                 >
-                  {/* Foto o inicial */}
-                  <div className="w-12 h-12 rounded-xl overflow-hidden flex-shrink-0">
+                  {/* Imagen o avatar */}
+                  <div className="relative overflow-hidden aspect-[4/3] bg-stone-50">
                     {pro.photo_url ? (
-                      <Image
-                        src={pro.photo_url}
-                        alt={pro.name}
-                        width={48}
-                        height={48}
-                        className="w-full h-full object-cover"
-                      />
+                      <div className="w-full h-full bg-white flex items-center justify-center p-5">
+                        <div className="relative w-full h-full">
+                          <Image
+                            src={pro.photo_url}
+                            alt={pro.name}
+                            fill
+                            className="object-contain"
+                            sizes="(max-width: 768px) 82vw, (max-width: 1024px) 50vw, 33vw"
+                            quality={80}
+                          />
+                        </div>
+                      </div>
                     ) : (
-                      <div
-                        className="w-full h-full flex items-center justify-center font-serif text-lg font-bold"
-                        style={{ background: "rgba(45,69,48,0.30)", color: "#E1DBC9" }}
-                      >
-                        {pro.name[0]}
+                      <div className="w-full h-full flex items-center justify-center" style={{ background: "#E1DBC9" }}>
+                        <div
+                          className="w-14 h-14 rounded-2xl flex items-center justify-center font-serif text-2xl font-bold"
+                          style={{ background: "#2D4530", color: "#E1DBC9" }}
+                        >
+                          {pro.name[0]}
+                        </div>
                       </div>
                     )}
                   </div>
 
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm font-semibold leading-tight truncate" style={{ color: "#E1DBC9" }}>
+                  {/* Texto */}
+                  <div className="px-4 pt-3.5 pb-4" style={{ background: "#F5EFE3" }}>
+                    <h3 className="text-sm font-bold leading-snug mb-1.5 line-clamp-2" style={{ color: "#2D4530" }}>
                       {pro.name}
-                    </p>
-                    {(pro.specialty || pro.specialty_group) && (
-                      <p className="text-xs mt-0.5 truncate" style={{ color: "rgba(225,219,201,0.70)" }}>
-                        {pro.specialty || pro.specialty_group}
-                      </p>
-                    )}
-                    <div className="flex items-center gap-1 mt-1.5">
-                      <MapPin size={9} className="flex-shrink-0" style={{ color: "rgba(225,219,201,0.35)" }} />
-                      <p className="text-xs truncate" style={{ color: "rgba(225,219,201,0.45)" }}>
-                        {pro.clinic_name}
-                      </p>
+                    </h3>
+
+                    <div className="min-h-[24px]">
+                      {(pro.specialty || pro.specialty_group) && (
+                        <span
+                          className="inline-block text-[10px] font-semibold px-2 py-0.5 rounded-full mb-2 uppercase tracking-wide"
+                          style={{ background: "rgba(45,69,48,0.10)", color: "#2D4530" }}
+                        >
+                          {pro.specialty || pro.specialty_group}
+                        </span>
+                      )}
                     </div>
-                    {pro.schedule && (
-                      <p className="text-xs mt-1 line-clamp-1" style={{ color: "rgba(225,219,201,0.35)" }}>
-                        {pro.schedule}
-                      </p>
-                    )}
+
+                    <div className="min-h-[32px]">
+                      {pro.description && (
+                        <p className="text-xs mb-2.5 leading-relaxed line-clamp-2" style={{ color: "rgba(45,69,48,0.60)" }}>
+                          {pro.description}
+                        </p>
+                      )}
+                    </div>
+
+                    <div className="flex items-center gap-1.5 mb-3">
+                      <Building2 size={10} className="flex-shrink-0" style={{ color: "rgba(45,69,48,0.45)" }} />
+                      <span className="text-xs truncate" style={{ color: "rgba(45,69,48,0.55)" }}>
+                        Atiende en {pro.clinic_name}
+                      </span>
+                    </div>
+
+                    <div
+                      className="flex items-center justify-between w-full px-3 py-2.5 rounded-xl text-xs font-semibold"
+                      style={{ background: "#2D4530", color: "#E1DBC9" }}
+                    >
+                      <span>Ver más</span>
+                      <ChevronRight size={13} />
+                    </div>
                   </div>
                 </Link>
               </AnimateIn>
