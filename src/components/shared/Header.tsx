@@ -42,12 +42,12 @@ export default function Header() {
     : "?"
 
   return (
-    <header className="sticky top-0 z-50" style={{ background: "transparent" }}>
+    <header className="sticky top-0 z-50 pointer-events-none" style={{ background: "transparent" }}>
       <div className="max-w-6xl mx-auto px-4 sm:px-6">
         <div className="h-16 flex items-center justify-between gap-2">
 
           {/* ── IZQUIERDA: Logo + accesos rápidos ── */}
-          <div className="flex items-center gap-2 sm:gap-4 min-w-0">
+          <div className="flex items-center gap-2 sm:gap-4 min-w-0 pointer-events-auto">
 
             {/* Logo */}
             <Link href="/" className="flex items-center gap-1.5 sm:gap-2 flex-shrink-0 -ml-1 sm:-ml-3">
@@ -116,7 +116,7 @@ export default function Header() {
           </div>
 
           {/* ── DERECHA: Auth ── */}
-          <div className="flex items-center gap-2 sm:gap-3 flex-shrink-0">
+          <div className="flex items-center gap-2 sm:gap-3 flex-shrink-0 pointer-events-auto">
             {user ? (
               <div className="relative">
                 <motion.button
