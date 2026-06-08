@@ -346,7 +346,7 @@ export default function InfoUtilPage({ initialCategoria, initialPueblo }: Props)
       .from("guardia_photos")
       .select("photo_url")
       .eq("category", "veterinarias")
-      .single()
+      .maybeSingle()
       .then(({ data }) => {
         setVetGuardiaPhoto(data?.photo_url ?? null)
         setLoadingVetGuardia(false)

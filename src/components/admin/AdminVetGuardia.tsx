@@ -18,7 +18,7 @@ export default function AdminVetGuardia() {
       .from("guardia_photos")
       .select("photo_url")
       .eq("category", "veterinarias")
-      .single()
+      .maybeSingle()
       .then(({ data, error: err }) => {
         if (err) setError("Error al cargar: " + err.message)
         else setPhotoUrl(data?.photo_url ?? null)
@@ -31,7 +31,7 @@ export default function AdminVetGuardia() {
     setError(null)
     const { error: err } = await createClient()
       .from("guardia_photos")
-      .update({ photo_url: photoUrl, updated_at: new Date().toISOString() })
+      .upsert({ category: "veterinarias", photo_url: photoUrl, updated_at: new Date().toISOString() })
       .eq("category", "veterinarias")
     setSaving(false)
     if (err) { setError("Error al guardar: " + err.message); return }
