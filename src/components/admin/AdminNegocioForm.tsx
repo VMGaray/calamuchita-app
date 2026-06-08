@@ -255,6 +255,7 @@ export default function AdminNegocioForm() {
       categories: finalCategories,
       subcategory: finalCategories[0] || null,
       address: fullAddress || null,
+      pueblo: form.pueblo || null,
       latitude: coords?.lat ?? null,
       longitude: coords?.lng ?? null,
       phone: form.phone || null,

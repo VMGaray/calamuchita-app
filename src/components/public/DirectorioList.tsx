@@ -21,6 +21,7 @@ interface Business {
   slug: string
   subcategory: string | null
   address: string | null
+  pueblo: string | null
   phone: string | null
   instagram: string | null
   logo_url: string | null
@@ -199,7 +200,7 @@ export default function DirectorioList({ section, filters }: Props) {
       const supabase = createClient()
       let query = supabase
         .from("businesses")
-        .select("id, name, slug, subcategory, address, phone, whatsapp, instagram, logo_url, cover_url, description, is_premium")
+        .select("id, name, slug, subcategory, address, pueblo, phone, whatsapp, instagram, logo_url, cover_url, description, is_premium")
         .eq("status", "active")
         .eq("section", section)
 
@@ -266,31 +267,41 @@ export default function DirectorioList({ section, filters }: Props) {
         pueblosFilter.length === 0
           ? expanded
           : expanded.filter(p => {
-              const match = pueblosFilter.some(pueblo =>
-                p.clinic_address?.toLowerCase().includes(pueblo.toLowerCase())
-              )
-              return match || hasNoPueblo(p.clinic_address)
+              if (p.clinic_address?.trim()) {
+                return pueblosFilter.some(pueblo =>
+                  p.clinic_address!.toLowerCase().includes(pueblo.toLowerCase())
+                )
+              }
+              return true // clínica sin dirección → global
             })
       )
     }
     fetchClinicPros()
   }, [section, activeCategory, filters.q, filters.pueblo])
 
-  // Filtro de pueblo client-side: negocios sin pueblo aparecen en cualquier localidad
+  // Filtro de pueblo client-side
   useEffect(() => {
     const pueblosFilter = filters.pueblo ? filters.pueblo.split(',').filter(Boolean) : []
     if (pueblosFilter.length === 0) {
       setBusinesses(allBusinesses)
-    } else {
-      setBusinesses(
-        allBusinesses.filter(b => {
-          const matchesPueblo = pueblosFilter.some(p =>
-            b.address?.toLowerCase().includes(p.toLowerCase())
-          )
-          return matchesPueblo || hasNoPueblo(b.address)
-        })
-      )
+      return
     }
+    setBusinesses(
+      allBusinesses.filter(b => {
+        // Columna pueblo explícita (registros nuevos o con backfill)
+        if (b.pueblo) {
+          return pueblosFilter.some(p => b.pueblo!.toLowerCase() === p.toLowerCase())
+        }
+        // Fallback: buscar en address; si la dirección existe pero no tiene pueblo → excluir
+        if (b.address?.trim()) {
+          return pueblosFilter.some(p =>
+            b.address!.toLowerCase().includes(p.toLowerCase())
+          )
+        }
+        // Sin dirección ni pueblo: servicio genuinamente global → incluir siempre
+        return true
+      })
+    )
   }, [allBusinesses, filters.pueblo])
 
   useEffect(() => {
