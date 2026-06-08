@@ -41,6 +41,7 @@ interface ClinicProfessional {
   clinic_name: string
   clinic_slug: string
   clinic_address: string | null
+  clinic_pueblo: string | null
 }
 
 // Mapeo: cat URL → specialty_group values del JSONB
@@ -242,7 +243,7 @@ export default function DirectorioList({ section, filters }: Props) {
       const supabase = createClient()
       const { data } = await supabase
         .from("businesses")
-        .select("name, slug, address, professionals")
+        .select("name, slug, address, pueblo, professionals")
         .eq("status", "active")
         .eq("section", "health")
         .not("professionals", "is", null)
@@ -269,6 +270,7 @@ export default function DirectorioList({ section, filters }: Props) {
             clinic_name: clinic.name,
             clinic_slug: clinic.slug,
             clinic_address: clinic.address,
+            clinic_pueblo: (clinic as any).pueblo || null,
           }))
       })
 
@@ -277,12 +279,18 @@ export default function DirectorioList({ section, filters }: Props) {
         pueblosFilter.length === 0
           ? expanded
           : expanded.filter(p => {
+              // Columna pueblo explícita (igual que el filtro de businesses)
+              if (p.clinic_pueblo) {
+                return pueblosFilter.some(pueblo => p.clinic_pueblo!.toLowerCase() === pueblo.toLowerCase())
+              }
+              // Fallback: buscar pueblo en el string de dirección
               if (p.clinic_address?.trim()) {
                 return pueblosFilter.some(pueblo =>
                   p.clinic_address!.toLowerCase().includes(pueblo.toLowerCase())
                 )
               }
-              return true // clínica sin dirección → global
+              // Sin dirección ni pueblo → global
+              return true
             })
       )
     }
