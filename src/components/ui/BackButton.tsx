@@ -1,6 +1,6 @@
 "use client"
 
-import Link from "next/link"
+import { useRouter } from "next/navigation"
 import { ArrowLeft } from "lucide-react"
 
 interface Props {
@@ -16,14 +16,25 @@ export default function BackButton({
   className = "",
   style,
 }: Props) {
+  const router = useRouter()
+
+  const handleBack = () => {
+    if (window.history.length > 1) {
+      router.back()
+    } else {
+      router.push(fallbackHref)
+    }
+  }
+
   return (
-    <Link
-      href={fallbackHref}
+    <button
+      type="button"
+      onClick={handleBack}
       className={`inline-flex items-center gap-1.5 transition-opacity hover:opacity-70 active:opacity-50 ${className}`}
       style={style}
     >
       <ArrowLeft size={14} />
       {label}
-    </Link>
+    </button>
   )
 }
