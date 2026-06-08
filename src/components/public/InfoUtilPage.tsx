@@ -7,7 +7,7 @@ import {
   Flame, Shield, Stethoscope, Zap,
   MapPin, Phone, ChevronDown,
   AlertCircle, Lightbulb, Pill, Landmark, Bus, Info, MoreHorizontal,
-  ArrowLeft, RefreshCw, ExternalLink, Clock, Dog, CreditCard,
+  ArrowLeft, RefreshCw, ExternalLink, Clock, Dog, CreditCard, X,
 } from "lucide-react"
 import Link from "next/link"
 import Image from "next/image"
@@ -329,6 +329,7 @@ export default function InfoUtilPage({ initialCategoria, initialPueblo }: Props)
   const [loadingTransport, setLoadingTransport] = useState(false)
   const [vetGuardiaPhoto, setVetGuardiaPhoto] = useState<string | null>(null)
   const [loadingVetGuardia, setLoadingVetGuardia] = useState(false)
+  const [vetLightbox, setVetLightbox] = useState(false)
 
   // Fetch localities once
   useEffect(() => {
@@ -566,11 +567,16 @@ export default function InfoUtilPage({ initialCategoria, initialPueblo }: Props)
             </div>
           )}
 
-          {/* Veterinarias de turno — solo foto */}
+          {/* Veterinarias de turno — foto con lightbox */}
           {categoria === "veterinarias" && !loadingVetGuardia && (
             vetGuardiaPhoto ? (
-              <div className="rounded-2xl overflow-hidden" style={{ border: "1px solid rgba(45,69,48,0.15)", boxShadow: "0 2px 12px rgba(45,69,48,0.08)" }}>
-                <div className="relative w-full" style={{ minHeight: 240 }}>
+              <>
+                <button
+                  type="button"
+                  onClick={() => setVetLightbox(true)}
+                  className="w-full rounded-2xl overflow-hidden block active:opacity-80 transition-opacity"
+                  style={{ border: "1px solid rgba(45,69,48,0.15)", boxShadow: "0 2px 12px rgba(45,69,48,0.08)" }}
+                >
                   <Image
                     src={vetGuardiaPhoto}
                     alt="Guardia de veterinarias — Valle de Calamuchita"
@@ -579,8 +585,47 @@ export default function InfoUtilPage({ initialCategoria, initialPueblo }: Props)
                     className="w-full h-auto object-contain bg-white"
                     style={{ display: "block" }}
                   />
-                </div>
-              </div>
+                </button>
+
+                <AnimatePresence>
+                  {vetLightbox && (
+                    <motion.div
+                      className="fixed inset-0 z-[300] flex items-center justify-center p-4"
+                      style={{ background: "rgba(0,0,0,0.92)" }}
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      exit={{ opacity: 0 }}
+                      onClick={() => setVetLightbox(false)}
+                    >
+                      <button
+                        type="button"
+                        onClick={() => setVetLightbox(false)}
+                        className="absolute top-4 right-4 w-10 h-10 rounded-full flex items-center justify-center"
+                        style={{ background: "rgba(255,255,255,0.15)" }}
+                      >
+                        <X size={20} color="white" />
+                      </button>
+                      <motion.div
+                        initial={{ scale: 0.85 }}
+                        animate={{ scale: 1 }}
+                        exit={{ scale: 0.85 }}
+                        transition={{ type: "spring", stiffness: 300, damping: 25 }}
+                        onClick={e => e.stopPropagation()}
+                        className="w-full max-w-2xl"
+                      >
+                        <Image
+                          src={vetGuardiaPhoto}
+                          alt="Guardia de veterinarias — Valle de Calamuchita"
+                          width={1200}
+                          height={900}
+                          className="w-full h-auto rounded-xl object-contain"
+                          style={{ maxHeight: "85vh" }}
+                        />
+                      </motion.div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </>
             ) : (
               <div className="flex flex-col items-center justify-center py-16 text-center rounded-3xl" style={{ background: "rgba(225,219,201,0.35)" }}>
                 <div className="w-14 h-14 rounded-2xl flex items-center justify-center mb-4" style={{ background: "rgba(45,69,48,0.08)" }}>

@@ -42,7 +42,7 @@ const categoryIcons: Record<string, any> = {
   "Actividades y Paseos": Activity, "Agencia de Viajes": Plane,
   "Alojamiento": Hotel, "Alquiler": Compass, "Excursiones": Map,
   "Forrajería": Package, "Hogar": Armchair, "Imprenta": Printer, "Indumentaria": Shirt, "Mascotas": Dog, "Niños": Baby,
-  "Tecnología": Smartphone, "Vehículos": Car,
+  "Tecnología": Smartphone, "Vehículos": Car, "Veterinarias": PawPrint,
   "Culturales": Palette, "Deportivos": Medal, "Festivales": PartyPopper,
   "Gastronomía": ChefHat, "Infantiles": Baby, "Música": Mic,
   "Cooperativas": Lightbulb, "Emergencias": AlertCircle, "Farmacias de turno": Clock3,

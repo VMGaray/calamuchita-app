@@ -65,6 +65,7 @@ export const MASTER_CATEGORIES = {
       { label: "Salud", icon: HeartPulse, bg: "bg-green-50", color: "text-green-600" },
       { label: "Tecnología", icon: Smartphone, bg: "bg-blue-50", color: "text-blue-600" },
       { label: "Vehículos", icon: Car, bg: "bg-red-50", color: "text-red-600" },
+      { label: "Veterinarias", icon: Dog, bg: "bg-teal-50", color: "text-teal-600" },
       { label: "Otro", icon: Store, bg: "bg-stone-50", color: "text-stone-400" },
     ]
   },

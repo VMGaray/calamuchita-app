@@ -92,6 +92,7 @@ export const sectionCategories = {
     { label: "Niños", desc: "Artículos infantiles", href: "/directorio/commerce?cat=ninos", bg: "bg-brand-earth/10", color: "text-brand-earth" },
     { label: "Tecnología", desc: "Electrónica y celulares", href: "/directorio/commerce?cat=tecnologia", bg: "bg-brand-charcoal/10", color: "text-brand-charcoal" },
     { label: "Vehículos", desc: "Repuestos y accesorios", href: "/directorio/commerce?cat=vehiculos", bg: "bg-brand-slate/10", color: "text-brand-slate" },
+    { label: "Veterinarias", desc: "Clínicas y tiendas veterinarias", href: "/directorio/commerce?cat=veterinarias", bg: "bg-brand-earth/10", color: "text-brand-earth" },
     { label: "Varios", desc: "Otros comercios del valle", href: "/directorio/commerce?cat=varios", bg: "bg-brand-sand/50", color: "text-brand-charcoal" },
     { label: "Todos", desc: "Ver todos los comercios", href: "/directorio/commerce", bg: "bg-brand-sand/50", color: "text-brand-charcoal" },
   ],
