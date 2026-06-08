@@ -235,3 +235,16 @@ export interface TransportSchedule {
   is_active: boolean
   created_at: string
 }
+
+export interface TransportCompany {
+  id: string
+  name: string
+  description: string | null
+  phone: string | null
+  website: string | null
+  address: string | null
+  coordinates: string | null
+  sort_order: number
+  is_active: boolean
+  created_at: string
+}

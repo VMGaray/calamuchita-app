@@ -14,7 +14,7 @@ import BackButton from "@/components/ui/BackButton"
 import { LOCALIDADES, MAIN_LOCALIDADES } from "@/lib/constants/telefonos"
 import { useLocalidad } from "@/lib/context/LocalidadContext"
 import { createClient } from "@/lib/supabase/client"
-import type { ServicePhone } from "@/types/database"
+import type { ServicePhone, TransportCompany } from "@/types/database"
 
 interface DBService {
   id: string
@@ -78,6 +78,87 @@ const WA_ICON = (
     <path d="M12 0C5.373 0 0 5.373 0 12c0 2.123.554 4.118 1.526 5.845L.057 23.545a.75.75 0 0 0 .921.921l5.701-1.469A11.945 11.945 0 0 0 12 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.75a9.695 9.695 0 0 1-4.964-1.366l-.355-.212-3.686.949.969-3.682-.231-.366A9.712 9.712 0 0 1 2.25 12C2.25 6.615 6.615 2.25 12 2.25S21.75 6.615 21.75 12 17.385 21.75 12 21.75z" />
   </svg>
 )
+
+// ── TransportCompanyCard ─────────────────────────────────────────────────────
+
+function TransportCompanyCard({ company }: { company: TransportCompany }) {
+  const mapsHref = company.coordinates
+    ? `https://maps.google.com/?q=${company.coordinates}`
+    : company.address
+      ? `https://maps.google.com/?q=${encodeURIComponent(company.address)}`
+      : null
+
+  return (
+    <div
+      className="rounded-2xl overflow-hidden bg-white"
+      style={{ border: "1px solid rgba(45,69,48,0.20)", boxShadow: "0 2px 8px rgba(45,69,48,0.06)" }}
+    >
+      <div className="flex items-start gap-3 px-4 pt-4 pb-4">
+        <div
+          className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0"
+          style={{ background: "rgba(45,69,48,0.10)" }}
+        >
+          <Bus size={18} style={{ color: "#2D4530" }} strokeWidth={1.8} />
+        </div>
+
+        <div className="flex-1 min-w-0 space-y-1.5">
+          <p className="text-sm font-semibold leading-tight" style={{ color: "#1a2e1c" }}>
+            {company.name}
+          </p>
+          {company.description && (
+            <p className="text-xs leading-snug" style={{ color: "rgba(45,69,48,0.55)" }}>
+              {company.description}
+            </p>
+          )}
+          {company.address && (
+            <p className="text-xs" style={{ color: "rgba(45,69,48,0.50)" }}>
+              <MapPin size={10} className="inline mr-1" />{company.address}
+            </p>
+          )}
+
+          {(company.phone || company.website || mapsHref) && (
+            <div className="flex flex-wrap gap-2 pt-1">
+              {company.phone && (
+                <a
+                  href={`tel:${company.phone}`}
+                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold transition-opacity active:opacity-80"
+                  style={{ background: "#2D4530", color: "#E1DBC9" }}
+                >
+                  <Phone size={12} strokeWidth={2} />
+                  {company.phone}
+                </a>
+              )}
+              {company.website && (
+                <a
+                  href={company.website}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold transition-opacity active:opacity-80"
+                  style={{ background: "rgba(45,69,48,0.08)", color: "#2D4530" }}
+                >
+                  <ExternalLink size={12} strokeWidth={2} />
+                  Sitio web
+                </a>
+              )}
+              {mapsHref && (
+                <a
+                  href={mapsHref}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold transition-opacity active:opacity-80"
+                  style={{ background: "rgba(45,69,48,0.08)", color: "#2D4530" }}
+                >
+                  <MapPin size={12} strokeWidth={2} />
+                  Ver en mapa
+                </a>
+              )}
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  )
+}
 
 // ── ServiceCard ──────────────────────────────────────────────────────────────
 
@@ -243,6 +324,8 @@ export default function InfoUtilPage({ initialCategoria, initialPueblo }: Props)
   const [contacts, setContacts] = useState<DBService[]>([])
   const [dbLocalities, setDbLocalities] = useState<DBLocality[]>([])
   const [loading, setLoading] = useState(false)
+  const [transportCompanies, setTransportCompanies] = useState<TransportCompany[]>([])
+  const [loadingTransport, setLoadingTransport] = useState(false)
 
   // Fetch localities once
   useEffect(() => {
@@ -251,6 +334,20 @@ export default function InfoUtilPage({ initialCategoria, initialPueblo }: Props)
       .select("id, name")
       .order("sort_order")
       .then(({ data }) => setDbLocalities(data || []))
+  }, [])
+
+  // Fetch transport companies once (not per-locality)
+  useEffect(() => {
+    setLoadingTransport(true)
+    createClient()
+      .from("transport_companies")
+      .select("*")
+      .eq("is_active", true)
+      .order("sort_order")
+      .then(({ data }) => {
+        setTransportCompanies((data as TransportCompany[]) || [])
+        setLoadingTransport(false)
+      })
   }, [])
 
   // Fetch useful_contacts filtered strictly by the selected locality
@@ -444,7 +541,7 @@ export default function InfoUtilPage({ initialCategoria, initialPueblo }: Props)
           transition={{ duration: 0.22 }}
         >
           {/* Loading skeleton */}
-          {loading && (
+          {(loading || (categoria === "transporte" && loadingTransport)) && (
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               {[1, 2, 3, 4].map(i => (
                 <div key={i} className="rounded-2xl bg-white animate-pulse h-20" style={{ border: "1px solid rgba(45,69,48,0.12)" }} />
@@ -453,7 +550,7 @@ export default function InfoUtilPage({ initialCategoria, initialPueblo }: Props)
           )}
 
           {/* De turno banner */}
-          {!loading && dutyService && (
+          {!loading && dutyService && categoria !== "transporte" && (
             <div className="flex items-center gap-4 rounded-2xl px-5 py-4 mb-5"
               style={{ background: "linear-gradient(135deg, rgba(234,179,8,0.15) 0%, rgba(234,179,8,0.08) 100%)", border: "1.5px solid rgba(234,179,8,0.40)" }}
             >
@@ -479,8 +576,8 @@ export default function InfoUtilPage({ initialCategoria, initialPueblo }: Props)
             </div>
           )}
 
-          {/* Empty state */}
-          {!loading && filteredServices.length === 0 && (
+          {/* Empty state (non-transport categories) */}
+          {categoria !== "transporte" && !loading && filteredServices.length === 0 && (
             <div className="flex flex-col items-center justify-center py-16 text-center rounded-3xl" style={{ background: "rgba(225,219,201,0.35)" }}>
               <div className="w-14 h-14 rounded-2xl flex items-center justify-center mb-4" style={{ background: "rgba(45,69,48,0.08)" }}>
                 <RefreshCw size={24} style={{ color: "rgba(45,69,48,0.38)" }} />
@@ -501,8 +598,28 @@ export default function InfoUtilPage({ initialCategoria, initialPueblo }: Props)
             </div>
           )}
 
-          {/* Service cards */}
-          {!loading && filteredServices.length > 0 && (
+          {/* Transport company cards */}
+          {categoria === "transporte" && !loadingTransport && transportCompanies.length > 0 && (
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              {transportCompanies.map(c => (
+                <TransportCompanyCard key={c.id} company={c} />
+              ))}
+            </div>
+          )}
+          {categoria === "transporte" && !loadingTransport && transportCompanies.length === 0 && (
+            <div className="flex flex-col items-center justify-center py-16 text-center rounded-3xl" style={{ background: "rgba(225,219,201,0.35)" }}>
+              <div className="w-14 h-14 rounded-2xl flex items-center justify-center mb-4" style={{ background: "rgba(45,69,48,0.08)" }}>
+                <Bus size={24} style={{ color: "rgba(45,69,48,0.38)" }} />
+              </div>
+              <h3 className="font-serif text-lg mb-1" style={{ color: "#2D4530" }}>Sin información disponible</h3>
+              <p className="text-sm max-w-xs leading-relaxed" style={{ color: "rgba(45,69,48,0.55)" }}>
+                Aún no hay empresas de transporte cargadas.
+              </p>
+            </div>
+          )}
+
+          {/* Service cards (all other categories) */}
+          {categoria !== "transporte" && !loading && filteredServices.length > 0 && (
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               {filteredServices.map(service => (
                 <ServiceCard key={service.id} service={service} localidad={localidad} />

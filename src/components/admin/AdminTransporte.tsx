@@ -2,59 +2,31 @@
 
 import { useEffect, useState } from "react"
 import { createClient } from "@/lib/supabase/client"
-import { Plus, Trash2, ToggleLeft, ToggleRight, Pencil } from "lucide-react"
-import { Locality, TransportSchedule } from "@/types/database"
-
-const DAYS = [
-  { key: "lunes",     short: "Lu" },
-  { key: "martes",    short: "Ma" },
-  { key: "miercoles", short: "Mi" },
-  { key: "jueves",    short: "Ju" },
-  { key: "viernes",   short: "Vi" },
-  { key: "sabado",    short: "Sá" },
-  { key: "domingo",   short: "Do" },
-]
+import { Plus, Trash2, Pencil, Globe, Phone, MapPin, Navigation } from "lucide-react"
+import { TransportCompany } from "@/types/database"
 
 const EMPTY_FORM = {
-  company: "", origin_id: "", destination_id: "",
-  departure_time: "", arrival_time: "", days: [] as string[], notes: "",
-}
-
-interface ScheduleWithLocalities extends TransportSchedule {
-  origin: { name: string } | null
-  destination: { name: string } | null
+  name: "", description: "", phone: "", website: "", address: "", coordinates: "",
 }
 
 export default function AdminTransporte() {
-  const [localities, setLocalities] = useState<Locality[]>([])
-  const [schedules, setSchedules] = useState<ScheduleWithLocalities[]>([])
+  const [companies, setCompanies] = useState<TransportCompany[]>([])
   const [loading, setLoading] = useState(true)
   const [showForm, setShowForm] = useState(false)
   const [editingId, setEditingId] = useState<string | null>(null)
   const [form, setForm] = useState(EMPTY_FORM)
   const [saving, setSaving] = useState(false)
-  const [filterOrigin, setFilterOrigin] = useState("")
 
   const fetchAll = async () => {
-    const supabase = createClient()
-    const [{ data: locs }, { data: scheds }] = await Promise.all([
-      supabase.from("localities").select("*").order("sort_order"),
-      supabase.from("transport_schedules")
-        .select("*, origin:localities!transport_schedules_origin_id_fkey(name), destination:localities!transport_schedules_destination_id_fkey(name)")
-        .order("departure_time"),
-    ])
-    setLocalities(locs || [])
-    setSchedules((scheds as ScheduleWithLocalities[]) || [])
+    const { data } = await createClient()
+      .from("transport_companies")
+      .select("*")
+      .order("sort_order")
+    setCompanies(data || [])
     setLoading(false)
   }
 
   useEffect(() => { fetchAll() }, [])
-
-  const toggleDay = (day: string) =>
-    setForm(p => ({
-      ...p,
-      days: p.days.includes(day) ? p.days.filter(d => d !== day) : [...p.days, day],
-    }))
 
   const openNew = () => {
     setForm(EMPTY_FORM)
@@ -62,37 +34,35 @@ export default function AdminTransporte() {
     setShowForm(true)
   }
 
-  const openEdit = (s: ScheduleWithLocalities) => {
+  const openEdit = (c: TransportCompany) => {
     setForm({
-      company: s.company,
-      origin_id: s.origin_id,
-      destination_id: s.destination_id,
-      departure_time: s.departure_time.slice(0, 5),
-      arrival_time: s.arrival_time ? s.arrival_time.slice(0, 5) : "",
-      days: s.days || [],
-      notes: s.notes || "",
+      name:        c.name,
+      description: c.description  || "",
+      phone:       c.phone        || "",
+      website:     c.website      || "",
+      address:     c.address      || "",
+      coordinates: c.coordinates  || "",
     })
-    setEditingId(s.id)
+    setEditingId(c.id)
     setShowForm(true)
   }
 
   const handleSave = async () => {
-    if (!form.company || !form.origin_id || !form.destination_id || !form.departure_time) return
+    if (!form.name.trim()) return
     setSaving(true)
     const payload = {
-      company: form.company,
-      origin_id: form.origin_id,
-      destination_id: form.destination_id,
-      departure_time: form.departure_time,
-      arrival_time: form.arrival_time || null,
-      days: form.days,
-      notes: form.notes || null,
+      name:        form.name.trim(),
+      description: form.description.trim()  || null,
+      phone:       form.phone.trim()        || null,
+      website:     form.website.trim()      || null,
+      address:     form.address.trim()      || null,
+      coordinates: form.coordinates.trim()  || null,
     }
     const supabase = createClient()
     if (editingId) {
-      await supabase.from("transport_schedules").update(payload).eq("id", editingId)
+      await supabase.from("transport_companies").update(payload).eq("id", editingId)
     } else {
-      await supabase.from("transport_schedules").insert([{ ...payload, is_active: true }])
+      await supabase.from("transport_companies").insert([{ ...payload, sort_order: companies.length }])
     }
     setSaving(false)
     setShowForm(false)
@@ -101,99 +71,93 @@ export default function AdminTransporte() {
     fetchAll()
   }
 
-  const handleToggle = async (id: string, current: boolean) => {
-    await createClient().from("transport_schedules").update({ is_active: !current }).eq("id", id)
-    setSchedules(prev => prev.map(s => s.id === id ? { ...s, is_active: !current } : s))
-  }
-
   const handleDelete = async (id: string) => {
-    if (!confirm("¿Eliminar este horario?")) return
-    await createClient().from("transport_schedules").delete().eq("id", id)
-    setSchedules(prev => prev.filter(s => s.id !== id))
+    if (!confirm("¿Eliminar esta empresa?")) return
+    await createClient().from("transport_companies").delete().eq("id", id)
+    setCompanies(prev => prev.filter(c => c.id !== id))
   }
 
   const set = (k: string, v: string) => setForm(p => ({ ...p, [k]: v }))
 
-  const filtered = filterOrigin
-    ? schedules.filter(s => s.origin_id === filterOrigin)
-    : schedules
-
   return (
     <div className="space-y-5">
-      <div className="flex flex-wrap items-center gap-3">
-        <select
-          value={filterOrigin}
-          onChange={e => setFilterOrigin(e.target.value)}
-          className="px-3 py-2 rounded-xl border border-stone-200 text-sm bg-white outline-none focus:ring-2 focus:ring-[#A3B18A]/50"
-        >
-          <option value="">Todos los orígenes</option>
-          {localities.map(l => <option key={l.id} value={l.id}>{l.name}</option>)}
-        </select>
+      <div className="flex items-center justify-end">
         <button
           onClick={openNew}
           className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-[#2D4530] text-white text-sm font-medium hover:bg-[#3a5a3e] transition-colors"
         >
           <Plus size={14} />
-          Nuevo horario
+          Nueva empresa
         </button>
       </div>
 
       {loading ? (
-        <div className="space-y-2">
-          {[1,2,3].map(i => <div key={i} className="bg-white rounded-xl h-14 animate-pulse border border-stone-200" />)}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          {[1, 2, 3].map(i => (
+            <div key={i} className="bg-white rounded-xl h-32 animate-pulse border border-stone-200" />
+          ))}
         </div>
-      ) : filtered.length === 0 ? (
+      ) : companies.length === 0 ? (
         <div className="bg-white rounded-2xl border border-stone-200 p-12 text-center">
-          <p className="text-sm text-stone-400">Sin horarios cargados</p>
+          <p className="text-sm text-stone-400">Sin empresas de transporte cargadas</p>
         </div>
       ) : (
-        <div className="bg-white rounded-2xl border border-stone-200 overflow-hidden">
-          {filtered.map((s, i) => (
-            <div
-              key={s.id}
-              className={`flex items-center gap-3 px-5 py-3.5 ${!s.is_active ? "opacity-50" : ""} ${i !== filtered.length - 1 ? "border-b border-stone-100" : ""}`}
-            >
-              <div className="flex-1 min-w-0">
-                <div className="flex items-baseline gap-2 flex-wrap">
-                  <span className="text-sm font-medium text-stone-800">{s.company}</span>
-                  <span className="text-xs text-stone-400">
-                    {s.origin?.name} → {s.destination?.name}
-                  </span>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          {companies.map(c => (
+            <div key={c.id} className="bg-white rounded-2xl border border-stone-200 p-4 space-y-2.5">
+              <div className="flex items-start justify-between gap-2">
+                <div className="min-w-0">
+                  <p className="text-sm font-semibold text-stone-800 leading-snug">{c.name}</p>
+                  {c.description && (
+                    <p className="text-xs text-stone-500 mt-0.5 leading-snug">{c.description}</p>
+                  )}
                 </div>
-                <div className="flex items-center gap-3 mt-0.5">
-                  <span className="text-xs font-mono text-[#2D4530]">
-                    {s.departure_time.slice(0, 5)}{s.arrival_time ? ` → ${s.arrival_time.slice(0, 5)}` : ""}
-                  </span>
-                  <div className="flex gap-0.5">
-                    {DAYS.map(d => (
-                      <span
-                        key={d.key}
-                        className="text-[9px] px-1 py-0.5 rounded font-medium"
-                        style={
-                          s.days.includes(d.key)
-                            ? { background: "#A3B18A", color: "white" }
-                            : { background: "rgba(45,69,48,0.06)", color: "rgba(45,69,48,0.3)" }
-                        }
-                      >
-                        {d.short}
-                      </span>
-                    ))}
-                  </div>
-                  {s.notes && <span className="text-[10px] text-stone-400 truncate max-w-[120px]">{s.notes}</span>}
+                <div className="flex gap-1 flex-shrink-0">
+                  <button
+                    onClick={() => openEdit(c)}
+                    className="w-7 h-7 flex items-center justify-center rounded-lg hover:bg-stone-100 text-stone-300 hover:text-stone-500 transition-colors"
+                    title="Editar"
+                  >
+                    <Pencil size={13} />
+                  </button>
+                  <button
+                    onClick={() => handleDelete(c.id)}
+                    className="w-7 h-7 flex items-center justify-center rounded-lg hover:bg-red-50 text-stone-300 hover:text-red-400 transition-colors"
+                    title="Eliminar"
+                  >
+                    <Trash2 size={13} />
+                  </button>
                 </div>
               </div>
 
-              <button onClick={() => openEdit(s)} className="w-7 h-7 flex items-center justify-center rounded-lg hover:bg-stone-100 text-stone-300 hover:text-stone-500 transition-colors" title="Editar">
-                <Pencil size={13} />
-              </button>
-              <button onClick={() => handleToggle(s.id, s.is_active)}>
-                {s.is_active
-                  ? <ToggleRight size={20} className="text-[#A3B18A]" />
-                  : <ToggleLeft size={20} className="text-stone-300" />}
-              </button>
-              <button onClick={() => handleDelete(s.id)} className="w-7 h-7 flex items-center justify-center rounded-lg hover:bg-red-50 text-stone-300 hover:text-red-400 transition-colors">
-                <Trash2 size={13} />
-              </button>
+              {(c.phone || c.website || c.address || c.coordinates) && (
+                <div className="space-y-1 pt-1 border-t border-stone-100">
+                  {c.phone && (
+                    <div className="flex items-center gap-1.5 text-xs text-stone-500">
+                      <Phone size={11} className="flex-shrink-0 text-stone-400" />
+                      {c.phone}
+                    </div>
+                  )}
+                  {c.website && (
+                    <div className="flex items-center gap-1.5 text-xs text-stone-500 min-w-0">
+                      <Globe size={11} className="flex-shrink-0 text-stone-400" />
+                      <span className="truncate">{c.website}</span>
+                    </div>
+                  )}
+                  {c.address && (
+                    <div className="flex items-start gap-1.5 text-xs text-stone-500">
+                      <MapPin size={11} className="flex-shrink-0 text-stone-400 mt-0.5" />
+                      {c.address}
+                    </div>
+                  )}
+                  {c.coordinates && (
+                    <div className="flex items-center gap-1.5 text-xs text-stone-400">
+                      <Navigation size={11} className="flex-shrink-0" />
+                      {c.coordinates}
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
           ))}
         </div>
@@ -203,71 +167,68 @@ export default function AdminTransporte() {
         <div className="fixed inset-0 z-50 flex items-end md:items-center justify-center p-4 bg-black/40 backdrop-blur-sm">
           <div className="bg-white rounded-2xl w-full max-w-md p-6 space-y-4 shadow-xl max-h-[90vh] overflow-y-auto">
             <h3 className="text-base font-medium text-stone-800">
-              {editingId ? "Editar horario" : "Nuevo horario"}
+              {editingId ? "Editar empresa" : "Nueva empresa de transporte"}
             </h3>
 
             <div>
-              <label className="block text-xs font-medium text-stone-600 mb-1">Empresa *</label>
-              <input value={form.company} onChange={e => set("company", e.target.value)}
+              <label className="block text-xs font-medium text-stone-600 mb-1">Nombre de la empresa</label>
+              <input
+                value={form.name}
+                onChange={e => set("name", e.target.value)}
                 placeholder="Ej: COTAP, Sierras de Calamuchita…"
-                className="w-full px-3 py-2 rounded-xl border border-stone-200 text-sm outline-none focus:ring-2 focus:ring-[#A3B18A]/50" />
-            </div>
-
-            <div className="grid grid-cols-2 gap-3">
-              <div>
-                <label className="block text-xs font-medium text-stone-600 mb-1">Desde *</label>
-                <select value={form.origin_id} onChange={e => set("origin_id", e.target.value)}
-                  className="w-full px-3 py-2 rounded-xl border border-stone-200 text-sm bg-white outline-none focus:ring-2 focus:ring-[#A3B18A]/50">
-                  <option value="">— Elegí —</option>
-                  {localities.map(l => <option key={l.id} value={l.id}>{l.name}</option>)}
-                </select>
-              </div>
-              <div>
-                <label className="block text-xs font-medium text-stone-600 mb-1">Hasta *</label>
-                <select value={form.destination_id} onChange={e => set("destination_id", e.target.value)}
-                  className="w-full px-3 py-2 rounded-xl border border-stone-200 text-sm bg-white outline-none focus:ring-2 focus:ring-[#A3B18A]/50">
-                  <option value="">— Elegí —</option>
-                  {localities.map(l => <option key={l.id} value={l.id}>{l.name}</option>)}
-                </select>
-              </div>
-            </div>
-
-            <div className="grid grid-cols-2 gap-3">
-              <div>
-                <label className="block text-xs font-medium text-stone-600 mb-1">Salida *</label>
-                <input type="time" value={form.departure_time} onChange={e => set("departure_time", e.target.value)}
-                  className="w-full px-3 py-2 rounded-xl border border-stone-200 text-sm outline-none focus:ring-2 focus:ring-[#A3B18A]/50" />
-              </div>
-              <div>
-                <label className="block text-xs font-medium text-stone-600 mb-1">Llegada</label>
-                <input type="time" value={form.arrival_time} onChange={e => set("arrival_time", e.target.value)}
-                  className="w-full px-3 py-2 rounded-xl border border-stone-200 text-sm outline-none focus:ring-2 focus:ring-[#A3B18A]/50" />
-              </div>
+                className="w-full px-3 py-2 rounded-xl border border-stone-200 text-sm outline-none focus:ring-2 focus:ring-[#A3B18A]/50"
+              />
             </div>
 
             <div>
-              <label className="block text-xs font-medium text-stone-600 mb-2">Días</label>
-              <div className="flex gap-1.5 flex-wrap">
-                {DAYS.map(d => (
-                  <button key={d.key} type="button" onClick={() => toggleDay(d.key)}
-                    className="px-2.5 py-1 rounded-lg text-xs font-medium transition-colors"
-                    style={
-                      form.days.includes(d.key)
-                        ? { background: "#2D4530", color: "white" }
-                        : { background: "rgba(45,69,48,0.07)", color: "rgba(45,69,48,0.6)" }
-                    }
-                  >
-                    {d.short}
-                  </button>
-                ))}
-              </div>
+              <label className="block text-xs font-medium text-stone-600 mb-1">Descripción</label>
+              <input
+                value={form.description}
+                onChange={e => set("description", e.target.value)}
+                placeholder="Ej: Servicio de larga distancia…"
+                className="w-full px-3 py-2 rounded-xl border border-stone-200 text-sm outline-none focus:ring-2 focus:ring-[#A3B18A]/50"
+              />
             </div>
 
             <div>
-              <label className="block text-xs font-medium text-stone-600 mb-1">Notas</label>
-              <input value={form.notes} onChange={e => set("notes", e.target.value)}
-                placeholder="Ej: Solo en temporada alta"
-                className="w-full px-3 py-2 rounded-xl border border-stone-200 text-sm outline-none focus:ring-2 focus:ring-[#A3B18A]/50" />
+              <label className="block text-xs font-medium text-stone-600 mb-1">Teléfono</label>
+              <input
+                value={form.phone}
+                onChange={e => set("phone", e.target.value)}
+                placeholder="Ej: 03546 42-0000"
+                className="w-full px-3 py-2 rounded-xl border border-stone-200 text-sm outline-none focus:ring-2 focus:ring-[#A3B18A]/50"
+              />
+            </div>
+
+            <div>
+              <label className="block text-xs font-medium text-stone-600 mb-1">Página web</label>
+              <input
+                value={form.website}
+                onChange={e => set("website", e.target.value)}
+                placeholder="Ej: https://www.cotap.com.ar"
+                className="w-full px-3 py-2 rounded-xl border border-stone-200 text-sm outline-none focus:ring-2 focus:ring-[#A3B18A]/50"
+              />
+            </div>
+
+            <div>
+              <label className="block text-xs font-medium text-stone-600 mb-1">Dirección</label>
+              <textarea
+                value={form.address}
+                onChange={e => set("address", e.target.value)}
+                placeholder="Ej: Av. Sobremonte 123, Santa Rosa de Calamuchita"
+                rows={2}
+                className="w-full px-3 py-2 rounded-xl border border-stone-200 text-sm outline-none focus:ring-2 focus:ring-[#A3B18A]/50 resize-none"
+              />
+            </div>
+
+            <div>
+              <label className="block text-xs font-medium text-stone-600 mb-1">Coordenadas</label>
+              <input
+                value={form.coordinates}
+                onChange={e => set("coordinates", e.target.value)}
+                placeholder="Ej: -32.0636, -64.5285"
+                className="w-full px-3 py-2 rounded-xl border border-stone-200 text-sm outline-none focus:ring-2 focus:ring-[#A3B18A]/50"
+              />
             </div>
 
             <div className="flex gap-3 pt-1">
@@ -279,7 +240,7 @@ export default function AdminTransporte() {
               </button>
               <button
                 onClick={handleSave}
-                disabled={saving || !form.company || !form.origin_id || !form.destination_id || !form.departure_time}
+                disabled={saving || !form.name.trim()}
                 className="flex-1 py-2.5 rounded-xl bg-[#2D4530] text-white text-sm font-medium hover:bg-[#3a5a3e] transition-colors disabled:opacity-50"
               >
                 {saving ? "Guardando…" : editingId ? "Guardar cambios" : "Guardar"}
