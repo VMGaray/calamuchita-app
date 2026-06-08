@@ -31,8 +31,10 @@ export default function AdminVetGuardia() {
     setError(null)
     const { error: err } = await createClient()
       .from("guardia_photos")
-      .upsert({ category: "veterinarias", photo_url: photoUrl, updated_at: new Date().toISOString() })
-      .eq("category", "veterinarias")
+      .upsert(
+        { category: "veterinarias", photo_url: photoUrl, updated_at: new Date().toISOString() },
+        { onConflict: "category" }
+      )
     setSaving(false)
     if (err) { setError("Error al guardar: " + err.message); return }
     setSaved(true)
