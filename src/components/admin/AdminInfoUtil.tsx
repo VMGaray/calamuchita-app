@@ -4,12 +4,14 @@ import { useState } from "react"
 import AdminLocalidades from "./AdminLocalidades"
 import AdminServiciosUtiles from "./AdminServiciosUtiles"
 import AdminTransporte from "./AdminTransporte"
+import AdminVetGuardia from "./AdminVetGuardia"
 
-type Tab = "servicios" | "transporte" | "localidades"
+type Tab = "servicios" | "transporte" | "guardias" | "localidades"
 
 const TABS: { key: Tab; label: string; desc: string }[] = [
   { key: "servicios",   label: "Servicios",   desc: "Cooperativas, salud, farmacias, emergencias y más — organizados por localidad" },
-  { key: "transporte",  label: "Transporte",  desc: "Horarios de micros y traslados" },
+  { key: "transporte",  label: "Transporte",  desc: "Empresas de transporte del Valle" },
+  { key: "guardias",    label: "Guardias",    desc: "Foto del cuadro de guardias de veterinarias (válida para todo el Valle)" },
   { key: "localidades", label: "Localidades", desc: "Administrar la lista de pueblos del valle" },
 ]
 
@@ -38,6 +40,7 @@ export default function AdminInfoUtil() {
 
       {tab === "servicios"   && <AdminServiciosUtiles />}
       {tab === "transporte"  && <AdminTransporte />}
+      {tab === "guardias"    && <AdminVetGuardia />}
       {tab === "localidades" && <AdminLocalidades />}
     </div>
   )

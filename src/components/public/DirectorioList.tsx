@@ -175,7 +175,7 @@ function hasNoPueblo(address: string | null): boolean {
 export default function DirectorioList({ section, filters }: Props) {
   const router = useRouter()
   const searchParams = useSearchParams()
-  const { setLocalidad } = useLocalidad()
+  const { localidad, setLocalidad } = useLocalidad()
   const [allBusinesses, setAllBusinesses] = useState<Business[]>([])
   const [businesses, setBusinesses] = useState<Business[]>([])
   const [loading, setLoading] = useState(true)
@@ -192,6 +192,16 @@ export default function DirectorioList({ section, filters }: Props) {
 
   useScrollLock(showPueblos || showCategories)
   useEffect(() => { setMounted(true) }, [])
+
+  // Al entrar sin pueblo en la URL, aplicar la localidad global como filtro inicial
+  useEffect(() => {
+    if (!filters.pueblo && localidad) {
+      const current = new URLSearchParams(searchParams.toString())
+      current.set("pueblo", localidad)
+      router.replace(`/directorio/${section}?${current.toString()}`, { scroll: false })
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   // Fetch sin filtro de pueblo — el filtro de pueblo se aplica client-side
   useEffect(() => {

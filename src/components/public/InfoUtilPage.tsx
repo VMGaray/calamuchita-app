@@ -10,6 +10,7 @@ import {
   ArrowLeft, RefreshCw, ExternalLink, Clock, Dog, CreditCard,
 } from "lucide-react"
 import Link from "next/link"
+import Image from "next/image"
 import BackButton from "@/components/ui/BackButton"
 import { LOCALIDADES, MAIN_LOCALIDADES } from "@/lib/constants/telefonos"
 import { useLocalidad } from "@/lib/context/LocalidadContext"
@@ -326,6 +327,8 @@ export default function InfoUtilPage({ initialCategoria, initialPueblo }: Props)
   const [loading, setLoading] = useState(false)
   const [transportCompanies, setTransportCompanies] = useState<TransportCompany[]>([])
   const [loadingTransport, setLoadingTransport] = useState(false)
+  const [vetGuardiaPhoto, setVetGuardiaPhoto] = useState<string | null>(null)
+  const [loadingVetGuardia, setLoadingVetGuardia] = useState(false)
 
   // Fetch localities once
   useEffect(() => {
@@ -334,6 +337,20 @@ export default function InfoUtilPage({ initialCategoria, initialPueblo }: Props)
       .select("id, name")
       .order("sort_order")
       .then(({ data }) => setDbLocalities(data || []))
+  }, [])
+
+  // Fetch foto de guardia veterinaria (global, sin localidad)
+  useEffect(() => {
+    setLoadingVetGuardia(true)
+    createClient()
+      .from("guardia_photos")
+      .select("photo_url")
+      .eq("category", "veterinarias")
+      .single()
+      .then(({ data }) => {
+        setVetGuardiaPhoto(data?.photo_url ?? null)
+        setLoadingVetGuardia(false)
+      })
   }, [])
 
   // Fetch transport companies once (not per-locality)
@@ -541,7 +558,7 @@ export default function InfoUtilPage({ initialCategoria, initialPueblo }: Props)
           transition={{ duration: 0.22 }}
         >
           {/* Loading skeleton */}
-          {(loading || (categoria === "transporte" && loadingTransport)) && (
+          {(loading || (categoria === "transporte" && loadingTransport) || (categoria === "veterinarias" && loadingVetGuardia)) && (
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               {[1, 2, 3, 4].map(i => (
                 <div key={i} className="rounded-2xl bg-white animate-pulse h-20" style={{ border: "1px solid rgba(45,69,48,0.12)" }} />
@@ -549,8 +566,36 @@ export default function InfoUtilPage({ initialCategoria, initialPueblo }: Props)
             </div>
           )}
 
+          {/* Veterinarias de turno — solo foto */}
+          {categoria === "veterinarias" && !loadingVetGuardia && (
+            vetGuardiaPhoto ? (
+              <div className="rounded-2xl overflow-hidden" style={{ border: "1px solid rgba(45,69,48,0.15)", boxShadow: "0 2px 12px rgba(45,69,48,0.08)" }}>
+                <div className="relative w-full" style={{ minHeight: 240 }}>
+                  <Image
+                    src={vetGuardiaPhoto}
+                    alt="Guardia de veterinarias — Valle de Calamuchita"
+                    width={900}
+                    height={600}
+                    className="w-full h-auto object-contain bg-white"
+                    style={{ display: "block" }}
+                  />
+                </div>
+              </div>
+            ) : (
+              <div className="flex flex-col items-center justify-center py-16 text-center rounded-3xl" style={{ background: "rgba(225,219,201,0.35)" }}>
+                <div className="w-14 h-14 rounded-2xl flex items-center justify-center mb-4" style={{ background: "rgba(45,69,48,0.08)" }}>
+                  <Dog size={24} style={{ color: "rgba(45,69,48,0.38)" }} />
+                </div>
+                <h3 className="font-serif text-lg mb-1" style={{ color: "#2D4530" }}>Sin información disponible</h3>
+                <p className="text-sm max-w-xs leading-relaxed" style={{ color: "rgba(45,69,48,0.55)" }}>
+                  Aún no se cargó el cuadro de guardias veterinarias.
+                </p>
+              </div>
+            )
+          )}
+
           {/* De turno banner */}
-          {!loading && dutyService && categoria !== "transporte" && (
+          {!loading && dutyService && categoria !== "transporte" && categoria !== "veterinarias" && (
             <div className="flex items-center gap-4 rounded-2xl px-5 py-4 mb-5"
               style={{ background: "linear-gradient(135deg, rgba(234,179,8,0.15) 0%, rgba(234,179,8,0.08) 100%)", border: "1.5px solid rgba(234,179,8,0.40)" }}
             >
@@ -576,8 +621,8 @@ export default function InfoUtilPage({ initialCategoria, initialPueblo }: Props)
             </div>
           )}
 
-          {/* Empty state (non-transport categories) */}
-          {categoria !== "transporte" && !loading && filteredServices.length === 0 && (
+          {/* Empty state (categorías normales) */}
+          {categoria !== "transporte" && categoria !== "veterinarias" && !loading && filteredServices.length === 0 && (
             <div className="flex flex-col items-center justify-center py-16 text-center rounded-3xl" style={{ background: "rgba(225,219,201,0.35)" }}>
               <div className="w-14 h-14 rounded-2xl flex items-center justify-center mb-4" style={{ background: "rgba(45,69,48,0.08)" }}>
                 <RefreshCw size={24} style={{ color: "rgba(45,69,48,0.38)" }} />
@@ -618,8 +663,8 @@ export default function InfoUtilPage({ initialCategoria, initialPueblo }: Props)
             </div>
           )}
 
-          {/* Service cards (all other categories) */}
-          {categoria !== "transporte" && !loading && filteredServices.length > 0 && (
+          {/* Service cards (categorías normales) */}
+          {categoria !== "transporte" && categoria !== "veterinarias" && !loading && filteredServices.length > 0 && (
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               {filteredServices.map(service => (
                 <ServiceCard key={service.id} service={service} localidad={localidad} />
