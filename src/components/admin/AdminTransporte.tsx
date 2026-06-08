@@ -16,12 +16,14 @@ export default function AdminTransporte() {
   const [editingId, setEditingId] = useState<string | null>(null)
   const [form, setForm] = useState(EMPTY_FORM)
   const [saving, setSaving] = useState(false)
+  const [error, setError] = useState<string | null>(null)
 
   const fetchAll = async () => {
-    const { data } = await createClient()
+    const { data, error: err } = await createClient()
       .from("transport_companies")
       .select("*")
       .order("sort_order")
+    if (err) setError("Error al cargar: " + err.message)
     setCompanies(data || [])
     setLoading(false)
   }
@@ -59,12 +61,14 @@ export default function AdminTransporte() {
       coordinates: form.coordinates.trim()  || null,
     }
     const supabase = createClient()
+    let err
     if (editingId) {
-      await supabase.from("transport_companies").update(payload).eq("id", editingId)
+      ;({ error: err } = await supabase.from("transport_companies").update(payload).eq("id", editingId))
     } else {
-      await supabase.from("transport_companies").insert([{ ...payload, sort_order: companies.length }])
+      ;({ error: err } = await supabase.from("transport_companies").insert([{ ...payload, is_active: true, sort_order: companies.length }]))
     }
     setSaving(false)
+    if (err) { setError("Error al guardar: " + err.message); return }
     setShowForm(false)
     setEditingId(null)
     setForm(EMPTY_FORM)
@@ -81,6 +85,11 @@ export default function AdminTransporte() {
 
   return (
     <div className="space-y-5">
+      {error && (
+        <div className="px-4 py-3 rounded-xl bg-red-50 border border-red-200 text-sm text-red-700">
+          {error}
+        </div>
+      )}
       <div className="flex items-center justify-end">
         <button
           onClick={openNew}
