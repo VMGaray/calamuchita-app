@@ -5,13 +5,14 @@ import AdminLocalidades from "./AdminLocalidades"
 import AdminServiciosUtiles from "./AdminServiciosUtiles"
 import AdminTransporte from "./AdminTransporte"
 import AdminVetGuardia from "./AdminVetGuardia"
+import AdminFarmaciaGuardia from "./AdminFarmaciaGuardia"
 
 type Tab = "servicios" | "transporte" | "guardias" | "localidades"
 
 const TABS: { key: Tab; label: string; desc: string }[] = [
   { key: "servicios",   label: "Servicios",   desc: "Cooperativas, salud, farmacias, emergencias y más — organizados por localidad" },
   { key: "transporte",  label: "Transporte",  desc: "Empresas de transporte del Valle" },
-  { key: "guardias",    label: "Guardias",    desc: "Foto del cuadro de guardias de veterinarias (válida para todo el Valle)" },
+  { key: "guardias",    label: "Guardias",    desc: "Fotos del cuadro de turnos: veterinarias (global) y farmacias (por localidad)" },
   { key: "localidades", label: "Localidades", desc: "Administrar la lista de pueblos del valle" },
 ]
 
@@ -40,7 +41,20 @@ export default function AdminInfoUtil() {
 
       {tab === "servicios"   && <AdminServiciosUtiles />}
       {tab === "transporte"  && <AdminTransporte />}
-      {tab === "guardias"    && <AdminVetGuardia />}
+      {tab === "guardias" && (
+        <div className="space-y-10">
+          <div>
+            <h3 className="text-base font-medium text-stone-700 mb-0.5">Veterinarias de turno</h3>
+            <p className="text-xs text-stone-400 mb-4">Una sola foto válida para todo el Valle</p>
+            <AdminVetGuardia />
+          </div>
+          <div>
+            <h3 className="text-base font-medium text-stone-700 mb-0.5">Farmacias de turno</h3>
+            <p className="text-xs text-stone-400 mb-4">Una foto por localidad con el cronograma de turnos</p>
+            <AdminFarmaciaGuardia />
+          </div>
+        </div>
+      )}
       {tab === "localidades" && <AdminLocalidades />}
     </div>
   )

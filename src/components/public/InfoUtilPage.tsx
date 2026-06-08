@@ -323,6 +323,8 @@ export default function InfoUtilPage({ initialCategoria, initialPueblo }: Props)
   const syncedRef = useRef(false)
   const vetPinchRef = useRef<{ dist: number; scale: number } | null>(null)
   const vetDragRef = useRef<{ x: number; y: number; ox: number; oy: number } | null>(null)
+  const farmaciaPinchRef = useRef<{ dist: number; scale: number } | null>(null)
+  const farmaciaDragRef = useRef<{ x: number; y: number; ox: number; oy: number } | null>(null)
 
   const [contacts, setContacts] = useState<DBService[]>([])
   const [dbLocalities, setDbLocalities] = useState<DBLocality[]>([])
@@ -334,6 +336,11 @@ export default function InfoUtilPage({ initialCategoria, initialPueblo }: Props)
   const [vetLightbox, setVetLightbox] = useState(false)
   const [vetZoomScale, setVetZoomScale] = useState(1)
   const [vetZoomOffset, setVetZoomOffset] = useState({ x: 0, y: 0 })
+  const [farmaciaGuardiaPhoto, setFarmaciaGuardiaPhoto] = useState<string | null>(null)
+  const [loadingFarmaciaGuardia, setLoadingFarmaciaGuardia] = useState(false)
+  const [farmaciaLightbox, setFarmaciaLightbox] = useState(false)
+  const [farmaciaZoomScale, setFarmaciaZoomScale] = useState(1)
+  const [farmaciaZoomOffset, setFarmaciaZoomOffset] = useState({ x: 0, y: 0 })
 
   // Fetch localities once
   useEffect(() => {
@@ -351,12 +358,30 @@ export default function InfoUtilPage({ initialCategoria, initialPueblo }: Props)
       .from("guardia_photos")
       .select("photo_url")
       .eq("category", "veterinarias")
+      .eq("locality", "")
       .maybeSingle()
       .then(({ data }) => {
         setVetGuardiaPhoto(data?.photo_url ?? null)
         setLoadingVetGuardia(false)
       })
   }, [])
+
+  // Fetch foto de cronograma de farmacias (por localidad)
+  useEffect(() => {
+    if (!localidad) return
+    setLoadingFarmaciaGuardia(true)
+    setFarmaciaGuardiaPhoto(null)
+    createClient()
+      .from("guardia_photos")
+      .select("photo_url")
+      .eq("category", "farmacias")
+      .eq("locality", localidad)
+      .maybeSingle()
+      .then(({ data }) => {
+        setFarmaciaGuardiaPhoto(data?.photo_url ?? null)
+        setLoadingFarmaciaGuardia(false)
+      })
+  }, [localidad])
 
   // Fetch transport companies once (not per-locality)
   useEffect(() => {
@@ -453,6 +478,46 @@ export default function InfoUtilPage({ initialCategoria, initialPueblo }: Props)
   const handleVetPinchEnd = () => {
     vetPinchRef.current = null
     vetDragRef.current = null
+  }
+
+  useEffect(() => {
+    if (!farmaciaLightbox) {
+      setFarmaciaZoomScale(1)
+      setFarmaciaZoomOffset({ x: 0, y: 0 })
+    }
+  }, [farmaciaLightbox])
+
+  const handleFarmaciaPinchStart = (e: React.TouchEvent) => {
+    if (e.touches.length === 2) {
+      const dx = e.touches[0].clientX - e.touches[1].clientX
+      const dy = e.touches[0].clientY - e.touches[1].clientY
+      farmaciaPinchRef.current = { dist: Math.hypot(dx, dy), scale: farmaciaZoomScale }
+      farmaciaDragRef.current = null
+    } else if (e.touches.length === 1 && farmaciaZoomScale > 1) {
+      farmaciaDragRef.current = { x: e.touches[0].clientX, y: e.touches[0].clientY, ox: farmaciaZoomOffset.x, oy: farmaciaZoomOffset.y }
+      farmaciaPinchRef.current = null
+    }
+  }
+
+  const handleFarmaciaPinchMove = (e: React.TouchEvent) => {
+    if (e.touches.length === 2 && farmaciaPinchRef.current) {
+      const dx = e.touches[0].clientX - e.touches[1].clientX
+      const dy = e.touches[0].clientY - e.touches[1].clientY
+      const ratio = Math.hypot(dx, dy) / farmaciaPinchRef.current.dist
+      const next = Math.min(4, Math.max(1, farmaciaPinchRef.current.scale * ratio))
+      setFarmaciaZoomScale(next)
+      if (next <= 1) setFarmaciaZoomOffset({ x: 0, y: 0 })
+    } else if (e.touches.length === 1 && farmaciaDragRef.current) {
+      setFarmaciaZoomOffset({
+        x: farmaciaDragRef.current.ox + (e.touches[0].clientX - farmaciaDragRef.current.x),
+        y: farmaciaDragRef.current.oy + (e.touches[0].clientY - farmaciaDragRef.current.y),
+      })
+    }
+  }
+
+  const handleFarmaciaPinchEnd = () => {
+    farmaciaPinchRef.current = null
+    farmaciaDragRef.current = null
   }
 
   const handlePuebloChange = (loc: string) => {
@@ -603,7 +668,7 @@ export default function InfoUtilPage({ initialCategoria, initialPueblo }: Props)
           transition={{ duration: 0.22 }}
         >
           {/* Loading skeleton */}
-          {(loading || (categoria === "transporte" && loadingTransport) || (categoria === "veterinarias" && loadingVetGuardia)) && (
+          {(loading || (categoria === "transporte" && loadingTransport) || (categoria === "veterinarias" && loadingVetGuardia) || (categoria === "farmacias" && loadingFarmaciaGuardia)) && (
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               {[1, 2, 3, 4].map(i => (
                 <div key={i} className="rounded-2xl bg-white animate-pulse h-20" style={{ border: "1px solid rgba(45,69,48,0.12)" }} />
@@ -696,6 +761,81 @@ export default function InfoUtilPage({ initialCategoria, initialPueblo }: Props)
                 </p>
               </div>
             )
+          )}
+
+          {/* Farmacias de turno — foto con cronograma por localidad */}
+          {categoria === "farmacias" && !loadingFarmaciaGuardia && farmaciaGuardiaPhoto && (
+            <>
+              <button
+                type="button"
+                onClick={() => setFarmaciaLightbox(true)}
+                className="w-full rounded-2xl overflow-hidden block active:opacity-80 transition-opacity mb-5"
+                style={{ border: "1px solid rgba(45,69,48,0.15)", boxShadow: "0 2px 12px rgba(45,69,48,0.08)" }}
+              >
+                <Image
+                  src={farmaciaGuardiaPhoto}
+                  alt={`Farmacias de turno — ${localidad}`}
+                  width={900}
+                  height={600}
+                  className="w-full h-auto object-contain bg-white"
+                  style={{ display: "block" }}
+                />
+              </button>
+
+              <AnimatePresence>
+                {farmaciaLightbox && (
+                  <motion.div
+                    className="fixed inset-0 z-[300] flex items-center justify-center p-4"
+                    style={{ background: "rgba(0,0,0,0.92)" }}
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    onClick={() => setFarmaciaLightbox(false)}
+                  >
+                    <button
+                      type="button"
+                      onClick={() => setFarmaciaLightbox(false)}
+                      className="absolute top-4 right-4 w-10 h-10 rounded-full flex items-center justify-center"
+                      style={{ background: "rgba(255,255,255,0.15)" }}
+                    >
+                      <X size={20} color="white" />
+                    </button>
+                    <motion.div
+                      initial={{ scale: 0.85 }}
+                      animate={{ scale: 1 }}
+                      exit={{ scale: 0.85 }}
+                      transition={{ type: "spring", stiffness: 300, damping: 25 }}
+                      onClick={e => e.stopPropagation()}
+                      onTouchStart={handleFarmaciaPinchStart}
+                      onTouchMove={handleFarmaciaPinchMove}
+                      onTouchEnd={handleFarmaciaPinchEnd}
+                      className="w-full max-w-2xl"
+                      style={{ touchAction: "none" }}
+                    >
+                      <div style={{
+                        transform: `translate(${farmaciaZoomOffset.x}px, ${farmaciaZoomOffset.y}px) scale(${farmaciaZoomScale})`,
+                        transformOrigin: "center center",
+                        willChange: "transform",
+                      }}>
+                        <Image
+                          src={farmaciaGuardiaPhoto}
+                          alt={`Farmacias de turno — ${localidad}`}
+                          width={1200}
+                          height={900}
+                          className="w-full h-auto rounded-xl object-contain"
+                          style={{ maxHeight: "85vh" }}
+                        />
+                      </div>
+                      {farmaciaZoomScale <= 1 && (
+                        <p className="text-center text-xs mt-3 opacity-40" style={{ color: "white" }}>
+                          Pellizcá para ampliar
+                        </p>
+                      )}
+                    </motion.div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </>
           )}
 
           {/* De turno banner */}
