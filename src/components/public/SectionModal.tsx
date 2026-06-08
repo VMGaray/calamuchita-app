@@ -46,6 +46,7 @@ const categoryIcons: Record<string, any> = {
   "Culturales": Palette, "Deportivos": Medal, "Festivales": PartyPopper,
   "Gastronomía": ChefHat, "Infantiles": Baby, "Música": Mic,
   "Cooperativas": Lightbulb, "Emergencias": AlertCircle, "Farmacias de turno": Clock3,
+  "Veterinarias de turno": Dog,
   "Municipalidad": Landmark, "Transporte": Bus, "Turismo oficial": Info,
 }
 

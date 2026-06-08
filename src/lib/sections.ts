@@ -109,6 +109,7 @@ export const sectionCategories = {
     { label: "Cooperativas", desc: "Luz, agua y gas", href: "/info-util?categoria=cooperativas", bg: "bg-brand-slate/10", color: "text-brand-slate" },
     { label: "Emergencias", desc: "Bomberos, policía, SAME", href: "/info-util?categoria=emergencias", bg: "bg-brand-earth/10", color: "text-brand-earth" },
     { label: "Farmacias de turno", desc: "Guardia 24hs", href: "/info-util?categoria=farmacias", bg: "bg-brand-pine/10", color: "text-brand-pine" },
+    { label: "Veterinarias de turno", desc: "Guardia veterinaria", href: "/info-util?categoria=veterinarias", bg: "bg-brand-earth/10", color: "text-brand-earth" },
     { label: "Municipalidad", desc: "Trámites y contacto", href: "/info-util?categoria=municipalidad", bg: "bg-brand-pine/10", color: "text-brand-pine" },
     { label: "Transporte", desc: "Horarios de buses", href: "/info-util?categoria=transporte", bg: "bg-brand-slate/10", color: "text-brand-slate" },
     { label: "Turismo oficial", desc: "Oficinas de turismo", href: "/info-util?categoria=turismo", bg: "bg-brand-pine/10", color: "text-brand-pine" },
