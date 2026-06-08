@@ -321,6 +321,8 @@ export default function InfoUtilPage({ initialCategoria, initialPueblo }: Props)
   const searchParams = useSearchParams()
   const [showAll, setShowAll] = useState(false)
   const syncedRef = useRef(false)
+  const vetPinchRef = useRef<{ dist: number; scale: number } | null>(null)
+  const vetDragRef = useRef<{ x: number; y: number; ox: number; oy: number } | null>(null)
 
   const [contacts, setContacts] = useState<DBService[]>([])
   const [dbLocalities, setDbLocalities] = useState<DBLocality[]>([])
@@ -330,6 +332,8 @@ export default function InfoUtilPage({ initialCategoria, initialPueblo }: Props)
   const [vetGuardiaPhoto, setVetGuardiaPhoto] = useState<string | null>(null)
   const [loadingVetGuardia, setLoadingVetGuardia] = useState(false)
   const [vetLightbox, setVetLightbox] = useState(false)
+  const [vetZoomScale, setVetZoomScale] = useState(1)
+  const [vetZoomOffset, setVetZoomOffset] = useState({ x: 0, y: 0 })
 
   // Fetch localities once
   useEffect(() => {
@@ -410,6 +414,46 @@ export default function InfoUtilPage({ initialCategoria, initialPueblo }: Props)
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
+
+  useEffect(() => {
+    if (!vetLightbox) {
+      setVetZoomScale(1)
+      setVetZoomOffset({ x: 0, y: 0 })
+    }
+  }, [vetLightbox])
+
+  const handleVetPinchStart = (e: React.TouchEvent) => {
+    if (e.touches.length === 2) {
+      const dx = e.touches[0].clientX - e.touches[1].clientX
+      const dy = e.touches[0].clientY - e.touches[1].clientY
+      vetPinchRef.current = { dist: Math.hypot(dx, dy), scale: vetZoomScale }
+      vetDragRef.current = null
+    } else if (e.touches.length === 1 && vetZoomScale > 1) {
+      vetDragRef.current = { x: e.touches[0].clientX, y: e.touches[0].clientY, ox: vetZoomOffset.x, oy: vetZoomOffset.y }
+      vetPinchRef.current = null
+    }
+  }
+
+  const handleVetPinchMove = (e: React.TouchEvent) => {
+    if (e.touches.length === 2 && vetPinchRef.current) {
+      const dx = e.touches[0].clientX - e.touches[1].clientX
+      const dy = e.touches[0].clientY - e.touches[1].clientY
+      const ratio = Math.hypot(dx, dy) / vetPinchRef.current.dist
+      const next = Math.min(4, Math.max(1, vetPinchRef.current.scale * ratio))
+      setVetZoomScale(next)
+      if (next <= 1) setVetZoomOffset({ x: 0, y: 0 })
+    } else if (e.touches.length === 1 && vetDragRef.current) {
+      setVetZoomOffset({
+        x: vetDragRef.current.ox + (e.touches[0].clientX - vetDragRef.current.x),
+        y: vetDragRef.current.oy + (e.touches[0].clientY - vetDragRef.current.y),
+      })
+    }
+  }
+
+  const handleVetPinchEnd = () => {
+    vetPinchRef.current = null
+    vetDragRef.current = null
+  }
 
   const handlePuebloChange = (loc: string) => {
     setLocalidad(loc)
@@ -611,16 +655,31 @@ export default function InfoUtilPage({ initialCategoria, initialPueblo }: Props)
                         exit={{ scale: 0.85 }}
                         transition={{ type: "spring", stiffness: 300, damping: 25 }}
                         onClick={e => e.stopPropagation()}
+                        onTouchStart={handleVetPinchStart}
+                        onTouchMove={handleVetPinchMove}
+                        onTouchEnd={handleVetPinchEnd}
                         className="w-full max-w-2xl"
+                        style={{ touchAction: "none" }}
                       >
-                        <Image
-                          src={vetGuardiaPhoto}
-                          alt="Guardia de veterinarias — Valle de Calamuchita"
-                          width={1200}
-                          height={900}
-                          className="w-full h-auto rounded-xl object-contain"
-                          style={{ maxHeight: "85vh" }}
-                        />
+                        <div style={{
+                          transform: `translate(${vetZoomOffset.x}px, ${vetZoomOffset.y}px) scale(${vetZoomScale})`,
+                          transformOrigin: "center center",
+                          willChange: "transform",
+                        }}>
+                          <Image
+                            src={vetGuardiaPhoto}
+                            alt="Guardia de veterinarias — Valle de Calamuchita"
+                            width={1200}
+                            height={900}
+                            className="w-full h-auto rounded-xl object-contain"
+                            style={{ maxHeight: "85vh" }}
+                          />
+                        </div>
+                        {vetZoomScale <= 1 && (
+                          <p className="text-center text-xs mt-3 opacity-40" style={{ color: "white" }}>
+                            Pellizcá para ampliar
+                          </p>
+                        )}
                       </motion.div>
                     </motion.div>
                   )}
