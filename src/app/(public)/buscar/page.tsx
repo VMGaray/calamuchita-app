@@ -1,6 +1,8 @@
 import BuscarResults from "@/components/public/BuscarResults"
 import { createClient } from "@/lib/supabase/server"
 
+export const dynamic = "force-dynamic"
+
 interface Props {
   searchParams: Promise<{ q?: string }>
 }
