@@ -40,7 +40,7 @@ function FeaturedCard({ biz }: { biz: FeaturedBusiness }) {
       style={{ width: CARD_W }}
     >
       <Link
-        href={biz.section === "gastronomy" ? `/negocios/${biz.slug}` : `/directorio/${biz.section}/${biz.slug}`}
+        href={biz.section === "gastronomy" ? `/negocios/${biz.slug}?from=/` : `/directorio/${biz.section}/${biz.slug}?from=/`}
         className="block w-full"
       >
         <div className="w-full aspect-[4/3] relative overflow-hidden rounded-[40px] bg-[#2D4530] shadow-2xl">

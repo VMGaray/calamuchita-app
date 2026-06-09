@@ -1,7 +1,7 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { useSearchParams } from "next/navigation"
+import { useSearchParams, useRouter } from "next/navigation"
 import Image from "next/image"
 import Link from "next/link"
 import BackButton from "@/components/ui/BackButton"
@@ -136,6 +136,7 @@ interface Props {
 
 export default function DirectorioDetalle({ business, section, promotions = [] }: Props) {
   const searchParams = useSearchParams()
+  const router = useRouter()
   const from = searchParams.get("from")
 
   // Fotos desde business_photos (tabla relacionada), ordenadas por sort_order, máx 3
@@ -216,16 +217,25 @@ export default function DirectorioDetalle({ business, section, promotions = [] }
   }
 
   return (
-    <div className="min-h-screen pb-24" style={{ background: "#F0EBE0" }}>
+    <div className="relative z-[110] min-h-screen pb-24" style={{ background: "#F0EBE0" }}>
       <div className="max-w-2xl mx-auto px-4 flex flex-col gap-y-4 pt-5">
 
         {/* 1 ── Volver ──────────────────────────────────────────────────── */}
-        <BackButton
-          fallbackHref={from ?? `/directorio/${section}`}
-          label={from === "/destacados" ? "Destacados" : (SECTION_TITLES[section] ?? "Volver")}
-          className="text-sm font-medium w-fit"
+        <button
+          onClick={(e) => {
+            e.preventDefault()
+            if (from === "/destacados") {
+              router.push("/#destacados")
+            } else {
+              router.push(`/directorio/${section}`)
+            }
+          }}
+          className="relative z-[310] text-sm font-medium w-fit flex items-center gap-2 hover:opacity-80 transition-opacity mb-2"
           style={{ color: "#2D4530" }}
-        />
+        >
+          <ArrowLeft size={16} />
+          <span>{from === "/destacados" ? "Destacados" : (SECTION_TITLES[section] ?? "Volver")}</span>
+        </button>
 
         {/* 2 ═══════════════════════════════════════════════════════════════
             BLOQUE 1 — MARCA + INFORMACIÓN

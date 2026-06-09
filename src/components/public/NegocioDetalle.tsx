@@ -1,7 +1,7 @@
 "use client"
 
 import { useEffect, useRef, useState } from "react"
-import { useSearchParams } from "next/navigation"
+import { useSearchParams, useRouter } from "next/navigation"
 import { motion, AnimatePresence } from "framer-motion"
 import {
   Phone,
@@ -113,6 +113,7 @@ interface Props {
 
 export default function NegocioDetalle({ business, promotions = [] }: Props) {
   const searchParams = useSearchParams()
+  const router = useRouter()
   const from = searchParams.get("from")
   const cartaRef = useRef<HTMLDivElement>(null)
   const [photoIdx, setPhotoIdx] = useState(0)
@@ -265,15 +266,25 @@ export default function NegocioDetalle({ business, promotions = [] }: Props) {
   const hasActions = waLink || business.phone
 
   return (
-    <div className="min-h-screen pb-24" style={{ background: "#F0EBE0" }}>
+    <div className="relative z-[110] min-h-screen pb-24" style={{ background: "#F0EBE0" }}>
       <div className="max-w-2xl mx-auto px-4 flex flex-col gap-y-4 pt-5">
 
-        <BackButton
-          fallbackHref={from ?? "/negocios"}
-          label={from === "/destacados" ? "Destacados" : "Volver"}
-          className="text-sm font-medium w-fit"
+        <button
+          onClick={(e) => {
+            e.preventDefault()
+            if (from === "/destacados") {
+              router.push("/#destacados")
+            } else {
+              const targetSection = business?.section || "services"
+              router.push(`/directorio/${targetSection}`)
+            }
+          }}
+          className="relative z-[310] text-sm font-medium w-fit flex items-center gap-2 hover:opacity-80 transition-opacity mb-2"
           style={{ color: "#2D4530" }}
-        />
+        >
+          <ArrowLeft size={16} />
+          <span>{from === "/destacados" ? "Destacados" : "Volver"}</span>
+        </button>
 
         {/* CONTENEDOR INFORMACIÓN */}
         <div className="bg-white rounded-3xl border border-stone-100 shadow-sm overflow-hidden">

@@ -18,8 +18,9 @@ export default function BackButton({
 }: Props) {
   const router = useRouter()
 
-  const handleBack = () => {
-    if (window.history.length > 1) {
+  const handleBack = (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault()
+    if (typeof window !== "undefined" && window.history.length > 1) {
       router.back()
     } else {
       router.push(fallbackHref)
