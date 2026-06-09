@@ -36,7 +36,7 @@ const SUBCAT_LABELS: Record<string, string> = {
   fletes:        "Fletes",
   gasista:       "Gasista",
   herrero:       "Herrero",
-  jardinero:     "Jardinero",
+  jardinero:     "Paisajismo y Jardines",
   limpieza:      "Limpieza",
   mecanica:      "Mecánica",
   movimiento:    "Movimiento de suelos",

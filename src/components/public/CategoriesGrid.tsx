@@ -21,7 +21,7 @@ const categoryIcons: Record<string, any> = {
   "Bares": Beer, "Delivery": Bike, "Abierto ahora": Clock, "Varios": MoreHorizontal,
   "Plomería": Wrench, "Electricidad": Zap, "Gasista": Flame,
   "Mecánica": Car, "Construcción": Building, "Pintor": Paintbrush,
-  "Herrero": Hammer, "Cerrajero": KeyRound, "Jardinero": Leaf,
+  "Herrero": Hammer, "Cerrajero": KeyRound, "Paisajismo y Jardines": Leaf,
   "Piletero": Waves, "Zinguero": Home, "Desinfecciones": Bug,
   "Perforaciones": Droplets, "Limpieza": Sparkles,
   "Clínicas y Consultorios": Stethoscope, "Farmacias": Pill,

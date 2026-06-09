@@ -24,7 +24,7 @@ const categoryIcons: Record<string, any> = {
   "Delivery": Bike, "Take Away": Package, "Abierto ahora": Clock,
   "Alarmas-Seguridad": Shield, "Cerrajero": KeyRound, "Construcción": Building,
   "Fletes": Truck, "Movimiento de suelos": HardHat, "Venta de áridos": Mountain, "Desinfecciones": Bug,
-  "Electricidad": Zap, "Gasista": Flame, "Herrero": Hammer, "Jardinero": Leaf,
+  "Electricidad": Zap, "Gasista": Flame, "Herrero": Hammer, "Paisajismo y Jardines": Leaf,
   "Limpieza": Sparkles, "Mecánica": Car, "Perforaciones": Droplets, "Piletero": Waves,
   "Pintor": Paintbrush, "Plomería": Wrench, "Zinguero": Home, "Profesionales": Briefcase, "Carteles tallados": Tag,
   "Costurera/Modista": Scissors, "Traslados": Car,

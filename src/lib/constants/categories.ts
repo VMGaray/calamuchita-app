@@ -34,7 +34,7 @@ export const MASTER_CATEGORIES = {
       { label: "Gasista", icon: Flame, bg: "bg-orange-50", color: "text-orange-600" },
       { label: "Herrero", icon: Hammer, bg: "bg-zinc-50", color: "text-zinc-600" },
       { label: "Impermeabilizaciones", icon: Waves, bg: "bg-teal-50", color: "text-teal-700" },
-      { label: "Jardinero", icon: Leaf, bg: "bg-green-50", color: "text-green-600" },
+      { label: "Paisajismo y Jardines", icon: Leaf, bg: "bg-green-50", color: "text-green-600" },
       { label: "Limpieza", icon: Sparkles, bg: "bg-teal-50", color: "text-teal-600" },
       { label: "Mecánica", icon: Car, bg: "bg-stone-50", color: "text-stone-600" },
       { label: "Movimiento de suelos", icon: HardHat, bg: "bg-yellow-50", color: "text-yellow-700" },
