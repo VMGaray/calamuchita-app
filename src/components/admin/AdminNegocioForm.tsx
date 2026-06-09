@@ -67,9 +67,9 @@ interface Professional {
 }
 
 const ESPECIALIDADES_SUGERIDAS = [
-  "Cardiología", "Clínica médica", "Dermatología", "Ginecología",
-  "Kinesiología", "Neurología", "Nutrición", "Odontología",
-  "Oftalmología", "Pediatría", "Psicología", "Traumatología",
+  "Cardiología", "Clínica médica", "Dermatología", "Fonoaudiología",
+  "Ginecología", "Kinesiología", "Neurología", "Nutrición", "Nutricionista",
+  "Odontología", "Oftalmología", "Pediatría", "Psicopedagogía", "Psicología", "Traumatología",
 ]
 
 const pueblos = [

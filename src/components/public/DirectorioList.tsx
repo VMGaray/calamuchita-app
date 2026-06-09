@@ -28,6 +28,7 @@ interface Business {
   cover_url: string | null
   description: string | null
   is_premium: boolean
+  medical_specialties: string[] | null
 }
 
 interface ClinicProfessional {
@@ -211,7 +212,7 @@ export default function DirectorioList({ section, filters }: Props) {
       const supabase = createClient()
       let query = supabase
         .from("businesses")
-        .select("id, name, slug, subcategory, address, pueblo, phone, whatsapp, instagram, logo_url, cover_url, description, is_premium")
+        .select("id, name, slug, subcategory, address, pueblo, phone, whatsapp, instagram, logo_url, cover_url, description, is_premium, medical_specialties")
         .eq("status", "active")
         .eq("section", section)
 
@@ -538,12 +539,17 @@ export default function DirectorioList({ section, filters }: Props) {
 
                       {/* min-h-[24px] reserva la fila de badge aunque subcategory sea null */}
                       <div className="min-h-[24px]">
-                        {business.subcategory && (
+                        {(section === "health"
+                          ? (business.medical_specialties?.[0] ?? business.subcategory)
+                          : business.subcategory
+                        ) && (
                           <span
                             className="inline-block text-[10px] font-semibold px-2 py-0.5 rounded-full mb-2 uppercase tracking-wide"
                             style={{ background: "rgba(45,69,48,0.10)", color: "#2D4530" }}
                           >
-                            {business.subcategory}
+                            {section === "health"
+                              ? (business.medical_specialties?.[0] ?? business.subcategory)
+                              : business.subcategory}
                           </span>
                         )}
                       </div>
