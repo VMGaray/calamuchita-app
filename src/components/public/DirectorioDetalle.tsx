@@ -217,25 +217,18 @@ export default function DirectorioDetalle({ business, section, promotions = [] }
   }
 
   return (
-    <div className="relative z-[110] min-h-screen pb-24" style={{ background: "#F0EBE0" }}>
+    <div className="isolate relative z-[200] min-h-screen pb-24" style={{ background: "#F0EBE0" }}>
       <div className="max-w-2xl mx-auto px-4 flex flex-col gap-y-4 pt-5">
 
         {/* 1 ── Volver ──────────────────────────────────────────────────── */}
-        <button
-          onClick={(e) => {
-            e.preventDefault()
-            if (from === "/destacados") {
-              router.push("/#destacados")
-            } else {
-              router.push(`/directorio/${section}`)
-            }
-          }}
-          className="relative z-[310] text-sm font-medium w-fit flex items-center gap-2 hover:opacity-80 transition-opacity mb-2"
+        <a
+          href={from === "/destacados" ? "/#destacados" : `/directorio/${section || business?.section || "services"}`}
+          className="text-sm font-medium w-fit flex items-center gap-2 hover:opacity-80 transition-opacity"
           style={{ color: "#2D4530" }}
         >
           <ArrowLeft size={16} />
           <span>{from === "/destacados" ? "Destacados" : (SECTION_TITLES[section] ?? "Volver")}</span>
-        </button>
+        </a>
 
         {/* 2 ═══════════════════════════════════════════════════════════════
             BLOQUE 1 — MARCA + INFORMACIÓN
