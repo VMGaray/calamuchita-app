@@ -4,63 +4,34 @@ import { useEffect, useRef, useState } from "react"
 import { useSearchParams, useRouter } from "next/navigation"
 import { motion, AnimatePresence } from "framer-motion"
 import {
-  Phone,
-  AtSign,
-  MapPin,
-  Clock,
-  Truck,
-  ShoppingBag,
-  UtensilsCrossed,
-  ArrowLeft,
-  Calendar,
-  Globe,
-  Navigation,
-  ChevronLeft,
-  ChevronRight,
-  X,
-  Users,
-  Tag,
-  Share2,
+  Phone, AtSign, MapPin, Clock, Truck, ShoppingBag,
+  UtensilsCrossed, ArrowLeft, Calendar, Globe,
+  Navigation, ChevronLeft, ChevronRight, X, Users, Tag, Share2,
 } from "lucide-react"
-import Link from "next/link"
 import Image from "next/image"
 import CartaInteractiva from "@/components/public/CartaInteractiva"
 import { createClient } from "@/lib/supabase/client"
 import { normalizeArgPhone } from "@/lib/phone"
-import BackButton from "@/components/ui/BackButton"
 
 const DAY = ["Domingo", "Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado"]
 const GUEST_KEY = "calamuchita_app_guest"
 
-interface GuestDetails {
-  name: string
-  phone: string
+interface GuestDetails { name: string; phone: string }
+interface ReservaForm extends GuestDetails { date: string; time: string; people: string; notes: string }
+
+const EMPTY_FORM: ReservaForm = { name: "", phone: "", date: "", time: "", people: "2", notes: "" }
+
+function WaIcon({ size = 14 }: { size?: number }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="currentColor" aria-hidden>
+      <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z" />
+    </svg>
+  )
 }
 
-interface ReservaForm extends GuestDetails {
-  date: string
-  time: string
-  people: string
-  notes: string
-}
-
-const EMPTY_FORM: ReservaForm = {
-  name: "",
-  phone: "",
-  date: "",
-  time: "",
-  people: "2",
-  notes: "",
-}
-
-const WA_SVG = (
-  <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
-    <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z" />
-    <path d="M12 0C5.373 0 0 5.373 0 12c0 2.123.554 4.118 1.526 5.845L.057 23.545a.75.75 0 0 0 .921.921l5.701-1.469A11.945 11.945 0 0 0 12 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.75a9.695 9.695 0 0 1-4.964-1.366l-.355-.212-3.686.949.969-3.682-.231-.366A9.712 9.712 0 0 1 2.25 12C2.25 6.615 6.615 2.25 12 2.25S21.75 6.615 21.75 12 17.385 21.75 12 21.75z" />
-  </svg>
-)
-
-function InfoRow({ icon, sublabel, label, href, external }: { icon: React.ReactNode; sublabel: string; label: string; href?: string; external?: boolean }) {
+function InfoRow({ icon, sublabel, label, href, external }: {
+  icon: React.ReactNode; sublabel: string; label: string; href?: string; external?: boolean
+}) {
   const inner = (
     <div className="flex items-start gap-3 py-3 border-b border-stone-100 last:border-0">
       <div className="w-8 h-8 rounded-lg bg-stone-50 border border-stone-100 flex items-center justify-center shrink-0 mt-0.5">
@@ -68,23 +39,16 @@ function InfoRow({ icon, sublabel, label, href, external }: { icon: React.ReactN
       </div>
       <div className="min-w-0 flex-1">
         <p className="text-[10px] font-bold uppercase tracking-wider text-stone-400 mb-0.5">{sublabel}</p>
-        <p className="text-sm font-semibold text-[#2D4530] leading-snug break-words">{label}</p>
+        <p className="text-sm font-semibold leading-snug break-words" style={{ color: "#2D4530" }}>{label}</p>
       </div>
     </div>
   )
-  if (href) {
-    return (
-      <a href={href} target={external ? "_blank" : undefined} rel={external ? "noopener noreferrer" : undefined} className="block hover:opacity-70 transition-opacity">
-        {inner}
-      </a>
-    )
-  }
+  if (href) return (
+    <a href={href} target={external ? "_blank" : undefined} rel={external ? "noopener noreferrer" : undefined} className="block hover:opacity-70 transition-opacity">{inner}</a>
+  )
   return inner
 }
 
-// Verifica si el negocio está abierto AHORA según sus horarios reales.
-// Soporta horario cortado: múltiples filas para el mismo día (ej. 08–14 y 17–00).
-// Usa la zona horaria de Argentina (America/Argentina/Buenos_Aires) sin importar dónde esté el visitante.
 function calcIsOpenNow(hours: any[]): boolean {
   if (!hours || hours.length === 0) return false
   const arDate = new Date(new Date().toLocaleString("en-US", { timeZone: "America/Argentina/Buenos_Aires" }))
@@ -92,36 +56,27 @@ function calcIsOpenNow(hours: any[]): boolean {
   const hhmm = `${String(arDate.getHours()).padStart(2, "0")}:${String(arDate.getMinutes()).padStart(2, "0")}`
   const todayShifts = hours.filter((h: any) => h.day_of_week === day && !h.is_closed)
   if (todayShifts.length === 0) return false
-  return todayShifts.some(
-    (h: any) => hhmm >= h.opens_at.slice(0, 5) && hhmm < h.closes_at.slice(0, 5),
-  )
+  return todayShifts.some((h: any) => hhmm >= h.opens_at.slice(0, 5) && hhmm < h.closes_at.slice(0, 5))
 }
 
 interface Promotion {
-  id: string
-  title: string
-  description: string | null
-  discount_percentage: number | null
-  discount_label: string | null
-  valid_until: string | null
+  id: string; title: string; description: string | null
+  discount_percentage: number | null; discount_label: string | null; valid_until: string | null
 }
 
-interface Props {
-  business: any
-  promotions?: Promotion[]
-}
+interface Props { business: any; promotions?: Promotion[] }
 
 export default function NegocioDetalle({ business, promotions = [] }: Props) {
   const searchParams = useSearchParams()
-  const router = useRouter()
   const from = searchParams.get("from")
   const cartaRef = useRef<HTMLDivElement>(null)
-  const [photoIdx, setPhotoIdx] = useState(0)
-  const [lightboxIdx, setLightboxIdx] = useState<number | null>(null)
-  const [lightboxSrc, setLightboxSrc] = useState<string | null>(null)
+
+  const [photoIdx,       setPhotoIdx]       = useState(0)
+  const [lightboxIdx,    setLightboxIdx]    = useState<number | null>(null)
+  const [lightboxSrc,    setLightboxSrc]    = useState<string | null>(null)
   const [lightboxTouchX, setLightboxTouchX] = useState<number | null>(null)
-  const [showReserva, setShowReserva] = useState(false)
-  const [reservaForm, setReservaForm] = useState<ReservaForm>(EMPTY_FORM)
+  const [showReserva,    setShowReserva]    = useState(false)
+  const [reservaForm,    setReservaForm]    = useState<ReservaForm>(EMPTY_FORM)
 
   useEffect(() => {
     if (lightboxIdx === null && !lightboxSrc) return
@@ -130,103 +85,64 @@ export default function NegocioDetalle({ business, promotions = [] }: Props) {
     return () => window.removeEventListener("keydown", onKey)
   }, [lightboxIdx, lightboxSrc])
 
-  // 1. Cargar desde localStorage en Mount de forma segura para SSR
   useEffect(() => {
     createClient().rpc("increment_view", { business_id: business.id }).then()
-    
     try {
       const stored = localStorage.getItem(GUEST_KEY)
       if (stored) {
         const parsed: Partial<GuestDetails> = JSON.parse(stored)
-        setReservaForm(prev => ({
-          ...prev,
-          name: parsed.name || "",
-          phone: parsed.phone || "",
-        }))
+        setReservaForm(prev => ({ ...prev, name: parsed.name || "", phone: parsed.phone || "" }))
       }
-    } catch (e) {
-      console.warn("localStorage no disponible o bloqueado por el navegador.", e)
-    }
+    } catch (e) { console.warn("localStorage no disponible.", e) }
   }, [business.id])
 
   const recordLead = (type: string) =>
     createClient().from("business_leads").insert({ business_id: business.id, type }).then()
 
-  const waNumber = normalizeArgPhone(business.whatsapp || business.phone || "")
-  const waLink = waNumber
+  const waNumber  = normalizeArgPhone(business.whatsapp || business.phone || "")
+  const waLink    = waNumber
     ? `https://wa.me/${waNumber}?text=${encodeURIComponent(`Hola! Me contacto desde Calamuchita App por el negocio ${business.name}.`)}`
     : null
 
-  const hasMenu = (business.menu_categories?.length ?? 0) > 0
-
+  const hasMenu   = (business.menu_categories?.length ?? 0) > 0
   const todayMenu = business.daily_menus?.find((m: any) => {
     const today = new Date().toISOString().split("T")[0]
     return m.date === today && m.is_published
   })
 
-  const handleVerCarta = () => cartaRef.current?.scrollIntoView({ behavior: "smooth", block: "start" })
-
+  const handleVerCarta  = () => cartaRef.current?.scrollIntoView({ behavior: "smooth", block: "start" })
   const handleHacerPedido = () => {
-    if (hasMenu) {
-      cartaRef.current?.scrollIntoView({ behavior: "smooth", block: "start" })
-    } else if (waNumber) {
+    if (hasMenu) { cartaRef.current?.scrollIntoView({ behavior: "smooth", block: "start" }) }
+    else if (waNumber) {
       recordLead("whatsapp")
-      window.open(
-        `https://wa.me/${waNumber}?text=${encodeURIComponent(`Hola ${business.name}! Quiero hacer un pedido. ¿Me compartís el menú disponible? Gracias!`)}`,
-        "_blank",
-      )
+      window.open(`https://wa.me/${waNumber}?text=${encodeURIComponent(`Hola ${business.name}! Quiero hacer un pedido. ¿Me compartís el menú disponible? Gracias!`)}`, "_blank")
     }
   }
 
-  // 2. Enviar Reserva y Persistir Datos Express
   const handleEnviarReserva = () => {
     recordLead("reserva")
-    
-    // Guardar datos básicos en localStorage para la próxima vez
-    try {
-      localStorage.setItem(GUEST_KEY, JSON.stringify({ name: reservaForm.name, phone: reservaForm.phone }))
-    } catch (e) {
-      console.error(e)
-    }
-
-    const fullPhone = normalizeArgPhone((business.whatsapp || business.phone) || "")
-    
-    const numPeople = parseInt(reservaForm.people, 10)
+    try { localStorage.setItem(GUEST_KEY, JSON.stringify({ name: reservaForm.name, phone: reservaForm.phone })) } catch (e) { console.error(e) }
+    const fullPhone  = normalizeArgPhone((business.whatsapp || business.phone) || "")
+    const numPeople  = parseInt(reservaForm.people, 10)
     const labelPeople = isNaN(numPeople) ? "más de 10" : numPeople === 1 ? "1 persona" : `${numPeople} personas`
-
     const msg = encodeURIComponent(
-      `🌿 ¡Hola *${business.name}*! 👋\n` +
-      `Vengo desde *Calamuchita App* para realizar una solicitud:\n\n` +
-      `📌 *DETALLES DE LA RESERVA:*\n` +
-      `👤 *Cliente:* ${reservaForm.name.trim()}\n` +
-      `📞 *Teléfono:* ${reservaForm.phone.trim()}\n` +
-      `📅 *Fecha:* ${reservaForm.date}\n` +
-      `🕐 *Hora:* ${reservaForm.time} hs\n` +
-      `👥 *Comensales:* ${labelPeople}\n\n` +
-      `📝 *Notas adicionales:*\n${reservaForm.notes.trim() || "Ninguna"}\n\n` +
-      `¡Muchas gracias!`
+      `🌿 ¡Hola *${business.name}*! 👋\nVengo desde *Calamuchita App* para realizar una solicitud:\n\n` +
+      `📌 *DETALLES DE LA RESERVA:*\n👤 *Cliente:* ${reservaForm.name.trim()}\n📞 *Teléfono:* ${reservaForm.phone.trim()}\n` +
+      `📅 *Fecha:* ${reservaForm.date}\n🕐 *Hora:* ${reservaForm.time} hs\n👥 *Comensales:* ${labelPeople}\n\n` +
+      `📝 *Notas adicionales:*\n${reservaForm.notes.trim() || "Ninguna"}\n\n¡Muchas gracias!`
     )
-    
     window.open(`https://wa.me/${fullPhone}?text=${msg}`, "_blank")
     setShowReserva(false)
-    
-    // Al cerrar limpiamos campos dinámicos pero PRESERVAMOS los datos del cliente
-    setReservaForm(prev => ({
-      ...prev,
-      date: "",
-      time: "",
-      notes: "",
-    }))
+    setReservaForm(prev => ({ ...prev, date: "", time: "", notes: "" }))
   }
 
-  // Validación robusta sin espacios en blanco colgados
-  const reservaValid = 
-    reservaForm.name.trim().length > 0 && 
-    reservaForm.phone.trim().length > 0 && 
-    reservaForm.date !== "" && 
+  const reservaValid =
+    reservaForm.name.trim().length > 0 &&
+    reservaForm.phone.trim().length > 0 &&
+    reservaForm.date !== "" &&
     reservaForm.time !== ""
 
-  const mapsExternalLink =
+  const mapsLink =
     business.latitude && business.longitude
       ? `https://www.google.com/maps/search/?api=1&query=${business.latitude},${business.longitude}`
       : typeof business.address === "string" && business.address.trim()
@@ -236,96 +152,155 @@ export default function NegocioDetalle({ business, promotions = [] }: Props) {
   const photos: string[] =
     Array.isArray(business.business_photos) && business.business_photos.length > 0
       ? business.business_photos.map((p: { url: string }) => p.url)
-      : business.cover_url
-      ? [business.cover_url]
-      : []
+      : business.cover_url ? [business.cover_url] : []
 
-  const prevPhoto = () => setPhotoIdx(i => (i - 1 + photos.length) % photos.length)
-  const nextPhoto = () => setPhotoIdx(i => (i + 1) % photos.length)
-
+  const coverUrl     = photos[0] || null
+  const prevPhoto    = () => setPhotoIdx(i => (i - 1 + photos.length) % photos.length)
+  const nextPhoto    = () => setPhotoIdx(i => (i + 1) % photos.length)
   const categoryLabel = business.subcategory || business.category || "Comercio"
+  const isOpen        = calcIsOpenNow(business.business_hours ?? [])
 
-  // Estado abierto/cerrado calculado en tiempo real (soporta horario cortado)
-  const isOpen = calcIsOpenNow(business.business_hours ?? [])
-
-  // Agrupar turnos por día para renderizar una sola fila por día aunque haya split-shift
   const todayIdx = new Date(new Date().toLocaleString("en-US", { timeZone: "America/Argentina/Buenos_Aires" })).getDay()
   const hoursByDay = new Map<number, any[]>()
-  for (const h of [...(business.business_hours ?? [])].sort(
-    (a: any, b: any) => a.day_of_week - b.day_of_week,
-  )) {
-    const arr = hoursByDay.get(h.day_of_week) ?? []
-    arr.push(h)
-    hoursByDay.set(h.day_of_week, arr)
+  for (const h of [...(business.business_hours ?? [])].sort((a: any, b: any) => a.day_of_week - b.day_of_week)) {
+    const arr = hoursByDay.get(h.day_of_week) ?? []; arr.push(h); hoursByDay.set(h.day_of_week, arr)
   }
 
-  const instagramHandle = business.instagram
-    ?.replace(/^@|https?:\/\/(www\.)?instagram\.com\//g, "")
-    .replace(/\/$/, "")
+  const instagramHandle = business.instagram?.replace(/^@|https?:\/\/(www\.)?instagram\.com\//g, "").replace(/\/$/, "")
+  const backHref  = from === "/destacados" ? "/#destacados" : `/directorio/${business?.section || "services"}`
+  const backLabel = from === "/destacados" ? "Destacados" : "Volver"
 
-  const hasActions = waLink || business.phone
+  const hasBottomActions = waLink || business.phone || mapsLink
 
   return (
-    <div className="isolate relative z-[200] min-h-screen pb-24" style={{ background: "#F0EBE0" }}>
-      <div className="max-w-2xl mx-auto px-4 flex flex-col gap-y-4 pt-16">
+    <div className="relative min-h-screen" style={{ background: "#F0EBE0" }}>
 
-        <a
-          href={from === "/destacados" ? "/#destacados" : `/directorio/${business?.section || "services"}`}
-          className="text-sm font-medium w-fit flex items-center gap-2 hover:opacity-70 transition-opacity"
-          style={{ color: "#2D4530" }}
-        >
-          <ArrowLeft size={16} />
-          <span>{from === "/destacados" ? "Destacados" : "Volver"}</span>
-        </a>
-
-        {/* CONTENEDOR INFORMACIÓN */}
-        <div className="bg-white rounded-3xl border border-stone-100 shadow-sm overflow-hidden">
-          <div className="px-6 pt-6 pb-5 border-b border-stone-100">
-            <div className="flex items-start gap-4">
-              <div className="flex-1 min-w-0">
-                <h1 className="text-2xl md:text-3xl font-bold leading-tight mb-3 tracking-tight" style={{ color: "#2D4530" }}>
-                  {business.name}
-                </h1>
-                <div className="flex items-center gap-2 flex-wrap min-h-[28px]">
-                  <span className="text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-wider" style={{ background: "rgba(45,69,48,0.10)", color: "#2D4530" }}>
-                    {categoryLabel}
-                  </span>
-                  <span className={`text-[10px] font-bold px-3 py-1 rounded-full flex items-center gap-1.5 ${isOpen ? "text-green-700 bg-green-50 border border-green-200" : "text-stone-500 bg-stone-100"}`}>
-                    <span className={`w-1.5 h-1.5 rounded-full inline-block ${isOpen ? "bg-green-500" : "bg-stone-400"}`} />
-                    {isOpen ? "Abierto ahora" : "Cerrado"}
-                  </span>
-                </div>
+      {/* ═══════════════════════════════════════════════════════════════
+          1 — PORTADA FULL-WIDTH
+      ═══════════════════════════════════════════════════════════════ */}
+      <div className="relative w-full h-64 sm:h-72 overflow-hidden bg-stone-200">
+        {coverUrl ? (
+          <Image
+            src={coverUrl} alt={business.name} fill priority
+            className="object-cover" sizes="100vw" quality={85}
+          />
+        ) : (
+          <div className="w-full h-full flex items-center justify-center"
+            style={{ background: "linear-gradient(135deg, #2D4530 0%, #4A6741 55%, #3D5C3A 100%)" }}>
+            {business.logo_url && (
+              <div className="relative w-28 h-28 opacity-20">
+                <Image src={business.logo_url} alt="" fill className="object-contain" sizes="112px" />
               </div>
+            )}
+          </div>
+        )}
+        {/* Gradiente superior para botón volver */}
+        <div className="absolute inset-x-0 top-0 h-28 bg-gradient-to-b from-black/45 to-transparent pointer-events-none" />
+        {/* Gradiente inferior para transición suave */}
+        <div className="absolute inset-x-0 bottom-0 h-20 bg-gradient-to-t from-[#F0EBE0] to-transparent pointer-events-none" />
 
-              {business.logo_url && (
-                <button
-                  onClick={() => setLightboxSrc(business.logo_url)}
-                  className="w-24 h-24 rounded-xl bg-white border border-stone-100 shadow-sm p-2 shrink-0 relative overflow-hidden cursor-zoom-in hover:ring-2 hover:ring-[#2D4530]/30 transition-all"
-                  aria-label="Ampliar logo"
+        {/* Botón volver — flota sobre la imagen */}
+        <a
+          href={backHref}
+          className="absolute top-20 left-4 z-10 flex items-center gap-2 px-3 py-2 rounded-full text-sm font-semibold text-white transition-opacity hover:opacity-80 active:opacity-60"
+          style={{ background: "rgba(0,0,0,0.28)", backdropFilter: "blur(8px)", WebkitBackdropFilter: "blur(8px)" }}
+        >
+          <ArrowLeft size={15} strokeWidth={2.5} />
+          <span>{backLabel}</span>
+        </a>
+      </div>
+
+      {/* ═══════════════════════════════════════════════════════════════
+          2 — FLOAT SHEET
+      ═══════════════════════════════════════════════════════════════ */}
+      <div
+        className="-mt-8 rounded-t-[32px] relative z-10 pb-28 md:pb-16"
+        style={{ background: "#F0EBE0" }}
+      >
+        <div className="max-w-2xl mx-auto px-5 pt-6 flex flex-col gap-y-5">
+
+          {/* ── Nombre + logo + badges ── */}
+          <div className="flex items-start gap-4">
+            <div className="flex-1 min-w-0">
+              <h1 className="text-2xl md:text-3xl font-bold leading-tight tracking-tight" style={{ color: "#2D4530" }}>
+                {business.name}
+              </h1>
+              <div className="flex items-center gap-2 flex-wrap mt-2.5">
+                <span
+                  className="text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-wider"
+                  style={{ background: "rgba(45,69,48,0.10)", color: "#2D4530" }}
                 >
-                  <div className="absolute inset-0 animate-pulse bg-gradient-to-r from-stone-50 via-stone-100 to-stone-50" />
-                  <Image src={business.logo_url} alt={`Logo de ${business.name}`} fill priority className="object-contain p-1.5" sizes="96px" quality={85} />
-                </button>
-              )}
+                  {categoryLabel}
+                </span>
+                <span
+                  className={`text-[10px] font-bold px-3 py-1 rounded-full flex items-center gap-1.5 ${
+                    isOpen ? "text-green-700 bg-green-50 border border-green-200" : "text-stone-500 bg-stone-100"
+                  }`}
+                >
+                  <span className={`w-1.5 h-1.5 rounded-full inline-block ${isOpen ? "bg-green-500" : "bg-stone-400"}`} />
+                  {isOpen ? "Abierto ahora" : "Cerrado"}
+                </span>
+              </div>
             </div>
+            {business.logo_url && (
+              <button
+                onClick={() => setLightboxSrc(business.logo_url)}
+                className="w-20 h-20 rounded-2xl bg-white border border-stone-100 shadow-sm p-2 shrink-0 relative overflow-hidden cursor-zoom-in hover:ring-2 hover:ring-[#2D4530]/25 transition-all"
+                aria-label="Ampliar logo"
+              >
+                <Image src={business.logo_url} alt={`Logo de ${business.name}`} fill className="object-contain p-1" sizes="80px" quality={85} />
+              </button>
+            )}
           </div>
 
+          {/* ── Sobre nosotros ── */}
           {business.description && (
-            <div className="px-6 py-5 border-b border-stone-100">
-              <p className="text-stone-500 text-sm leading-relaxed">{business.description}</p>
+            <div>
+              <p className="text-[10px] font-black uppercase tracking-[0.22em] mb-2" style={{ color: "rgba(45,69,48,0.42)" }}>
+                Sobre nosotros
+              </p>
+              <p className="text-sm leading-relaxed" style={{ color: "rgba(45,69,48,0.72)" }}>
+                {business.description}
+              </p>
             </div>
           )}
 
-          <div className="px-6 py-1">
-            {business.phone && <InfoRow icon={<Phone size={14} style={{ color: "#2D4530" }} />} sublabel="Teléfono" label={business.phone} href={`tel:${business.phone}`} />}
-            {instagramHandle && <InfoRow icon={<AtSign size={14} style={{ color: "#2D4530" }} />} sublabel="Instagram" label={`@${instagramHandle}`} href={`https://instagram.com/${instagramHandle}`} external />}
-            {business.website && <InfoRow icon={<Globe size={14} style={{ color: "#2D4530" }} />} sublabel="Web" label={business.website.replace(/^https?:\/\//, "")} href={business.website} external />}
-            {business.address && <InfoRow icon={<MapPin size={14} style={{ color: "#2D4530" }} />} sublabel="Dirección" label={business.address} />}
+          {/* ── Desktop: botones de acción ── */}
+          <div className="hidden md:flex gap-3">
+            {waLink && (
+              <a href={waLink} target="_blank" rel="noopener noreferrer" onClick={() => recordLead("whatsapp")}
+                className="flex-1 flex items-center justify-center gap-2 py-3.5 rounded-2xl font-bold text-sm text-white shadow-sm hover:brightness-105 transition-all"
+                style={{ background: "#25D366" }}>
+                <WaIcon size={16} /> WhatsApp
+              </a>
+            )}
+            {mapsLink && (
+              <a href={mapsLink} target="_blank" rel="noopener noreferrer"
+                className="flex-1 flex items-center justify-center gap-2 py-3.5 rounded-2xl font-bold text-sm shadow-sm hover:opacity-90 transition-all"
+                style={{ background: "#2D4530", color: "#E1DBC9" }}>
+                <Navigation size={16} /> Llegar
+              </a>
+            )}
+            {business.phone && (
+              <a href={`tel:${business.phone}`}
+                className="flex-1 flex items-center justify-center gap-2 py-3.5 rounded-2xl font-bold text-sm bg-white border-2 shadow-sm hover:opacity-80 transition-all"
+                style={{ color: "#2D4530", borderColor: "#2D4530" }}>
+                <Phone size={16} /> Llamar
+              </a>
+            )}
           </div>
 
-          {/* Horarios: una fila por día, turnos combinados en línea para no desbordar en mobile */}
+          {/* ── Datos de contacto ── */}
+          <div className="bg-white/50 rounded-2xl px-4 py-1">
+            {business.phone      && <InfoRow icon={<Phone size={14} style={{ color: "#2D4530" }} />}  sublabel="Teléfono"   label={business.phone}                                   href={`tel:${business.phone}`} />}
+            {instagramHandle     && <InfoRow icon={<AtSign size={14} style={{ color: "#2D4530" }} />} sublabel="Instagram"  label={`@${instagramHandle}`}                            href={`https://instagram.com/${instagramHandle}`} external />}
+            {business.website    && <InfoRow icon={<Globe size={14} style={{ color: "#2D4530" }} />}  sublabel="Web"        label={business.website.replace(/^https?:\/\//, "")}     href={business.website} external />}
+            {business.address    && <InfoRow icon={<MapPin size={14} style={{ color: "#2D4530" }} />} sublabel="Dirección"  label={business.address} />}
+          </div>
+
+          {/* ── Horarios ── */}
           {hoursByDay.size > 0 && (
-            <div className="px-6 pt-4 pb-6 border-t border-stone-100">
+            <div className="bg-white/50 rounded-2xl p-4">
               <div className="flex items-center gap-2 mb-3">
                 <Clock size={13} style={{ color: "rgba(45,69,48,0.40)" }} />
                 <p className="text-[10px] font-black uppercase tracking-[0.2em]" style={{ color: "rgba(45,69,48,0.40)" }}>
@@ -335,34 +310,18 @@ export default function NegocioDetalle({ business, promotions = [] }: Props) {
               <div className="space-y-0">
                 {Array.from(hoursByDay.entries()).map(([day, rows]) => {
                   const isToday = day === todayIdx
-                  const first = rows[0]
-                  // Si el día tiene múltiples turnos, los combina: "08:00–15:00 · 17:00–00:00"
+                  const first   = rows[0]
                   const timeStr = first.is_closed
                     ? "Cerrado"
                     : rows.length > 1
                     ? rows.map((r: any) => `${r.opens_at.slice(0, 5)}–${r.closes_at.slice(0, 5)}`).join(" · ")
                     : `${first.opens_at.slice(0, 5)} — ${first.closes_at.slice(0, 5)}`
                   return (
-                    <div
-                      key={day}
-                      className="flex justify-between items-center py-1.5 border-b border-stone-50 last:border-0 text-sm gap-3"
-                    >
-                      <span
-                        className="shrink-0"
-                        style={{
-                          color: isToday ? "#2D4530" : "rgba(45,69,48,0.50)",
-                          fontWeight: isToday ? 700 : 500,
-                        }}
-                      >
+                    <div key={day} className="flex justify-between items-center py-1.5 border-b border-stone-100 last:border-0 text-sm gap-3">
+                      <span className="shrink-0" style={{ color: isToday ? "#2D4530" : "rgba(45,69,48,0.50)", fontWeight: isToday ? 700 : 500 }}>
                         {DAY[day]}
                       </span>
-                      <span
-                        className="text-right"
-                        style={{
-                          color: first.is_closed ? "#C4B9A8" : "#2D4530",
-                          fontWeight: isToday ? 700 : 600,
-                        }}
-                      >
+                      <span className="text-right" style={{ color: first.is_closed ? "#C4B9A8" : "#2D4530", fontWeight: isToday ? 700 : 600 }}>
                         {timeStr}
                       </span>
                     </div>
@@ -371,278 +330,242 @@ export default function NegocioDetalle({ business, promotions = [] }: Props) {
               </div>
             </div>
           )}
-        </div>
 
-        {/* PROMOCIONES ACTIVAS */}
-        {promotions.length > 0 && (
-          <div className="flex flex-col gap-3">
-            {promotions.map(promo => {
-              const badge = promo.discount_label || (promo.discount_percentage ? `${promo.discount_percentage}% OFF` : "PROMO EXCLUSIVA")
-              const validDate = promo.valid_until
-                ? new Date(promo.valid_until + "T12:00:00").toLocaleDateString("es-AR", { day: "numeric", month: "long", year: "numeric" })
-                : null
-
-              const handleShare = async () => {
-                const url = `${window.location.origin}/negocios/${business.slug}`
-                const text = `¡Mirá esta promo en Calamuchita App! ${business.name} tiene ${badge}. Entrá acá:`
-                if (navigator.share) {
-                  await navigator.share({ title: "Calamuchita App", text, url }).catch(() => {})
-                } else {
-                  await navigator.clipboard.writeText(`${text} ${url}`)
+          {/* ── Promociones ── */}
+          {promotions.length > 0 && (
+            <div className="flex flex-col gap-3">
+              {promotions.map(promo => {
+                const badge = promo.discount_label || (promo.discount_percentage ? `${promo.discount_percentage}% OFF` : "PROMO EXCLUSIVA")
+                const validDate = promo.valid_until
+                  ? new Date(promo.valid_until + "T12:00:00").toLocaleDateString("es-AR", { day: "numeric", month: "long", year: "numeric" })
+                  : null
+                const handleShare = async () => {
+                  const url  = `${window.location.origin}/negocios/${business.slug}`
+                  const text = `¡Mirá esta promo en Calamuchita App! ${business.name} tiene ${badge}. Entrá acá:`
+                  if (navigator.share) { await navigator.share({ title: "Calamuchita App", text, url }).catch(() => {}) }
+                  else { await navigator.clipboard.writeText(`${text} ${url}`) }
                 }
-              }
-
-              return (
-                <div
-                  key={promo.id}
-                  className="rounded-3xl border border-[#2D4530]/40 overflow-hidden"
-                  style={{ background: "#F0F7F0" }}
-                >
-                  {/* Banner de descuento */}
-                  <div className="px-6 py-4 flex items-center gap-3" style={{ background: "#2D4530" }}>
-                    <Tag size={16} className="text-yellow-400 shrink-0" />
-                    <span className="font-black text-xl tracking-tight text-yellow-400">{badge}</span>
-                    <span className="ml-auto text-xs font-semibold uppercase tracking-widest" style={{ color: "rgba(225,219,201,0.70)" }}>
-                      Promo activa
-                    </span>
-                  </div>
-
-                  {/* Cuerpo */}
-                  <div className="px-6 py-5">
-                    <h3 className="font-bold text-base mb-2" style={{ color: "#2D4530" }}>{promo.title}</h3>
-                    {promo.description && (
-                      <p className="text-sm leading-relaxed whitespace-pre-line" style={{ color: "rgba(45,69,48,0.75)" }}>
-                        {promo.description}
-                      </p>
-                    )}
-
-                    <div className="flex items-center justify-between mt-4 pt-4 border-t border-[#2D4530]/10">
-                      {validDate && (
-                        <span className="text-xs font-medium" style={{ color: "rgba(45,69,48,0.50)" }}>
-                          Válido hasta el <strong style={{ color: "#2D4530" }}>{validDate}</strong>
-                        </span>
-                      )}
-                      <button
-                        onClick={handleShare}
-                        className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold transition-opacity hover:opacity-70 ml-auto"
-                        style={{ background: "rgba(45,69,48,0.08)", color: "#2D4530" }}
-                      >
-                        <Share2 size={12} /> Compartir
-                      </button>
+                return (
+                  <div key={promo.id} className="rounded-3xl border border-[#2D4530]/40 overflow-hidden" style={{ background: "#F0F7F0" }}>
+                    <div className="px-6 py-4 flex items-center gap-3" style={{ background: "#2D4530" }}>
+                      <Tag size={16} className="text-yellow-400 shrink-0" />
+                      <span className="font-black text-xl tracking-tight text-yellow-400">{badge}</span>
+                      <span className="ml-auto text-xs font-semibold uppercase tracking-widest" style={{ color: "rgba(225,219,201,0.70)" }}>Promo activa</span>
+                    </div>
+                    <div className="px-6 py-5">
+                      <h3 className="font-bold text-base mb-2" style={{ color: "#2D4530" }}>{promo.title}</h3>
+                      {promo.description && <p className="text-sm leading-relaxed whitespace-pre-line" style={{ color: "rgba(45,69,48,0.75)" }}>{promo.description}</p>}
+                      <div className="flex items-center justify-between mt-4 pt-4 border-t border-[#2D4530]/10">
+                        {validDate && <span className="text-xs font-medium" style={{ color: "rgba(45,69,48,0.50)" }}>Válido hasta el <strong style={{ color: "#2D4530" }}>{validDate}</strong></span>}
+                        <button onClick={handleShare} className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold transition-opacity hover:opacity-70 ml-auto" style={{ background: "rgba(45,69,48,0.08)", color: "#2D4530" }}>
+                          <Share2 size={12} /> Compartir
+                        </button>
+                      </div>
                     </div>
                   </div>
-                </div>
-              )
-            })}
-          </div>
-        )}
-
-        {/* ACCIONES ESTÁNDAR */}
-        {hasActions && (
-          <div className="flex flex-wrap gap-3">
-            {waLink && (
-              <a href={waLink} target="_blank" rel="noopener noreferrer" onClick={() => recordLead("whatsapp")} className="flex-1 min-w-[140px] flex items-center justify-center gap-2 py-4 rounded-2xl font-bold text-sm text-white shadow-md hover:brightness-110 transition-all active:scale-95" style={{ background: "#25D366" }}>
-                {WA_SVG} WhatsApp
-              </a>
-            )}
-            {mapsExternalLink && (
-              <a href={mapsExternalLink} target="_blank" rel="noopener noreferrer" className="flex-1 min-w-[140px] flex items-center justify-center gap-2 py-4 rounded-2xl font-bold text-sm shadow-md hover:opacity-90 transition-all active:scale-95" style={{ background: "#2D4530", color: "#E1DBC9" }}>
-                <Navigation size={16} /> Llegar
-              </a>
-            )}
-          </div>
-        )}
-
-        {/* DETALLES DE SERVICIO GASTRONÓMICO */}
-        {(business.offers_delivery || business.offers_takeaway || business.offers_dine_in) && (
-          <div className="bg-white rounded-3xl border border-stone-100 shadow-sm p-5 flex flex-wrap gap-3">
-            {business.offers_dine_in && <div className="flex items-center gap-2 px-3 py-2 rounded-xl text-sm font-semibold" style={{ background: "rgba(45,69,48,0.07)", color: "#2D4530" }}><UtensilsCrossed size={14} /> Salón</div>}
-            {business.offers_delivery && <div className="flex items-center gap-2 px-3 py-2 rounded-xl text-sm font-semibold" style={{ background: "rgba(45,69,48,0.07)", color: "#2D4530" }}><Truck size={14} /> Delivery</div>}
-            {business.offers_takeaway && <div className="flex items-center gap-2 px-3 py-2 rounded-xl text-sm font-semibold" style={{ background: "rgba(45,69,48,0.07)", color: "#2D4530" }}><ShoppingBag size={14} /> Take away</div>}
-          </div>
-        )}
-
-        {business.section === "gastronomy" && (
-          <div className="flex flex-wrap gap-3">
-            <button onClick={handleVerCarta} disabled={!hasMenu} className="flex-1 min-w-[120px] flex items-center justify-center gap-2 py-4 rounded-2xl font-bold text-sm shadow-md transition-all active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed" style={{ background: "#2D4530", color: "#E1DBC9" }}>
-              <UtensilsCrossed size={17} /> Ver Carta
-            </button>
-            {business.has_table_service && (
-              <button onClick={() => setShowReserva(true)} disabled={!waNumber} className="flex-1 min-w-[120px] flex items-center justify-center gap-2 py-4 rounded-2xl font-bold text-sm shadow-md transition-all active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed" style={{ background: "#2D4530", color: "#E1DBC9" }}>
-                <Calendar size={17} /> Reservar Mesa
-              </button>
-            )}
-            <button onClick={handleHacerPedido} disabled={!hasMenu && !waNumber} className="flex-1 min-w-[120px] flex items-center justify-center gap-2 py-4 rounded-2xl font-bold text-sm shadow-md transition-all active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed" style={{ background: "#2D4530", color: "#E1DBC9" }}>
-              <ShoppingBag size={17} /> Hacer Pedido
-            </button>
-          </div>
-        )}
-
-        {todayMenu && todayMenu.daily_menu_items?.length > 0 && (
-          <div className="bg-white rounded-3xl border border-stone-100 shadow-sm p-6">
-            <div className="flex items-center gap-2 mb-5">
-              <UtensilsCrossed size={18} style={{ color: "#2D4530" }} />
-              <h2 className="font-bold text-lg" style={{ color: "#2D4530" }}>Menú del día</h2>
+                )
+              })}
             </div>
-            <div className="space-y-0">
-              {todayMenu.daily_menu_items.map((item: any) => (
-                <div key={item.id} className="flex items-center justify-between py-3 border-b border-stone-100 last:border-0">
-                  <div className="min-w-0 pr-4">
-                    <p className="font-semibold text-stone-800 text-sm">{item.name}</p>
-                    {item.description && <p className="text-xs text-stone-400 mt-0.5">{item.description}</p>}
+          )}
+
+          {/* ── Características de servicio (delivery / salón / take away) ── */}
+          {(business.offers_delivery || business.offers_takeaway || business.offers_dine_in) && (
+            <div className="bg-white/50 rounded-2xl p-4 flex flex-wrap gap-2">
+              {business.offers_dine_in  && <div className="flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-semibold" style={{ background: "rgba(45,69,48,0.07)", color: "#2D4530" }}><UtensilsCrossed size={13} /> Salón</div>}
+              {business.offers_delivery && <div className="flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-semibold" style={{ background: "rgba(45,69,48,0.07)", color: "#2D4530" }}><Truck size={13} /> Delivery</div>}
+              {business.offers_takeaway && <div className="flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-semibold" style={{ background: "rgba(45,69,48,0.07)", color: "#2D4530" }}><ShoppingBag size={13} /> Take away</div>}
+            </div>
+          )}
+
+          {/* ── Botones gastronómicos ── */}
+          {business.section === "gastronomy" && (
+            <div className="flex flex-wrap gap-3">
+              <button onClick={handleVerCarta} disabled={!hasMenu}
+                className="flex-1 min-w-[110px] flex items-center justify-center gap-2 py-4 rounded-2xl font-bold text-sm shadow-sm transition-all active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed"
+                style={{ background: "#2D4530", color: "#E1DBC9" }}>
+                <UtensilsCrossed size={16} /> Ver Carta
+              </button>
+              {business.has_table_service && (
+                <button onClick={() => setShowReserva(true)} disabled={!waNumber}
+                  className="flex-1 min-w-[110px] flex items-center justify-center gap-2 py-4 rounded-2xl font-bold text-sm shadow-sm transition-all active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed"
+                  style={{ background: "#2D4530", color: "#E1DBC9" }}>
+                  <Calendar size={16} /> Reservar
+                </button>
+              )}
+              <button onClick={handleHacerPedido} disabled={!hasMenu && !waNumber}
+                className="flex-1 min-w-[110px] flex items-center justify-center gap-2 py-4 rounded-2xl font-bold text-sm shadow-sm transition-all active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed"
+                style={{ background: "#2D4530", color: "#E1DBC9" }}>
+                <ShoppingBag size={16} /> Hacer Pedido
+              </button>
+            </div>
+          )}
+
+          {/* ── Menú del día ── */}
+          {todayMenu && todayMenu.daily_menu_items?.length > 0 && (
+            <div className="bg-white/50 rounded-2xl p-5">
+              <div className="flex items-center gap-2 mb-4">
+                <UtensilsCrossed size={16} style={{ color: "#2D4530" }} />
+                <h2 className="font-bold text-base" style={{ color: "#2D4530" }}>Menú del día</h2>
+              </div>
+              <div>
+                {todayMenu.daily_menu_items.map((item: any) => (
+                  <div key={item.id} className="flex items-center justify-between py-3 border-b border-stone-100 last:border-0">
+                    <div className="min-w-0 pr-4">
+                      <p className="font-semibold text-stone-800 text-sm">{item.name}</p>
+                      {item.description && <p className="text-xs text-stone-400 mt-0.5">{item.description}</p>}
+                    </div>
+                    <p className="font-bold shrink-0 text-sm" style={{ color: "#2D4530" }}>${item.price.toLocaleString("es-AR")}</p>
                   </div>
-                  <p className="font-bold shrink-0 text-sm" style={{ color: "#2D4530" }}>${item.price.toLocaleString("es-AR")}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {/* GALERÍA DE FOTOS ABAJO */}
-        {photos.length > 0 && (
-          <div className="flex flex-col gap-y-3 mt-2">
-            <div className="flex items-center gap-3">
-              <span className="h-px flex-1 bg-stone-200" />
-              <span className="text-[10px] font-bold uppercase tracking-[0.2em] px-3 py-1 rounded-full shrink-0" style={{ background: "rgba(45,69,48,0.10)", color: "#2D4530" }}>
-                {categoryLabel}
-              </span>
-              <span className="h-px flex-1 bg-stone-200" />
-            </div>
-            <div className="flex items-center gap-2">
-              {photos.length > 1 && (
-                <button onClick={prevPhoto} aria-label="Foto anterior" className="shrink-0 w-10 h-10 rounded-full flex items-center justify-center border-2 border-[#2D4530] text-[#2D4530] hover:bg-[#2D4530] hover:text-[#E1DBC9] transition-all active:scale-90">
-                  <ChevronLeft size={18} />
-                </button>
-              )}
-              <button
-                onClick={() => setLightboxIdx(photoIdx)}
-                className="flex-1 aspect-[4/3] sm:aspect-video rounded-2xl overflow-hidden relative bg-stone-100 cursor-zoom-in block"
-                aria-label="Ampliar foto"
-              >
-                <div className="absolute inset-0 animate-pulse bg-gradient-to-r from-stone-100 via-stone-50 to-stone-100" />
-                <Image src={photos[photoIdx]} alt={`${business.name} — foto ${photoIdx + 1}`} fill priority={photoIdx === 0} className="object-contain" sizes="(max-width: 640px) calc(100vw - 32px), 640px" quality={85} onError={e => { (e.target as HTMLImageElement).src = "/valle.jpg" }} />
-              </button>
-              {photos.length > 1 && (
-                <button onClick={nextPhoto} aria-label="Foto siguiente" className="shrink-0 w-10 h-10 rounded-full flex items-center justify-center border-2 border-[#2D4530] text-[#2D4530] hover:bg-[#2D4530] hover:text-[#E1DBC9] transition-all active:scale-90">
-                  <ChevronRight size={18} />
-                </button>
-              )}
-            </div>
-            {photos.length > 1 && (
-              <div className="flex items-center justify-center gap-2 h-4">
-                {photos.map((_, i) => (
-                  <button key={i} onClick={() => setPhotoIdx(i)} className="h-1.5 rounded-full transition-all duration-300" style={{ width: i === photoIdx ? 20 : 6, background: i === photoIdx ? "#2D4530" : "rgba(45,69,48,0.22)" }} />
                 ))}
               </div>
-            )}
-            <p className="text-center text-xs text-stone-500 font-semibold leading-snug mt-1">
-              {business.gallery_caption || "Ver detalles del modelo, precio y stock."}
-            </p>
-          </div>
-        )}
+            </div>
+          )}
 
-        {business.menu_categories?.length > 0 && (
-          <div ref={cartaRef}>
-            <CartaInteractiva categories={business.menu_categories} business={business} />
-          </div>
-        )}
+          {/* ═══════════════════════════════════════════════════════════
+              5 — CARRUSEL DE FOTOS
+          ═══════════════════════════════════════════════════════════ */}
+          {photos.length > 0 && (
+            <div className="flex flex-col gap-y-3">
+              <div className="flex items-center gap-3">
+                <span className="h-px flex-1 bg-stone-200/80" />
+                <span className="text-[10px] font-bold uppercase tracking-[0.2em] px-3 py-1 rounded-full shrink-0" style={{ background: "rgba(45,69,48,0.10)", color: "#2D4530" }}>
+                  {categoryLabel}
+                </span>
+                <span className="h-px flex-1 bg-stone-200/80" />
+              </div>
+
+              <div className="flex items-center gap-2">
+                {photos.length > 1 && (
+                  <button onClick={prevPhoto} aria-label="Foto anterior" className="shrink-0 w-10 h-10 rounded-full flex items-center justify-center border-2 border-[#2D4530] text-[#2D4530] hover:bg-[#2D4530] hover:text-[#E1DBC9] transition-all active:scale-90">
+                    <ChevronLeft size={18} />
+                  </button>
+                )}
+                <button
+                  onClick={() => setLightboxIdx(photoIdx)}
+                  className="flex-1 aspect-[4/3] sm:aspect-video rounded-2xl overflow-hidden relative bg-stone-100 cursor-zoom-in"
+                  aria-label="Ampliar foto"
+                >
+                  <div className="absolute inset-0 animate-pulse bg-gradient-to-r from-stone-100 via-stone-50 to-stone-100" />
+                  <Image src={photos[photoIdx]} alt={`${business.name} — foto ${photoIdx + 1}`} fill priority={photoIdx === 0} className="object-contain" sizes="(max-width: 640px) calc(100vw - 40px), 640px" quality={85} />
+                </button>
+                {photos.length > 1 && (
+                  <button onClick={nextPhoto} aria-label="Foto siguiente" className="shrink-0 w-10 h-10 rounded-full flex items-center justify-center border-2 border-[#2D4530] text-[#2D4530] hover:bg-[#2D4530] hover:text-[#E1DBC9] transition-all active:scale-90">
+                    <ChevronRight size={18} />
+                  </button>
+                )}
+              </div>
+
+              {photos.length > 1 && (
+                <div className="flex items-center justify-center gap-2 h-4">
+                  {photos.map((_, i) => (
+                    <button key={i} onClick={() => setPhotoIdx(i)} className="h-1.5 rounded-full transition-all duration-300"
+                      style={{ width: i === photoIdx ? 20 : 6, background: i === photoIdx ? "#2D4530" : "rgba(45,69,48,0.22)" }} />
+                  ))}
+                </div>
+              )}
+              {business.gallery_caption && (
+                <p className="text-center text-xs text-stone-400 font-medium">{business.gallery_caption}</p>
+              )}
+            </div>
+          )}
+
+          {/* Carta interactiva */}
+          {business.menu_categories?.length > 0 && (
+            <div ref={cartaRef}>
+              <CartaInteractiva categories={business.menu_categories} business={business} />
+            </div>
+          )}
+
+        </div>
       </div>
 
-      {/* LIGHTBOX — galería con navegación y swipe */}
+      {/* ═══════════════════════════════════════════════════════════════
+          6 — BOTONERA FIJA MOBILE
+      ═══════════════════════════════════════════════════════════════ */}
+      {hasBottomActions && (
+        <div
+          className="md:hidden fixed bottom-0 left-0 right-0 z-[60] flex gap-2 px-4 pt-3 pb-6"
+          style={{
+            background: "rgba(255,255,255,0.88)",
+            backdropFilter: "blur(16px)",
+            WebkitBackdropFilter: "blur(16px)",
+            borderTop: "1px solid rgba(45,69,48,0.09)",
+          }}
+        >
+          {waLink && (
+            <a href={waLink} target="_blank" rel="noopener noreferrer" onClick={() => recordLead("whatsapp")}
+              className="flex-1 flex items-center justify-center gap-1.5 py-3.5 rounded-2xl text-xs font-bold text-white shadow-sm active:scale-95 transition-transform"
+              style={{ background: "#25D366" }}>
+              <WaIcon size={15} /> WhatsApp
+            </a>
+          )}
+          {business.phone && (
+            <a href={`tel:${business.phone}`}
+              className="flex-1 flex items-center justify-center gap-1.5 py-3.5 rounded-2xl text-xs font-bold border-2 bg-white active:scale-95 transition-transform"
+              style={{ color: "#2D4530", borderColor: "#2D4530" }}>
+              <Phone size={15} /> Llamar
+            </a>
+          )}
+          {mapsLink && (
+            <a href={mapsLink} target="_blank" rel="noopener noreferrer"
+              className="flex-1 flex items-center justify-center gap-1.5 py-3.5 rounded-2xl text-xs font-bold shadow-sm active:scale-95 transition-transform"
+              style={{ background: "#2D4530", color: "#E1DBC9" }}>
+              <Navigation size={15} /> Llegar
+            </a>
+          )}
+        </div>
+      )}
+
+      {/* ─── LIGHTBOX galería ───────────────────────────────────────── */}
       <AnimatePresence>
         {lightboxIdx !== null && (
           <motion.div
             className="fixed inset-0 z-[300] flex items-center justify-center"
             style={{ background: "rgba(0,0,0,0.95)" }}
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
+            initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
             onClick={() => setLightboxIdx(null)}
             onTouchStart={e => setLightboxTouchX(e.touches[0].clientX)}
             onTouchEnd={e => {
               if (lightboxTouchX === null || lightboxIdx === null) return
               const diff = lightboxTouchX - e.changedTouches[0].clientX
               if (Math.abs(diff) > 50) {
-                const next = diff > 0
-                  ? (lightboxIdx + 1) % photos.length
-                  : (lightboxIdx - 1 + photos.length) % photos.length
-                setLightboxIdx(next)
-                setPhotoIdx(next)
+                const next = diff > 0 ? (lightboxIdx + 1) % photos.length : (lightboxIdx - 1 + photos.length) % photos.length
+                setLightboxIdx(next); setPhotoIdx(next)
               }
               setLightboxTouchX(null)
             }}
           >
-            {/* Botón cerrar */}
-            <button
-              onClick={e => { e.stopPropagation(); setLightboxIdx(null) }}
-              aria-label="Cerrar"
+            <button onClick={e => { e.stopPropagation(); setLightboxIdx(null) }} aria-label="Cerrar"
               className="absolute top-4 right-4 z-20 w-12 h-12 rounded-full flex items-center justify-center shadow-lg"
-              style={{ background: "rgba(0,0,0,0.70)", color: "#fff", border: "1.5px solid rgba(255,255,255,0.30)" }}
-            >
+              style={{ background: "rgba(0,0,0,0.70)", color: "#fff", border: "1.5px solid rgba(255,255,255,0.30)" }}>
               <X size={24} strokeWidth={2.5} />
             </button>
-
-            {/* Contador */}
             {photos.length > 1 && (
               <div className="absolute top-5 left-4 z-20 px-3 py-1 rounded-full text-xs font-bold text-white" style={{ background: "rgba(0,0,0,0.45)" }}>
                 {lightboxIdx + 1} / {photos.length}
               </div>
             )}
-
-            {/* Imagen */}
-            <motion.div
-              className="relative"
-              style={{ width: "min(96vw, 900px)", height: "min(82vh, 700px)" }}
-              initial={{ scale: 0.88, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.88, opacity: 0 }}
-              transition={{ type: "spring", stiffness: 320, damping: 28 }}
-              onClick={e => e.stopPropagation()}
-            >
+            <motion.div className="relative" style={{ width: "min(96vw, 900px)", height: "min(82vh, 700px)" }}
+              initial={{ scale: 0.88, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.88, opacity: 0 }}
+              transition={{ type: "spring", stiffness: 320, damping: 28 }} onClick={e => e.stopPropagation()}>
               <Image src={photos[lightboxIdx]} alt="Foto ampliada" fill className="object-contain" sizes="96vw" quality={90} />
             </motion.div>
-
-            {/* Flechas de navegación */}
             {photos.length > 1 && (
               <>
-                <button
-                  onClick={e => {
-                    e.stopPropagation()
-                    const next = (lightboxIdx - 1 + photos.length) % photos.length
-                    setLightboxIdx(next); setPhotoIdx(next)
-                  }}
-                  aria-label="Foto anterior"
-                  className="absolute left-3 top-1/2 -translate-y-1/2 z-20 w-12 h-12 rounded-full flex items-center justify-center"
-                  style={{ background: "rgba(255,255,255,0.20)", color: "#fff" }}
-                >
-                  <ChevronLeft size={22} />
-                </button>
-                <button
-                  onClick={e => {
-                    e.stopPropagation()
-                    const next = (lightboxIdx + 1) % photos.length
-                    setLightboxIdx(next); setPhotoIdx(next)
-                  }}
-                  aria-label="Foto siguiente"
-                  className="absolute right-3 top-1/2 -translate-y-1/2 z-20 w-12 h-12 rounded-full flex items-center justify-center"
-                  style={{ background: "rgba(255,255,255,0.20)", color: "#fff" }}
-                >
-                  <ChevronRight size={22} />
-                </button>
+                <button onClick={e => { e.stopPropagation(); const next = (lightboxIdx - 1 + photos.length) % photos.length; setLightboxIdx(next); setPhotoIdx(next) }}
+                  aria-label="Foto anterior" className="absolute left-3 top-1/2 -translate-y-1/2 z-20 w-12 h-12 rounded-full flex items-center justify-center"
+                  style={{ background: "rgba(255,255,255,0.20)", color: "#fff" }}><ChevronLeft size={22} /></button>
+                <button onClick={e => { e.stopPropagation(); const next = (lightboxIdx + 1) % photos.length; setLightboxIdx(next); setPhotoIdx(next) }}
+                  aria-label="Foto siguiente" className="absolute right-3 top-1/2 -translate-y-1/2 z-20 w-12 h-12 rounded-full flex items-center justify-center"
+                  style={{ background: "rgba(255,255,255,0.20)", color: "#fff" }}><ChevronRight size={22} /></button>
               </>
             )}
-
-            {/* Dots */}
             {photos.length > 1 && (
               <div className="absolute bottom-6 left-0 right-0 flex justify-center gap-2 z-20">
                 {photos.map((_, i) => (
-                  <button
-                    key={i}
-                    onClick={e => { e.stopPropagation(); setLightboxIdx(i); setPhotoIdx(i) }}
-                    aria-label={`Ver foto ${i + 1}`}
+                  <button key={i} onClick={e => { e.stopPropagation(); setLightboxIdx(i); setPhotoIdx(i) }} aria-label={`Ver foto ${i + 1}`}
                     className="h-1.5 rounded-full transition-all duration-300"
-                    style={{ width: i === lightboxIdx ? 20 : 6, background: i === lightboxIdx ? "#fff" : "rgba(255,255,255,0.40)" }}
-                  />
+                    style={{ width: i === lightboxIdx ? 20 : 6, background: i === lightboxIdx ? "#fff" : "rgba(255,255,255,0.40)" }} />
                 ))}
               </div>
             )}
@@ -650,79 +573,50 @@ export default function NegocioDetalle({ business, promotions = [] }: Props) {
         )}
       </AnimatePresence>
 
-      {/* LIGHTBOX logo */}
+      {/* ─── LIGHTBOX logo ──────────────────────────────────────────── */}
       <AnimatePresence>
         {lightboxSrc && (
-          <motion.div
-            className="fixed inset-0 z-[300] flex items-center justify-center p-4"
+          <motion.div className="fixed inset-0 z-[300] flex items-center justify-center p-4"
             style={{ background: "rgba(0,0,0,0.92)" }}
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            onClick={() => setLightboxSrc(null)}
-          >
-            <motion.div
-              className="relative"
-              style={{ width: "min(80vw, 500px)", height: "min(60vh, 500px)" }}
-              initial={{ scale: 0.88, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.88, opacity: 0 }}
-              transition={{ type: "spring", stiffness: 320, damping: 28 }}
-              onClick={e => e.stopPropagation()}
-            >
+            initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+            onClick={() => setLightboxSrc(null)}>
+            <motion.div className="relative" style={{ width: "min(80vw, 500px)", height: "min(60vh, 500px)" }}
+              initial={{ scale: 0.88, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.88, opacity: 0 }}
+              transition={{ type: "spring", stiffness: 320, damping: 28 }} onClick={e => e.stopPropagation()}>
               <Image src={lightboxSrc} alt="Logo" fill className="object-contain" sizes="80vw" quality={90} />
             </motion.div>
-            <button
-              onClick={e => { e.stopPropagation(); setLightboxSrc(null) }}
-              aria-label="Cerrar"
+            <button onClick={e => { e.stopPropagation(); setLightboxSrc(null) }} aria-label="Cerrar"
               className="absolute top-4 right-4 z-20 w-12 h-12 rounded-full flex items-center justify-center shadow-lg"
-              style={{ background: "rgba(0,0,0,0.70)", color: "#fff", border: "1.5px solid rgba(255,255,255,0.30)" }}
-            >
+              style={{ background: "rgba(0,0,0,0.70)", color: "#fff", border: "1.5px solid rgba(255,255,255,0.30)" }}>
               <X size={24} strokeWidth={2.5} />
             </button>
           </motion.div>
         )}
       </AnimatePresence>
 
-      {/* MODAL RESERVAS (CON PRE-RELLENADO DESDE LOCALSTORAGE) */}
+      {/* ─── MODAL RESERVAS ─────────────────────────────────────────── */}
       <AnimatePresence>
         {showReserva && (
           <>
-            {/* z-[200]/z-[210]: supera la sticky nav (z-[100]) y cualquier header fijo */}
             <motion.div className="fixed inset-0 bg-black/40 z-[200]" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setShowReserva(false)} />
-            <motion.div className="fixed inset-x-4 bottom-4 top-4 z-[210] max-w-md mx-auto overflow-y-auto" initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }}>
+            <motion.div className="fixed inset-x-4 bottom-4 top-4 z-[210] max-w-md mx-auto overflow-y-auto"
+              initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }}>
               <div className="bg-white rounded-3xl overflow-hidden shadow-2xl">
                 <div className="px-6 py-4 flex items-center justify-between" style={{ background: "#2D4530" }}>
                   <h2 className="font-bold text-lg" style={{ color: "#E1DBC9" }}>Reservar mesa</h2>
                   <button onClick={() => setShowReserva(false)} className="text-stone-300 hover:text-white"><X size={22} /></button>
                 </div>
                 <div className="p-6 space-y-4">
-                  {/* Grid de dos columnas para Nombre y Teléfono Express */}
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <div>
                       <label className="block text-sm font-medium text-stone-700 mb-1">Tu nombre *</label>
-                      <input
-                        type="text"
-                        value={reservaForm.name}
-                        onChange={e => setReservaForm(p => ({ ...p, name: e.target.value }))}
-                        placeholder="María García"
-                        className="w-full px-4 py-2.5 rounded-xl border border-stone-200 text-stone-800 text-sm outline-none focus:ring-2 focus:ring-[#2D4530]/20"
-                      />
+                      <input type="text" value={reservaForm.name} onChange={e => setReservaForm(p => ({ ...p, name: e.target.value }))} placeholder="María García" className="w-full px-4 py-2.5 rounded-xl border border-stone-200 text-stone-800 text-sm outline-none focus:ring-2 focus:ring-[#2D4530]/20" />
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-stone-700 mb-1">WhatsApp de contacto *</label>
-                      <input
-                        type="tel"
-                        inputMode="tel"
-                        autoComplete="tel"
-                        value={reservaForm.phone}
-                        onChange={e => setReservaForm(p => ({ ...p, phone: e.target.value }))}
-                        placeholder="3516123456"
-                        className="w-full px-4 py-2.5 rounded-xl border border-stone-200 text-stone-800 text-sm outline-none focus:ring-2 focus:ring-[#2D4530]/20"
-                      />
+                      <label className="block text-sm font-medium text-stone-700 mb-1">WhatsApp *</label>
+                      <input type="tel" inputMode="tel" autoComplete="tel" value={reservaForm.phone} onChange={e => setReservaForm(p => ({ ...p, phone: e.target.value }))} placeholder="3516123456" className="w-full px-4 py-2.5 rounded-xl border border-stone-200 text-stone-800 text-sm outline-none focus:ring-2 focus:ring-[#2D4530]/20" />
                     </div>
                   </div>
-
                   <div className="grid grid-cols-2 gap-3">
                     <div>
                       <label className="block text-sm font-medium text-stone-700 mb-1"><Calendar size={12} className="inline mr-1" />Fecha *</label>
@@ -736,9 +630,7 @@ export default function NegocioDetalle({ business, promotions = [] }: Props) {
                   <div>
                     <label className="block text-sm font-medium text-stone-700 mb-1"><Users size={12} className="inline mr-1" />Personas *</label>
                     <select value={reservaForm.people} onChange={e => setReservaForm(p => ({ ...p, people: e.target.value }))} className="w-full px-4 py-2.5 rounded-xl border border-stone-200 text-stone-800 text-sm outline-none bg-white">
-                      {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(n => (
-                        <option key={n} value={n}>{n} {n === 1 ? "persona" : "personas"}</option>
-                      ))}
+                      {[1,2,3,4,5,6,7,8,9,10].map(n => <option key={n} value={n}>{n} {n === 1 ? "persona" : "personas"}</option>)}
                       <option value="más de 10">Más de 10</option>
                     </select>
                   </div>
@@ -746,13 +638,10 @@ export default function NegocioDetalle({ business, promotions = [] }: Props) {
                     <label className="block text-sm font-medium text-stone-700 mb-1">Aclaraciones <span className="text-stone-400 font-normal">(opcional)</span></label>
                     <textarea value={reservaForm.notes} onChange={e => setReservaForm(p => ({ ...p, notes: e.target.value }))} placeholder="Ej: ventana, celíaco, silla para bebé..." rows={2} className="w-full px-4 py-2.5 rounded-xl border border-stone-200 text-stone-800 text-sm outline-none resize-none" />
                   </div>
-                  <button
-                    onClick={handleEnviarReserva}
-                    disabled={!reservaValid}
+                  <button onClick={handleEnviarReserva} disabled={!reservaValid}
                     className="w-full py-3 rounded-xl text-sm font-bold transition-all disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center gap-2 text-white active:scale-95"
-                    style={{ background: "#25D366" }}
-                  >
-                    {WA_SVG} Enviar reserva por WhatsApp
+                    style={{ background: "#25D366" }}>
+                    <WaIcon size={16} /> Enviar reserva por WhatsApp
                   </button>
                 </div>
               </div>
