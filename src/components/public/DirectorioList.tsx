@@ -11,7 +11,7 @@ import Card3D from "@/components/ui/Card3D"
 import { SkeletonBusinessGrid } from "@/components/ui/Skeleton"
 import { createClient } from "@/lib/supabase/client"
 import { sectionCategories, SectionKey } from "@/lib/sections"
-import { Phone, AtSign, MapPin, X, LayoutGrid, Check, ChevronRight, Stethoscope, Building2 } from "lucide-react"
+import { Phone, AtSign, MapPin, X, LayoutGrid, Check, ChevronLeft, ChevronRight, Stethoscope, Building2 } from "lucide-react"
 import Link from "next/link"
 import Image from "next/image"
 
@@ -187,7 +187,50 @@ export default function DirectorioList({ section, filters }: Props) {
   const [showCategories, setShowCategories] = useState(false)
   const [mounted, setMounted] = useState(false)
   const resultsRef = useRef<HTMLDivElement>(null)
+  const scrollRef = useRef<HTMLDivElement>(null)
+  const scrollRefPros = useRef<HTMLDivElement>(null)
   const isFirstRender = useRef(true)
+
+  const [atStart, setAtStart] = useState(true)
+  const [atEnd, setAtEnd] = useState(false)
+  const [atStartPros, setAtStartPros] = useState(true)
+  const [atEndPros, setAtEndPros] = useState(false)
+
+  const checkScroll = () => {
+    const el = scrollRef.current
+    if (!el) return
+    setAtStart(el.scrollLeft <= 4)
+    setAtEnd(el.scrollLeft >= el.scrollWidth - el.clientWidth - 4)
+  }
+  const checkScrollPros = () => {
+    const el = scrollRefPros.current
+    if (!el) return
+    setAtStartPros(el.scrollLeft <= 4)
+    setAtEndPros(el.scrollLeft >= el.scrollWidth - el.clientWidth - 4)
+  }
+
+  const scrollBy = (ref: React.RefObject<HTMLDivElement>, dir: "left" | "right") => {
+    const el = ref.current
+    if (!el) return
+    const cardWidth = el.clientWidth * 0.82 + 16
+    el.scrollBy({ left: dir === "left" ? -cardWidth : cardWidth, behavior: "smooth" })
+  }
+
+  useEffect(() => {
+    const el = scrollRef.current
+    if (!el) return
+    checkScroll()
+    el.addEventListener("scroll", checkScroll, { passive: true })
+    return () => el.removeEventListener("scroll", checkScroll)
+  }, [businesses])
+
+  useEffect(() => {
+    const el = scrollRefPros.current
+    if (!el) return
+    checkScrollPros()
+    el.addEventListener("scroll", checkScrollPros, { passive: true })
+    return () => el.removeEventListener("scroll", checkScrollPros)
+  }, [clinicProfessionals])
 
   const categories = sectionCategories[section] || []
   const activeCategory = filters.cat || ""
@@ -474,7 +517,28 @@ export default function DirectorioList({ section, filters }: Props) {
             </p>
 
             {/* Carrusel en mobile, grilla en desktop */}
-            <div className="flex gap-4 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden snap-x snap-mandatory -mx-4 px-4 pb-6 md:mx-0 md:px-0 md:grid md:grid-cols-2 lg:grid-cols-3 md:overflow-x-visible md:pb-0 md:gap-5">
+            <div className="relative">
+              {businesses.length > 1 && (
+                <>
+                  <button
+                    onClick={() => scrollBy(scrollRef, "left")}
+                    className="md:hidden absolute left-0 top-1/2 -translate-y-1/2 z-10 w-8 h-8 flex items-center justify-center rounded-full transition-opacity duration-200"
+                    style={{ background: "rgba(45,69,48,0.85)", border: "1px solid rgba(163,177,138,0.4)", boxShadow: "0 2px 12px rgba(0,0,0,0.3)", opacity: atStart ? 0 : 1, pointerEvents: atStart ? "none" : "auto" }}
+                    aria-label="Anterior"
+                  >
+                    <ChevronLeft size={16} color="#E1DBC9" />
+                  </button>
+                  <button
+                    onClick={() => scrollBy(scrollRef, "right")}
+                    className="md:hidden absolute right-0 top-1/2 -translate-y-1/2 z-10 w-8 h-8 flex items-center justify-center rounded-full transition-opacity duration-200"
+                    style={{ background: "rgba(45,69,48,0.85)", border: "1px solid rgba(163,177,138,0.4)", boxShadow: "0 2px 12px rgba(0,0,0,0.3)", opacity: atEnd ? 0 : 1, pointerEvents: atEnd ? "none" : "auto" }}
+                    aria-label="Siguiente"
+                  >
+                    <ChevronRight size={16} color="#E1DBC9" />
+                  </button>
+                </>
+              )}
+            <div ref={scrollRef} className="flex gap-4 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden snap-x snap-mandatory -mx-4 px-4 pb-6 md:mx-0 md:px-0 md:grid md:grid-cols-2 lg:grid-cols-3 md:overflow-x-visible md:pb-0 md:gap-5">
               {businesses.map((business, i) => (
                 <AnimateIn
                   key={business.id}
@@ -585,6 +649,7 @@ export default function DirectorioList({ section, filters }: Props) {
                 </AnimateIn>
               ))}
             </div>
+            </div>{/* /relative wrapper */}
           </>
         )}
       </div>
@@ -593,7 +658,28 @@ export default function DirectorioList({ section, filters }: Props) {
       {section === "health" && clinicProfessionals.length > 0 && (
         <div className="mt-10">
           <SectionLabel icon={<Stethoscope size={11} />} label="Profesionales en clínicas" />
-          <div className="flex gap-4 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden snap-x snap-mandatory -mx-4 px-4 pb-6 md:mx-0 md:px-0 md:grid md:grid-cols-2 lg:grid-cols-3 md:overflow-x-visible md:pb-0 md:gap-5">
+          <div className="relative">
+            {clinicProfessionals.length > 1 && (
+              <>
+                <button
+                  onClick={() => scrollBy(scrollRefPros, "left")}
+                  className="md:hidden absolute left-0 top-1/2 -translate-y-1/2 z-10 w-8 h-8 flex items-center justify-center rounded-full transition-opacity duration-200"
+                  style={{ background: "rgba(45,69,48,0.85)", border: "1px solid rgba(163,177,138,0.4)", boxShadow: "0 2px 12px rgba(0,0,0,0.3)", opacity: atStartPros ? 0 : 1, pointerEvents: atStartPros ? "none" : "auto" }}
+                  aria-label="Anterior"
+                >
+                  <ChevronLeft size={16} color="#E1DBC9" />
+                </button>
+                <button
+                  onClick={() => scrollBy(scrollRefPros, "right")}
+                  className="md:hidden absolute right-0 top-1/2 -translate-y-1/2 z-10 w-8 h-8 flex items-center justify-center rounded-full transition-opacity duration-200"
+                  style={{ background: "rgba(45,69,48,0.85)", border: "1px solid rgba(163,177,138,0.4)", boxShadow: "0 2px 12px rgba(0,0,0,0.3)", opacity: atEndPros ? 0 : 1, pointerEvents: atEndPros ? "none" : "auto" }}
+                  aria-label="Siguiente"
+                >
+                  <ChevronRight size={16} color="#E1DBC9" />
+                </button>
+              </>
+            )}
+          <div ref={scrollRefPros} className="flex gap-4 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden snap-x snap-mandatory -mx-4 px-4 pb-6 md:mx-0 md:px-0 md:grid md:grid-cols-2 lg:grid-cols-3 md:overflow-x-visible md:pb-0 md:gap-5">
             {clinicProfessionals.map((pro, i) => (
               <AnimateIn
                 key={`${pro.clinic_slug}-${i}`}
@@ -677,6 +763,7 @@ export default function DirectorioList({ section, filters }: Props) {
               </AnimateIn>
             ))}
           </div>
+          </div>{/* /relative wrapper pros */}
         </div>
       )}
 

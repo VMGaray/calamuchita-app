@@ -178,11 +178,11 @@ export default function NegocioDetalle({ business, promotions = [] }: Props) {
       {/* ═══════════════════════════════════════════════════════════════
           1 — PORTADA FULL-WIDTH
       ═══════════════════════════════════════════════════════════════ */}
-      <div className="relative w-full h-64 sm:h-72 overflow-hidden bg-stone-200">
+      <div className="relative w-full h-64 sm:h-72 overflow-hidden" style={{ background: "#1a2e1c" }}>
         {coverUrl ? (
           <Image
             src={coverUrl} alt={business.name} fill priority
-            className="object-cover" sizes="100vw" quality={85}
+            className="object-contain" sizes="100vw" quality={85}
           />
         ) : (
           <div className="w-full h-full flex items-center justify-center"

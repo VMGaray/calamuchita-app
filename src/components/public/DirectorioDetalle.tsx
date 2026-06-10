@@ -154,9 +154,9 @@ export default function DirectorioDetalle({ business, section, promotions = [] }
       {/* ═══════════════════════════════════════════════════════════════
           1 — PORTADA FULL-WIDTH
       ═══════════════════════════════════════════════════════════════ */}
-      <div className="relative w-full h-64 sm:h-72 overflow-hidden bg-stone-200">
+      <div className="relative w-full h-64 sm:h-72 overflow-hidden" style={{ background: "#1a2e1c" }}>
         {coverUrl ? (
-          <Image src={coverUrl} alt={business.name} fill priority className="object-cover" sizes="100vw" quality={85} />
+          <Image src={coverUrl} alt={business.name} fill priority className="object-contain" sizes="100vw" quality={85} />
         ) : (
           <div className="w-full h-full flex items-center justify-center"
             style={{ background: "linear-gradient(135deg, #2D4530 0%, #4A6741 55%, #3D5C3A 100%)" }}>
