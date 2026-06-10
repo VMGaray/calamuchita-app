@@ -1,14 +1,22 @@
 "use client"
 
+import { Suspense } from "react"
 import { motion } from "framer-motion"
-import { useRouter } from "next/navigation"
+import { useRouter, usePathname } from "next/navigation"
 import { useState } from "react"
 import InteractiveText from "@/components/ui/InteractiveText"
 import MagneticButton from "@/components/ui/MagneticButton"
 
-export default function HeroSection() {
+function HeroSectionInner() {
   const router = useRouter()
+  const pathname = usePathname()
   const [query, setQuery] = useState("")
+
+  const isDetailPage =
+    /^\/directorio\/[^/]+\/[^/]+/.test(pathname) ||
+    /^\/negocios\/[^/?]+/.test(pathname)
+
+  if (isDetailPage) return null
 
   const handleSearch = () => {
     if (!query.trim()) return
@@ -102,5 +110,13 @@ export default function HeroSection() {
       </motion.div>
 
     </section>
+  )
+}
+
+export default function HeroSection() {
+  return (
+    <Suspense fallback={null}>
+      <HeroSectionInner />
+    </Suspense>
   )
 }
