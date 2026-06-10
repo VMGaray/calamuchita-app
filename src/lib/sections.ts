@@ -83,6 +83,7 @@ export const sectionCategories = {
   ],
   commerce: [
     { label: "Accesorios", desc: "Bijouterie, bolsos y complementos", href: "/directorio/commerce?cat=accesorios", bg: "bg-brand-earth/10", color: "text-brand-earth" },
+    { label: "Fábrica de Espumantes", desc: "Producción y venta de espumantes", href: "/directorio/commerce?cat=fabrica-espumantes", bg: "bg-rose-100", color: "text-rose-700" },
     { label: "Forrajería", desc: "Alimentos y productos rurales", href: "/directorio/commerce?cat=forrajeria", bg: "bg-brand-earth/10", color: "text-brand-earth" },
     { label: "Hogar", desc: "Muebles y decoración", href: "/directorio/commerce?cat=hogar", bg: "bg-brand-earth/10", color: "text-brand-earth" },
     { label: "Imprenta", desc: "Impresión y diseño gráfico", href: "/directorio/commerce?cat=imprenta", bg: "bg-brand-slate/10", color: "text-brand-slate" },
