@@ -33,6 +33,7 @@ export const sectionCategories = {
     { label: "Zinguero", desc: "Techos y canaletas", href: "/directorio/services?cat=zinguero", bg: "bg-brand-slate/10", color: "text-brand-slate" },
     { label: "Carteles tallados", desc: "Señalética y carteles artesanales", href: "/directorio/services?cat=carteles", bg: "bg-brand-earth/10", color: "text-brand-earth" },
     { label: "Costurera/Modista", desc: "Confección y arreglos de ropa", href: "/directorio/services?cat=costurera", bg: "bg-brand-slate/10", color: "text-brand-slate" },
+    { label: "Escuela de Equitación", desc: "Clases y escuelas de equitación", href: "/directorio/services?cat=equitacion", bg: "bg-amber-100", color: "text-amber-700" },
     { label: "Traslados", desc: "Transporte de personas", href: "/directorio/services?cat=traslados", bg: "bg-brand-earth/10", color: "text-brand-earth" },
     { label: "Varios", desc: "Otros servicios del valle", href: "/directorio/services?cat=varios", bg: "bg-brand-sand/50", color: "text-brand-charcoal" },
     { label: "Todos", desc: "Ver todos los servicios", href: "/directorio/services", bg: "bg-brand-sand/50", color: "text-brand-charcoal" },

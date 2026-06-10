@@ -47,6 +47,7 @@ export const MASTER_CATEGORIES = {
       { label: "Zinguero", icon: Home, bg: "bg-slate-50", color: "text-slate-600" },
       { label: "Carteles tallados", icon: Tag, bg: "bg-amber-50", color: "text-amber-700" },
       { label: "Costurera/Modista", icon: Scissors, bg: "bg-pink-50", color: "text-pink-600" },
+      { label: "Escuela de Equitación", icon: PersonStanding, bg: "bg-amber-50", color: "text-amber-700" },
       { label: "Traslados", icon: Car, bg: "bg-blue-50", color: "text-blue-600" },
       { label: "Otro", icon: Sparkles, bg: "bg-stone-50", color: "text-stone-400" },
     ]

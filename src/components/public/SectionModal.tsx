@@ -27,7 +27,7 @@ const categoryIcons: Record<string, any> = {
   "Electricidad": Zap, "Gasista": Flame, "Herrero": Hammer, "Paisajismo y Jardines": Leaf,
   "Limpieza": Sparkles, "Mecánica": Car, "Perforaciones": Droplets, "Piletero": Waves,
   "Pintor": Paintbrush, "Plomería": Wrench, "Zinguero": Home, "Profesionales": Briefcase, "Carteles tallados": Tag,
-  "Costurera/Modista": Scissors, "Traslados": Car,
+  "Costurera/Modista": Scissors, "Escuela de Equitación": Activity, "Traslados": Car,
   "Fútbol": Trophy, "Rugby": Shield, "Hockey": Zap, "Básquet": Activity,
   "Handball": Users, "Fausball": Trophy,
   "Pádel": Activity, "Vóley": Users, "Tenis": Activity,
