@@ -1,21 +1,14 @@
 "use client"
 
 import { motion } from "framer-motion"
-import { useRouter, usePathname } from "next/navigation"
+import { useRouter } from "next/navigation"
 import { useState } from "react"
 import InteractiveText from "@/components/ui/InteractiveText"
 import MagneticButton from "@/components/ui/MagneticButton"
 
 export default function HeroSection() {
   const router = useRouter()
-  const pathname = usePathname()
   const [query, setQuery] = useState("")
-
-  const isDetailPage =
-    /^\/directorio\/[^/]+\/[^/]+/.test(pathname) ||
-    /^\/negocios\/[^/?]+/.test(pathname)
-
-  if (isDetailPage) return null
 
   const handleSearch = () => {
     if (!query.trim()) return

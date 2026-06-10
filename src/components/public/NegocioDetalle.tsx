@@ -267,11 +267,11 @@ export default function NegocioDetalle({ business, promotions = [] }: Props) {
 
   return (
     <div className="isolate relative z-[200] min-h-screen pb-24" style={{ background: "#F0EBE0" }}>
-      <div className="max-w-2xl mx-auto px-4 flex flex-col gap-y-4 pt-24">
+      <div className="max-w-2xl mx-auto px-4 flex flex-col gap-y-4 pt-16">
 
         <a
           href={from === "/destacados" ? "/#destacados" : `/directorio/${business?.section || "services"}`}
-          className="text-sm font-medium w-fit flex items-center gap-2 hover:opacity-70 transition-opacity relative z-50"
+          className="text-sm font-medium w-fit flex items-center gap-2 hover:opacity-70 transition-opacity"
           style={{ color: "#2D4530" }}
         >
           <ArrowLeft size={16} />
