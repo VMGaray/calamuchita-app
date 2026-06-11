@@ -8,18 +8,19 @@ const LS_KEY = "calamuchita_localidad"
 type LocalidadContextValue = {
   localidad: string
   setLocalidad: (loc: string) => void
+  hydrated: boolean
 }
 
 const LocalidadContext = createContext<LocalidadContextValue | null>(null)
 
 export function LocalidadProvider({ children }: { children: React.ReactNode }) {
   const [localidad, setLocalidadState] = useState(MAIN_LOCALIDADES[0])
+  const [hydrated, setHydrated] = useState(false)
 
-  // Hydrate from localStorage after mount
   useEffect(() => {
     const saved = localStorage.getItem(LS_KEY)
-    if (saved && saved !== localidad) setLocalidadState(saved)
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    if (saved) setLocalidadState(saved)
+    setHydrated(true)
   }, [])
 
   const setLocalidad = (loc: string) => {
@@ -28,7 +29,7 @@ export function LocalidadProvider({ children }: { children: React.ReactNode }) {
   }
 
   return (
-    <LocalidadContext.Provider value={{ localidad, setLocalidad }}>
+    <LocalidadContext.Provider value={{ localidad, setLocalidad, hydrated }}>
       {children}
     </LocalidadContext.Provider>
   )

@@ -67,8 +67,6 @@ export default function StickyCategoryBar({ stickyOffset = 0 }: Props) {
   const handleClick = (key: NavKey) => {
     if (key === "events") {
       router.push("/eventos")
-    } else if (key === "sports") {
-      router.push("/directorio/education?cat=deporte")
     } else {
       setActiveSection(prev => (prev === key ? null : key))
     }
@@ -78,9 +76,6 @@ export default function StickyCategoryBar({ stickyOffset = 0 }: Props) {
   const handleDrawerCategory = (key: NavKey) => {
     if (key === "events") {
       router.push("/eventos"); setIsOpen(false); return
-    }
-    if (key === "sports") {
-      router.push("/directorio/education?cat=deporte"); setIsOpen(false); return
     }
     setExpandedCat(prev => (prev === key ? null : key))
   }
