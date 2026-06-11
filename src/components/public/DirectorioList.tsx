@@ -209,7 +209,7 @@ export default function DirectorioList({ section, filters }: Props) {
     setAtEndPros(el.scrollLeft >= el.scrollWidth - el.clientWidth - 4)
   }
 
-  const scrollBy = (ref: React.RefObject<HTMLDivElement>, dir: "left" | "right") => {
+  const scrollBy = (ref: React.RefObject<HTMLDivElement | null>, dir: "left" | "right") => {
     const el = ref.current
     if (!el) return
     const cardWidth = el.clientWidth * 0.82 + 16
