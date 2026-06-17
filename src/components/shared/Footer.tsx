@@ -138,7 +138,7 @@ export default function Footer() {
         <div className="mt-10 pt-6 flex flex-col md:flex-row justify-between items-center gap-2"
           style={{ borderTop: "1px solid rgba(225,219,201,0.07)" }}>
           <p className="text-xs" style={{ color: "rgba(225,219,201,0.55)" }}>
-            <Link href="/login" style={{ color: "inherit" }}>©</Link> 2025 Calamuchita App · Valle de Calamuchita, Córdoba
+            <Link href="/login" style={{ color: "inherit" }}>©</Link> 2026 Calamuchita App · Valle de Calamuchita, Córdoba
           </p>
           <a
             href="https://vmg-setup-ai.vercel.app/"
