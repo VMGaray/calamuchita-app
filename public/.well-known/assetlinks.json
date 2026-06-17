@@ -1,8 +1,10 @@
-[{
-  "relation": ["delegate_permission/common.handle_all_urls"],
-  "target": {
-    "namespace": "android_app",
-    "package_name": "com.calamuchita.app",
-    "sha256_cert_fingerprints": ["CC:2C:A1:CB:92:00:9D:67:07:FB:22:31:85:97:CD:99:9D:A1:7F:08:46:E6:0E:AE:B2:41:AF:71:F6:EC:8D:B9"]
+[
+  {
+    "relation": ["delegate_permission/common.handle_all_urls"],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "com.calamuchita.app",
+      "sha256_cert_fingerprints": ["3B:2B:B3:54:A7:7D:54:31:5C:7F:0D:FC:D9:40:71:E5:F8:6C:4E:B3:B1:B5:7D:29:FA:C1:50:43:AF:8A:73:25"]
+    }
   }
-}]
+]
