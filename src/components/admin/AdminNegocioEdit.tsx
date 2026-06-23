@@ -124,6 +124,7 @@ export default function AdminNegocioEdit({ id }: Props) {
   const [professionalType, setProfessionalType] = useState("")
   const [professionals, setProfessionals] = useState<Professional[]>([])
   const [coordsInput, setCoordsInput] = useState("")
+  const [selectedCategories, setSelectedCategories] = useState<string[]>([])
 
   const [form, setForm] = useState({
     name: "",
@@ -197,6 +198,8 @@ export default function AdminNegocioEdit({ id }: Props) {
         const cats: string[] = business.categories || []
         const profType = cats.find((c: string) => PROFESIONALES_OPTIONS.includes(c)) || ""
         setProfessionalType(profType)
+        const nonProfCats = cats.filter((c: string) => !PROFESIONALES_OPTIONS.includes(c))
+        setSelectedCategories(nonProfCats.length > 0 ? nonProfCats : (business.subcategory ? [business.subcategory] : []))
         if (business.latitude && business.longitude) {
           setCoordsInput(`${business.latitude}, ${business.longitude}`)
         }
@@ -229,6 +232,12 @@ export default function AdminNegocioEdit({ id }: Props) {
     setForm(prev => ({ ...prev, [field]: value }))
   }
 
+  const toggleCategory = (cat: string) => {
+    setSelectedCategories(prev =>
+      prev.includes(cat) ? prev.filter(c => c !== cat) : [...prev, cat]
+    )
+  }
+
   const handleSave = async () => {
     if (!form.name) { setError("El nombre es obligatorio"); return }
     setSaving(true)
@@ -240,12 +249,10 @@ export default function AdminNegocioEdit({ id }: Props) {
     const manualCoords = parseManualCoords(coordsInput)
     const coords = manualCoords ?? (fullAddress ? await geocodeAddress(fullAddress) : null)
 
-    const isProfesionales = form.section === "services" && form.subcategory === "Profesionales"
-    const updatedCategories = isProfesionales && professionalType
-      ? ["Profesionales", professionalType]
-      : isProfesionales
-      ? ["Profesionales"]
-      : [form.subcategory].filter(Boolean)
+    const hasProfesionales = form.section === "services" && selectedCategories.includes("Profesionales")
+    const updatedCategories = hasProfesionales && professionalType
+      ? [...new Set([...selectedCategories, professionalType])]
+      : selectedCategories.filter(Boolean)
 
     const { error: updateError } = await supabase
       .from("businesses")
@@ -255,7 +262,7 @@ export default function AdminNegocioEdit({ id }: Props) {
         description: form.description || null,
         section: form.section,
         category: form.section === "gastronomy" ? form.category : null,
-        subcategory: form.subcategory || null,
+        subcategory: updatedCategories[0] || null,
         categories: updatedCategories,
         address: fullAddress || null,
         pueblo: form.pueblo || null,
@@ -403,24 +410,28 @@ export default function AdminNegocioEdit({ id }: Props) {
           )}
           {form.section !== "gastronomy" && (
   <div className="mt-4">
-    <label className="block text-sm font-medium text-stone-700 mb-2">
-      Subcategoría <span className="text-stone-400 font-normal">(rubro)</span>
+    <label className="block text-sm font-medium text-stone-700 mb-1">
+      Rubros <span className="text-stone-400 font-normal">(podés elegir más de uno)</span>
     </label>
     {subcategoryOptions[form.section] && (
-      <div className="flex gap-2 flex-wrap mb-3">
+      <div className="flex gap-2 flex-wrap mt-2 mb-3">
         {subcategoryOptions[form.section].map(opt => (
-          <button key={opt} onClick={() => handleChange("subcategory", opt)}
+          <button
+            key={opt}
+            type="button"
+            onClick={() => toggleCategory(opt)}
             className={`py-1.5 px-3 rounded-xl text-xs font-medium border transition-colors ${
-              form.subcategory === opt
+              selectedCategories.includes(opt)
                 ? "bg-primary-500 text-white border-primary-500"
                 : "bg-white text-stone-600 border-stone-200 hover:border-primary-300"
-            }`}>
+            }`}
+          >
             {opt}
           </button>
         ))}
       </div>
     )}
-    {form.section === "services" && form.subcategory === "Profesionales" && (
+    {form.section === "services" && selectedCategories.includes("Profesionales") && (
       <div className="mt-3 p-4 bg-violet-50 rounded-xl border border-violet-100">
         <label className="block text-xs font-semibold text-violet-700 mb-2">Tipo de profesional</label>
         <div className="flex gap-2 flex-wrap">
@@ -441,10 +452,37 @@ export default function AdminNegocioEdit({ id }: Props) {
         </div>
       </div>
     )}
-    <input type="text" value={form.subcategory}
-      onChange={e => handleChange("subcategory", e.target.value)}
-      placeholder="O escribí una subcategoría personalizada..."
-      className="w-full px-4 py-2.5 rounded-xl border border-stone-200 text-stone-800 text-sm outline-none focus:ring-2 focus:ring-primary-300" />
+    <input
+      type="text"
+      placeholder="Escribí un rubro personalizado y presioná Enter…"
+      className="w-full px-4 py-2.5 rounded-xl border border-stone-200 text-stone-800 text-sm outline-none focus:ring-2 focus:ring-primary-300"
+      onKeyDown={e => {
+        if (e.key === "Enter" && e.currentTarget.value.trim()) {
+          toggleCategory(e.currentTarget.value.trim())
+          e.currentTarget.value = ""
+          e.preventDefault()
+        }
+      }}
+    />
+    {selectedCategories.length > 0 && (
+      <div className="flex gap-2 flex-wrap mt-2.5">
+        {selectedCategories.map(cat => (
+          <span
+            key={cat}
+            className="flex items-center gap-1 py-1 px-2.5 rounded-full text-xs bg-primary-50 text-primary-600 border border-primary-100"
+          >
+            {cat}
+            <button
+              type="button"
+              onClick={() => toggleCategory(cat)}
+              className="hover:text-red-400 ml-0.5 leading-none font-bold"
+            >
+              ×
+            </button>
+          </span>
+        ))}
+      </div>
+    )}
   </div>
 )}
         </div>
