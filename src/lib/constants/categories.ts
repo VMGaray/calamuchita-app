@@ -6,7 +6,7 @@ import {
   Hotel, Map, Tent, Activity, Compass, Bike, Plane,
   Utensils, Coffee, Beer, Wine, ShoppingBag, Clock, Wheat,
   Truck, Mountain, Printer, CreditCard, Briefcase,
-  Dumbbell, PersonStanding, Timer, Wind, Tag, Video
+  Dumbbell, PersonStanding, Timer, Wind, Tag, Video, ShieldCheck, ClipboardList
 } from "lucide-react"
 
 export const MASTER_CATEGORIES = {
@@ -51,6 +51,8 @@ export const MASTER_CATEGORIES = {
       { label: "Traslados", icon: Car, bg: "bg-blue-50", color: "text-blue-600" },
       { label: "Auxilio y Remolque", icon: AlertCircle, bg: "bg-orange-50", color: "text-orange-600" },
       { label: "Servicios audiovisuales", icon: Video, bg: "bg-indigo-50", color: "text-indigo-600" },
+      { label: "Higiene y seguridad laboral", icon: ShieldCheck, bg: "bg-emerald-50", color: "text-emerald-600" },
+      { label: "Licenciado en higiene y seguridad", icon: ClipboardList, bg: "bg-teal-50", color: "text-teal-700" },
       { label: "Otro", icon: Sparkles, bg: "bg-stone-50", color: "text-stone-400" },
     ]
   },
