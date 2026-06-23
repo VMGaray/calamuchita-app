@@ -9,7 +9,7 @@ import { sectionCategories, SectionKey } from "@/lib/sections"
 import { ShoppingBag, MapPin, Check } from "lucide-react"
 import {
   Utensils, Coffee, Beer, Bike, Clock, Package,
-  Wrench, Zap, Flame, Car, Building, Paintbrush, Hammer, KeyRound, Leaf, Waves, Home, Bug, Droplets, Sparkles, Shield, Truck, Mountain, HardHat, Scissors,
+  Wrench, Zap, Flame, Car, Building, Paintbrush, Hammer, KeyRound, Leaf, Waves, Home, Bug, Droplets, Sparkles, Shield, Truck, Mountain, HardHat, Scissors, Video,
   Stethoscope, Pill, Brain, Smile, Eye, PawPrint, AlertCircle, Ambulance,
   GraduationCap, BookOpen, Languages, Users, Music, Trophy,
   Hotel, Map, Tent, Activity, Compass, Plane,
@@ -27,7 +27,7 @@ const categoryIcons: Record<string, any> = {
   "Electricidad": Zap, "Gasista": Flame, "Herrero": Hammer, "Paisajismo y Jardines": Leaf,
   "Limpieza": Sparkles, "Mecánica": Car, "Perforaciones": Droplets, "Piletero": Waves,
   "Pintor": Paintbrush, "Plomería": Wrench, "Zinguero": Home, "Profesionales": Briefcase, "Carteles tallados": Tag,
-  "Costurera/Modista": Scissors, "Escuela de Equitación": Activity, "Traslados": Car,
+  "Costurera/Modista": Scissors, "Escuela de Equitación": Activity, "Traslados": Car, "Servicios audiovisuales": Video,
   "Fútbol": Trophy, "Rugby": Shield, "Hockey": Zap, "Básquet": Activity,
   "Handball": Users, "Fausball": Trophy,
   "Pádel": Activity, "Vóley": Users, "Tenis": Activity,
