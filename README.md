@@ -19,7 +19,10 @@ Conecta a turistas y residentes con los comercios, servicios y restaurantes de l
 | Lucide React | Iconografía |
 | Mapbox GL / react-map-gl | Mapa interactivo de comercios |
 | qrcode.react | Generación de QR en canvas |
+| Recharts | Gráficos de estadísticas |
+| Swiper | Carruseles (menú del día, galería) |
 | Lenis | Smooth scrolling |
+| next-pwa (`@ducanh2912`) | Progressive Web App (service worker, manifest) |
 
 ---
 
@@ -40,6 +43,8 @@ Conecta a turistas y residentes con los comercios, servicios y restaurantes de l
 - **Agenda de eventos** — listado filtrable por localidad con detalle y galería de fotos
 - **Mapa interactivo** — comercios geolocalizados sobre Mapbox con popup de detalle
 - **Página de planes** (`/unite`) — landing para negocios con tres planes y banner "Club Fundadores"
+- **Política de privacidad** (`/politica-de-privacidad`) — página estática con política de privacidad del sitio
+- **Eliminar cuenta** (`/eliminar-cuenta`) — formulario para que usuarios soliciten la baja de su cuenta
 
 ### Auth — Gastronómicos
 
@@ -213,6 +218,8 @@ src/
 /admin/marketing                    QR general + calcomanías
 /admin/info-util                    Contactos, localidades, servicios, transporte
 /admin/gastronomicos                Vista previa del dashboard (demo para clientes)
+/politica-de-privacidad             Política de privacidad
+/eliminar-cuenta                    Solicitud de baja de cuenta
 ```
 
 ---
@@ -499,6 +506,17 @@ $$;
 | `event-images` | Imágenes de eventos |
 
 Todos públicos (lectura pública, escritura autenticada).
+
+---
+
+## PWA
+
+La app está configurada como Progressive Web App con `@ducanh2912/next-pwa`.
+
+- `public/manifest.json` — nombre, colores, íconos
+- `public/icons/` — íconos en múltiples tamaños incluyendo `icon-512-maskable.png` (para Android adaptive icons)
+- El service worker se genera automáticamente en build de producción
+- `assetlinks.json` en `/public/.well-known/` habilita TWA (Trusted Web Activity) en Android con el SHA-256 del certificado de firma de Google Play
 
 ---
 

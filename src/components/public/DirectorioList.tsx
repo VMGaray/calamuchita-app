@@ -267,7 +267,7 @@ export default function DirectorioList({ section, filters }: Props) {
           const key = c.href.includes("cat=") ? c.href.split("cat=")[1] : ""
           return key === activeCategory
         })?.label ?? activeCategory
-        query = query.ilike("subcategory", `%${catLabel}%`)
+        query = query.or(`subcategory.ilike.%${catLabel}%,categories.cs.{"${catLabel}"}`)
       }
       if (filters.q) query = query.ilike("name", `%${filters.q}%`)
 
