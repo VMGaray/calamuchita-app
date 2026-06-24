@@ -54,6 +54,7 @@ const SUBCAT_LABELS: Record<string, string> = {
   audiovisuales:     "Servicios audiovisuales",
   "higiene-seguridad": "Higiene y seguridad laboral",
   "licenciado-hys":    "Licenciado en higiene y seguridad",
+  bombas:              "Bombas y Motores eléctricos",
   // health
   clinicas:      "Clínicas y Consultorios",
   especialidades:"Especialidades",

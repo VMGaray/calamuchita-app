@@ -38,6 +38,7 @@ export const sectionCategories = {
     { label: "Auxilio y Remolque", desc: "Auxilio mecánico y remolque en ruta", href: "/directorio/services?cat=auxilio", bg: "bg-brand-earth/10", color: "text-brand-earth" },
     { label: "Servicios audiovisuales", desc: "Fotografía, video y producción", href: "/directorio/services?cat=audiovisuales", bg: "bg-brand-slate/10", color: "text-brand-slate" },
     { label: "Higiene y seguridad laboral", desc: "Asesoramiento y capacitación en H&S", href: "/directorio/services?cat=higiene-seguridad", bg: "bg-brand-pine/10", color: "text-brand-pine" },
+    { label: "Bombas y Motores eléctricos", desc: "Bombas de agua y motores eléctricos", href: "/directorio/services?cat=bombas", bg: "bg-brand-slate/10", color: "text-brand-slate" },
     { label: "Varios", desc: "Otros servicios del valle", href: "/directorio/services?cat=varios", bg: "bg-brand-sand/50", color: "text-brand-charcoal" },
     { label: "Todos", desc: "Ver todos los servicios", href: "/directorio/services", bg: "bg-brand-sand/50", color: "text-brand-charcoal" },
   ],

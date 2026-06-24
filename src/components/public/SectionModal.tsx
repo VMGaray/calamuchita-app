@@ -16,7 +16,7 @@ import {
   PartyPopper, ChefHat, Mic, Medal, Palette, Baby,
   Store, Salad, Shirt, Gem, MoreHorizontal,
   Clock3, Landmark, Lightbulb, Bus, Info,
-  Armchair, Dog, Smartphone, FlaskConical, Printer, Briefcase, Dumbbell, Timer, Tag, Wheat, Wine
+  Armchair, Dog, Smartphone, FlaskConical, Printer, Briefcase, Dumbbell, Timer, Tag, Wheat, Wine, Cog
 } from "lucide-react"
 
 const categoryIcons: Record<string, any> = {
@@ -29,6 +29,7 @@ const categoryIcons: Record<string, any> = {
   "Pintor": Paintbrush, "Plomería": Wrench, "Zinguero": Home, "Profesionales": Briefcase, "Carteles tallados": Tag,
   "Costurera/Modista": Scissors, "Escuela de Equitación": Activity, "Traslados": Car, "Servicios audiovisuales": Video,
   "Higiene y seguridad laboral": ShieldCheck, "Licenciado en higiene y seguridad": ClipboardList,
+  "Bombas y Motores eléctricos": Cog,
   "Fútbol": Trophy, "Rugby": Shield, "Hockey": Zap, "Básquet": Activity,
   "Handball": Users, "Fausball": Trophy,
   "Pádel": Activity, "Vóley": Users, "Tenis": Activity,
