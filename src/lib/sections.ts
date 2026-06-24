@@ -39,6 +39,7 @@ export const sectionCategories = {
     { label: "Servicios audiovisuales", desc: "Fotografía, video y producción", href: "/directorio/services?cat=audiovisuales", bg: "bg-brand-slate/10", color: "text-brand-slate" },
     { label: "Higiene y seguridad laboral", desc: "Asesoramiento y capacitación en H&S", href: "/directorio/services?cat=higiene-seguridad", bg: "bg-brand-pine/10", color: "text-brand-pine" },
     { label: "Bombas y Motores eléctricos", desc: "Bombas de agua y motores eléctricos", href: "/directorio/services?cat=bombas", bg: "bg-brand-slate/10", color: "text-brand-slate" },
+    { label: "Refrigeración", desc: "Aire acondicionado y cámaras frías", href: "/directorio/services?cat=refrigeracion", bg: "bg-brand-slate/10", color: "text-brand-slate" },
     { label: "Varios", desc: "Otros servicios del valle", href: "/directorio/services?cat=varios", bg: "bg-brand-sand/50", color: "text-brand-charcoal" },
     { label: "Todos", desc: "Ver todos los servicios", href: "/directorio/services", bg: "bg-brand-sand/50", color: "text-brand-charcoal" },
   ],
