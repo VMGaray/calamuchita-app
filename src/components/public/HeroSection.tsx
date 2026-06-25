@@ -16,7 +16,7 @@ function HeroSectionInner() {
     /^\/directorio\/[^/]+\/[^/]+/.test(pathname) ||
     /^\/negocios\/[^/?]+/.test(pathname)
 
-  if (isDetailPage) return null
+  if (isDetailPage || pathname.startsWith("/buscar")) return null
 
   const handleSearch = () => {
     if (!query.trim()) return
