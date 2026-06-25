@@ -54,6 +54,7 @@ export const MASTER_CATEGORIES = {
       { label: "Higiene y seguridad laboral", icon: ShieldCheck, bg: "bg-emerald-50", color: "text-emerald-600" },
       { label: "Licenciado en higiene y seguridad", icon: ClipboardList, bg: "bg-teal-50", color: "text-teal-700" },
       { label: "Bombas y Motores eléctricos", icon: Cog, bg: "bg-cyan-50", color: "text-cyan-700" },
+      { label: "Alquiler de autos", icon: Car, bg: "bg-blue-50", color: "text-blue-600" },
       { label: "Refrigeración", icon: Snowflake, bg: "bg-slate-50", color: "text-slate-400" },
       { label: "Otro", icon: Sparkles, bg: "bg-stone-50", color: "text-stone-400" },
     ]
@@ -73,6 +74,7 @@ export const MASTER_CATEGORIES = {
       { label: "Salud", icon: HeartPulse, bg: "bg-green-50", color: "text-green-600" },
       { label: "Tecnología", icon: Smartphone, bg: "bg-blue-50", color: "text-blue-600" },
       { label: "Vehículos", icon: Car, bg: "bg-red-50", color: "text-red-600" },
+      { label: "Verdulería", icon: Leaf, bg: "bg-green-50", color: "text-green-600" },
       { label: "Veterinarias", icon: Dog, bg: "bg-teal-50", color: "text-teal-600" },
       { label: "Otro", icon: Store, bg: "bg-stone-50", color: "text-stone-400" },
     ]

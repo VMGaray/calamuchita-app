@@ -56,6 +56,7 @@ const SUBCAT_LABELS: Record<string, string> = {
   "licenciado-hys":    "Licenciado en higiene y seguridad",
   bombas:              "Bombas y Motores eléctricos",
   refrigeracion:       "Refrigeración",
+  "alquiler-autos":    "Alquiler de autos",
   // health
   clinicas:      "Clínicas y Consultorios",
   especialidades:"Especialidades",
@@ -83,6 +84,7 @@ const SUBCAT_LABELS: Record<string, string> = {
   indumentaria:  "Indumentaria",
   mascotas:      "Mascotas",
   ninos:         "Niños",
+  verduleria:    "Verdulería",
   tecnologia:    "Tecnología",
   vehiculos:     "Vehículos",
   // events
