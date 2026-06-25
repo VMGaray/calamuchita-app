@@ -7,19 +7,27 @@ import { motion, AnimatePresence } from "framer-motion"
 import { createClient } from "@/lib/supabase/client"
 import { useRouter } from "next/navigation"
 
-export default function Header() {
+interface Props {
+  solid?: boolean
+}
+
+export default function Header({ solid: solidProp = false }: Props) {
   const router = useRouter()
   const [user, setUser] = useState<any>(null)
   const [profile, setProfile] = useState<any>(null)
   const [menuOpen, setMenuOpen] = useState(false)
   const [scrolled, setScrolled] = useState(false)
 
+  // En páginas sin hero (solidProp=true) el fondo es visible desde el inicio.
+  // En el home (solidProp=false) el header se vuelve sólido al scrollear.
+  const solid = solidProp || scrolled
+
   useEffect(() => {
+    if (solidProp) return // ya es sólido, no necesita detectar scroll
     const handler = () => setScrolled(window.scrollY > 10)
     window.addEventListener("scroll", handler, { passive: true })
-    handler()
     return () => window.removeEventListener("scroll", handler)
-  }, [])
+  }, [solidProp])
 
   useEffect(() => {
     const supabase = createClient()
@@ -49,27 +57,22 @@ export default function Header() {
     ? profile.full_name.split(" ").map((n: string) => n[0]).slice(0, 2).join("").toUpperCase()
     : "?"
 
-  // Sin scroll: transparente con texto blanco (para el hero del home)
-  // Con scroll: crema con texto verde oscuro (visible en todas las páginas)
-  const solid = scrolled
-  const bg = solid ? "rgba(225,219,201,0.97)" : "transparent"
-  const border = solid ? "1px solid rgba(45,69,48,0.10)" : "none"
-  const logoColor = solid ? "#2D4530" : "rgba(255,255,255,0.97)"
-  const logoShadow = solid ? "none" : "0 1px 6px rgba(0,0,0,0.40)"
-  const logoBg = solid ? "rgba(45,69,48,0.10)" : "rgba(255,255,255,0.2)"
-  const logoBorder = solid ? "1px solid rgba(45,69,48,0.18)" : "1px solid rgba(255,255,255,0.35)"
-  const chipBg = solid ? "rgba(45,69,48,0.10)" : "rgba(45,69,48,0.45)"
-  const chipBorder = solid ? "rgba(45,69,48,0.18)" : "rgba(255,255,255,0.22)"
-  const chipColor = solid ? "#2D4530" : "rgba(255,255,255,0.9)"
+  const logoColor   = solid ? "#2D4530"                   : "rgba(255,255,255,0.97)"
+  const logoShadow  = solid ? "none"                      : "0 1px 6px rgba(0,0,0,0.40)"
+  const logoBg      = solid ? "rgba(45,69,48,0.10)"       : "rgba(255,255,255,0.20)"
+  const logoBorder  = solid ? "1px solid rgba(45,69,48,0.18)" : "1px solid rgba(255,255,255,0.35)"
+  const chipBg      = solid ? "rgba(45,69,48,0.10)"       : "rgba(45,69,48,0.45)"
+  const chipBorder  = solid ? "rgba(45,69,48,0.18)"       : "rgba(255,255,255,0.22)"
+  const chipColor   = solid ? "#2D4530"                   : "rgba(255,255,255,0.9)"
 
   return (
     <header
       className="sticky top-0 z-50 pointer-events-none transition-all duration-300"
       style={{
-        background: bg,
+        background: solid ? "rgba(225,219,201,0.97)" : "transparent",
         backdropFilter: solid ? "blur(16px)" : undefined,
         WebkitBackdropFilter: solid ? "blur(16px)" : undefined,
-        borderBottom: border,
+        borderBottom: solid ? "1px solid rgba(45,69,48,0.10)" : "none",
       }}
     >
       <div className="max-w-6xl mx-auto px-4 sm:px-6">
@@ -107,12 +110,7 @@ export default function Header() {
               href="/mapa"
               prefetch={false}
               className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-full transition-all duration-300 hover:scale-105 active:scale-95 flex-shrink-0"
-              style={{
-                background: chipBg,
-                border: `1px solid ${chipBorder}`,
-                backdropFilter: "blur(4px)",
-                color: chipColor,
-              }}
+              style={{ background: chipBg, border: `1px solid ${chipBorder}`, backdropFilter: "blur(4px)", color: chipColor }}
             >
               <MapIcon size={15} />
               <span className="sm:hidden text-[11px] font-bold uppercase tracking-wide">Mapa</span>
@@ -123,12 +121,7 @@ export default function Header() {
             <Link
               href="/eventos"
               className="hidden sm:flex items-center gap-1.5 px-2.5 py-1.5 rounded-full transition-all duration-300 hover:scale-105 active:scale-95 flex-shrink-0"
-              style={{
-                background: chipBg,
-                border: `1px solid ${chipBorder}`,
-                backdropFilter: "blur(4px)",
-                color: chipColor,
-              }}
+              style={{ background: chipBg, border: `1px solid ${chipBorder}`, backdropFilter: "blur(4px)", color: chipColor }}
             >
               <CalendarDays size={15} />
               <span className="text-[11px] font-bold uppercase tracking-wide">Agenda</span>

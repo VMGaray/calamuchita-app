@@ -37,7 +37,7 @@ export default async function PublicLayout({
       )}
 
       <header className="relative z-[100]">
-        <Header />
+        <Header solid={isSearchPage || isCategoryPage} />
         {!isCategoryPage && !isSearchPage && <HeroSection />}
       </header>
 
