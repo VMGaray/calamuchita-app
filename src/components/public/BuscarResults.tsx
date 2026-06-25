@@ -37,6 +37,16 @@ type BusinessHour = {
   is_closed: boolean
 }
 
+interface Professional {
+  name: string
+  specialty_group: string
+  specialty: string
+  description: string
+  schedule: string
+  contact: string
+  photo_url: string | null
+}
+
 function calcIsOpen(hours: BusinessHour[], fallback: boolean): boolean {
   if (!hours || hours.length === 0) return fallback
   const now = new Date()
@@ -61,6 +71,7 @@ interface Business {
   phone: string | null
   whatsapp: string | null
   business_hours: BusinessHour[]
+  matchedProfessional?: Professional
 }
 
 interface Props {
@@ -177,77 +188,120 @@ export default function BuscarResults({ query, results }: Props) {
         {/* Lista de resultados */}
         {results.length > 0 && (
           <div className="space-y-3">
-            {results.map((business, i) => (
-              <AnimateIn key={business.id} direction="up" delay={i * 0.04}>
-                <Link href={getDetailUrl(business)}>
-                  <div
-                    className="bg-white rounded-2xl border border-stone-200 overflow-hidden flex items-center gap-4 p-4 hover:border-stone-300 transition-all hover:shadow-sm"
-                  >
-                    {/* Logo/cover */}
-                    <div className="w-16 h-16 rounded-xl overflow-hidden flex-shrink-0 bg-stone-100">
-                      {business.logo_url ? (
-                        <Image src={business.logo_url} alt={business.name} width={64} height={64}
-                          className="w-full h-full object-cover" />
-                      ) : business.cover_url ? (
-                        <Image src={business.cover_url} alt={business.name} width={64} height={64}
-                          className="w-full h-full object-cover" />
-                      ) : (
-                        <div className="w-full h-full flex items-center justify-center font-serif text-2xl"
-                          style={{ color: "rgba(45,69,48,0.35)" }}>
-                          {business.name[0]}
-                        </div>
-                      )}
-                    </div>
+            {results.map((business, i) => {
+              const prof    = business.matchedProfessional
+              const isOpen  = calcIsOpen(business.business_hours, business.is_open)
+              // Clave única: para resultados de profesionales dos profs del mismo
+              // negocio tendrán el mismo id → diferenciamos con el nombre del prof.
+              const cardKey = business.id + (prof?.name ?? "")
 
-                    {/* Info */}
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2 mb-1 flex-wrap">
-                        <h3 className="text-sm font-semibold text-stone-800">{business.name}</h3>
-                        <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${sectionColors[business.section]}`}>
-                          {sectionLabels[business.section]}
-                        </span>
-                        {calcIsOpen(business.business_hours, business.is_open) && (
-                          <span className="text-xs font-medium px-2 py-0.5 rounded-full bg-brand-pine/10 text-brand-pine">
-                            Abierto
-                          </span>
+              return (
+                <AnimateIn key={cardKey} direction="up" delay={i * 0.04}>
+                  <Link href={getDetailUrl(business)}>
+                    <div className="bg-white rounded-2xl border border-stone-200 overflow-hidden flex items-center gap-4 p-4 hover:border-stone-300 transition-all hover:shadow-sm">
+
+                      {/* Avatar: foto del profesional si existe, sino logo/cover del negocio */}
+                      <div className="w-16 h-16 rounded-xl overflow-hidden flex-shrink-0 bg-stone-100">
+                        {prof?.photo_url ? (
+                          <Image src={prof.photo_url} alt={prof.name} width={64} height={64}
+                            className="w-full h-full object-cover object-top" />
+                        ) : business.logo_url ? (
+                          <Image src={business.logo_url} alt={business.name} width={64} height={64}
+                            className="w-full h-full object-cover" />
+                        ) : business.cover_url ? (
+                          <Image src={business.cover_url} alt={business.name} width={64} height={64}
+                            className="w-full h-full object-cover" />
+                        ) : (
+                          <div className="w-full h-full flex items-center justify-center font-serif text-2xl"
+                            style={{ color: "rgba(45,69,48,0.35)" }}>
+                            {(prof?.name ?? business.name)[0]}
+                          </div>
                         )}
                       </div>
-                      {business.subcategory && (
-                        <p className="text-xs text-stone-400 mb-1">{business.subcategory}</p>
-                      )}
-                      {business.description && (
-                        <p className="text-xs text-stone-500 line-clamp-1 leading-relaxed">
-                          {business.description}
-                        </p>
-                      )}
-                      {business.address && (
-                        <div className="flex items-center gap-1 mt-1">
-                          <MapPin size={10} className="text-stone-300 flex-shrink-0" />
-                          <span className="text-xs text-stone-400 truncate">{business.address}</span>
-                        </div>
-                      )}
-                    </div>
 
-                    {/* WhatsApp rápido */}
-                    {business.whatsapp && (
-                      <a
-                        href={`https://wa.me/${normalizeArgPhone(business.whatsapp)}`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        onClick={e => e.stopPropagation()}
-                        className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0 transition-colors"
-                        style={{ background: "rgba(37,211,102,0.1)", color: "#25D366" }}
-                      >
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-                          <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/>
-                          <path d="M12 0C5.373 0 0 5.373 0 12c0 2.123.554 4.118 1.526 5.845L.057 23.545a.75.75 0 0 0 .921.921l5.701-1.469A11.945 11.945 0 0 0 12 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.75a9.695 9.695 0 0 1-4.964-1.366l-.355-.212-3.686.949.969-3.682-.231-.366A9.712 9.712 0 0 1 2.25 12C2.25 6.615 6.615 2.25 12 2.25S21.75 6.615 21.75 12 17.385 21.75 12 21.75z"/>
-                        </svg>
-                      </a>
-                    )}
-                  </div>
-                </Link>
-              </AnimateIn>
-            ))}
+                      {/* Info */}
+                      <div className="flex-1 min-w-0">
+                        {prof ? (
+                          // ── Card de profesional ──────────────────────────
+                          <>
+                            <div className="flex items-center gap-2 mb-0.5 flex-wrap">
+                              <h3 className="text-sm font-semibold text-stone-800">{prof.name}</h3>
+                              <span className="text-xs font-medium px-2 py-0.5 rounded-full bg-brand-pine/10 text-brand-pine">
+                                {prof.specialty_group}
+                              </span>
+                              {isOpen && (
+                                <span className="text-xs font-medium px-2 py-0.5 rounded-full bg-brand-pine/10 text-brand-pine">
+                                  Abierto
+                                </span>
+                              )}
+                            </div>
+                            <p className="text-xs text-stone-400 mb-1">en {business.name}</p>
+                            {(prof.specialty || prof.description) && (
+                              <p className="text-xs text-stone-500 line-clamp-1 leading-relaxed">
+                                {prof.specialty || prof.description}
+                              </p>
+                            )}
+                            {business.address && (
+                              <div className="flex items-center gap-1 mt-1">
+                                <MapPin size={10} className="text-stone-300 flex-shrink-0" />
+                                <span className="text-xs text-stone-400 truncate">{business.address}</span>
+                              </div>
+                            )}
+                          </>
+                        ) : (
+                          // ── Card de negocio normal ───────────────────────
+                          <>
+                            <div className="flex items-center gap-2 mb-1 flex-wrap">
+                              <h3 className="text-sm font-semibold text-stone-800">{business.name}</h3>
+                              <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${sectionColors[business.section]}`}>
+                                {sectionLabels[business.section]}
+                              </span>
+                              {isOpen && (
+                                <span className="text-xs font-medium px-2 py-0.5 rounded-full bg-brand-pine/10 text-brand-pine">
+                                  Abierto
+                                </span>
+                              )}
+                            </div>
+                            {business.subcategory && (
+                              <p className="text-xs text-stone-400 mb-1">{business.subcategory}</p>
+                            )}
+                            {business.description && (
+                              <p className="text-xs text-stone-500 line-clamp-1 leading-relaxed">
+                                {business.description}
+                              </p>
+                            )}
+                            {business.address && (
+                              <div className="flex items-center gap-1 mt-1">
+                                <MapPin size={10} className="text-stone-300 flex-shrink-0" />
+                                <span className="text-xs text-stone-400 truncate">{business.address}</span>
+                              </div>
+                            )}
+                          </>
+                        )}
+                      </div>
+
+                      {/* WhatsApp rápido */}
+                      {business.whatsapp && (
+                        <a
+                          href={`https://wa.me/${normalizeArgPhone(business.whatsapp)}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          onClick={e => e.stopPropagation()}
+                          className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0 transition-colors"
+                          style={{ background: "rgba(37,211,102,0.1)", color: "#25D366" }}
+                        >
+                          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/>
+                            <path d="M12 0C5.373 0 0 5.373 0 12c0 2.123.554 4.118 1.526 5.845L.057 23.545a.75.75 0 0 0 .921.921l5.701-1.469A11.945 11.945 0 0 0 12 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.75a9.695 9.695 0 0 1-4.964-1.366l-.355-.212-3.686.949.969-3.682-.231-.366A9.712 9.712 0 0 1 2.25 12C2.25 6.615 6.615 2.25 12 2.25S21.75 6.615 21.75 12 17.385 21.75 12 21.75z"/>
+                          </svg>
+                        </a>
+                      )}
+
+                    </div>
+                  </Link>
+                </AnimateIn>
+              )
+            })}
           </div>
         )}
       </div>

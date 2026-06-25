@@ -1,8 +1,8 @@
 import { notFound } from "next/navigation"
-import Image from "next/image"
 import Link from "next/link"
 import { ArrowLeft, CalendarDays } from "lucide-react"
 import { createClient } from "@/lib/supabase/server"
+import ImageLightbox from "@/components/ui/ImageLightbox"
 
 const TYPE_STYLES: Record<string, { bg: string; color: string }> = {
   "Entrevista":      { bg: "rgba(45,69,48,0.10)",   color: "#2D4530" },
@@ -67,20 +67,16 @@ export default async function EditorialPostPage({ params }: Props) {
           Volver al inicio
         </Link>
 
-        {/* Imagen principal */}
+        {/* Imagen principal — clic abre lightbox */}
         {post.image_url && (
-          <div className="relative aspect-video w-full rounded-3xl overflow-hidden bg-stone-100 mb-6 shadow-sm">
-            <div className="absolute inset-0 animate-pulse bg-gradient-to-r from-stone-100 via-stone-50 to-stone-100" />
-            <Image
-              src={post.image_url}
-              alt={post.title}
-              fill
-              priority
-              className="object-cover object-top"
-              sizes="(max-width: 672px) 100vw, 672px"
-              quality={85}
-            />
-          </div>
+          <ImageLightbox
+            src={post.image_url}
+            alt={post.title}
+            containerClassName="aspect-video w-full rounded-3xl overflow-hidden bg-stone-100 mb-6 shadow-sm"
+            sizes="(max-width: 672px) 100vw, 672px"
+            quality={85}
+            priority
+          />
         )}
 
         {/* Tipo + fecha */}

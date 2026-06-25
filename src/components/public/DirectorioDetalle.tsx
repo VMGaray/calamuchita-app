@@ -6,7 +6,7 @@ import Image from "next/image"
 import {
   Phone, AtSign, MapPin, Clock, ArrowLeft, Globe, CreditCard,
   PawPrint, Truck, ShoppingBag, UtensilsCrossed, Star, Navigation,
-  Wifi, Car, ChevronLeft, ChevronRight, Tag, Share2, X,
+  Wifi, Car, ChevronLeft, ChevronRight, Tag, Share2, X, Building2,
 } from "lucide-react"
 import { motion, AnimatePresence } from "framer-motion"
 import { createClient } from "@/lib/supabase/client"
@@ -81,7 +81,15 @@ interface Props { business: any; section: string; promotions?: Promotion[] }
 
 export default function DirectorioDetalle({ business, section, promotions = [] }: Props) {
   const searchParams = useSearchParams()
-  const from = searchParams.get("from")
+  const from     = searchParams.get("from")
+  const profName = searchParams.get("prof")
+
+  // Si se navegó desde una card de profesional individual, encontrar sus datos
+  const matchedPro = profName && Array.isArray(business.professionals)
+    ? (business.professionals as any[]).find(
+        p => p.name?.toLowerCase().trim() === decodeURIComponent(profName).toLowerCase().trim()
+      ) ?? null
+    : null
 
   const rawPhotos = ((business.business_photos ?? []) as any[])
     .sort((a: any, b: any) => a.sort_order - b.sort_order)
@@ -186,6 +194,105 @@ export default function DirectorioDetalle({ business, section, promotions = [] }
       ═══════════════════════════════════════════════════════════════ */}
       <div className="-mt-8 rounded-t-[32px] relative z-10 pb-12" style={{ background: "#F0EBE0" }}>
         <div className="max-w-2xl mx-auto px-5 pt-6 flex flex-col gap-y-5">
+
+          {/* ── Perfil del profesional ──────────────────────────────────────────
+              Se muestra cuando el usuario llegó desde una card de profesional
+              en el directorio (?prof=Nombre). Aparece antes que el info del centro
+              para que el perfil sea el contenido primario de la pantalla.       */}
+          {matchedPro && (
+            <>
+              <div className="bg-white rounded-2xl p-5 shadow-sm border border-stone-100">
+                <div className="flex items-start gap-4 mb-4">
+                  {/* Foto o inicial */}
+                  {matchedPro.photo_url ? (
+                    <div className="relative w-20 h-20 rounded-2xl overflow-hidden flex-shrink-0 bg-stone-100">
+                      <Image
+                        src={matchedPro.photo_url}
+                        alt={matchedPro.name}
+                        fill
+                        className="object-cover object-top"
+                        sizes="80px"
+                        quality={85}
+                      />
+                    </div>
+                  ) : (
+                    <div
+                      className="w-20 h-20 rounded-2xl flex-shrink-0 flex items-center justify-center font-serif text-3xl font-bold"
+                      style={{ background: "#2D4530", color: "#E1DBC9" }}
+                    >
+                      {matchedPro.name?.[0] ?? "?"}
+                    </div>
+                  )}
+
+                  {/* Nombre + especialidad */}
+                  <div className="flex-1 min-w-0">
+                    <h2 className="text-xl font-bold leading-snug" style={{ color: "#2D4530" }}>
+                      {matchedPro.name}
+                    </h2>
+                    {(matchedPro.specialty || matchedPro.specialty_group) && (
+                      <span
+                        className="inline-block text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-full mt-1.5"
+                        style={{ background: "rgba(45,69,48,0.10)", color: "#2D4530" }}
+                      >
+                        {matchedPro.specialty || matchedPro.specialty_group}
+                      </span>
+                    )}
+                    <div className="flex items-center gap-1.5 mt-2.5">
+                      <Building2 size={11} style={{ color: "rgba(45,69,48,0.45)" }} />
+                      <span className="text-xs font-medium" style={{ color: "rgba(45,69,48,0.55)" }}>
+                        Atiende en {business.name}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                {matchedPro.description && (
+                  <p className="text-sm leading-relaxed mb-3" style={{ color: "rgba(45,69,48,0.70)" }}>
+                    {matchedPro.description}
+                  </p>
+                )}
+                {matchedPro.schedule && (
+                  <p className="text-xs mb-4" style={{ color: "rgba(45,69,48,0.50)" }}>
+                    🕐 {matchedPro.schedule}
+                  </p>
+                )}
+
+                {/* Botón de contacto del profesional */}
+                {(() => {
+                  const isPhone = matchedPro.contact && !matchedPro.contact.startsWith("http")
+                  const waUrl = isPhone
+                    ? `https://wa.me/${normalizeArgPhone(matchedPro.contact)}?text=${encodeURIComponent(
+                        `Hola! Vi el perfil de ${matchedPro.name} en ${business.name} (Calamuchita App) y quería consultar sobre un turno.`
+                      )}`
+                    : null
+                  if (waUrl) return (
+                    <a href={waUrl} target="_blank" rel="noopener noreferrer"
+                      className="flex items-center justify-center gap-2 w-full py-3 rounded-2xl text-sm font-bold text-white transition-opacity hover:opacity-90"
+                      style={{ background: "#25D366" }}>
+                      <WaIcon size={14} /> Consultar turno por WhatsApp
+                    </a>
+                  )
+                  if (matchedPro.contact?.startsWith("http")) return (
+                    <a href={matchedPro.contact} target="_blank" rel="noopener noreferrer"
+                      className="flex items-center justify-center gap-2 w-full py-3 rounded-2xl text-sm font-bold transition-opacity hover:opacity-80"
+                      style={{ background: "rgba(45,69,48,0.08)", color: "#2D4530" }}>
+                      📅 Sacar turno online
+                    </a>
+                  )
+                  return null
+                })()}
+              </div>
+
+              {/* Separador visual antes de la info del centro */}
+              <div className="flex items-center gap-3">
+                <div className="flex-1 h-px" style={{ background: "rgba(45,69,48,0.12)" }} />
+                <p className="text-[10px] font-black uppercase tracking-[0.22em]" style={{ color: "rgba(45,69,48,0.35)" }}>
+                  Centro de atención
+                </p>
+                <div className="flex-1 h-px" style={{ background: "rgba(45,69,48,0.12)" }} />
+              </div>
+            </>
+          )}
 
           {/* ── Nombre + logo + badges ── */}
           <div className="flex items-start gap-4">

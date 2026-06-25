@@ -55,6 +55,12 @@ const SPECIALTY_TO_GROUPS: Record<string, string[]> = {
 }
 const NO_PROFESSIONAL_CATS = ["traslado"]
 
+// Comparación insensible a acentos y mayúsculas — evita que un specialty_group
+// guardado como "Nutricion" no matchee con "Nutrición" en SPECIALTY_TO_GROUPS.
+function normGroup(s: string) {
+  return s.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase().trim()
+}
+
 interface Props {
   section: SectionKey
   filters: { cat?: string; q?: string; pueblo?: string }
@@ -301,7 +307,7 @@ export default function DirectorioList({ section, filters }: Props) {
         const pros = (clinic.professionals as any[]) || []
         return pros
           .filter(p => p.name?.trim())
-          .filter(p => !allowedGroups || allowedGroups.includes(p.specialty_group))
+          .filter(p => !allowedGroups || allowedGroups.some(g => normGroup(g) === normGroup(p.specialty_group || "")))
           .filter(p => !filters.q ||
             p.name.toLowerCase().includes(filters.q.toLowerCase()) ||
             (p.specialty || "").toLowerCase().includes(filters.q.toLowerCase())
@@ -691,7 +697,7 @@ export default function DirectorioList({ section, filters }: Props) {
                 className="w-[82vw] flex-shrink-0 snap-center md:w-auto"
               >
                 <Link
-                  href={`/directorio/health/${pro.clinic_slug}`}
+                  href={`/directorio/health/${pro.clinic_slug}?prof=${encodeURIComponent(pro.name)}`}
                   className="block rounded-2xl overflow-hidden shadow-sm transition-shadow hover:shadow-md"
                   style={{ background: "#FFFFFF", border: "1px solid rgba(45,69,48,0.09)" }}
                 >
