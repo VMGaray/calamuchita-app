@@ -5,29 +5,26 @@ import { MapPin, Map as MapIcon, CalendarDays } from "lucide-react"
 import { useState, useEffect } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import { createClient } from "@/lib/supabase/client"
-import { useRouter } from "next/navigation"
+import { useRouter, usePathname } from "next/navigation"
 
-interface Props {
-  solid?: boolean
-}
-
-export default function Header({ solid: solidProp = false }: Props) {
+export default function Header() {
   const router = useRouter()
+  const pathname = usePathname()
   const [user, setUser] = useState<any>(null)
   const [profile, setProfile] = useState<any>(null)
   const [menuOpen, setMenuOpen] = useState(false)
-  const [scrolled, setScrolled] = useState(false)
 
-  // En páginas sin hero (solidProp=true) el fondo es visible desde el inicio.
-  // En el home (solidProp=false) el header se vuelve sólido al scrollear.
-  const solid = solidProp || scrolled
-
-  useEffect(() => {
-    if (solidProp) return // ya es sólido, no necesita detectar scroll
-    const handler = () => setScrolled(window.scrollY > 10)
-    window.addEventListener("scroll", handler, { passive: true })
-    return () => window.removeEventListener("scroll", handler)
-  }, [solidProp])
+  // El header necesita fondo sólido cuando no hay hero oscuro detrás.
+  // usePathname() se actualiza en cada navegación cliente, a diferencia de
+  // las props del layout que quedan congeladas tras el primer render.
+  const solid = pathname.startsWith("/buscar")
+    || pathname.startsWith("/directorio")
+    || pathname.startsWith("/negocios")
+    || pathname.startsWith("/eventos")
+    || pathname.startsWith("/mapa")
+    || pathname.startsWith("/info-util")
+    || pathname.startsWith("/unite")
+    || pathname.startsWith("/mapa")
 
   useEffect(() => {
     const supabase = createClient()
@@ -57,22 +54,16 @@ export default function Header({ solid: solidProp = false }: Props) {
     ? profile.full_name.split(" ").map((n: string) => n[0]).slice(0, 2).join("").toUpperCase()
     : "?"
 
-  const logoColor   = solid ? "#2D4530"                   : "rgba(255,255,255,0.97)"
-  const logoShadow  = solid ? "none"                      : "0 1px 6px rgba(0,0,0,0.40)"
-  const logoBg      = solid ? "rgba(45,69,48,0.10)"       : "rgba(255,255,255,0.20)"
-  const logoBorder  = solid ? "1px solid rgba(45,69,48,0.18)" : "1px solid rgba(255,255,255,0.35)"
-  const chipBg      = solid ? "rgba(45,69,48,0.10)"       : "rgba(45,69,48,0.45)"
-  const chipBorder  = solid ? "rgba(45,69,48,0.18)"       : "rgba(255,255,255,0.22)"
-  const chipColor   = solid ? "#2D4530"                   : "rgba(255,255,255,0.9)"
-
   return (
     <header
-      className="sticky top-0 z-50 pointer-events-none transition-all duration-300"
-      style={{
-        background: solid ? "rgba(225,219,201,0.97)" : "transparent",
-        backdropFilter: solid ? "blur(16px)" : undefined,
-        WebkitBackdropFilter: solid ? "blur(16px)" : undefined,
-        borderBottom: solid ? "1px solid rgba(45,69,48,0.10)" : "none",
+      className="sticky top-0 z-50 pointer-events-none"
+      style={solid ? {
+        background: "rgba(225,219,201,0.97)",
+        backdropFilter: "blur(16px)",
+        WebkitBackdropFilter: "blur(16px)",
+        borderBottom: "1px solid rgba(45,69,48,0.10)",
+      } : {
+        background: "transparent",
       }}
     >
       <div className="max-w-6xl mx-auto px-4 sm:px-6">
@@ -84,21 +75,27 @@ export default function Header({ solid: solidProp = false }: Props) {
             {/* Logo */}
             <Link href="/" className="flex items-center gap-1.5 sm:gap-2 flex-shrink-0 -ml-1 sm:-ml-3">
               <div
-                className="w-8 h-8 rounded-xl flex items-center justify-center transition-all duration-300"
-                style={{ background: logoBg, border: logoBorder }}
+                className="w-8 h-8 rounded-xl flex items-center justify-center"
+                style={solid
+                  ? { background: "rgba(45,69,48,0.10)", border: "1px solid rgba(45,69,48,0.18)" }
+                  : { background: "rgba(255,255,255,0.2)", border: "1px solid rgba(255,255,255,0.35)" }}
               >
-                <MapPin size={15} style={{ color: logoColor }} />
+                <MapPin size={15} style={{ color: solid ? "#2D4530" : "rgba(255,255,255,0.9)" }} />
               </div>
               <div className="flex flex-col leading-none">
                 <span
-                  className="font-serif text-[15px] sm:text-[17px] font-semibold transition-all duration-300"
-                  style={{ color: logoColor, textShadow: logoShadow }}
+                  className="font-serif text-[15px] sm:text-[17px] font-semibold"
+                  style={solid
+                    ? { color: "#2D4530" }
+                    : { color: "rgba(255,255,255,0.97)", textShadow: "0 1px 6px rgba(0,0,0,0.40)" }}
                 >
                   Calamuchita
                 </span>
                 <span
-                  className="font-serif text-[10px] sm:text-[11px] font-medium tracking-widest uppercase transition-all duration-300"
-                  style={{ color: logoColor, textShadow: logoShadow }}
+                  className="font-serif text-[10px] sm:text-[11px] font-medium tracking-widest uppercase"
+                  style={solid
+                    ? { color: "rgba(45,69,48,0.70)" }
+                    : { color: "rgba(255,255,255,0.97)", textShadow: "0 1px 6px rgba(0,0,0,0.40)" }}
                 >
                   App
                 </span>
@@ -109,8 +106,10 @@ export default function Header({ solid: solidProp = false }: Props) {
             <Link
               href="/mapa"
               prefetch={false}
-              className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-full transition-all duration-300 hover:scale-105 active:scale-95 flex-shrink-0"
-              style={{ background: chipBg, border: `1px solid ${chipBorder}`, backdropFilter: "blur(4px)", color: chipColor }}
+              className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-full transition-all hover:scale-105 active:scale-95 flex-shrink-0"
+              style={solid
+                ? { background: "rgba(45,69,48,0.10)", border: "1px solid rgba(45,69,48,0.18)", color: "#2D4530" }
+                : { background: "rgba(45,69,48,0.45)", border: "1px solid rgba(255,255,255,0.22)", backdropFilter: "blur(4px)", color: "rgba(255,255,255,0.9)" }}
             >
               <MapIcon size={15} />
               <span className="sm:hidden text-[11px] font-bold uppercase tracking-wide">Mapa</span>
@@ -120,8 +119,10 @@ export default function Header({ solid: solidProp = false }: Props) {
             {/* Botón Agenda */}
             <Link
               href="/eventos"
-              className="hidden sm:flex items-center gap-1.5 px-2.5 py-1.5 rounded-full transition-all duration-300 hover:scale-105 active:scale-95 flex-shrink-0"
-              style={{ background: chipBg, border: `1px solid ${chipBorder}`, backdropFilter: "blur(4px)", color: chipColor }}
+              className="hidden sm:flex items-center gap-1.5 px-2.5 py-1.5 rounded-full transition-all hover:scale-105 active:scale-95 flex-shrink-0"
+              style={solid
+                ? { background: "rgba(45,69,48,0.10)", border: "1px solid rgba(45,69,48,0.18)", color: "#2D4530" }
+                : { background: "rgba(45,69,48,0.45)", border: "1px solid rgba(255,255,255,0.22)", backdropFilter: "blur(4px)", color: "rgba(255,255,255,0.9)" }}
             >
               <CalendarDays size={15} />
               <span className="text-[11px] font-bold uppercase tracking-wide">Agenda</span>
@@ -138,12 +139,16 @@ export default function Header({ solid: solidProp = false }: Props) {
                   whileTap={{ scale: 0.97 }}
                 >
                   <div
-                    className="w-8 h-8 rounded-full flex items-center justify-center transition-all duration-300"
-                    style={{ background: logoBg, border: logoBorder }}
+                    className="w-8 h-8 rounded-full flex items-center justify-center"
+                    style={solid
+                      ? { background: "rgba(45,69,48,0.10)", border: "1px solid rgba(45,69,48,0.18)" }
+                      : { background: "rgba(255,255,255,0.2)", border: "1px solid rgba(255,255,255,0.35)" }}
                   >
-                    <span className="text-xs font-medium" style={{ color: logoColor }}>{initials}</span>
+                    <span className="text-xs font-medium" style={{ color: solid ? "#2D4530" : "rgba(255,255,255,0.95)" }}>
+                      {initials}
+                    </span>
                   </div>
-                  <span className="text-sm hidden md:block transition-all duration-300" style={{ color: logoColor }}>
+                  <span className="text-sm hidden md:block" style={{ color: solid ? "#2D4530" : "rgba(255,255,255,0.8)" }}>
                     {profile?.full_name?.split(" ")[0] || "Mi cuenta"}
                   </span>
                 </motion.button>
