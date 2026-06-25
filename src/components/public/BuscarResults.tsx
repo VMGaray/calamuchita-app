@@ -86,8 +86,8 @@ export default function BuscarResults({ query, results }: Props) {
   return (
     <div className="min-h-screen bg-brand-sand">
 
-      {/* Buscador inline */}
-      <div className="px-4 pt-6 max-w-4xl mx-auto">
+      {/* Buscador */}
+      <div className="px-4 pt-5 pb-2 max-w-4xl mx-auto">
         <div
           className="flex items-center rounded-2xl overflow-hidden h-12"
           style={{
@@ -96,7 +96,7 @@ export default function BuscarResults({ query, results }: Props) {
             boxShadow: "0 2px 12px rgba(45,69,48,0.07)",
           }}
         >
-          <Search size={16} className="ml-4 flex-shrink-0" style={{ color: "rgba(45,69,48,0.4)" }} />
+          <Search size={15} className="ml-4 flex-shrink-0" style={{ color: "rgba(45,69,48,0.4)" }} />
           <input
             type="text"
             value={inputValue}
@@ -108,7 +108,7 @@ export default function BuscarResults({ query, results }: Props) {
           />
           <button
             onClick={handleSearch}
-            className="px-5 h-full text-sm font-medium transition-colors"
+            className="px-5 h-full text-sm font-medium flex-shrink-0"
             style={{ background: "#2D4530", color: "#E1DBC9" }}
           >
             Buscar

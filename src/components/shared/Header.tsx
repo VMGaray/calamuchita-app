@@ -5,21 +5,21 @@ import { MapPin, Map as MapIcon, CalendarDays } from "lucide-react"
 import { useState, useEffect } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import { createClient } from "@/lib/supabase/client"
-import { useRouter, usePathname } from "next/navigation"
+import { useRouter } from "next/navigation"
 
 export default function Header() {
   const router = useRouter()
-  const pathname = usePathname()
   const [user, setUser] = useState<any>(null)
   const [profile, setProfile] = useState<any>(null)
   const [menuOpen, setMenuOpen] = useState(false)
+  const [scrolled, setScrolled] = useState(false)
 
-  const hasDarkHero = !pathname.startsWith("/directorio") &&
-    !pathname.startsWith("/negocios") &&
-    !pathname.startsWith("/buscar") &&
-    !pathname.startsWith("/eventos") &&
-    !pathname.startsWith("/mapa") &&
-    !pathname.startsWith("/info-util")
+  useEffect(() => {
+    const handler = () => setScrolled(window.scrollY > 10)
+    window.addEventListener("scroll", handler, { passive: true })
+    handler()
+    return () => window.removeEventListener("scroll", handler)
+  }, [])
 
   useEffect(() => {
     const supabase = createClient()
@@ -49,23 +49,27 @@ export default function Header() {
     ? profile.full_name.split(" ").map((n: string) => n[0]).slice(0, 2).join("").toUpperCase()
     : "?"
 
-  const headerBg = hasDarkHero
-    ? "transparent"
-    : "rgba(225,219,201,0.96)"
-  const textColor = hasDarkHero ? "rgba(255,255,255,0.97)" : "#2D4530"
-  const textShadow = hasDarkHero ? "0 1px 6px rgba(0,0,0,0.40)" : "none"
-  const chipBg = hasDarkHero ? "rgba(45,69,48,0.45)" : "rgba(45,69,48,0.12)"
-  const chipBorder = hasDarkHero ? "rgba(255,255,255,0.22)" : "rgba(45,69,48,0.2)"
-  const chipText = hasDarkHero ? "text-white/90" : "text-[#2D4530]"
+  // Sin scroll: transparente con texto blanco (para el hero del home)
+  // Con scroll: crema con texto verde oscuro (visible en todas las páginas)
+  const solid = scrolled
+  const bg = solid ? "rgba(225,219,201,0.97)" : "transparent"
+  const border = solid ? "1px solid rgba(45,69,48,0.10)" : "none"
+  const logoColor = solid ? "#2D4530" : "rgba(255,255,255,0.97)"
+  const logoShadow = solid ? "none" : "0 1px 6px rgba(0,0,0,0.40)"
+  const logoBg = solid ? "rgba(45,69,48,0.10)" : "rgba(255,255,255,0.2)"
+  const logoBorder = solid ? "1px solid rgba(45,69,48,0.18)" : "1px solid rgba(255,255,255,0.35)"
+  const chipBg = solid ? "rgba(45,69,48,0.10)" : "rgba(45,69,48,0.45)"
+  const chipBorder = solid ? "rgba(45,69,48,0.18)" : "rgba(255,255,255,0.22)"
+  const chipColor = solid ? "#2D4530" : "rgba(255,255,255,0.9)"
 
   return (
     <header
-      className="sticky top-0 z-50 pointer-events-none"
+      className="sticky top-0 z-50 pointer-events-none transition-all duration-300"
       style={{
-        background: headerBg,
-        backdropFilter: hasDarkHero ? undefined : "blur(16px)",
-        WebkitBackdropFilter: hasDarkHero ? undefined : "blur(16px)",
-        borderBottom: hasDarkHero ? undefined : "1px solid rgba(45,69,48,0.10)",
+        background: bg,
+        backdropFilter: solid ? "blur(16px)" : undefined,
+        WebkitBackdropFilter: solid ? "blur(16px)" : undefined,
+        borderBottom: border,
       }}
     >
       <div className="max-w-6xl mx-auto px-4 sm:px-6">
@@ -77,23 +81,21 @@ export default function Header() {
             {/* Logo */}
             <Link href="/" className="flex items-center gap-1.5 sm:gap-2 flex-shrink-0 -ml-1 sm:-ml-3">
               <div
-                className="w-8 h-8 rounded-xl flex items-center justify-center"
-                style={{ background: hasDarkHero ? "rgba(255,255,255,0.2)" : "rgba(45,69,48,0.12)", border: `1px solid ${hasDarkHero ? "rgba(255,255,255,0.35)" : "rgba(45,69,48,0.2)"}` }}
+                className="w-8 h-8 rounded-xl flex items-center justify-center transition-all duration-300"
+                style={{ background: logoBg, border: logoBorder }}
               >
-                <MapPin size={15} style={{ color: textColor }} />
+                <MapPin size={15} style={{ color: logoColor }} />
               </div>
-
-              {/* Nombre en dos líneas — igual en mobile y desktop */}
               <div className="flex flex-col leading-none">
                 <span
-                  className="font-serif text-[15px] sm:text-[17px] font-semibold"
-                  style={{ color: textColor, textShadow }}
+                  className="font-serif text-[15px] sm:text-[17px] font-semibold transition-all duration-300"
+                  style={{ color: logoColor, textShadow: logoShadow }}
                 >
                   Calamuchita
                 </span>
                 <span
-                  className="font-serif text-[10px] sm:text-[11px] font-medium tracking-widest uppercase"
-                  style={{ color: textColor, textShadow }}
+                  className="font-serif text-[10px] sm:text-[11px] font-medium tracking-widest uppercase transition-all duration-300"
+                  style={{ color: logoColor, textShadow: logoShadow }}
                 >
                   App
                 </span>
@@ -104,38 +106,32 @@ export default function Header() {
             <Link
               href="/mapa"
               prefetch={false}
-              className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-full transition-all hover:scale-105 active:scale-95 flex-shrink-0 ${chipText}`}
+              className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-full transition-all duration-300 hover:scale-105 active:scale-95 flex-shrink-0"
               style={{
                 background: chipBg,
                 border: `1px solid ${chipBorder}`,
                 backdropFilter: "blur(4px)",
+                color: chipColor,
               }}
             >
               <MapIcon size={15} />
-              {/* Mobile: etiqueta corta siempre visible */}
-              <span className="sm:hidden text-[11px] font-bold uppercase tracking-wide">
-                Mapa
-              </span>
-              {/* Desktop: etiqueta larga */}
-              <span className="hidden sm:block text-[10px] font-bold uppercase tracking-wider">
-                Explorar Mapa
-              </span>
+              <span className="sm:hidden text-[11px] font-bold uppercase tracking-wide">Mapa</span>
+              <span className="hidden sm:block text-[10px] font-bold uppercase tracking-wider">Explorar Mapa</span>
             </Link>
 
-            {/* Botón Agenda — oculto en mobile (ya está en la barra de categorías) */}
+            {/* Botón Agenda */}
             <Link
               href="/eventos"
-              className={`hidden sm:flex items-center gap-1.5 px-2.5 py-1.5 rounded-full transition-all hover:scale-105 active:scale-95 flex-shrink-0 ${chipText}`}
+              className="hidden sm:flex items-center gap-1.5 px-2.5 py-1.5 rounded-full transition-all duration-300 hover:scale-105 active:scale-95 flex-shrink-0"
               style={{
                 background: chipBg,
                 border: `1px solid ${chipBorder}`,
                 backdropFilter: "blur(4px)",
+                color: chipColor,
               }}
             >
               <CalendarDays size={15} />
-              <span className="text-[11px] font-bold uppercase tracking-wide">
-                Agenda
-              </span>
+              <span className="text-[11px] font-bold uppercase tracking-wide">Agenda</span>
             </Link>
           </div>
 
@@ -149,12 +145,12 @@ export default function Header() {
                   whileTap={{ scale: 0.97 }}
                 >
                   <div
-                    className="w-8 h-8 rounded-full flex items-center justify-center"
-                    style={{ background: "rgba(255,255,255,0.2)", border: "1px solid rgba(255,255,255,0.35)" }}
+                    className="w-8 h-8 rounded-full flex items-center justify-center transition-all duration-300"
+                    style={{ background: logoBg, border: logoBorder }}
                   >
-                    <span className="text-xs font-medium" style={{ color: "rgba(255,255,255,0.95)" }}>{initials}</span>
+                    <span className="text-xs font-medium" style={{ color: logoColor }}>{initials}</span>
                   </div>
-                  <span className="text-sm hidden md:block" style={{ color: "rgba(255,255,255,0.8)" }}>
+                  <span className="text-sm hidden md:block transition-all duration-300" style={{ color: logoColor }}>
                     {profile?.full_name?.split(" ")[0] || "Mi cuenta"}
                   </span>
                 </motion.button>
