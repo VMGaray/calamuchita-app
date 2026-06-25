@@ -5,6 +5,8 @@ import Image from "next/image"
 import AnimateIn from "@/components/ui/AnimateIn"
 import { Search, MapPin } from "lucide-react"
 import { normalizeArgPhone } from "@/lib/phone"
+import { useState } from "react"
+import { useRouter } from "next/navigation"
 
 const sectionLabels: Record<string, string> = {
   gastronomy: "Gastronomía",
@@ -67,16 +69,55 @@ interface Props {
 }
 
 export default function BuscarResults({ query, results }: Props) {
+  const router = useRouter()
+  const [inputValue, setInputValue] = useState(query)
+
   const getDetailUrl = (business: Business) => {
     if (business.section === "gastronomy") return `/negocios/${business.slug}`
     return `/directorio/${business.section}/${business.slug}`
   }
 
+  const handleSearch = () => {
+    const q = inputValue.trim()
+    if (!q) return
+    router.push(`/buscar?q=${encodeURIComponent(q)}`)
+  }
+
   return (
     <div className="min-h-screen bg-brand-sand">
 
+      {/* Buscador inline */}
+      <div className="px-4 pt-6 max-w-4xl mx-auto">
+        <div
+          className="flex items-center rounded-2xl overflow-hidden h-12"
+          style={{
+            background: "white",
+            border: "1px solid rgba(45,69,48,0.18)",
+            boxShadow: "0 2px 12px rgba(45,69,48,0.07)",
+          }}
+        >
+          <Search size={16} className="ml-4 flex-shrink-0" style={{ color: "rgba(45,69,48,0.4)" }} />
+          <input
+            type="text"
+            value={inputValue}
+            onChange={e => setInputValue(e.target.value)}
+            onKeyDown={e => e.key === "Enter" && handleSearch()}
+            placeholder="Buscar en todo el valle..."
+            className="flex-1 bg-transparent border-none outline-none px-3 h-full text-sm placeholder:text-stone-400"
+            style={{ color: "#2D4530" }}
+          />
+          <button
+            onClick={handleSearch}
+            className="px-5 h-full text-sm font-medium transition-colors"
+            style={{ background: "#2D4530", color: "#E1DBC9" }}
+          >
+            Buscar
+          </button>
+        </div>
+      </div>
+
       {/* Resultados */}
-      <div className="px-4 py-8 max-w-4xl mx-auto">
+      <div className="px-4 py-6 max-w-4xl mx-auto">
 
         {/* Resultados */}
         {query && (
