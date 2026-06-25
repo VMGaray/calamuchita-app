@@ -19,32 +19,39 @@ function normalizeStr(s: string) {
   return s.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase()
 }
 
+// Sinónimos que apuntan a subcategorías ESPECÍFICAS (no categorías catch-all)
 const SYNONYMS: Record<string, string[]> = {
   electricista: ["Electricidad"],
-  plomero: ["Plomería"],
-  gasista: ["Gasista"],
-  pintor: ["Pintor"],
-  cerrajero: ["Cerrajero"],
-  herrero: ["Herrero"],
-  mecanico: ["Mecánica"],
-  medico: ["Clínicas y Consultorios", "Especialidades"],
-  psicologo: ["Psicología"],
-  psicologa: ["Psicología"],
-  dentista: ["Clínicas y Consultorios"],
-  veterinario: ["Veterinarias"],
-  veterinaria: ["Veterinarias"],
-  kinesiologo: ["Especialidades"],
-  nutricionista: ["Especialidades"],
-  fonoaudiologo: ["Especialidades", "Clínicas y Consultorios"],
-  fonoaudiologa: ["Especialidades", "Clínicas y Consultorios"],
-  fonoaudiologia: ["Especialidades", "Clínicas y Consultorios"],
-  farmacia: ["Clínicas y Consultorios"],
-  carpintero: ["Profesionales"],
-  albañil: ["Construcción"],
-  albanil: ["Construcción"],
-  contador: ["Profesionales"],
-  abogado: ["Profesionales"],
-  arquitecto: ["Profesionales"],
+  plomero:      ["Plomería"],
+  plomeria:     ["Plomería"],
+  gasista:      ["Gasista"],
+  pintor:       ["Pintor"],
+  cerrajero:    ["Cerrajero"],
+  herrero:      ["Herrero"],
+  mecanico:     ["Mecánica"],
+  mecanica:     ["Mecánica"],
+  veterinario:  ["Veterinarias"],
+  veterinaria:  ["Veterinarias"],
+  psicologo:    ["Psicología"],
+  psicologa:    ["Psicología"],
+  psicologia:   ["Psicología"],
+  albanil:      ["Construcción"],
+  construccion: ["Construcción"],
+  jardinero:    ["Paisajismo y Jardines"],
+  jardineria:   ["Paisajismo y Jardines"],
+  limpieza:     ["Limpieza"],
+  piletero:     ["Piletero"],
+  pintura:      ["Pintor"],
+  zinguero:     ["Zinguero"],
+  fletes:       ["Fletes"],
+  flete:        ["Fletes"],
+  carpintero:   ["Profesionales"],
+  contador:     ["Profesionales"],
+  abogado:      ["Profesionales"],
+  arquitecto:   ["Profesionales"],
+  alojamiento:  ["Alojamiento"],
+  excursion:    ["Excursiones"],
+  excursiones:  ["Excursiones"],
 }
 
 function findMatchingSubcategories(q: string): string[] {
@@ -55,6 +62,7 @@ function findMatchingSubcategories(q: string): string[] {
   const allSubcats = Object.values(MASTER_CATEGORIES).flatMap(c =>
     c.subcategories.map(s => s.label)
   )
+  // Coincidencia normalizada con labels de subcategorías
   const fromLabels = allSubcats.filter(label => {
     const nl = normalizeStr(label)
     return nl.includes(nq) || nq.includes(nl)
@@ -71,12 +79,23 @@ export default async function BuscarPage({ searchParams }: Props) {
     ? await (async () => {
         const matchingSubcats = findMatchingSubcategories(q)
 
-        const orParts = [
+        const orParts: string[] = [
           `name.ilike.%${q}%`,
           `description.ilike.%${q}%`,
           `address.ilike.%${q}%`,
-          ...matchingSubcats.map(s => `subcategory.eq.${s}`),
         ]
+
+        // Búsqueda por prefijo (primeros 8 chars) para tolerar acentos en nombres.
+        // Ej: "fonoaudiologia" → busca también "%fonoaudi%" que sí matchea "Fonoaudióloga"
+        const prefix = q.substring(0, 8)
+        if (prefix.length >= 6 && prefix !== q) {
+          orParts.push(`name.ilike.%${prefix}%`)
+        }
+
+        // Coincidencias exactas por subcategoría
+        for (const s of matchingSubcats) {
+          orParts.push(`subcategory.eq.${s}`)
+        }
 
         return supabase
           .from("businesses")

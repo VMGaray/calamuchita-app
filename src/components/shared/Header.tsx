@@ -5,13 +5,21 @@ import { MapPin, Map as MapIcon, CalendarDays } from "lucide-react"
 import { useState, useEffect } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import { createClient } from "@/lib/supabase/client"
-import { useRouter } from "next/navigation"
+import { useRouter, usePathname } from "next/navigation"
 
 export default function Header() {
   const router = useRouter()
+  const pathname = usePathname()
   const [user, setUser] = useState<any>(null)
   const [profile, setProfile] = useState<any>(null)
   const [menuOpen, setMenuOpen] = useState(false)
+
+  const hasDarkHero = !pathname.startsWith("/directorio") &&
+    !pathname.startsWith("/negocios") &&
+    !pathname.startsWith("/buscar") &&
+    !pathname.startsWith("/eventos") &&
+    !pathname.startsWith("/mapa") &&
+    !pathname.startsWith("/info-util")
 
   useEffect(() => {
     const supabase = createClient()
@@ -41,8 +49,25 @@ export default function Header() {
     ? profile.full_name.split(" ").map((n: string) => n[0]).slice(0, 2).join("").toUpperCase()
     : "?"
 
+  const headerBg = hasDarkHero
+    ? "transparent"
+    : "rgba(225,219,201,0.96)"
+  const textColor = hasDarkHero ? "rgba(255,255,255,0.97)" : "#2D4530"
+  const textShadow = hasDarkHero ? "0 1px 6px rgba(0,0,0,0.40)" : "none"
+  const chipBg = hasDarkHero ? "rgba(45,69,48,0.45)" : "rgba(45,69,48,0.12)"
+  const chipBorder = hasDarkHero ? "rgba(255,255,255,0.22)" : "rgba(45,69,48,0.2)"
+  const chipText = hasDarkHero ? "text-white/90" : "text-[#2D4530]"
+
   return (
-    <header className="sticky top-0 z-50 pointer-events-none" style={{ background: "transparent" }}>
+    <header
+      className="sticky top-0 z-50 pointer-events-none"
+      style={{
+        background: headerBg,
+        backdropFilter: hasDarkHero ? undefined : "blur(16px)",
+        WebkitBackdropFilter: hasDarkHero ? undefined : "blur(16px)",
+        borderBottom: hasDarkHero ? undefined : "1px solid rgba(45,69,48,0.10)",
+      }}
+    >
       <div className="max-w-6xl mx-auto px-4 sm:px-6">
         <div className="h-16 flex items-center justify-between gap-2">
 
@@ -53,22 +78,22 @@ export default function Header() {
             <Link href="/" className="flex items-center gap-1.5 sm:gap-2 flex-shrink-0 -ml-1 sm:-ml-3">
               <div
                 className="w-8 h-8 rounded-xl flex items-center justify-center"
-                style={{ background: "rgba(255,255,255,0.2)", border: "1px solid rgba(255,255,255,0.35)" }}
+                style={{ background: hasDarkHero ? "rgba(255,255,255,0.2)" : "rgba(45,69,48,0.12)", border: `1px solid ${hasDarkHero ? "rgba(255,255,255,0.35)" : "rgba(45,69,48,0.2)"}` }}
               >
-                <MapPin size={15} style={{ color: "rgba(255,255,255,0.9)" }} />
+                <MapPin size={15} style={{ color: textColor }} />
               </div>
 
               {/* Nombre en dos líneas — igual en mobile y desktop */}
               <div className="flex flex-col leading-none">
                 <span
                   className="font-serif text-[15px] sm:text-[17px] font-semibold"
-                  style={{ color: "rgba(255,255,255,0.97)", textShadow: "0 1px 6px rgba(0,0,0,0.40)" }}
+                  style={{ color: textColor, textShadow }}
                 >
                   Calamuchita
                 </span>
                 <span
                   className="font-serif text-[10px] sm:text-[11px] font-medium tracking-widest uppercase"
-                  style={{ color: "rgba(255,255,255,0.97)", textShadow: "0 1px 6px rgba(0,0,0,0.40)" }}
+                  style={{ color: textColor, textShadow }}
                 >
                   App
                 </span>
@@ -79,20 +104,20 @@ export default function Header() {
             <Link
               href="/mapa"
               prefetch={false}
-              className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-full transition-all hover:scale-105 active:scale-95 flex-shrink-0"
+              className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-full transition-all hover:scale-105 active:scale-95 flex-shrink-0 ${chipText}`}
               style={{
-                background: "rgba(45,69,48,0.45)",
-                border: "1px solid rgba(255,255,255,0.22)",
+                background: chipBg,
+                border: `1px solid ${chipBorder}`,
                 backdropFilter: "blur(4px)",
               }}
             >
-              <MapIcon size={15} className="text-white/90" />
+              <MapIcon size={15} />
               {/* Mobile: etiqueta corta siempre visible */}
-              <span className="sm:hidden text-[11px] font-bold uppercase tracking-wide text-white/90">
+              <span className="sm:hidden text-[11px] font-bold uppercase tracking-wide">
                 Mapa
               </span>
               {/* Desktop: etiqueta larga */}
-              <span className="hidden sm:block text-[10px] font-bold uppercase tracking-wider text-white/90">
+              <span className="hidden sm:block text-[10px] font-bold uppercase tracking-wider">
                 Explorar Mapa
               </span>
             </Link>
@@ -100,16 +125,15 @@ export default function Header() {
             {/* Botón Agenda — oculto en mobile (ya está en la barra de categorías) */}
             <Link
               href="/eventos"
-              className="hidden sm:flex items-center gap-1.5 px-2.5 py-1.5 rounded-full transition-all hover:scale-105 active:scale-95 flex-shrink-0"
+              className={`hidden sm:flex items-center gap-1.5 px-2.5 py-1.5 rounded-full transition-all hover:scale-105 active:scale-95 flex-shrink-0 ${chipText}`}
               style={{
-                background: "rgba(45,69,48,0.45)",
-                border: "1px solid rgba(255,255,255,0.22)",
+                background: chipBg,
+                border: `1px solid ${chipBorder}`,
                 backdropFilter: "blur(4px)",
               }}
             >
-              <CalendarDays size={15} className="text-white/90" />
-              {/* Etiqueta visible en todos los tamaños */}
-              <span className="text-[11px] font-bold uppercase tracking-wide text-white/90">
+              <CalendarDays size={15} />
+              <span className="text-[11px] font-bold uppercase tracking-wide">
                 Agenda
               </span>
             </Link>
