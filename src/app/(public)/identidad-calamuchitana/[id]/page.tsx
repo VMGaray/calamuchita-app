@@ -76,7 +76,7 @@ export default async function EditorialPostPage({ params }: Props) {
               alt={post.title}
               fill
               priority
-              className="object-cover"
+              className="object-cover object-top"
               sizes="(max-width: 672px) 100vw, 672px"
               quality={85}
             />

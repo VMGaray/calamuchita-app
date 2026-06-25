@@ -97,8 +97,8 @@ export default function PulsoDelValle({ posts }: Props) {
               href={`/identidad-calamuchitana/${post.id}`}
               className="flex-shrink-0 w-[72vw] max-w-[280px] snap-center bg-white rounded-2xl overflow-hidden flex flex-col shadow-md hover:shadow-lg transition-shadow group"
             >
-              {/* Imagen — aspect-video fijo, anti-CLS */}
-              <div className="relative aspect-video overflow-hidden bg-stone-100 flex-shrink-0">
+              {/* Imagen — aspect-[4/3] fijo, anti-CLS */}
+              <div className="relative aspect-[4/3] overflow-hidden bg-stone-100 flex-shrink-0">
                 {/* shimmer sobre fondo claro */}
                 <div className="absolute inset-0 animate-pulse bg-gradient-to-r from-stone-100 via-stone-50 to-stone-100" />
 
@@ -107,7 +107,7 @@ export default function PulsoDelValle({ posts }: Props) {
                     src={post.image_url}
                     alt={post.title}
                     fill
-                    className="object-cover group-hover:scale-105 transition-transform duration-500"
+                    className="object-cover object-top group-hover:scale-105 transition-transform duration-500"
                     sizes="(max-width: 768px) 72vw, 280px"
                     quality={75}
                     priority={i < 2}
