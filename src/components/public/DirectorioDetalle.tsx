@@ -162,7 +162,11 @@ export default function DirectorioDetalle({ business, section, promotions = [] }
       {/* ═══════════════════════════════════════════════════════════════
           1 — PORTADA FULL-WIDTH
       ═══════════════════════════════════════════════════════════════ */}
-      <div className="relative w-full h-64 sm:h-72 overflow-hidden" style={{ background: "#1a2e1c" }}>
+      <div
+        className="relative w-full h-64 sm:h-72 overflow-hidden"
+        style={{ background: "#1a2e1c", cursor: coverUrl ? "zoom-in" : undefined }}
+        onClick={() => { if (coverUrl) setLightboxSrc(coverUrl) }}
+      >
         {coverUrl ? (
           <Image src={coverUrl} alt={business.name} fill priority className="object-contain" sizes="100vw" quality={85} />
         ) : (
@@ -181,6 +185,7 @@ export default function DirectorioDetalle({ business, section, promotions = [] }
         {/* Botón volver */}
         <a
           href={backHref}
+          onClick={e => e.stopPropagation()}
           className="absolute top-20 left-4 z-10 flex items-center gap-2 px-3 py-2 rounded-full text-sm font-semibold text-white transition-opacity hover:opacity-80 active:opacity-60"
           style={{ background: "rgba(0,0,0,0.28)", backdropFilter: "blur(8px)", WebkitBackdropFilter: "blur(8px)" }}
         >
