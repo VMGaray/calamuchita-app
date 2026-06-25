@@ -148,7 +148,7 @@ export default function DirectorioDetalle({ business, section, promotions = [] }
     const arr = byDay.get(h.day_of_week) ?? []; arr.push(h); byDay.set(h.day_of_week, arr)
   }
 
-  const coverUrl     = photos[0] || null
+  const coverUrl     = business.cover_url || photos[0] || null
   const prevPhoto    = () => setPhotoIdx(i => (i - 1 + photos.length) % photos.length)
   const nextPhoto    = () => setPhotoIdx(i => (i + 1) % photos.length)
 
