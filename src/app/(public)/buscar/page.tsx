@@ -97,6 +97,8 @@ const SPECIALTY_SYNONYMS: Record<string, string[]> = {
   dentista:        ["Odontología"],
   medico:          ["Medicina"],
   medicina:        ["Medicina"],
+  clinico:         ["Medicina"],
+  clinica:         ["Medicina"],
   pediatra:        ["Pediatría"],
   pediatria:       ["Pediatría"],
   reflexologo:     ["Reflexología"],

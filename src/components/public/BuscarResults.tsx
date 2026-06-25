@@ -197,7 +197,7 @@ export default function BuscarResults({ query, results }: Props) {
 
               return (
                 <AnimateIn key={cardKey} direction="up" delay={i * 0.04}>
-                  <Link href={getDetailUrl(business)}>
+                  <Link href={prof ? `${getDetailUrl(business)}?prof=${encodeURIComponent(prof.name)}` : getDetailUrl(business)}>
                     <div className="bg-white rounded-2xl border border-stone-200 overflow-hidden flex items-center gap-4 p-4 hover:border-stone-300 transition-all hover:shadow-sm">
 
                       {/* Avatar: foto del profesional si existe, sino logo/cover del negocio */}
