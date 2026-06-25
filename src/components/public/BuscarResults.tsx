@@ -3,7 +3,7 @@
 import Link from "next/link"
 import Image from "next/image"
 import AnimateIn from "@/components/ui/AnimateIn"
-import { Search, MapPin } from "lucide-react"
+import { Search, MapPin, ArrowLeft } from "lucide-react"
 import { normalizeArgPhone } from "@/lib/phone"
 import { useState } from "react"
 import { useRouter } from "next/navigation"
@@ -86,8 +86,22 @@ export default function BuscarResults({ query, results }: Props) {
   return (
     <div className="min-h-screen bg-brand-sand">
 
-      {/* Buscador */}
-      <div className="px-4 pt-5 pb-2 max-w-4xl mx-auto">
+      {/* pt-20 compensa el -mt-20 del layout: este componente empieza en y≈8px
+          (64px header + 24px navbars − 80px margen negativo). Con 80px de padding
+          el primer elemento visible queda en y≈88px, debajo del header fijo. */}
+      <div className="px-4 pt-20 pb-2 max-w-4xl mx-auto">
+
+        {/* Navegación de regreso — siempre visible independientemente del header */}
+        <Link
+          href="/"
+          className="inline-flex items-center gap-1.5 mb-3 py-0.5"
+          style={{ color: "#2D4530" }}
+        >
+          <ArrowLeft size={15} />
+          <span className="text-sm font-medium">Inicio</span>
+        </Link>
+
+        {/* Buscador */}
         <div
           className="flex items-center rounded-2xl overflow-hidden h-12"
           style={{

@@ -56,7 +56,7 @@ export default function Header() {
 
   return (
     <header
-      className="sticky top-0 z-50 pointer-events-none"
+      className="sticky top-0 z-50 pointer-events-auto"
       style={solid ? {
         background: "rgba(225,219,201,0.97)",
         backdropFilter: "blur(16px)",
