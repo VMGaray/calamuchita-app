@@ -55,6 +55,7 @@ export const MASTER_CATEGORIES = {
       { label: "Licenciado en higiene y seguridad", icon: ClipboardList, bg: "bg-teal-50", color: "text-teal-700" },
       { label: "Bombas y Motores eléctricos", icon: Cog, bg: "bg-cyan-50", color: "text-cyan-700" },
       { label: "Alquiler de autos", icon: Car, bg: "bg-blue-50", color: "text-blue-600" },
+      { label: "Compostura de calzado", icon: Scissors, bg: "bg-amber-50", color: "text-amber-700" },
       { label: "Refrigeración", icon: Snowflake, bg: "bg-slate-50", color: "text-slate-400" },
       { label: "Otro", icon: Sparkles, bg: "bg-stone-50", color: "text-stone-400" },
     ]
