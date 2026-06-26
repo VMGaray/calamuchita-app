@@ -100,6 +100,7 @@ export const MASTER_CATEGORIES = {
       { label: "Colegios", icon: GraduationCap, bg: "bg-indigo-50", color: "text-indigo-600" },
       { label: "Idiomas", icon: Languages, bg: "bg-violet-50", color: "text-violet-600" },
       { label: "Maestras/os Particulares", icon: Users, bg: "bg-orange-50", color: "text-orange-600" },
+      { label: "Universidad/Terciario", icon: BookOpen, bg: "bg-blue-50", color: "text-blue-600" },
     ]
   },
   sports: {

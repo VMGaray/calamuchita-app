@@ -61,6 +61,7 @@ export const sectionCategories = {
     { label: "Colegios", desc: "Escuelas primarias y secundarias", href: "/directorio/education?cat=colegios", bg: "bg-brand-pine/10", color: "text-brand-pine" },
     { label: "Idiomas", desc: "Inglés, portugués y más", href: "/directorio/education?cat=idiomas", bg: "bg-brand-slate/10", color: "text-brand-slate" },
     { label: "Maestras/os Particulares", desc: "Apoyo escolar y tutorías", href: "/directorio/education?cat=maestras", bg: "bg-brand-earth/10", color: "text-brand-earth" },
+    { label: "Universidad/Terciario", desc: "Institutos terciarios y universidad", href: "/directorio/education?cat=universidad", bg: "bg-brand-slate/10", color: "text-brand-slate" },
     { label: "Todos", desc: "Ver toda la oferta educativa", href: "/directorio/education", bg: "bg-brand-sand/50", color: "text-brand-charcoal" },
   ],
   sports: [

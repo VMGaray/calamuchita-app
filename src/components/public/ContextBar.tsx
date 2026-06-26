@@ -72,6 +72,7 @@ const SUBCAT_LABELS: Record<string, string> = {
   deporte:       "Deporte",
   idiomas:       "Idiomas",
   maestras:      "Maestras/os",
+  universidad:   "Universidad/Terciario",
   // tourism
   actividades:   "Actividades",
   agencia:       "Agencia de Viajes",

@@ -42,7 +42,7 @@ const categoryIcons: Record<string, any> = {
   "Hospitales y Dispensarios": AlertCircle, "Laboratorios": FlaskConical,
   "Psicología": Brain, "Terapias alternativas": Leaf, "Traslado de pacientes": Ambulance,
   "Arte y Música": Music, "Colegios": GraduationCap, "Deporte": Trophy,
-  "Idiomas": Languages, "Maestras/os Particulares": Users,
+  "Idiomas": Languages, "Maestras/os Particulares": Users, "Universidad/Terciario": BookOpen,
   "Actividades y Paseos": Activity, "Agencia de Viajes": Plane,
   "Alojamiento": Hotel, "Alquiler": Compass, "Alquiler de autos": Car, "Compostura de calzado": Scissors, "Excursiones": Map,
   "Fábrica de Espumantes": Wine, "Forrajería": Package, "Hogar": Armchair, "Imprenta": Printer, "Indumentaria": Shirt, "Mascotas": Dog, "Niños": Baby,
