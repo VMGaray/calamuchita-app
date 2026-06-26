@@ -42,6 +42,7 @@ export const sectionCategories = {
     { label: "Alquiler de autos", desc: "Alquiler de vehículos", href: "/directorio/services?cat=alquiler-autos", bg: "bg-brand-slate/10", color: "text-brand-slate" },
     { label: "Compostura de calzado", desc: "Reparación y arreglo de zapatos", href: "/directorio/services?cat=compostura", bg: "bg-brand-earth/10", color: "text-brand-earth" },
     { label: "Refrigeración", desc: "Aire acondicionado y cámaras frías", href: "/directorio/services?cat=refrigeracion", bg: "bg-brand-slate/10", color: "text-brand-slate" },
+    { label: "Papelería creativa", desc: "Librería, materiales y suministros creativos", href: "/directorio/services?cat=papeleria-creativa", bg: "bg-brand-slate/10", color: "text-brand-slate" },
     { label: "Varios", desc: "Otros servicios del valle", href: "/directorio/services?cat=varios", bg: "bg-brand-sand/50", color: "text-brand-charcoal" },
     { label: "Todos", desc: "Ver todos los servicios", href: "/directorio/services", bg: "bg-brand-sand/50", color: "text-brand-charcoal" },
   ],

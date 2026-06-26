@@ -58,6 +58,7 @@ const SUBCAT_LABELS: Record<string, string> = {
   refrigeracion:       "Refrigeración",
   "alquiler-autos":    "Alquiler de autos",
   compostura:          "Compostura de calzado",
+  "papeleria-creativa": "Papelería creativa",
   // health
   clinicas:      "Clínicas y Consultorios",
   especialidades:"Especialidades",

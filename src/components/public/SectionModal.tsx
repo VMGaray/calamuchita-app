@@ -31,6 +31,7 @@ const categoryIcons: Record<string, any> = {
   "Higiene y seguridad laboral": ShieldCheck, "Licenciado en higiene y seguridad": ClipboardList,
   "Bombas y Motores eléctricos": Cog,
   "Refrigeración": Snowflake,
+  "Papelería creativa": Palette,
   "Fútbol": Trophy, "Rugby": Shield, "Hockey": Zap, "Básquet": Activity,
   "Handball": Users, "Fausball": Trophy,
   "Pádel": Activity, "Vóley": Users, "Tenis": Activity,
