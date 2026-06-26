@@ -293,6 +293,7 @@ export default function NegocioDetalle({ business, promotions = [] }: Props) {
           {/* ── Datos de contacto ── */}
           <div className="bg-white/50 rounded-2xl px-4 py-1">
             {business.phone      && <InfoRow icon={<Phone size={14} style={{ color: "#2D4530" }} />}  sublabel="Teléfono"   label={business.phone}                                   href={`tel:${business.phone}`} />}
+            {business.whatsapp && business.whatsapp !== business.phone && <InfoRow icon={<WaIcon size={14} />} sublabel="WhatsApp" label={business.whatsapp} href={waLink ?? undefined} external />}
             {instagramHandle     && <InfoRow icon={<AtSign size={14} style={{ color: "#2D4530" }} />} sublabel="Instagram"  label={`@${instagramHandle}`}                            href={`https://instagram.com/${instagramHandle}`} external />}
             {business.website    && <InfoRow icon={<Globe size={14} style={{ color: "#2D4530" }} />}  sublabel="Web"        label={business.website.replace(/^https?:\/\//, "")}     href={business.website} external />}
             {business.address    && <InfoRow icon={<MapPin size={14} style={{ color: "#2D4530" }} />} sublabel="Dirección"  label={business.address} />}

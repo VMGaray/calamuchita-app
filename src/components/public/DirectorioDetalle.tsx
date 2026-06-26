@@ -372,6 +372,7 @@ export default function DirectorioDetalle({ business, section, promotions = [] }
           {/* ── Datos de contacto ── */}
           <div className="bg-white/50 rounded-2xl px-4 py-1">
             {business.phone      && <InfoRow icon={<Phone size={14} style={{ color: "#2D4530" }} />}  sublabel="Teléfono"   label={business.phone}                                   href={`tel:${business.phone}`} />}
+            {business.whatsapp && business.whatsapp !== business.phone && <InfoRow icon={<WaIcon size={14} />} sublabel="WhatsApp" label={business.whatsapp} href={waLink ?? undefined} external />}
             {instagramHandle     && <InfoRow icon={<AtSign size={14} style={{ color: "#2D4530" }} />} sublabel="Instagram"  label={`@${instagramHandle}`}                            href={`https://instagram.com/${instagramHandle}`} external />}
             {websiteUrl          && <InfoRow icon={<Globe size={14} style={{ color: "#2D4530" }} />}  sublabel="Sitio web"  label={websiteUrl.replace(/^https?:\/\//, "")}            href={websiteUrl} external />}
             {business.address    && <InfoRow icon={<MapPin size={14} style={{ color: "#2D4530" }} />} sublabel="Dirección"  label={business.address} />}
