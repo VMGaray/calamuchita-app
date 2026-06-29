@@ -166,7 +166,11 @@ export default function NegocioDetalle({ business, promotions = [] }: Props) {
   const coverUrl     = photos[0] || null
   const prevPhoto    = () => setPhotoIdx(i => (i - 1 + photos.length) % photos.length)
   const nextPhoto    = () => setPhotoIdx(i => (i + 1) % photos.length)
-  const categoryLabel = business.subcategory || business.category || "Comercio"
+  const CATEGORY_LABELS: Record<string, string> = {
+    restaurant: "Restaurante", cafe_bar: "Bar/Café", cafe: "Café", bar: "Bar",
+    viandas: "Viandas", panaderia: "Panadería", sushi: "Sushi", other: "Gastronomía",
+  }
+  const categoryLabel = business.subcategory || CATEGORY_LABELS[business.category] || "Gastronomía"
   const isOpen        = calcIsOpenNow(business.business_hours ?? [])
 
   const todayIdx = new Date(new Date().toLocaleString("en-US", { timeZone: "America/Argentina/Buenos_Aires" })).getDay()

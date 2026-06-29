@@ -78,9 +78,12 @@ export default function BusinessesGrid() {
 
   const categoryLabel: Record<string, string> = {
     restaurant: "Restaurante",
+    cafe_bar: "Bar/Café",
     cafe: "Café",
-    viandas: "Viandas",
     bar: "Bar",
+    viandas: "Viandas",
+    panaderia: "Panadería",
+    sushi: "Sushi",
     other: "Gastronomía",
   }
 

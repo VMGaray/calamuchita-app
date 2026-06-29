@@ -24,6 +24,7 @@ const SECTION_ES: Record<string, string> = {
   health:     "Salud",
   education:  "Educación",
   tourism:    "Turismo",
+  sports:     "Deportes",
   events:     "Eventos",
   info:       "Info útil",
 }

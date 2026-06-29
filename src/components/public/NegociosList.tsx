@@ -39,10 +39,12 @@ interface Props {
 
 const categoryLabel: Record<string, string> = {
   restaurant: "Restaurante",
+  cafe_bar: "Bar/Café",
   cafe: "Café",
+  bar: "Bar",
   viandas: "Viandas",
   panaderia: "Panadería",
-  bar: "Bar",
+  sushi: "Sushi",
   other: "Gastronomía",
 }
 
