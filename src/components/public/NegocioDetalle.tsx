@@ -120,8 +120,9 @@ export default function NegocioDetalle({ business, promotions = [] }: Props) {
     }
   }
   const handleHacerPedido = () => {
-    if (hasMenu) { handleVerCarta() }
-    else if (waNumber) {
+    if (hasInteractiveCarta) {
+      cartaRef.current?.scrollIntoView({ behavior: "smooth", block: "start" })
+    } else if (waNumber) {
       recordLead("whatsapp")
       window.open(`https://wa.me/${waNumber}?text=${encodeURIComponent(`Hola ${business.name}! Quiero hacer un pedido. ¿Me compartís el menú disponible? Gracias!`)}`, "_blank")
     }
