@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react"
 import { motion } from "framer-motion"
-import { Eye, MessageCircle, Star, TrendingUp } from "lucide-react"
+import { Eye, MessageCircle, Star, TrendingUp, Download } from "lucide-react"
 import { createClient } from "@/lib/supabase/client"
 import AnimatedCounter from "@/components/ui/AnimatedCounter"
 import {
@@ -97,13 +97,49 @@ export default function AdminStats() {
     .filter(s => s.count > 0)
     .sort((a, b) => b.views - a.views)
 
+  function exportCSV() {
+    const rows = [
+      ["Negocio", "Sección", "Vistas", "Contactos WhatsApp", "Conversión (%)"],
+      ...businesses.map(b => {
+        const conv = b.total_views > 0
+          ? ((b.total_leads / b.total_views) * 100).toFixed(1)
+          : "0.0"
+        return [
+          b.name,
+          SECTION_LABELS[b.section] ?? b.section,
+          b.total_views,
+          b.total_leads,
+          conv,
+        ]
+      }),
+    ]
+    const csv = rows.map(r => r.map(v => `"${String(v).replace(/"/g, '""')}"`).join(",")).join("\n")
+    const blob = new Blob(["﻿" + csv], { type: "text/csv;charset=utf-8;" })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement("a")
+    a.href = url
+    a.download = `metricas-calamuchita-${new Date().toISOString().slice(0, 10)}.csv`
+    a.click()
+    URL.revokeObjectURL(url)
+  }
+
   // ── Render ────────────────────────────────────────────────────────
   return (
     <div className="space-y-6">
 
-      <div>
-        <h1 className="text-2xl text-stone-800 mb-1">Estadísticas</h1>
-        <p className="text-stone-500 text-sm">Actividad acumulada de todos los negocios activos</p>
+      <div className="flex items-start justify-between gap-4">
+        <div>
+          <h1 className="text-2xl text-stone-800 mb-1">Estadísticas</h1>
+          <p className="text-stone-500 text-sm">Actividad acumulada de todos los negocios activos</p>
+        </div>
+        <button
+          onClick={exportCSV}
+          className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold transition-all hover:opacity-90 active:scale-95 shrink-0"
+          style={{ background: "#2D4530", color: "#E1DBC9" }}
+        >
+          <Download size={15} />
+          Exportar CSV
+        </button>
       </div>
 
       {/* ── KPIs ── */}
