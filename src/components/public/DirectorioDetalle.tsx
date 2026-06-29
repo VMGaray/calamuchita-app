@@ -210,7 +210,11 @@ export default function DirectorioDetalle({ business, section, promotions = [] }
                 <div className="flex items-start gap-4 mb-4">
                   {/* Foto o inicial */}
                   {matchedPro.photo_url ? (
-                    <div className="relative w-20 h-20 rounded-2xl overflow-hidden flex-shrink-0 bg-stone-100">
+                    <button
+                      onClick={() => setLightboxSrc(matchedPro.photo_url)}
+                      className="relative w-20 h-20 rounded-2xl overflow-hidden flex-shrink-0 bg-stone-100 cursor-zoom-in hover:ring-2 hover:ring-[#2D4530]/30 transition-all"
+                      aria-label="Ampliar foto"
+                    >
                       <Image
                         src={matchedPro.photo_url}
                         alt={matchedPro.name}
@@ -219,7 +223,7 @@ export default function DirectorioDetalle({ business, section, promotions = [] }
                         sizes="80px"
                         quality={85}
                       />
-                    </div>
+                    </button>
                   ) : (
                     <div
                       className="w-20 h-20 rounded-2xl flex-shrink-0 flex items-center justify-center font-serif text-3xl font-bold"
@@ -562,15 +566,21 @@ export default function DirectorioDetalle({ business, section, promotions = [] }
                             : null
                           return (
                             <div key={i} className="rounded-2xl border border-stone-100 p-3 flex flex-col items-center text-center gap-2" style={{ background: "#FAFAF9" }}>
-                              <div className="w-14 h-14 rounded-xl overflow-hidden flex-shrink-0">
-                                {pro.photo_url ? (
+                              {pro.photo_url ? (
+                                <button
+                                  onClick={() => setLightboxSrc(pro.photo_url)}
+                                  className="w-14 h-14 rounded-xl overflow-hidden flex-shrink-0 cursor-zoom-in hover:ring-2 hover:ring-[#2D4530]/30 transition-all"
+                                  aria-label="Ampliar foto"
+                                >
                                   <Image src={pro.photo_url} alt={pro.name} width={56} height={56} className="w-full h-full object-cover" />
-                                ) : (
+                                </button>
+                              ) : (
+                                <div className="w-14 h-14 rounded-xl overflow-hidden flex-shrink-0">
                                   <div className="w-full h-full flex items-center justify-center font-serif text-xl font-bold" style={{ background: "#2D4530", color: "#E1DBC9" }}>
                                     {pro.name?.[0] ?? "?"}
                                   </div>
-                                )}
-                              </div>
+                                </div>
+                              )}
                               <div className="w-full">
                                 <p className="text-xs font-bold leading-snug line-clamp-2" style={{ color: "#2D4530" }}>{pro.name}</p>
                                 {pro.specialty && <p className="text-[10px] mt-0.5 line-clamp-1" style={{ color: "rgba(45,69,48,0.55)" }}>{pro.specialty}</p>}
