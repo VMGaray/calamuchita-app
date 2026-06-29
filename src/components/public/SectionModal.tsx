@@ -8,7 +8,7 @@ import { useLocalidad } from "@/lib/context/LocalidadContext"
 import { sectionCategories, SectionKey } from "@/lib/sections"
 import { ShoppingBag, MapPin, Check } from "lucide-react"
 import {
-  Utensils, Coffee, Beer, Bike, Clock, Package,
+  Utensils, Coffee, Beer, Bike, Clock, Package, Fish,
   Wrench, Zap, Flame, Car, Building, Paintbrush, Hammer, KeyRound, Leaf, Waves, Home, Bug, Droplets, Sparkles, Shield, Truck, Mountain, HardHat, Scissors, Video, ShieldCheck, ClipboardList,
   Stethoscope, Pill, Brain, Smile, Eye, PawPrint, AlertCircle, Ambulance,
   GraduationCap, BookOpen, Languages, Users, Music, Trophy,
@@ -20,7 +20,7 @@ import {
 } from "lucide-react"
 
 const categoryIcons: Record<string, any> = {
-  "Restaurantes": Utensils, "Bar/Café": Coffee, "Viandas": ShoppingBag, "Panadería": Wheat,
+  "Restaurantes": Utensils, "Bar/Café": Coffee, "Viandas": ShoppingBag, "Panadería": Wheat, "Sushi": Fish,
   "Delivery": Bike, "Take Away": Package, "Abierto ahora": Clock,
   "Alarmas-Seguridad": Shield, "Cerrajero": KeyRound, "Construcción": Building,
   "Fletes": Truck, "Movimiento de suelos": HardHat, "Venta de áridos": Mountain, "Desinfecciones": Bug,
