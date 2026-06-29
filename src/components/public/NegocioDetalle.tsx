@@ -104,15 +104,23 @@ export default function NegocioDetalle({ business, promotions = [] }: Props) {
     ? `https://wa.me/${waNumber}?text=${encodeURIComponent(`Hola! Me contacto desde Calamuchita App por el negocio ${business.name}.`)}`
     : null
 
-  const hasMenu   = (business.menu_categories?.length ?? 0) > 0
+  const hasInteractiveCarta = (business.menu_categories?.length ?? 0) > 0
+  const hasPdfCarta         = !!business.menu_pdf_url
+  const hasMenu             = hasInteractiveCarta || hasPdfCarta
   const todayMenu = business.daily_menus?.find((m: any) => {
     const today = new Date().toISOString().split("T")[0]
     return m.date === today && m.is_published
   })
 
-  const handleVerCarta  = () => cartaRef.current?.scrollIntoView({ behavior: "smooth", block: "start" })
+  const handleVerCarta = () => {
+    if (hasInteractiveCarta) {
+      cartaRef.current?.scrollIntoView({ behavior: "smooth", block: "start" })
+    } else if (hasPdfCarta) {
+      window.open(business.menu_pdf_url, "_blank")
+    }
+  }
   const handleHacerPedido = () => {
-    if (hasMenu) { cartaRef.current?.scrollIntoView({ behavior: "smooth", block: "start" }) }
+    if (hasMenu) { handleVerCarta() }
     else if (waNumber) {
       recordLead("whatsapp")
       window.open(`https://wa.me/${waNumber}?text=${encodeURIComponent(`Hola ${business.name}! Quiero hacer un pedido. ¿Me compartís el menú disponible? Gracias!`)}`, "_blank")
@@ -471,9 +479,32 @@ export default function NegocioDetalle({ business, promotions = [] }: Props) {
           )}
 
           {/* Carta interactiva */}
-          {business.menu_categories?.length > 0 && (
+          {hasInteractiveCarta && (
             <div ref={cartaRef}>
               <CartaInteractiva categories={business.menu_categories} business={business} />
+            </div>
+          )}
+
+          {/* Carta en PDF */}
+          {hasPdfCarta && !hasInteractiveCarta && (
+            <div ref={cartaRef} className="bg-white rounded-2xl border border-stone-200 p-5">
+              <p className="text-[10px] font-black uppercase tracking-[0.2em] mb-4" style={{ color: "rgba(45,69,48,0.42)" }}>Carta</p>
+              <a
+                href={business.menu_pdf_url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-4 p-4 rounded-xl border border-stone-100 hover:border-[#2D4530]/30 transition-all"
+                style={{ background: "rgba(45,69,48,0.03)" }}
+              >
+                <div className="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0" style={{ background: "#2D4530" }}>
+                  <span className="text-xs font-black text-white">PDF</span>
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-semibold" style={{ color: "#2D4530" }}>Ver carta completa</p>
+                  <p className="text-xs mt-0.5" style={{ color: "rgba(45,69,48,0.50)" }}>Se abre en una nueva pestaña</p>
+                </div>
+                <span style={{ color: "#2D4530", opacity: 0.5 }}>↗</span>
+              </a>
             </div>
           )}
 
