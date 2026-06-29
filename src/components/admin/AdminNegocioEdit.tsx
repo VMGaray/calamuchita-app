@@ -674,26 +674,51 @@ export default function AdminNegocioEdit({ id }: Props) {
           </div>
         </div>
 
-        {/* PDF */}
-       {form.section === "gastronomy" && (
-  <div className="bg-white rounded-2xl border border-stone-200 p-6">
-    <h2 className="text-sm font-medium text-stone-700 mb-4">Servicios</h2>
-    <div className="space-y-3">
-      {[
-        { key: "offers_dine_in", label: "Salón" },
-        { key: "offers_delivery", label: "Delivery" },
-        { key: "offers_takeaway", label: "Take away" },
-        { key: "accepts_reservations", label: "Reserva de mesa" },
-      ].map(({ key, label }) => (
-        <label key={key} className="flex items-center gap-3 cursor-pointer">
-          <input type="checkbox" checked={form[key as keyof typeof form] as boolean}
-            onChange={e => handleChange(key, e.target.checked)} className="w-4 h-4 accent-primary-500" />
-          <span className="text-sm text-stone-700">{label}</span>
-        </label>
-      ))}
-    </div>
-  </div>
-)}
+        {/* Servicios ofrecidos — gastronomía */}
+        {form.section === "gastronomy" && (
+          <div className="bg-white rounded-2xl border border-stone-200 p-6">
+            <h2 className="text-sm font-medium text-stone-700 mb-4">Servicios</h2>
+            <div className="space-y-3">
+              {[
+                { key: "offers_dine_in", label: "Salón" },
+                { key: "offers_delivery", label: "Delivery" },
+                { key: "offers_takeaway", label: "Take away" },
+                { key: "accepts_reservations", label: "Reserva de mesa" },
+              ].map(({ key, label }) => (
+                <label key={key} className="flex items-center gap-3 cursor-pointer">
+                  <input type="checkbox" checked={form[key as keyof typeof form] as boolean}
+                    onChange={e => handleChange(key, e.target.checked)} className="w-4 h-4 accent-primary-500" />
+                  <span className="text-sm text-stone-700">{label}</span>
+                </label>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Carta en PDF — solo gastronomía */}
+        {form.section === "gastronomy" && (
+          <div className="bg-white rounded-2xl border border-stone-200 p-6 space-y-4">
+            <h2 className="text-sm font-medium text-stone-700">Carta en PDF</h2>
+            {form.menu_pdf_url ? (
+              <div className="flex items-center justify-between p-4 bg-stone-50 rounded-xl border border-stone-200">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 bg-primary-100 rounded-xl flex items-center justify-center">
+                    <span className="text-primary-600 text-xs font-bold">PDF</span>
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium text-stone-700">Carta subida</p>
+                    <a href={form.menu_pdf_url} target="_blank" rel="noopener noreferrer"
+                      className="text-xs text-primary-500">Ver PDF</a>
+                  </div>
+                </div>
+                <button onClick={() => handleChange("menu_pdf_url", null)}
+                  className="text-red-400 hover:text-red-500 text-sm">Eliminar</button>
+              </div>
+            ) : (
+              <PdfUpload onChange={url => handleChange("menu_pdf_url", url)} />
+            )}
+          </div>
+        )}
 
 {["services", "commerce", "health", "tourism", "education"].includes(form.section) && (
   <div className="bg-white rounded-2xl border border-stone-200 p-6 space-y-5">
