@@ -32,6 +32,7 @@ const categoryIcons: Record<string, any> = {
   "Bombas y Motores eléctricos": Cog,
   "Refrigeración": Snowflake,
   "Papelería creativa": Palette,
+  "Máquinas de coser": Cog,
   "Fútbol": Trophy, "Rugby": Shield, "Hockey": Zap, "Básquet": Activity,
   "Handball": Users, "Fausball": Trophy,
   "Pádel": Activity, "Vóley": Users, "Tenis": Activity,

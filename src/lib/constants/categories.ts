@@ -58,6 +58,7 @@ export const MASTER_CATEGORIES = {
       { label: "Compostura de calzado", icon: Scissors, bg: "bg-amber-50", color: "text-amber-700" },
       { label: "Refrigeración", icon: Snowflake, bg: "bg-slate-50", color: "text-slate-400" },
       { label: "Papelería creativa", icon: Palette, bg: "bg-stone-50", color: "text-stone-500" },
+      { label: "Máquinas de coser", icon: Cog, bg: "bg-slate-50", color: "text-slate-600" },
       { label: "Otro", icon: Sparkles, bg: "bg-stone-50", color: "text-stone-400" },
     ]
   },
