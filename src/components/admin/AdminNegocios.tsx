@@ -57,6 +57,8 @@ export default function AdminNegocios() {
   const [businesses, setBusinesses] = useState<Business[]>([])
   const [loading, setLoading] = useState(true)
   const [filter, setFilter] = useState("")
+  const [puebloFilter, setPuebloFilter] = useState("")
+  const [categoryFilter, setCategoryFilter] = useState("")
   const [sortBy, setSortBy] = useState<SortKey>("created_at")
   const [sortDir, setSortDir] = useState<SortDir>("desc")
 
@@ -101,7 +103,28 @@ export default function AdminNegocios() {
     }
   }
 
-  const filtered = (filter ? businesses.filter(b => b.section === filter) : businesses)
+  const bySection = filter ? businesses.filter(b => b.section === filter) : businesses
+  const byPueblo  = puebloFilter ? bySection.filter(b => (b.pueblo || "Sin localidad") === puebloFilter) : bySection
+
+  const puebloCounts = bySection.reduce((acc, b) => {
+    const key = b.pueblo || "Sin localidad"
+    acc[key] = (acc[key] || 0) + 1
+    return acc
+  }, {} as Record<string, number>)
+  const puebloOptions = Object.keys(puebloCounts).sort((a, b) =>
+    a === "Sin localidad" ? 1 : b === "Sin localidad" ? -1 : a.localeCompare(b)
+  )
+
+  const categoryCounts = byPueblo.reduce((acc, b) => {
+    const key = b.subcategory || "Sin categoría"
+    acc[key] = (acc[key] || 0) + 1
+    return acc
+  }, {} as Record<string, number>)
+  const categoryOptions = Object.keys(categoryCounts).sort((a, b) =>
+    a === "Sin categoría" ? 1 : b === "Sin categoría" ? -1 : a.localeCompare(b)
+  )
+
+  const filtered = (categoryFilter ? byPueblo.filter(b => (b.subcategory || "Sin categoría") === categoryFilter) : byPueblo)
     .slice()
     .sort((a, b) => {
       let av = 0, bv = 0
@@ -135,7 +158,7 @@ export default function AdminNegocios() {
       {/* Filtros por sección */}
       <div className="flex gap-2 mb-4 flex-wrap">
         <button
-          onClick={() => setFilter("")}
+          onClick={() => { setFilter(""); setPuebloFilter(""); setCategoryFilter("") }}
           className={`px-4 py-2 rounded-xl text-sm border transition-colors ${
             filter === "" ? "bg-primary-500 text-primary-100 border-primary-500" : "bg-white text-stone-600 border-stone-200 hover:border-primary-300"
           }`}
@@ -148,7 +171,7 @@ export default function AdminNegocios() {
           return (
             <button
               key={key}
-              onClick={() => setFilter(key)}
+              onClick={() => { setFilter(key); setPuebloFilter(""); setCategoryFilter("") }}
               className={`px-4 py-2 rounded-xl text-sm border transition-colors ${
                 filter === key ? "bg-primary-500 text-primary-100 border-primary-500" : "bg-white text-stone-600 border-stone-200 hover:border-primary-300"
               }`}
@@ -159,13 +182,55 @@ export default function AdminNegocios() {
         })}
       </div>
 
+      {/* Filtros por localidad y categoría */}
+      <div className="flex items-center gap-3 mb-6 flex-wrap">
+        <div className="flex flex-col gap-1">
+          <label className="text-xs text-stone-400">Localidad</label>
+          <select
+            value={puebloFilter}
+            onChange={e => { setPuebloFilter(e.target.value); setCategoryFilter("") }}
+            className="px-3 py-2 rounded-xl border border-stone-200 text-sm text-stone-700 outline-none focus:ring-2 focus:ring-primary-300 bg-white min-w-[200px]"
+          >
+            <option value="">Todas las localidades ({bySection.length})</option>
+            {puebloOptions.map(p => (
+              <option key={p} value={p}>{p} ({puebloCounts[p]})</option>
+            ))}
+          </select>
+        </div>
+        <div className="flex flex-col gap-1">
+          <label className="text-xs text-stone-400">Categoría</label>
+          <select
+            value={categoryFilter}
+            onChange={e => setCategoryFilter(e.target.value)}
+            className="px-3 py-2 rounded-xl border border-stone-200 text-sm text-stone-700 outline-none focus:ring-2 focus:ring-primary-300 bg-white min-w-[200px]"
+          >
+            <option value="">Todas las categorías ({byPueblo.length})</option>
+            {categoryOptions.map(c => (
+              <option key={c} value={c}>{c} ({categoryCounts[c]})</option>
+            ))}
+          </select>
+        </div>
+        {(puebloFilter || categoryFilter) && (
+          <button
+            onClick={() => { setPuebloFilter(""); setCategoryFilter("") }}
+            className="text-xs text-stone-400 hover:text-red-500 self-end mb-2 transition-colors"
+          >
+            Limpiar filtros
+          </button>
+        )}
+      </div>
+
       {/* Ordenamiento */}
-      <div className="flex items-center gap-2 mb-6">
+      <div className="flex items-center gap-2 mb-3 flex-wrap">
         <span className="text-xs text-stone-400 mr-1">Ordenar por:</span>
         <SortButton label="Más reciente" sortKey="created_at" current={sortBy} dir={sortDir} onClick={handleSort} />
         <SortButton label="Vistas" sortKey="total_views" current={sortBy} dir={sortDir} onClick={handleSort} />
         <SortButton label="Contactos" sortKey="total_leads" current={sortBy} dir={sortDir} onClick={handleSort} />
       </div>
+
+      {(puebloFilter || categoryFilter) && (
+        <p className="text-xs text-stone-400 mb-3">Mostrando {filtered.length} de {businesses.length} negocios</p>
+      )}
 
       {/* Lista */}
       {loading ? (

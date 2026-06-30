@@ -39,6 +39,7 @@ export interface Business {
   categories: string[]          // ← nuevo
   subcategory: string | null
   address: string | null
+  pueblo: string | null
   phone: string | null
   whatsapp: string | null       // ← nuevo
   instagram: string | null

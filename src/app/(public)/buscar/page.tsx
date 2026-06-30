@@ -106,11 +106,13 @@ const SPECIALTY_SYNONYMS: Record<string, string[]> = {
   pediatria:       ["Pediatría"],
   reflexologo:     ["Reflexología"],
   reflexologia:    ["Reflexología"],
+  osteopata:       ["Osteopatía"],
+  osteopatia:      ["Osteopatía"],
 }
 
 const ALL_SPECIALTY_GROUPS = [
   "Nutrición", "Psicología", "Kinesiología / Fisioterapia", "Fonoaudiología",
-  "Cosmiatría", "Odontología", "Medicina", "Pediatría", "Reflexología",
+  "Cosmiatría", "Odontología", "Medicina", "Pediatría", "Reflexología", "Osteopatía",
   "Laboratorio", "Farmacia", "Otros",
 ]
 

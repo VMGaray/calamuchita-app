@@ -52,6 +52,7 @@ const SPECIALTY_TO_GROUPS: Record<string, string[]> = {
   "terapias":       ["Kinesiología / Fisioterapia", "Cosmiatría", "Reflexología", "Fonoaudiología"],
   "laboratorios":   ["Laboratorio", "Farmacia"],
   "hospitales":     ["Medicina"],
+  "osteopatia":     ["Osteopatía"],
 }
 const NO_PROFESSIONAL_CATS = ["traslado"]
 

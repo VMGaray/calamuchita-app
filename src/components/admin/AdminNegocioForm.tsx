@@ -54,7 +54,7 @@ const COBERTURAS = [
 
 const SPECIALTY_GROUPS = [
   "Medicina", "Pediatría", "Psicología", "Kinesiología / Fisioterapia",
-  "Nutrición", "Fonoaudiología", "Cosmiatría", "Reflexología",
+  "Nutrición", "Fonoaudiología", "Cosmiatría", "Reflexología", "Osteopatía",
   "Odontología", "Farmacia", "Laboratorio", "Otros",
 ]
 
@@ -71,7 +71,7 @@ interface Professional {
 const ESPECIALIDADES_SUGERIDAS = [
   "Cardiología", "Clínica médica", "Dermatología", "Fonoaudiología",
   "Ginecología", "Kinesiología", "Neurología", "Nutrición", "Nutricionista",
-  "Odontología", "Oftalmología", "Pediatría", "Psicopedagogía", "Psicología", "Traumatología",
+  "Odontología", "Oftalmología", "Osteopatía", "Pediatría", "Psicopedagogía", "Psicología", "Traumatología",
 ]
 
 const pueblos = [

@@ -50,7 +50,7 @@ const subcategoryOptions: Record<string, string[]> = {
 
 const SPECIALTY_GROUPS = [
   "Medicina", "Pediatría", "Psicología", "Kinesiología / Fisioterapia",
-  "Nutrición", "Fonoaudiología", "Cosmiatría", "Reflexología",
+  "Nutrición", "Fonoaudiología", "Cosmiatría", "Reflexología", "Osteopatía",
   "Odontología", "Farmacia", "Laboratorio", "Otros",
 ]
 

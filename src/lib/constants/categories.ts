@@ -6,7 +6,7 @@ import {
   Hotel, Map, Tent, Activity, Compass, Bike, Plane,
   Utensils, Coffee, Beer, Wine, ShoppingBag, Clock, Wheat,
   Truck, Mountain, Printer, CreditCard, Briefcase,
-  Dumbbell, PersonStanding, Timer, Wind, Tag, Video, ShieldCheck, ClipboardList, Cog, Snowflake
+  Dumbbell, PersonStanding, Timer, Wind, Tag, Video, ShieldCheck, ClipboardList, Cog, Snowflake, Bone
 } from "lucide-react"
 
 export const MASTER_CATEGORIES = {
@@ -92,6 +92,7 @@ export const MASTER_CATEGORIES = {
       { label: "Especialidades", icon: Stethoscope, bg: "bg-purple-50", color: "text-purple-600" },
       { label: "Hospitales y Dispensarios", icon: AlertCircle, bg: "bg-red-50", color: "text-red-600" },
       { label: "Laboratorios", icon: FlaskConical, bg: "bg-cyan-50", color: "text-cyan-600" },
+      { label: "Osteopatía", icon: Bone, bg: "bg-amber-50", color: "text-amber-600" },
       { label: "Psicología", icon: Brain, bg: "bg-indigo-50", color: "text-indigo-600" },
       { label: "Terapias alternativas", icon: Leaf, bg: "bg-green-50", color: "text-green-600" },
       { label: "Traslado de pacientes", icon: Ambulance, bg: "bg-sky-50", color: "text-sky-600" },
