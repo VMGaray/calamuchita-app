@@ -108,6 +108,7 @@ export const sectionCategories = {
     { label: "Vehículos", desc: "Repuestos y accesorios", href: "/directorio/commerce?cat=vehiculos", bg: "bg-brand-slate/10", color: "text-brand-slate" },
     { label: "Verdulería", desc: "Frutas y verduras frescas", href: "/directorio/commerce?cat=verduleria", bg: "bg-brand-pine/10", color: "text-brand-pine" },
     { label: "Veterinarias", desc: "Clínicas y tiendas veterinarias", href: "/directorio/commerce?cat=veterinarias", bg: "bg-brand-earth/10", color: "text-brand-earth" },
+    { label: "Cuero Argentino", desc: "Artículos de cuero artesanal argentino", href: "/directorio/commerce?cat=cuero", bg: "bg-brand-charcoal/10", color: "text-brand-charcoal" },
     { label: "Varios", desc: "Otros comercios del valle", href: "/directorio/commerce?cat=varios", bg: "bg-brand-sand/50", color: "text-brand-charcoal" },
     { label: "Todos", desc: "Ver todos los comercios", href: "/directorio/commerce", bg: "bg-brand-sand/50", color: "text-brand-charcoal" },
   ],

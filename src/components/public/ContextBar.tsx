@@ -91,6 +91,7 @@ const SUBCAT_LABELS: Record<string, string> = {
   verduleria:    "Verdulería",
   tecnologia:    "Tecnología",
   vehiculos:     "Vehículos",
+  cuero:         "Cuero Argentino",
   // events
   culturales:    "Culturales",
   deportivos:    "Deportivos",

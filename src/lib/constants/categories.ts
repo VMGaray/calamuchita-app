@@ -81,6 +81,7 @@ export const MASTER_CATEGORIES = {
       { label: "Vehículos", icon: Car, bg: "bg-red-50", color: "text-red-600" },
       { label: "Verdulería", icon: Leaf, bg: "bg-green-50", color: "text-green-600" },
       { label: "Veterinarias", icon: Dog, bg: "bg-teal-50", color: "text-teal-600" },
+      { label: "Cuero Argentino", icon: Briefcase, bg: "bg-stone-50", color: "text-stone-600" },
       { label: "Otro", icon: Store, bg: "bg-stone-50", color: "text-stone-400" },
     ]
   },

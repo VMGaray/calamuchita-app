@@ -48,6 +48,7 @@ const categoryIcons: Record<string, any> = {
   "Actividades y Paseos": Activity, "Agencia de Viajes": Plane,
   "Alojamiento": Hotel, "Alquiler": Compass, "Alquiler de autos": Car, "Compostura de calzado": Scissors, "Excursiones": Map,
   "Fábrica de Espumantes": Wine, "Forrajería": Package, "Hogar": Armchair, "Imprenta": Printer, "Indumentaria": Shirt, "Mascotas": Dog, "Niños": Baby,
+  "Cuero Argentino": Briefcase,
   "Tecnología": Smartphone, "Vehículos": Car, "Verdulería": Leaf, "Veterinarias": PawPrint,
   "Culturales": Palette, "Deportivos": Medal, "Festivales": PartyPopper,
   "Gastronomía": ChefHat, "Infantiles": Baby, "Música": Mic,
