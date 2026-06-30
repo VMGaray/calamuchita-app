@@ -548,9 +548,9 @@ export default function DirectorioDetalle({ business, section, promotions = [] }
                 </span>
                 <span className="h-px flex-1 bg-stone-200/80" />
               </div>
-              <div className="aspect-video w-full rounded-2xl overflow-hidden">
+              <div className="mx-auto w-full max-w-[360px] aspect-[9/16] rounded-2xl overflow-hidden">
                 <iframe
-                  src={`https://www.youtube.com/embed/${extractYoutubeId(business.video_url)}`}
+                  src={`https://www.youtube.com/embed/${extractYoutubeId(business.video_url)}?modestbranding=1&rel=0&iv_load_policy=3`}
                   className="w-full h-full"
                   allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                   allowFullScreen

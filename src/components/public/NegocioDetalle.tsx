@@ -12,6 +12,7 @@ import Image from "next/image"
 import CartaInteractiva from "@/components/public/CartaInteractiva"
 import { createClient } from "@/lib/supabase/client"
 import { normalizeArgPhone } from "@/lib/phone"
+import { extractYoutubeId } from "@/lib/utils/youtube"
 
 const DAY = ["Domingo", "Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado"]
 const GUEST_KEY = "calamuchita_app_guest"
@@ -480,6 +481,29 @@ export default function NegocioDetalle({ business, promotions = [] }: Props) {
               {business.gallery_caption && (
                 <p className="text-center text-xs text-stone-400 font-medium">{business.gallery_caption}</p>
               )}
+            </div>
+          )}
+
+          {/* ── Video de YouTube ── */}
+          {business.video_url && extractYoutubeId(business.video_url) && (
+            <div className="flex flex-col gap-y-3">
+              <div className="flex items-center gap-3">
+                <span className="h-px flex-1 bg-stone-200/80" />
+                <span className="text-[10px] font-bold uppercase tracking-[0.2em] px-3 py-1 rounded-full shrink-0" style={{ background: "rgba(45,69,48,0.10)", color: "#2D4530" }}>
+                  Video
+                </span>
+                <span className="h-px flex-1 bg-stone-200/80" />
+              </div>
+              <div className="mx-auto w-full max-w-[360px] aspect-[9/16] rounded-2xl overflow-hidden">
+                <iframe
+                  src={`https://www.youtube.com/embed/${extractYoutubeId(business.video_url)}?modestbranding=1&rel=0&iv_load_policy=3`}
+                  className="w-full h-full"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  allowFullScreen
+                  loading="lazy"
+                  title={`Video de ${business.name}`}
+                />
+              </div>
             </div>
           )}
 
