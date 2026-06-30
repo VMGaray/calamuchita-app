@@ -14,7 +14,6 @@ const sectionLabels: Record<string, string> = {
   tourism:    "Turismo",
   commerce:   "Comercios",
   events:     "Eventos",
-  info:       "Info útil",
 }
 
 type SortKey = "created_at" | "total_views" | "total_leads"
@@ -67,6 +66,7 @@ export default function AdminNegocios() {
     const { data } = await supabase
       .from("businesses")
       .select("*")
+      .neq("section", "info")
       .order("created_at", { ascending: false })
     setBusinesses(data || [])
     setLoading(false)
