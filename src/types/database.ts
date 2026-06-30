@@ -56,6 +56,8 @@ export interface Business {
   offers_takeaway: boolean
   offers_dine_in: boolean
   status: BusinessStatus
+  group_name: string | null
+  group_id: string | null
   created_at: string
   updated_at: string
 }

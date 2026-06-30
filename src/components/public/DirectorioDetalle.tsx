@@ -104,6 +104,17 @@ export default function DirectorioDetalle({ business, section, promotions = [] }
   const [lightboxIdx,    setLightboxIdx]    = useState<number | null>(null)
   const [lightboxSrc,    setLightboxSrc]    = useState<string | null>(null)
   const [lightboxTouchX, setLightboxTouchX] = useState<number | null>(null)
+  const [groupMembers,   setGroupMembers]   = useState<any[]>([])
+
+  useEffect(() => {
+    if (!business.group_id) { setGroupMembers([]); return }
+    createClient()
+      .from("businesses")
+      .select("id, name, slug, section, subcategory, logo_url")
+      .eq("group_id", business.group_id)
+      .neq("id", business.id)
+      .then(({ data }) => setGroupMembers(data ?? []))
+  }, [business.group_id, business.id])
 
   useEffect(() => {
     if (lightboxIdx === null && !lightboxSrc) return
@@ -389,6 +400,45 @@ export default function DirectorioDetalle({ business, section, promotions = [] }
               />
             ))}
           </div>
+
+          {/* ── Forma parte de (grupo profesional) ── */}
+          {business.group_name && business.group_id && groupMembers.length > 0 && (
+            <div className="bg-white/50 rounded-2xl p-4">
+              <div className="flex items-center gap-2 mb-3">
+                <Building2 size={13} style={{ color: "rgba(45,69,48,0.40)" }} />
+                <p className="text-[10px] font-black uppercase tracking-[0.2em]" style={{ color: "rgba(45,69,48,0.40)" }}>
+                  Forma parte de {business.group_name}
+                </p>
+              </div>
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                {groupMembers.map((member) => (
+                  <a
+                    key={member.id}
+                    href={`/directorio/${member.section}/${member.slug}`}
+                    className="rounded-2xl border border-stone-100 p-3 flex flex-col items-center text-center gap-2 hover:shadow-sm transition-shadow"
+                    style={{ background: "#FAFAF9" }}
+                  >
+                    {member.logo_url ? (
+                      <div className="relative w-14 h-14 rounded-xl overflow-hidden flex-shrink-0 bg-white">
+                        <Image src={member.logo_url} alt={member.name} fill className="object-contain p-1" sizes="56px" />
+                      </div>
+                    ) : (
+                      <div
+                        className="w-14 h-14 rounded-xl flex-shrink-0 flex items-center justify-center font-serif text-xl font-bold"
+                        style={{ background: "#2D4530", color: "#E1DBC9" }}
+                      >
+                        {member.name?.[0] ?? "?"}
+                      </div>
+                    )}
+                    <div className="w-full">
+                      <p className="text-xs font-bold leading-snug line-clamp-2" style={{ color: "#2D4530" }}>{member.name}</p>
+                      {member.subcategory && <p className="text-[10px] mt-0.5 line-clamp-1" style={{ color: "rgba(45,69,48,0.55)" }}>{member.subcategory}</p>}
+                    </div>
+                  </a>
+                ))}
+              </div>
+            </div>
+          )}
 
           {/* ── Horarios ── */}
           {byDay.size > 0 && (

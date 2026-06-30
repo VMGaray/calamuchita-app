@@ -179,6 +179,8 @@ export default function AdminNegocioForm() {
     health_coverages: [] as string[],
     has_24h_guard: false,
     appointment_system: "",
+    group_name: "",
+    group_id: "",
   })
 
   const handleChange = (field: string, value: any) => {
@@ -284,6 +286,8 @@ export default function AdminNegocioForm() {
       professionals: form.section === "health" ? professionals : [],
       has_24h_guard: form.section === "health" ? form.has_24h_guard : false,
       appointment_system: form.section === "health" ? form.appointment_system || null : null,
+      group_name: form.group_name || null,
+      group_id: form.group_id || null,
     })
 
     if (insertError) {
@@ -930,6 +934,32 @@ export default function AdminNegocioForm() {
             )}
           </div>
         )}
+
+        {/* Grupo profesional */}
+        <div className="bg-white rounded-2xl border border-stone-200 p-6 space-y-4">
+          <h2 className="text-sm font-medium text-stone-700">Grupo profesional (opcional)</h2>
+          <div>
+            <label className="block text-sm font-medium text-stone-700 mb-1">Nombre del grupo</label>
+            <input type="text" value={form.group_name} onChange={e => handleChange("group_name", e.target.value)}
+              placeholder="ej: Grupo Vértice"
+              className="w-full px-4 py-2.5 rounded-xl border border-stone-200 text-stone-800 text-sm outline-none focus:ring-2 focus:ring-primary-300" />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-stone-700 mb-1">ID del grupo</label>
+            <div className="flex gap-2">
+              <input type="text" value={form.group_id} onChange={e => handleChange("group_id", e.target.value)}
+                placeholder="UUID compartido entre los miembros del grupo"
+                className="flex-1 px-4 py-2.5 rounded-xl border border-stone-200 text-stone-800 text-sm outline-none focus:ring-2 focus:ring-primary-300" />
+              <button type="button" onClick={() => handleChange("group_id", crypto.randomUUID())}
+                className="px-3 py-2.5 rounded-xl border border-primary-300 text-primary-600 text-xs font-medium hover:bg-primary-50 transition-colors whitespace-nowrap">
+                Generar nuevo ID
+              </button>
+            </div>
+          </div>
+          <p className="text-xs text-stone-400">
+            Si este profesional forma parte de un espacio compartido con otros colegas, completá estos campos. Usá el mismo ID de grupo en todos los miembros del grupo.
+          </p>
+        </div>
 
         {/* Botones */}
         <div className="flex gap-3">
