@@ -6,18 +6,23 @@ import Link from "next/link"
 
 interface EventCardProps {
   event: {
-    id: string // Necesitamos el ID para el link
+    id: string
     title: string
     description: string
     localidad: string
     date_description: string
-    image_url: string[] // Cambiado a array de strings
+    image_url: string[]
+    start_date: string | null
+    end_date: string | null
   }
 }
 
 export default function EventCard({ event }: EventCardProps) {
-  // Tomamos la primera imagen del array, o un placeholder si no hay
   const mainImage = event.image_url?.[0] || null
+
+  const today = new Date().toISOString().split("T")[0]
+  const referenceDate = event.end_date || event.start_date
+  const isUpcoming = referenceDate ? referenceDate >= today : false
 
   return (
     <div className="bg-white rounded-[32px] overflow-hidden border border-stone-100 shadow-sm hover:shadow-md transition-all group">
@@ -35,11 +40,13 @@ export default function EventCard({ event }: EventCardProps) {
             <Calendar className="text-stone-300" size={40} />
           </div>
         )}
-        <div className="absolute top-4 left-4">
-          <span className="text-[10px] font-black uppercase tracking-widest px-3 py-1.5 rounded-full shadow-lg text-white" style={{ background: "#2D4530" }}>
-            Próximamente
-          </span>
-        </div>
+        {isUpcoming && (
+          <div className="absolute top-4 left-4">
+            <span className="text-[10px] font-black uppercase tracking-widest px-3 py-1.5 rounded-full shadow-lg text-white" style={{ background: "#2D4530" }}>
+              Próximamente
+            </span>
+          </div>
+        )}
       </div>
 
       {/* Contenido */}

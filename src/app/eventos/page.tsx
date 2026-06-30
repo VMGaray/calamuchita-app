@@ -90,6 +90,8 @@ export default function EventosPage() {
                   localidad: event.localidad ?? "",
                   date_description: event.date_description ?? "",
                   image_url: Array.isArray(event.image_url) ? event.image_url : [],
+                  start_date: event.start_date ?? null,
+                  end_date: event.end_date ?? null,
                 }}
               />
             ))}
