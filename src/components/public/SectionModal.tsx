@@ -16,7 +16,7 @@ import {
   PartyPopper, ChefHat, Mic, Medal, Palette, Baby,
   Store, Salad, Shirt, Gem, MoreHorizontal,
   Clock3, Landmark, Lightbulb, Bus, Info,
-  Armchair, Dog, Smartphone, FlaskConical, Printer, Briefcase, Dumbbell, Timer, Tag, Wheat, Wine, Cog, Snowflake
+  Armchair, Dog, Smartphone, FlaskConical, Printer, Briefcase, Dumbbell, Timer, Tag, Wheat, Wine, Cog, Snowflake, CreditCard
 } from "lucide-react"
 
 const categoryIcons: Record<string, any> = {
@@ -33,6 +33,7 @@ const categoryIcons: Record<string, any> = {
   "Refrigeración": Snowflake,
   "Papelería creativa": Palette,
   "Máquinas de coser": Cog,
+  "Comisiones": CreditCard,
   "Fútbol": Trophy, "Rugby": Shield, "Hockey": Zap, "Básquet": Activity,
   "Handball": Users, "Fausball": Trophy,
   "Pádel": Activity, "Vóley": Users, "Tenis": Activity,

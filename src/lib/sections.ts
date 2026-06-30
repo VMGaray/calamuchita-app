@@ -45,6 +45,7 @@ export const sectionCategories = {
     { label: "Refrigeración", desc: "Aire acondicionado y cámaras frías", href: "/directorio/services?cat=refrigeracion", bg: "bg-brand-slate/10", color: "text-brand-slate" },
     { label: "Papelería creativa", desc: "Librería, materiales y suministros creativos", href: "/directorio/services?cat=papeleria-creativa", bg: "bg-brand-slate/10", color: "text-brand-slate" },
     { label: "Máquinas de coser", desc: "Venta y reparación de máquinas de coser", href: "/directorio/services?cat=maquinas-coser", bg: "bg-brand-slate/10", color: "text-brand-slate" },
+    { label: "Comisiones", desc: "Agentes y gestores inmobiliarios", href: "/directorio/services?cat=comisiones", bg: "bg-brand-pine/10", color: "text-brand-pine" },
     { label: "Varios", desc: "Otros servicios del valle", href: "/directorio/services?cat=varios", bg: "bg-brand-sand/50", color: "text-brand-charcoal" },
     { label: "Todos", desc: "Ver todos los servicios", href: "/directorio/services", bg: "bg-brand-sand/50", color: "text-brand-charcoal" },
   ],

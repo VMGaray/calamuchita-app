@@ -60,6 +60,7 @@ export const MASTER_CATEGORIES = {
       { label: "Refrigeración", icon: Snowflake, bg: "bg-slate-50", color: "text-slate-400" },
       { label: "Papelería creativa", icon: Palette, bg: "bg-stone-50", color: "text-stone-500" },
       { label: "Máquinas de coser", icon: Cog, bg: "bg-slate-50", color: "text-slate-600" },
+      { label: "Comisiones", icon: CreditCard, bg: "bg-emerald-50", color: "text-emerald-700" },
       { label: "Otro", icon: Sparkles, bg: "bg-stone-50", color: "text-stone-400" },
     ]
   },
