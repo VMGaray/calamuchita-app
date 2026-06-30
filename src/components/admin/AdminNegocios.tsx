@@ -16,6 +16,24 @@ const sectionLabels: Record<string, string> = {
   events:     "Eventos",
 }
 
+// La gastronomía no usa `subcategory` — guarda su categoría en el campo `category`
+// (restaurant, cafe_bar, etc.), por eso necesita su propio mapeo a etiqueta legible.
+const gastronomyCategoryLabels: Record<string, string> = {
+  restaurant: "Restaurante",
+  cafe_bar:   "Bar/Café",
+  viandas:    "Viandas",
+  panaderia:  "Panadería",
+  sushi:      "Sushi",
+  other:      "Otro",
+}
+
+function getCategoryLabel(b: Business): string {
+  if (b.section === "gastronomy") {
+    return gastronomyCategoryLabels[b.category ?? "other"] ?? "Otro"
+  }
+  return b.subcategory || "Sin categoría"
+}
+
 type SortKey = "created_at" | "total_views" | "total_leads"
 type SortDir = "asc" | "desc"
 
@@ -116,7 +134,7 @@ export default function AdminNegocios() {
   )
 
   const categoryCounts = byPueblo.reduce((acc, b) => {
-    const key = b.subcategory || "Sin categoría"
+    const key = getCategoryLabel(b)
     acc[key] = (acc[key] || 0) + 1
     return acc
   }, {} as Record<string, number>)
@@ -124,7 +142,7 @@ export default function AdminNegocios() {
     a === "Sin categoría" ? 1 : b === "Sin categoría" ? -1 : a.localeCompare(b)
   )
 
-  const filtered = (categoryFilter ? byPueblo.filter(b => (b.subcategory || "Sin categoría") === categoryFilter) : byPueblo)
+  const filtered = (categoryFilter ? byPueblo.filter(b => getCategoryLabel(b) === categoryFilter) : byPueblo)
     .slice()
     .sort((a, b) => {
       let av = 0, bv = 0
@@ -281,10 +299,10 @@ export default function AdminNegocios() {
                 </div>
                 <div className="flex items-center gap-2 mt-0.5 flex-wrap">
                   <span className="text-xs text-stone-400">{sectionLabels[business.section]}</span>
-                  {business.subcategory && (
+                  {getCategoryLabel(business) !== "Sin categoría" && (
                     <>
                       <span className="text-stone-300">·</span>
-                      <span className="text-xs text-stone-400">{business.subcategory}</span>
+                      <span className="text-xs text-stone-400">{getCategoryLabel(business)}</span>
                     </>
                   )}
                   {business.address && (
