@@ -7,6 +7,7 @@ import { BusinessSection, BusinessCategory } from "@/types/database"
 import { MASTER_CATEGORIES } from "@/lib/constants/categories"
 import ImageUpload from "@/components/ui/ImageUpload"
 import PdfUpload from "@/components/ui/PdfUpload"
+import { isValidYoutubeUrl } from "@/lib/utils/youtube"
 import HorariosEditor, { HorarioDay, expandHorariosForSave, defaultHorarios } from "@/components/ui/HorariosEditor"
 
 const sections: { value: BusinessSection; label: string }[] = [
@@ -172,6 +173,7 @@ export default function AdminNegocioForm() {
     logo_url: null as string | null,
     cover_url: null as string | null,
     menu_pdf_url: null as string | null,
+    video_url: "",
     doctor_name: "",
     medical_specialties: [] as string[],
     health_coverages: [] as string[],
@@ -275,6 +277,7 @@ export default function AdminNegocioForm() {
       logo_url: form.logo_url,
       cover_url: form.cover_url,
       menu_pdf_url: form.menu_pdf_url,
+      video_url: form.video_url || null,
       doctor_name: form.section === "health" ? form.doctor_name || null : null,
       medical_specialties: form.section === "health" ? form.medical_specialties : [],
       health_coverages: form.section === "health" ? form.health_coverages : [],
@@ -882,6 +885,24 @@ export default function AdminNegocioForm() {
                 />
               ))}
             </div>
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-stone-700 mb-1">
+              Video de YouTube <span className="text-stone-400 font-normal">(opcional)</span>
+            </label>
+            <input
+              type="url"
+              value={form.video_url}
+              onChange={e => handleChange("video_url", e.target.value)}
+              placeholder="https://www.youtube.com/watch?v=XXXXXXXXXXX"
+              className="w-full px-4 py-2.5 rounded-xl border border-stone-200 text-sm text-stone-700 placeholder:text-stone-300 focus:outline-none focus:ring-2 focus:ring-primary-300"
+            />
+            {form.video_url && !isValidYoutubeUrl(form.video_url) && (
+              <p className="text-xs text-red-500 mt-1">El link no parece ser un video de YouTube válido.</p>
+            )}
+            {form.video_url && isValidYoutubeUrl(form.video_url) && (
+              <p className="text-xs text-green-600 mt-1">✓ Link de YouTube válido</p>
+            )}
           </div>
         </div>
 

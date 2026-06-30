@@ -7,6 +7,7 @@ import { BusinessSection, BusinessCategory } from "@/types/database"
 import { MASTER_CATEGORIES } from "@/lib/constants/categories"
 import ImageUpload from "@/components/ui/ImageUpload"
 import PdfUpload from "@/components/ui/PdfUpload"
+import { isValidYoutubeUrl } from "@/lib/utils/youtube"
 import HorariosEditor, { HorarioDay, expandHorariosForSave, mergeHorariosFromDB, defaultHorarios } from "@/components/ui/HorariosEditor"
 import { ArrowLeft, Star } from "lucide-react"
 import QRMarketing from "@/components/admin/QRMarketing"
@@ -146,6 +147,7 @@ export default function AdminNegocioEdit({ id }: Props) {
     logo_url: null as string | null,
     cover_url: null as string | null,
     menu_pdf_url: null as string | null,
+    video_url: "",
     status: "active",
     menu_link: "",
     pet_friendly: false,
@@ -186,6 +188,7 @@ export default function AdminNegocioEdit({ id }: Props) {
           logo_url: business.logo_url || null,
           cover_url: business.cover_url || null,
           menu_pdf_url: business.menu_pdf_url || null,
+          video_url: business.video_url || "",
           status: business.status || "active",
           menu_link: business.menu_link || "",
           pet_friendly: business.pet_friendly || false,
@@ -279,6 +282,7 @@ export default function AdminNegocioEdit({ id }: Props) {
         logo_url: form.logo_url,
         cover_url: form.cover_url,
         menu_pdf_url: form.menu_pdf_url || null,
+        video_url: form.video_url || null,
         status: form.status,
         menu_link: form.menu_link || null,
         pet_friendly: form.pet_friendly,
@@ -671,6 +675,24 @@ export default function AdminNegocioEdit({ id }: Props) {
                 />
               ))}
             </div>
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-stone-700 mb-1">
+              Video de YouTube <span className="text-stone-400 font-normal">(opcional)</span>
+            </label>
+            <input
+              type="url"
+              value={form.video_url}
+              onChange={e => handleChange("video_url", e.target.value)}
+              placeholder="https://www.youtube.com/watch?v=XXXXXXXXXXX"
+              className="w-full px-4 py-2.5 rounded-xl border border-stone-200 text-sm text-stone-700 placeholder:text-stone-300 focus:outline-none focus:ring-2 focus:ring-primary-300"
+            />
+            {form.video_url && !isValidYoutubeUrl(form.video_url) && (
+              <p className="text-xs text-red-500 mt-1">El link no parece ser un video de YouTube válido.</p>
+            )}
+            {form.video_url && isValidYoutubeUrl(form.video_url) && (
+              <p className="text-xs text-green-600 mt-1">✓ Link de YouTube válido</p>
+            )}
           </div>
         </div>
 

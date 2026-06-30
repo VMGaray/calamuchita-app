@@ -11,6 +11,7 @@ import {
 import { motion, AnimatePresence } from "framer-motion"
 import { createClient } from "@/lib/supabase/client"
 import { normalizeArgPhone } from "@/lib/phone"
+import { extractYoutubeId } from "@/lib/utils/youtube"
 
 function WaIcon({ size = 14 }: { size?: number }) {
   return (
@@ -534,6 +535,29 @@ export default function DirectorioDetalle({ business, section, promotions = [] }
                 </div>
               )}
               <p className="text-center text-xs text-stone-400 font-medium leading-snug">{business.name}{business.address ? ` · ${business.address}` : ""}</p>
+            </div>
+          )}
+
+          {/* ── Video de YouTube ── */}
+          {business.video_url && extractYoutubeId(business.video_url) && (
+            <div className="flex flex-col gap-y-3">
+              <div className="flex items-center gap-3">
+                <span className="h-px flex-1 bg-stone-200/80" />
+                <span className="text-[10px] font-bold uppercase tracking-[0.2em] px-3 py-1 rounded-full shrink-0" style={{ background: "rgba(45,69,48,0.10)", color: "#2D4530" }}>
+                  Video
+                </span>
+                <span className="h-px flex-1 bg-stone-200/80" />
+              </div>
+              <div className="aspect-video w-full rounded-2xl overflow-hidden">
+                <iframe
+                  src={`https://www.youtube.com/embed/${extractYoutubeId(business.video_url)}`}
+                  className="w-full h-full"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  allowFullScreen
+                  loading="lazy"
+                  title={`Video de ${business.name}`}
+                />
+              </div>
             </div>
           )}
 
