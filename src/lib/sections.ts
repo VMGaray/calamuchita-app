@@ -15,6 +15,7 @@ export const sectionCategories = {
     { label: "Alarmas-Seguridad", desc: "Sistemas de alarmas y seguridad", href: "/directorio/services?cat=alarmas", bg: "bg-brand-slate/10", color: "text-brand-slate" },
     { label: "Cerrajero", desc: "Cerraduras y llaves", href: "/directorio/services?cat=cerrajero", bg: "bg-brand-slate/10", color: "text-brand-slate" },
     { label: "Construcción", desc: "Albañilería y reformas", href: "/directorio/services?cat=construccion", bg: "bg-brand-earth/10", color: "text-brand-earth" },
+    { label: "Decoración y Terminaciones de Interiores", desc: "Diseño de interiores y terminaciones", href: "/directorio/services?cat=decoracion-interiores", bg: "bg-brand-earth/10", color: "text-brand-earth" },
     { label: "Desinfecciones", desc: "Plagas y fumigaciones", href: "/directorio/services?cat=desinfecciones", bg: "bg-brand-pine/10", color: "text-brand-pine" },
     { label: "Electricidad", desc: "Electricistas matriculados", href: "/directorio/services?cat=electricidad", bg: "bg-brand-slate/10", color: "text-brand-slate" },
     { label: "Fletes", desc: "Transporte de cargas y mudanzas", href: "/directorio/services?cat=fletes", bg: "bg-brand-earth/10", color: "text-brand-earth" },
