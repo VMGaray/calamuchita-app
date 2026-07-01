@@ -15,6 +15,7 @@ export const sectionCategories = {
     { label: "Alambrados", desc: "Cercos y tejidos perimetrales", href: "/directorio/services?cat=alambrados", bg: "bg-brand-slate/10", color: "text-brand-slate" },
     { label: "Alarmas-Seguridad", desc: "Sistemas de alarmas y seguridad", href: "/directorio/services?cat=alarmas", bg: "bg-brand-slate/10", color: "text-brand-slate" },
     { label: "Alquiler de autos", desc: "Alquiler de vehículos", href: "/directorio/services?cat=alquiler-autos", bg: "bg-brand-slate/10", color: "text-brand-slate" },
+    { label: "Animación Cumpleaños", desc: "Shows y animación para fiestas infantiles", href: "/directorio/services?cat=animacion-cumpleanos", bg: "bg-brand-charcoal/10", color: "text-brand-charcoal" },
     { label: "Auxilio y Remolque", desc: "Auxilio mecánico y remolque en ruta", href: "/directorio/services?cat=auxilio", bg: "bg-brand-earth/10", color: "text-brand-earth" },
     { label: "Bombas y Motores eléctricos", desc: "Bombas de agua y motores eléctricos", href: "/directorio/services?cat=bombas", bg: "bg-brand-slate/10", color: "text-brand-slate" },
     { label: "Carteles tallados", desc: "Señalética y carteles artesanales", href: "/directorio/services?cat=carteles", bg: "bg-brand-earth/10", color: "text-brand-earth" },
@@ -57,6 +58,7 @@ export const sectionCategories = {
   health: [
     { label: "Clínicas y Consultorios", desc: "Atención médica general", href: "/directorio/health?cat=clinicas", bg: "bg-brand-pine/10", color: "text-brand-pine" },
     { label: "Especialidades", desc: "Médicos especializados", href: "/directorio/health?cat=especialidades", bg: "bg-brand-slate/10", color: "text-brand-slate" },
+    { label: "Estética", desc: "Tratamientos estéticos y de belleza", href: "/directorio/health?cat=estetica", bg: "bg-brand-charcoal/10", color: "text-brand-charcoal" },
     { label: "Hospitales y Dispensarios", desc: "Guardias y urgencias", href: "/directorio/health?cat=hospitales", bg: "bg-brand-earth/10", color: "text-brand-earth" },
     { label: "Laboratorios", desc: "Análisis clínicos y diagnóstico", href: "/directorio/health?cat=laboratorios", bg: "bg-brand-slate/10", color: "text-brand-slate" },
     { label: "Osteopatía", desc: "Terapia manual y osteopática", href: "/directorio/health?cat=osteopatia", bg: "bg-brand-earth/10", color: "text-brand-earth" },

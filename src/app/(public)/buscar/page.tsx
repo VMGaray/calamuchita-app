@@ -45,6 +45,10 @@ const SYNONYMS: Record<string, string[]> = {
   alambrado:      ["Alambrados"],
   cerco:          ["Alambrados"],
   tejido:         ["Alambrados"],
+  animacion:      ["Animación Cumpleaños"],
+  cumpleanos:     ["Animación Cumpleaños"],
+  cumpleaños:     ["Animación Cumpleaños"],
+  animador:       ["Animación Cumpleaños"],
   coach:          ["Coaching"],
   gestoria:       ["Gestoría"],
   gestor:         ["Gestoría"],
@@ -76,6 +80,9 @@ const SYNONYMS: Record<string, string[]> = {
   dentista:       ["Odontología"],
   pediatra:       ["Pediatría"],
   pediatria:      ["Pediatría"],
+  estetica:       ["Estética"],
+  esteticista:    ["Estética"],
+  belleza:        ["Estética"],
 }
 
 function findMatchingSubcategories(q: string): string[] {

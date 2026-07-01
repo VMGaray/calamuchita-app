@@ -30,6 +30,7 @@ const SUBCAT_LABELS: Record<string, string> = {
   // services
   alambrados:    "Alambrados",
   alarmas:       "Alarmas-Seguridad",
+  "animacion-cumpleanos": "Animación Cumpleaños",
   cerrajero:     "Cerrajero",
   coaching:      "Coaching",
   construccion:  "Construcción",
@@ -67,6 +68,7 @@ const SUBCAT_LABELS: Record<string, string> = {
   // health
   clinicas:      "Clínicas y Consultorios",
   especialidades:"Especialidades",
+  estetica:      "Estética",
   hospitales:    "Hospitales",
   laboratorios:  "Laboratorios",
   terapias:      "Terapias alternativas",

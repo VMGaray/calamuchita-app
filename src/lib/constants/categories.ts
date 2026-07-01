@@ -6,7 +6,7 @@ import {
   Hotel, Map, Tent, Activity, Compass, Bike, Plane,
   Utensils, Coffee, Beer, Wine, ShoppingBag, Clock, Wheat,
   Truck, Mountain, Printer, CreditCard, Briefcase,
-  Dumbbell, PersonStanding, Timer, Wind, Tag, Video, ShieldCheck, ClipboardList, Cog, Snowflake, Bone, Sofa, Target, FileText, Fence
+  Dumbbell, PersonStanding, Timer, Wind, Tag, Video, ShieldCheck, ClipboardList, Cog, Snowflake, Bone, Sofa, Target, FileText, Fence, Cake
 } from "lucide-react"
 
 export const MASTER_CATEGORIES = {
@@ -29,6 +29,7 @@ export const MASTER_CATEGORIES = {
       { label: "Alambrados", icon: Fence, bg: "bg-stone-50", color: "text-stone-600" },
       { label: "Alarmas-Seguridad", icon: Shield, bg: "bg-blue-50", color: "text-blue-600" },
       { label: "Alquiler de autos", icon: Car, bg: "bg-blue-50", color: "text-blue-600" },
+      { label: "Animación Cumpleaños", icon: Cake, bg: "bg-gray-50", color: "text-gray-600" },
       { label: "Auxilio y Remolque", icon: AlertCircle, bg: "bg-orange-50", color: "text-orange-600" },
       { label: "Bombas y Motores eléctricos", icon: Cog, bg: "bg-cyan-50", color: "text-cyan-700" },
       { label: "Carteles tallados", icon: Tag, bg: "bg-amber-50", color: "text-amber-700" },
@@ -94,6 +95,7 @@ export const MASTER_CATEGORIES = {
     subcategories: [
       { label: "Clínicas y Consultorios", icon: Building, bg: "bg-blue-50", color: "text-blue-600" },
       { label: "Especialidades", icon: Stethoscope, bg: "bg-purple-50", color: "text-purple-600" },
+      { label: "Estética", icon: Sparkles, bg: "bg-stone-50", color: "text-stone-600" },
       { label: "Hospitales y Dispensarios", icon: AlertCircle, bg: "bg-red-50", color: "text-red-600" },
       { label: "Laboratorios", icon: FlaskConical, bg: "bg-cyan-50", color: "text-cyan-600" },
       { label: "Osteopatía", icon: Bone, bg: "bg-amber-50", color: "text-amber-600" },

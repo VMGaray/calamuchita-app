@@ -16,13 +16,13 @@ import {
   PartyPopper, ChefHat, Mic, Medal, Palette, Baby,
   Store, Salad, Shirt, Gem, MoreHorizontal,
   Clock3, Landmark, Lightbulb, Bus, Info,
-  Armchair, Dog, Smartphone, FlaskConical, Printer, Briefcase, Dumbbell, Timer, Tag, Wheat, Wine, Cog, Snowflake, CreditCard, Sofa, Target, FileText, Fence
+  Armchair, Dog, Smartphone, FlaskConical, Printer, Briefcase, Dumbbell, Timer, Tag, Wheat, Wine, Cog, Snowflake, CreditCard, Sofa, Target, FileText, Fence, Cake
 } from "lucide-react"
 
 const categoryIcons: Record<string, any> = {
   "Restaurantes": Utensils, "Bar/Café": Coffee, "Viandas": ShoppingBag, "Panadería": Wheat, "Sushi": Soup,
   "Delivery": Bike, "Take Away": Package, "Abierto ahora": Clock,
-  "Alambrados": Fence, "Alarmas-Seguridad": Shield, "Cerrajero": KeyRound, "Construcción": Building,
+  "Alambrados": Fence, "Alarmas-Seguridad": Shield, "Animación Cumpleaños": Cake, "Cerrajero": KeyRound, "Construcción": Building,
   "Fletes": Truck, "Movimiento de suelos": HardHat, "Venta de áridos": Mountain, "Desinfecciones": Bug,
   "Decoración y Terminaciones de Interiores": Sofa,
   "Electricidad": Zap, "Gasista": Flame, "Herrero": Hammer, "Paisajismo y Jardines": Leaf,
@@ -43,7 +43,7 @@ const categoryIcons: Record<string, any> = {
   "Natación": Waves, "Ciclismo": Bike,
   "Trekking / Montaña": Mountain, "Yoga / Pilates": Sparkles, "Gimnasio": Dumbbell,
   "Artes marciales": Shield, "Running": Timer,
-  "Clínicas y Consultorios": Building, "Especialidades": Stethoscope,
+  "Clínicas y Consultorios": Building, "Especialidades": Stethoscope, "Estética": Sparkles,
   "Hospitales y Dispensarios": AlertCircle, "Laboratorios": FlaskConical,
   "Psicología": Brain, "Terapias alternativas": Leaf, "Traslado de pacientes": Ambulance,
   "Arte y Música": Music, "Colegios": GraduationCap, "Deporte": Trophy,
