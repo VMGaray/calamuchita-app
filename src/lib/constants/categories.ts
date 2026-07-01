@@ -6,7 +6,7 @@ import {
   Hotel, Map, Tent, Activity, Compass, Bike, Plane,
   Utensils, Coffee, Beer, Wine, ShoppingBag, Clock, Wheat,
   Truck, Mountain, Printer, CreditCard, Briefcase,
-  Dumbbell, PersonStanding, Timer, Wind, Tag, Video, ShieldCheck, ClipboardList, Cog, Snowflake, Bone, Sofa, Target, FileText, Fence, Cake, Sun
+  Dumbbell, PersonStanding, Timer, Wind, Tag, Video, ShieldCheck, ClipboardList, Cog, Snowflake, Bone, Sofa, Target, FileText, Fence, Cake, Sun, PenTool, Brush
 } from "lucide-react"
 
 export const MASTER_CATEGORIES = {
@@ -30,6 +30,7 @@ export const MASTER_CATEGORIES = {
       { label: "Alarmas-Seguridad", icon: Shield, bg: "bg-blue-50", color: "text-blue-600" },
       { label: "Alquiler de autos", icon: Car, bg: "bg-blue-50", color: "text-blue-600" },
       { label: "Animación Cumpleaños", icon: Cake, bg: "bg-gray-50", color: "text-gray-600" },
+      { label: "Artista plástica", icon: Brush, bg: "bg-slate-50", color: "text-slate-600" },
       { label: "Auxilio y Remolque", icon: AlertCircle, bg: "bg-orange-50", color: "text-orange-600" },
       { label: "Bombas y Motores eléctricos", icon: Cog, bg: "bg-cyan-50", color: "text-cyan-700" },
       { label: "Carteles tallados", icon: Tag, bg: "bg-amber-50", color: "text-amber-700" },
@@ -65,6 +66,7 @@ export const MASTER_CATEGORIES = {
       { label: "Profesionales", icon: Briefcase, bg: "bg-violet-50", color: "text-violet-600" },
       { label: "Refrigeración", icon: Snowflake, bg: "bg-slate-50", color: "text-slate-400" },
       { label: "Servicios audiovisuales", icon: Video, bg: "bg-indigo-50", color: "text-indigo-600" },
+      { label: "Tatuajes", icon: PenTool, bg: "bg-zinc-50", color: "text-zinc-600" },
       { label: "Traslados", icon: Car, bg: "bg-blue-50", color: "text-blue-600" },
       { label: "Venta de áridos", icon: Mountain, bg: "bg-stone-50", color: "text-stone-600" },
       { label: "Zinguero", icon: Home, bg: "bg-slate-50", color: "text-slate-600" },
