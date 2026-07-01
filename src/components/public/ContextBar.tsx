@@ -28,6 +28,7 @@ const SUBCAT_LABELS: Record<string, string> = {
   bar:           "Bares",
   other:         "Varios",
   // services
+  alambrados:    "Alambrados",
   alarmas:       "Alarmas-Seguridad",
   cerrajero:     "Cerrajero",
   coaching:      "Coaching",

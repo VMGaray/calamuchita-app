@@ -6,7 +6,7 @@ import {
   Hotel, Map, Tent, Activity, Compass, Bike, Plane,
   Utensils, Coffee, Beer, Wine, ShoppingBag, Clock, Wheat,
   Truck, Mountain, Printer, CreditCard, Briefcase,
-  Dumbbell, PersonStanding, Timer, Wind, Tag, Video, ShieldCheck, ClipboardList, Cog, Snowflake, Bone, Sofa, Target, FileText
+  Dumbbell, PersonStanding, Timer, Wind, Tag, Video, ShieldCheck, ClipboardList, Cog, Snowflake, Bone, Sofa, Target, FileText, Fence
 } from "lucide-react"
 
 export const MASTER_CATEGORIES = {
@@ -26,13 +26,14 @@ export const MASTER_CATEGORIES = {
   services: {
     label: "Servicios",
     subcategories: [
+      { label: "Alambrados", icon: Fence, bg: "bg-stone-50", color: "text-stone-600" },
       { label: "Alarmas-Seguridad", icon: Shield, bg: "bg-blue-50", color: "text-blue-600" },
       { label: "Alquiler de autos", icon: Car, bg: "bg-blue-50", color: "text-blue-600" },
       { label: "Auxilio y Remolque", icon: AlertCircle, bg: "bg-orange-50", color: "text-orange-600" },
       { label: "Bombas y Motores eléctricos", icon: Cog, bg: "bg-cyan-50", color: "text-cyan-700" },
       { label: "Carteles tallados", icon: Tag, bg: "bg-amber-50", color: "text-amber-700" },
       { label: "Cerrajero", icon: KeyRound, bg: "bg-gray-50", color: "text-gray-600" },
-      { label: "Coaching", icon: Target, bg: "bg-fuchsia-50", color: "text-fuchsia-600" },
+      { label: "Coaching", icon: Target, bg: "bg-zinc-50", color: "text-zinc-600" },
       { label: "Comisiones", icon: CreditCard, bg: "bg-emerald-50", color: "text-emerald-700" },
       { label: "Compostura de calzado", icon: Scissors, bg: "bg-amber-50", color: "text-amber-700" },
       { label: "Construcción", icon: Building, bg: "bg-amber-50", color: "text-amber-600" },
@@ -40,10 +41,10 @@ export const MASTER_CATEGORIES = {
       { label: "Decoración y Terminaciones de Interiores", icon: Sofa, bg: "bg-rose-50", color: "text-rose-600" },
       { label: "Desinfecciones", icon: Bug, bg: "bg-lime-50", color: "text-lime-600" },
       { label: "Electricidad", icon: Zap, bg: "bg-yellow-50", color: "text-yellow-600" },
-      { label: "Escuela de Equitación", icon: PersonStanding, bg: "bg-amber-50", color: "text-amber-700" },
+      { label: "Escuela de Equitación", icon: PersonStanding, bg: "bg-gray-50", color: "text-gray-600" },
       { label: "Fletes", icon: Truck, bg: "bg-orange-50", color: "text-orange-700" },
       { label: "Gasista", icon: Flame, bg: "bg-orange-50", color: "text-orange-600" },
-      { label: "Gestoría", icon: FileText, bg: "bg-indigo-50", color: "text-indigo-700" },
+      { label: "Gestoría", icon: FileText, bg: "bg-slate-50", color: "text-slate-600" },
       { label: "Herrero", icon: Hammer, bg: "bg-zinc-50", color: "text-zinc-600" },
       { label: "Higiene y seguridad laboral", icon: ShieldCheck, bg: "bg-emerald-50", color: "text-emerald-600" },
       { label: "Impermeabilizaciones", icon: Waves, bg: "bg-teal-50", color: "text-teal-700" },

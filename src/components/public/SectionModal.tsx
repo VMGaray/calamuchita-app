@@ -16,13 +16,13 @@ import {
   PartyPopper, ChefHat, Mic, Medal, Palette, Baby,
   Store, Salad, Shirt, Gem, MoreHorizontal,
   Clock3, Landmark, Lightbulb, Bus, Info,
-  Armchair, Dog, Smartphone, FlaskConical, Printer, Briefcase, Dumbbell, Timer, Tag, Wheat, Wine, Cog, Snowflake, CreditCard, Sofa, Target, FileText
+  Armchair, Dog, Smartphone, FlaskConical, Printer, Briefcase, Dumbbell, Timer, Tag, Wheat, Wine, Cog, Snowflake, CreditCard, Sofa, Target, FileText, Fence
 } from "lucide-react"
 
 const categoryIcons: Record<string, any> = {
   "Restaurantes": Utensils, "Bar/Café": Coffee, "Viandas": ShoppingBag, "Panadería": Wheat, "Sushi": Soup,
   "Delivery": Bike, "Take Away": Package, "Abierto ahora": Clock,
-  "Alarmas-Seguridad": Shield, "Cerrajero": KeyRound, "Construcción": Building,
+  "Alambrados": Fence, "Alarmas-Seguridad": Shield, "Cerrajero": KeyRound, "Construcción": Building,
   "Fletes": Truck, "Movimiento de suelos": HardHat, "Venta de áridos": Mountain, "Desinfecciones": Bug,
   "Decoración y Terminaciones de Interiores": Sofa,
   "Electricidad": Zap, "Gasista": Flame, "Herrero": Hammer, "Paisajismo y Jardines": Leaf,
