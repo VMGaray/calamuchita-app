@@ -6,7 +6,7 @@ import {
   Hotel, Map, Tent, Activity, Compass, Bike, Plane,
   Utensils, Coffee, Beer, Wine, ShoppingBag, Clock, Wheat,
   Truck, Mountain, Printer, CreditCard, Briefcase,
-  Dumbbell, PersonStanding, Timer, Wind, Tag, Video, ShieldCheck, ClipboardList, Cog, Snowflake, Bone, Sofa, Target, FileText, Fence, Cake, Sun, PenTool, Brush
+  Dumbbell, PersonStanding, Timer, Wind, Tag, Video, ShieldCheck, ClipboardList, Cog, Snowflake, Bone, Sofa, Target, FileText, Fence, Cake, Sun, PenTool, Brush, Frame
 } from "lucide-react"
 
 export const MASTER_CATEGORIES = {
@@ -75,6 +75,7 @@ export const MASTER_CATEGORIES = {
   commerce: {
     label: "Comercios",
     subcategories: [
+      { label: "Aberturas de aluminio", icon: Frame, bg: "bg-slate-50", color: "text-slate-600" },
       { label: "Accesorios", icon: Gem, bg: "bg-pink-50", color: "text-pink-600" },
       { label: "Fábrica de Espumantes", icon: Wine, bg: "bg-rose-50", color: "text-rose-700" },
       { label: "Forrajería", icon: Package, bg: "bg-amber-50", color: "text-amber-700" },

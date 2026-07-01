@@ -16,7 +16,7 @@ import {
   PartyPopper, ChefHat, Mic, Medal, Palette, Baby,
   Store, Salad, Shirt, Gem, MoreHorizontal,
   Clock3, Landmark, Lightbulb, Bus, Info,
-  Armchair, Dog, Smartphone, FlaskConical, Printer, Briefcase, Dumbbell, Timer, Tag, Wheat, Wine, Cog, Snowflake, CreditCard, Sofa, Target, FileText, Fence, Cake, Sun, PenTool, Brush
+  Armchair, Dog, Smartphone, FlaskConical, Printer, Briefcase, Dumbbell, Timer, Tag, Wheat, Wine, Cog, Snowflake, CreditCard, Sofa, Target, FileText, Fence, Cake, Sun, PenTool, Brush, Frame
 } from "lucide-react"
 
 const categoryIcons: Record<string, any> = {
@@ -50,7 +50,7 @@ const categoryIcons: Record<string, any> = {
   "Idiomas": Languages, "Maestras/os Particulares": Users, "Universidad/Terciario": BookOpen,
   "Actividades y Paseos": Activity, "Agencia de Viajes": Plane,
   "Alojamiento": Hotel, "Alquiler": Compass, "Alquiler de autos": Car, "Compostura de calzado": Scissors, "Excursiones": Map,
-  "Fábrica de Espumantes": Wine, "Forrajería": Package, "Hogar": Armchair, "Imprenta": Printer, "Indumentaria": Shirt, "Mascotas": Dog, "Niños": Baby,
+  "Aberturas de aluminio": Frame, "Fábrica de Espumantes": Wine, "Forrajería": Package, "Hogar": Armchair, "Imprenta": Printer, "Indumentaria": Shirt, "Mascotas": Dog, "Niños": Baby,
   "Cuero Argentino": Briefcase,
   "Tecnología": Smartphone, "Vehículos": Car, "Verdulería": Leaf, "Veterinarias": PawPrint,
   "Culturales": Palette, "Deportivos": Medal, "Festivales": PartyPopper,

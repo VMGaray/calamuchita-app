@@ -106,6 +106,7 @@ export const sectionCategories = {
     { label: "Todos", desc: "Ver todo el turismo", href: "/directorio/tourism", bg: "bg-brand-sand/50", color: "text-brand-charcoal" },
   ],
   commerce: [
+    { label: "Aberturas de aluminio", desc: "Ventanas, puertas y cerramientos", href: "/directorio/commerce?cat=aberturas-aluminio", bg: "bg-brand-slate/10", color: "text-brand-slate" },
     { label: "Accesorios", desc: "Bijouterie, bolsos y complementos", href: "/directorio/commerce?cat=accesorios", bg: "bg-brand-earth/10", color: "text-brand-earth" },
     { label: "Fábrica de Espumantes", desc: "Producción y venta de espumantes", href: "/directorio/commerce?cat=fabrica-espumantes", bg: "bg-rose-100", color: "text-rose-700" },
     { label: "Forrajería", desc: "Alimentos y productos rurales", href: "/directorio/commerce?cat=forrajeria", bg: "bg-brand-earth/10", color: "text-brand-earth" },
