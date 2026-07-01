@@ -6,7 +6,7 @@ import {
   Hotel, Map, Tent, Activity, Compass, Bike, Plane,
   Utensils, Coffee, Beer, Wine, ShoppingBag, Clock, Wheat,
   Truck, Mountain, Printer, CreditCard, Briefcase,
-  Dumbbell, PersonStanding, Timer, Wind, Tag, Video, ShieldCheck, ClipboardList, Cog, Snowflake, Bone, Sofa, Target, FileText, Fence, Cake
+  Dumbbell, PersonStanding, Timer, Wind, Tag, Video, ShieldCheck, ClipboardList, Cog, Snowflake, Bone, Sofa, Target, FileText, Fence, Cake, Sun
 } from "lucide-react"
 
 export const MASTER_CATEGORIES = {
@@ -42,6 +42,7 @@ export const MASTER_CATEGORIES = {
       { label: "Decoración y Terminaciones de Interiores", icon: Sofa, bg: "bg-rose-50", color: "text-rose-600" },
       { label: "Desinfecciones", icon: Bug, bg: "bg-lime-50", color: "text-lime-600" },
       { label: "Electricidad", icon: Zap, bg: "bg-yellow-50", color: "text-yellow-600" },
+      { label: "Energía Renovable", icon: Sun, bg: "bg-slate-50", color: "text-slate-600" },
       { label: "Escuela de Equitación", icon: PersonStanding, bg: "bg-gray-50", color: "text-gray-600" },
       { label: "Fletes", icon: Truck, bg: "bg-orange-50", color: "text-orange-700" },
       { label: "Gasista", icon: Flame, bg: "bg-orange-50", color: "text-orange-600" },

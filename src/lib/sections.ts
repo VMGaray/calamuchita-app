@@ -28,6 +28,7 @@ export const sectionCategories = {
     { label: "Decoración y Terminaciones de Interiores", desc: "Diseño de interiores y terminaciones", href: "/directorio/services?cat=decoracion-interiores", bg: "bg-brand-earth/10", color: "text-brand-earth" },
     { label: "Desinfecciones", desc: "Plagas y fumigaciones", href: "/directorio/services?cat=desinfecciones", bg: "bg-brand-pine/10", color: "text-brand-pine" },
     { label: "Electricidad", desc: "Electricistas matriculados", href: "/directorio/services?cat=electricidad", bg: "bg-brand-slate/10", color: "text-brand-slate" },
+    { label: "Energía Renovable", desc: "Paneles solares y energía limpia", href: "/directorio/services?cat=energia-renovable", bg: "bg-brand-charcoal/10", color: "text-brand-charcoal" },
     { label: "Escuela de Equitación", desc: "Clases y escuelas de equitación", href: "/directorio/services?cat=equitacion", bg: "bg-brand-slate/10", color: "text-brand-slate" },
     { label: "Fletes", desc: "Transporte de cargas y mudanzas", href: "/directorio/services?cat=fletes", bg: "bg-brand-earth/10", color: "text-brand-earth" },
     { label: "Gasista", desc: "Instalaciones de gas", href: "/directorio/services?cat=gasista", bg: "bg-brand-earth/10", color: "text-brand-earth" },

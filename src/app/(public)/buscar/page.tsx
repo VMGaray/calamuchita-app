@@ -22,6 +22,10 @@ function normalizeStr(s: string) {
 // ── Sinónimos → subcategorías de negocios ──────────────────────────────────
 const SYNONYMS: Record<string, string[]> = {
   electricista:   ["Electricidad"],
+  "energia renovable": ["Energía Renovable"],
+  solar:          ["Energía Renovable"],
+  paneles:        ["Energía Renovable"],
+  fotovoltaico:   ["Energía Renovable"],
   plomero:        ["Plomería"],
   plomeria:       ["Plomería"],
   gasista:        ["Gasista"],
