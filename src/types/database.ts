@@ -43,6 +43,7 @@ export interface Business {
   phone: string | null
   whatsapp: string | null       // ← nuevo
   instagram: string | null
+  facebook: string | null
   logo_url: string | null
   cover_url: string | null
   menu_pdf_url: string | null

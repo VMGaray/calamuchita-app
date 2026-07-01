@@ -163,6 +163,7 @@ export default function AdminNegocioForm() {
     phone: "",
     whatsapp: "",
     instagram: "",
+    facebook: "",
     menu_link: "",
     offers_delivery: false,
     offers_takeaway: false,
@@ -266,6 +267,7 @@ export default function AdminNegocioForm() {
       phone: form.phone || null,
       whatsapp: form.whatsapp || null,
       instagram: form.instagram || null,
+      facebook: form.facebook || null,
       menu_link: form.menu_link || null,
       offers_delivery: form.offers_delivery,
       offers_takeaway: form.offers_takeaway,
@@ -503,11 +505,17 @@ export default function AdminNegocioForm() {
                 className="w-full px-4 py-2.5 rounded-xl border border-stone-200 text-stone-800 text-sm outline-none focus:ring-2 focus:ring-primary-300" />
             </div>
           </div>
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-3 gap-4">
             <div>
               <label className="block text-sm font-medium text-stone-700 mb-1">Instagram</label>
               <input type="text" value={form.instagram} onChange={e => handleChange("instagram", e.target.value)}
                 placeholder="@usuario"
+                className="w-full px-4 py-2.5 rounded-xl border border-stone-200 text-stone-800 text-sm outline-none focus:ring-2 focus:ring-primary-300" />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-stone-700 mb-1">Facebook</label>
+              <input type="text" value={form.facebook} onChange={e => handleChange("facebook", e.target.value)}
+                placeholder="usuario o https://facebook.com/..."
                 className="w-full px-4 py-2.5 rounded-xl border border-stone-200 text-stone-800 text-sm outline-none focus:ring-2 focus:ring-primary-300" />
             </div>
             <div>

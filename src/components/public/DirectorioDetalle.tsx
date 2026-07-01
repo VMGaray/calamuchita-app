@@ -21,6 +21,14 @@ function WaIcon({ size = 14 }: { size?: number }) {
   )
 }
 
+function FbIcon({ size = 14 }: { size?: number }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="currentColor" aria-hidden>
+      <path d="M22 12.06C22 6.505 17.523 2 12 2S2 6.505 2 12.06c0 5.02 3.657 9.184 8.438 9.94v-7.03H7.898v-2.91h2.54V9.845c0-2.507 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.771-1.63 1.562v1.878h2.773l-.443 2.91h-2.33V22c4.78-.756 8.437-4.92 8.437-9.94z" />
+    </svg>
+  )
+}
+
 const DAY_SHORT = ["Dom", "Lun", "Mar", "Mié", "Jue", "Vie", "Sáb"]
 
 const SECTION_TITLES: Record<string, string> = {
@@ -146,6 +154,9 @@ export default function DirectorioDetalle({ business, section, promotions = [] }
   const hasHoursData  = todayRows.length > 0
 
   const instagramHandle = business.instagram?.replace(/^@|https?:\/\/(www\.)?instagram\.com\//g, "").replace(/\/$/, "")
+  const facebookUrl     = business.facebook
+    ? (/^https?:\/\//.test(business.facebook) ? business.facebook : `https://facebook.com/${business.facebook.replace(/^@/, "")}`)
+    : null
   const websiteUrl      = business.menu_link || business.website
   const categoryLabel   = business.subcategory || business.category || SECTION_TITLES[section] || "Comercio"
   const branches: any[] = Array.isArray(business.branches) ? business.branches : []
@@ -390,6 +401,7 @@ export default function DirectorioDetalle({ business, section, promotions = [] }
             {business.phone      && <InfoRow icon={<Phone size={14} style={{ color: "#2D4530" }} />}  sublabel="Teléfono"   label={business.phone}                                   href={`tel:${business.phone}`} />}
             {business.whatsapp && business.whatsapp !== business.phone && <InfoRow icon={<WaIcon size={14} />} sublabel="WhatsApp" label={business.whatsapp} href={waLink ?? undefined} external />}
             {instagramHandle     && <InfoRow icon={<AtSign size={14} style={{ color: "#2D4530" }} />} sublabel="Instagram"  label={`@${instagramHandle}`}                            href={`https://instagram.com/${instagramHandle}`} external />}
+            {facebookUrl         && <InfoRow icon={<FbIcon size={14} />}                              sublabel="Facebook"   label={facebookUrl.replace(/^https?:\/\//, "")}           href={facebookUrl} external />}
             {websiteUrl          && <InfoRow icon={<Globe size={14} style={{ color: "#2D4530" }} />}  sublabel="Sitio web"  label={websiteUrl.replace(/^https?:\/\//, "")}            href={websiteUrl} external />}
             {business.address    && <InfoRow icon={<MapPin size={14} style={{ color: "#2D4530" }} />} sublabel="Dirección"  label={business.address} />}
             {branches.map((branch: any, i: number) => (

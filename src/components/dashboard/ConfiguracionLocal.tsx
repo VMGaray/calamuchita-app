@@ -94,6 +94,7 @@ export default function ConfiguracionLocal() {
     phone: "",
     whatsapp: "",
     instagram: "",
+    facebook: "",
     menu_link: "",
     offers_delivery: false,
     offers_takeaway: false,
@@ -131,6 +132,7 @@ export default function ConfiguracionLocal() {
           phone: business.phone || "",
           whatsapp: business.whatsapp || "",
           instagram: business.instagram || "",
+          facebook: business.facebook || "",
           menu_link: business.menu_link || "",
           offers_delivery: business.offers_delivery || false,
           offers_takeaway: business.offers_takeaway || false,
@@ -243,6 +245,7 @@ export default function ConfiguracionLocal() {
       phone: form.phone || null,
       whatsapp: form.whatsapp || null,
       instagram: form.instagram || null,
+      facebook: form.facebook || null,
       menu_link: form.menu_link || null,
       offers_delivery: form.offers_delivery,
       offers_takeaway: form.offers_takeaway,
@@ -371,15 +374,27 @@ export default function ConfiguracionLocal() {
               />
             </div>
           </div>
-          <div>
-            <label className="block text-sm font-medium text-stone-700 mb-1">Instagram</label>
-            <input
-              type="text"
-              value={form.instagram}
-              onChange={(e) => handleChange("instagram", e.target.value)}
-              placeholder="@usuario"
-              className="w-full px-4 py-2.5 rounded-xl border border-stone-200 text-stone-800 text-sm outline-none focus:ring-2 focus:ring-primary-300"
-            />
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-stone-700 mb-1">Instagram</label>
+              <input
+                type="text"
+                value={form.instagram}
+                onChange={(e) => handleChange("instagram", e.target.value)}
+                placeholder="@usuario"
+                className="w-full px-4 py-2.5 rounded-xl border border-stone-200 text-stone-800 text-sm outline-none focus:ring-2 focus:ring-primary-300"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-stone-700 mb-1">Facebook</label>
+              <input
+                type="text"
+                value={form.facebook}
+                onChange={(e) => handleChange("facebook", e.target.value)}
+                placeholder="usuario o https://facebook.com/..."
+                className="w-full px-4 py-2.5 rounded-xl border border-stone-200 text-stone-800 text-sm outline-none focus:ring-2 focus:ring-primary-300"
+              />
+            </div>
           </div>
           <div>
             <label className="block text-sm font-medium text-stone-700 mb-1">Pueblo</label>
