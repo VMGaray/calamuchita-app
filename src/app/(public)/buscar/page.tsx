@@ -161,16 +161,6 @@ function findMatchingSpecialtyGroups(q: string): string[] {
   return [...new Set([...fromSynonyms, ...fromGroups])]
 }
 
-interface Professional {
-  name: string
-  specialty_group: string
-  specialty: string
-  description: string
-  schedule: string
-  contact: string
-  photo_url: string | null
-}
-
 export interface SearchResult {
   id: string
   name: string
@@ -185,7 +175,6 @@ export interface SearchResult {
   phone: string | null
   whatsapp: string | null
   business_hours: { day_of_week: number; opens_at: string; closes_at: string; is_closed: boolean }[]
-  matchedProfessional?: Professional
 }
 
 export default async function BuscarPage({ searchParams }: Props) {
@@ -196,7 +185,6 @@ export default async function BuscarPage({ searchParams }: Props) {
     return <BuscarResults query="" results={[]} />
   }
 
-  const nq = normalizeStr(q)
   const matchingSubcats   = findMatchingSubcategories(q)
   const targetGroups      = findMatchingSpecialtyGroups(q)
 
@@ -226,74 +214,27 @@ export default async function BuscarPage({ searchParams }: Props) {
   const mainResults: SearchResult[] = (mainData ?? []) as SearchResult[]
   const mainIds = new Set(mainResults.map(r => r.id))
 
-  // ── Query secundaria: profesionales dentro de centros de salud ─────────
-  // Solo se ejecuta cuando el término sugiere una especialidad médica.
-  const professionalResults: SearchResult[] = []
+  // ── Query secundaria: profesionales de salud por especialidad ──────────
+  // Cada profesional es su propia ficha (subcategory/medical_specialties);
+  // esta query cubre términos que sugieren una especialidad médica pero no
+  // matchean el nombre/subcategoría de la ficha directamente.
+  const specialtyResults: SearchResult[] = []
 
   if (targetGroups.length > 0) {
-    const { data: healthData } = await supabase
+    const { data: specialtyData } = await supabase
       .from("businesses")
-      .select("id, name, slug, section, subcategory, address, logo_url, cover_url, description, is_open, phone, whatsapp, professionals, business_hours(day_of_week, opens_at, closes_at, is_closed)")
+      .select("id, name, slug, section, subcategory, address, logo_url, cover_url, description, is_open, phone, whatsapp, business_hours(day_of_week, opens_at, closes_at, is_closed)")
       .eq("status", "active")
       .eq("section", "health")
+      .overlaps("medical_specialties", targetGroups)
 
-    if (healthData) {
-      for (const biz of healthData) {
-        const profs = Array.isArray((biz as any).professionals)
-          ? (biz as any).professionals as Professional[]
-          : []
-
-        for (const prof of profs) {
-          const groupNorm = normalizeStr(prof.specialty_group ?? "")
-          const nameNorm  = normalizeStr(prof.name ?? "")
-          const specNorm  = normalizeStr(prof.specialty ?? "")
-          const descNorm  = normalizeStr(prof.description ?? "")
-
-          const groupMatch = targetGroups.some(g => normalizeStr(g) === groupNorm)
-          const textMatch  = nameNorm.includes(nq) || specNorm.includes(nq) || descNorm.includes(nq)
-
-          if (groupMatch || textMatch) {
-            // Si el negocio ya aparece en la búsqueda principal no lo duplicamos
-            if (mainIds.has(biz.id)) continue
-
-            professionalResults.push({
-              id: biz.id,
-              name: biz.name,
-              slug: biz.slug,
-              section: biz.section,
-              subcategory: biz.subcategory ?? null,
-              address: biz.address ?? null,
-              logo_url: biz.logo_url ?? null,
-              cover_url: biz.cover_url ?? null,
-              description: biz.description ?? null,
-              is_open: biz.is_open,
-              phone: biz.phone ?? null,
-              whatsapp: biz.whatsapp ?? null,
-              business_hours: (biz as any).business_hours ?? [],
-              matchedProfessional: {
-                name: prof.name,
-                specialty_group: prof.specialty_group,
-                specialty: prof.specialty,
-                description: prof.description,
-                schedule: prof.schedule,
-                contact: prof.contact,
-                photo_url: prof.photo_url ?? null,
-              },
-            })
-          }
-        }
-      }
+    for (const biz of specialtyData ?? []) {
+      if (mainIds.has(biz.id)) continue
+      specialtyResults.push(biz as SearchResult)
     }
   }
 
-  // Negocios primero, profesionales después; sin duplicados por (id + prof.name)
-  const seen = new Set<string>()
-  const results = [...mainResults, ...professionalResults].filter(r => {
-    const key = r.id + (r.matchedProfessional?.name ?? "")
-    if (seen.has(key)) return false
-    seen.add(key)
-    return true
-  })
+  const results = [...mainResults, ...specialtyResults]
 
   return <BuscarResults query={q} results={results} />
 }

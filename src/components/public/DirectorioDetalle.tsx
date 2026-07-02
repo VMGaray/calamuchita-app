@@ -91,14 +91,6 @@ interface Props { business: any; section: string; promotions?: Promotion[] }
 export default function DirectorioDetalle({ business, section, promotions = [] }: Props) {
   const searchParams = useSearchParams()
   const from     = searchParams.get("from")
-  const profName = searchParams.get("prof")
-
-  // Si se navegó desde una card de profesional individual, encontrar sus datos
-  const matchedPro = profName && Array.isArray(business.professionals)
-    ? (business.professionals as any[]).find(
-        p => p.name?.toLowerCase().trim() === decodeURIComponent(profName).toLowerCase().trim()
-      ) ?? null
-    : null
 
   const rawPhotos = ((business.business_photos ?? []) as any[])
     .sort((a: any, b: any) => a.sort_order - b.sort_order)
@@ -222,109 +214,6 @@ export default function DirectorioDetalle({ business, section, promotions = [] }
       ═══════════════════════════════════════════════════════════════ */}
       <div className="-mt-8 rounded-t-[32px] relative z-10 pb-12" style={{ background: "#F0EBE0" }}>
         <div className="max-w-2xl mx-auto px-5 pt-6 flex flex-col gap-y-5">
-
-          {/* ── Perfil del profesional ──────────────────────────────────────────
-              Se muestra cuando el usuario llegó desde una card de profesional
-              en el directorio (?prof=Nombre). Aparece antes que el info del centro
-              para que el perfil sea el contenido primario de la pantalla.       */}
-          {matchedPro && (
-            <>
-              <div className="bg-white rounded-2xl p-5 shadow-sm border border-stone-100">
-                <div className="flex items-start gap-4 mb-4">
-                  {/* Foto o inicial */}
-                  {matchedPro.photo_url ? (
-                    <button
-                      onClick={() => setLightboxSrc(matchedPro.photo_url)}
-                      className="relative w-20 h-20 rounded-2xl overflow-hidden flex-shrink-0 bg-stone-100 cursor-zoom-in hover:ring-2 hover:ring-[#2D4530]/30 transition-all"
-                      aria-label="Ampliar foto"
-                    >
-                      <Image
-                        src={matchedPro.photo_url}
-                        alt={matchedPro.name}
-                        fill
-                        className="object-cover object-top"
-                        sizes="80px"
-                        quality={85}
-                      />
-                    </button>
-                  ) : (
-                    <div
-                      className="w-20 h-20 rounded-2xl flex-shrink-0 flex items-center justify-center font-serif text-3xl font-bold"
-                      style={{ background: "#2D4530", color: "#E1DBC9" }}
-                    >
-                      {matchedPro.name?.[0] ?? "?"}
-                    </div>
-                  )}
-
-                  {/* Nombre + especialidad */}
-                  <div className="flex-1 min-w-0">
-                    <h2 className="text-xl font-bold leading-snug" style={{ color: "#2D4530" }}>
-                      {matchedPro.name}
-                    </h2>
-                    {(matchedPro.specialty || matchedPro.specialty_group) && (
-                      <span
-                        className="inline-block text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-full mt-1.5"
-                        style={{ background: "rgba(45,69,48,0.10)", color: "#2D4530" }}
-                      >
-                        {matchedPro.specialty || matchedPro.specialty_group}
-                      </span>
-                    )}
-                    <div className="flex items-center gap-1.5 mt-2.5">
-                      <Building2 size={11} style={{ color: "rgba(45,69,48,0.45)" }} />
-                      <span className="text-xs font-medium" style={{ color: "rgba(45,69,48,0.55)" }}>
-                        Atiende en {business.name}
-                      </span>
-                    </div>
-                  </div>
-                </div>
-
-                {matchedPro.description && (
-                  <p className="text-sm leading-relaxed mb-3" style={{ color: "rgba(45,69,48,0.70)" }}>
-                    {matchedPro.description}
-                  </p>
-                )}
-                {matchedPro.schedule && (
-                  <p className="text-xs mb-4" style={{ color: "rgba(45,69,48,0.50)" }}>
-                    🕐 {matchedPro.schedule}
-                  </p>
-                )}
-
-                {/* Botón de contacto del profesional */}
-                {(() => {
-                  const isPhone = matchedPro.contact && !matchedPro.contact.startsWith("http")
-                  const waUrl = isPhone
-                    ? `https://wa.me/${normalizeArgPhone(matchedPro.contact)}?text=${encodeURIComponent(
-                        `Hola! Vi el perfil de ${matchedPro.name} en ${business.name} (Calamuchita App) y quería consultar sobre un turno.`
-                      )}`
-                    : null
-                  if (waUrl) return (
-                    <a href={waUrl} target="_blank" rel="noopener noreferrer"
-                      className="flex items-center justify-center gap-2 w-full py-3 rounded-2xl text-sm font-bold text-white transition-opacity hover:opacity-90"
-                      style={{ background: "#25D366" }}>
-                      <WaIcon size={14} /> Consultar turno por WhatsApp
-                    </a>
-                  )
-                  if (matchedPro.contact?.startsWith("http")) return (
-                    <a href={matchedPro.contact} target="_blank" rel="noopener noreferrer"
-                      className="flex items-center justify-center gap-2 w-full py-3 rounded-2xl text-sm font-bold transition-opacity hover:opacity-80"
-                      style={{ background: "rgba(45,69,48,0.08)", color: "#2D4530" }}>
-                      📅 Sacar turno online
-                    </a>
-                  )
-                  return null
-                })()}
-              </div>
-
-              {/* Separador visual antes de la info del centro */}
-              <div className="flex items-center gap-3">
-                <div className="flex-1 h-px" style={{ background: "rgba(45,69,48,0.12)" }} />
-                <p className="text-[10px] font-black uppercase tracking-[0.22em]" style={{ color: "rgba(45,69,48,0.35)" }}>
-                  Centro de atención
-                </p>
-                <div className="flex-1 h-px" style={{ background: "rgba(45,69,48,0.12)" }} />
-              </div>
-            </>
-          )}
 
           {/* ── Nombre + logo + badges ── */}
           <div className="flex items-start gap-4">
@@ -623,76 +512,17 @@ export default function DirectorioDetalle({ business, section, promotions = [] }
             </div>
           )}
 
-          {/* ── Profesionales ── */}
-          {Array.isArray(business.professionals) && business.professionals.length > 0 && (() => {
-            const groups = business.professionals.reduce((acc: Record<string, any[]>, pro: any) => {
-              const key = pro.specialty_group || "Otros"
-              if (!acc[key]) acc[key] = []
-              acc[key].push(pro)
-              return acc
-            }, {})
-            return (
-              <div className="bg-white/50 rounded-2xl p-5">
-                <p className="text-[10px] font-black uppercase tracking-[0.2em] mb-3" style={{ color: "rgba(45,69,48,0.40)" }}>Profesionales</p>
-                {business.has_24h_guard && (
-                  <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold mb-3" style={{ background: "rgba(45,69,48,0.08)", color: "#2D4530" }}>
-                    ✦ Guardia 24 hs
-                  </span>
-                )}
-                {business.appointment_system && <p className="text-xs text-stone-500 mb-4">{business.appointment_system}</p>}
-                <div className="space-y-5">
-                  {Object.entries(groups).map(([group, members]) => (
-                    <div key={group}>
-                      <p className="text-[10px] font-black uppercase tracking-[0.15em] mb-3 pb-1.5 border-b border-stone-100" style={{ color: "#2D4530" }}>{group}</p>
-                      <div className="grid grid-cols-2 gap-3">
-                        {(members as any[]).map((pro: any, i: number) => {
-                          const isPhone = pro.contact && !pro.contact.startsWith("http")
-                          const waUrl = isPhone
-                            ? `https://wa.me/${normalizeArgPhone(pro.contact)}?text=${encodeURIComponent(`Hola! Vi el perfil de ${pro.name} en ${business.name} (Calamuchita App) y quería consultar sobre un turno.`)}`
-                            : null
-                          return (
-                            <div key={i} className="rounded-2xl border border-stone-100 p-3 flex flex-col items-center text-center gap-2" style={{ background: "#FAFAF9" }}>
-                              {pro.photo_url ? (
-                                <button
-                                  onClick={() => setLightboxSrc(pro.photo_url)}
-                                  className="w-14 h-14 rounded-xl overflow-hidden flex-shrink-0 cursor-zoom-in hover:ring-2 hover:ring-[#2D4530]/30 transition-all"
-                                  aria-label="Ampliar foto"
-                                >
-                                  <Image src={pro.photo_url} alt={pro.name} width={56} height={56} className="w-full h-full object-cover" />
-                                </button>
-                              ) : (
-                                <div className="w-14 h-14 rounded-xl overflow-hidden flex-shrink-0">
-                                  <div className="w-full h-full flex items-center justify-center font-serif text-xl font-bold" style={{ background: "#2D4530", color: "#E1DBC9" }}>
-                                    {pro.name?.[0] ?? "?"}
-                                  </div>
-                                </div>
-                              )}
-                              <div className="w-full">
-                                <p className="text-xs font-bold leading-snug line-clamp-2" style={{ color: "#2D4530" }}>{pro.name}</p>
-                                {pro.specialty && <p className="text-[10px] mt-0.5 line-clamp-1" style={{ color: "rgba(45,69,48,0.55)" }}>{pro.specialty}</p>}
-                              </div>
-                              {pro.description && <p className="text-[10px] line-clamp-2 leading-relaxed w-full text-left" style={{ color: "rgba(45,69,48,0.60)" }}>{pro.description}</p>}
-                              {pro.schedule && <p className="text-[10px] w-full text-left" style={{ color: "rgba(45,69,48,0.45)" }}>🕐 {pro.schedule}</p>}
-                              {waUrl && (
-                                <a href={waUrl} target="_blank" rel="noopener noreferrer" className="mt-auto w-full flex items-center justify-center gap-1.5 py-2 rounded-xl text-xs font-semibold text-white transition-opacity hover:opacity-90 active:scale-95" style={{ background: "#25D366" }}>
-                                  <WaIcon size={12} /> WhatsApp
-                                </a>
-                              )}
-                              {!waUrl && pro.contact?.startsWith("http") && (
-                                <a href={pro.contact} target="_blank" rel="noopener noreferrer" className="mt-auto w-full flex items-center justify-center gap-1.5 py-2 rounded-xl text-xs font-semibold transition-colors hover:opacity-80" style={{ background: "rgba(45,69,48,0.08)", color: "#2D4530" }}>
-                                  📅 Sacar turno
-                                </a>
-                              )}
-                            </div>
-                          )
-                        })}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )
-          })()}
+          {/* ── Guardia y turnos (salud) ── */}
+          {(business.has_24h_guard || business.appointment_system) && (
+            <div className="bg-white/50 rounded-2xl p-4">
+              {business.has_24h_guard && (
+                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold" style={{ background: "rgba(45,69,48,0.08)", color: "#2D4530" }}>
+                  ✦ Guardia 24 hs
+                </span>
+              )}
+              {business.appointment_system && <p className="text-xs text-stone-500 mt-2">{business.appointment_system}</p>}
+            </div>
+          )}
 
           {/* ── Botonera de contacto (mobile) ── */}
           {hasBottomActions && (

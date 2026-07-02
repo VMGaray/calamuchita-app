@@ -11,7 +11,7 @@ import Card3D from "@/components/ui/Card3D"
 import { SkeletonBusinessGrid } from "@/components/ui/Skeleton"
 import { createClient } from "@/lib/supabase/client"
 import { sectionCategories, SectionKey } from "@/lib/sections"
-import { Phone, AtSign, MapPin, X, LayoutGrid, Check, ChevronLeft, ChevronRight, Stethoscope, Building2 } from "lucide-react"
+import { Phone, AtSign, MapPin, X, LayoutGrid, Check, ChevronLeft, ChevronRight } from "lucide-react"
 import Link from "next/link"
 import Image from "next/image"
 
@@ -29,37 +29,6 @@ interface Business {
   description: string | null
   is_premium: boolean
   medical_specialties: string[] | null
-}
-
-interface ClinicProfessional {
-  name: string
-  specialty: string
-  specialty_group: string
-  description: string
-  schedule: string
-  contact: string
-  photo_url: string | null
-  clinic_name: string
-  clinic_slug: string
-  clinic_address: string | null
-  clinic_pueblo: string | null
-}
-
-// Mapeo: cat URL → specialty_group values del JSONB
-const SPECIALTY_TO_GROUPS: Record<string, string[]> = {
-  "especialidades": ["Medicina", "Pediatría", "Odontología", "Nutrición", "Otros"],
-  "psicologia":     ["Psicología"],
-  "terapias":       ["Kinesiología / Fisioterapia", "Cosmiatría", "Reflexología", "Fonoaudiología"],
-  "laboratorios":   ["Laboratorio", "Farmacia"],
-  "hospitales":     ["Medicina"],
-  "osteopatia":     ["Osteopatía"],
-}
-const NO_PROFESSIONAL_CATS = ["traslado"]
-
-// Comparación insensible a acentos y mayúsculas — evita que un specialty_group
-// guardado como "Nutricion" no matchee con "Nutrición" en SPECIALTY_TO_GROUPS.
-function normGroup(s: string) {
-  return s.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase().trim()
 }
 
 interface Props {
@@ -188,32 +157,22 @@ export default function DirectorioList({ section, filters }: Props) {
   const [allBusinesses, setAllBusinesses] = useState<Business[]>([])
   const [businesses, setBusinesses] = useState<Business[]>([])
   const [loading, setLoading] = useState(true)
-  const [clinicProfessionals, setClinicProfessionals] = useState<ClinicProfessional[]>([])
   const [search, setSearch] = useState(filters.q || "")
   const [showPueblos, setShowPueblos] = useState(false)
   const [showCategories, setShowCategories] = useState(false)
   const [mounted, setMounted] = useState(false)
   const resultsRef = useRef<HTMLDivElement>(null)
   const scrollRef = useRef<HTMLDivElement>(null)
-  const scrollRefPros = useRef<HTMLDivElement>(null)
   const isFirstRender = useRef(true)
 
   const [atStart, setAtStart] = useState(true)
   const [atEnd, setAtEnd] = useState(false)
-  const [atStartPros, setAtStartPros] = useState(true)
-  const [atEndPros, setAtEndPros] = useState(false)
 
   const checkScroll = () => {
     const el = scrollRef.current
     if (!el) return
     setAtStart(el.scrollLeft <= 4)
     setAtEnd(el.scrollLeft >= el.scrollWidth - el.clientWidth - 4)
-  }
-  const checkScrollPros = () => {
-    const el = scrollRefPros.current
-    if (!el) return
-    setAtStartPros(el.scrollLeft <= 4)
-    setAtEndPros(el.scrollLeft >= el.scrollWidth - el.clientWidth - 4)
   }
 
   const scrollBy = (ref: React.RefObject<HTMLDivElement | null>, dir: "left" | "right") => {
@@ -230,14 +189,6 @@ export default function DirectorioList({ section, filters }: Props) {
     el.addEventListener("scroll", checkScroll, { passive: true })
     return () => el.removeEventListener("scroll", checkScroll)
   }, [businesses])
-
-  useEffect(() => {
-    const el = scrollRefPros.current
-    if (!el) return
-    checkScrollPros()
-    el.addEventListener("scroll", checkScrollPros, { passive: true })
-    return () => el.removeEventListener("scroll", checkScrollPros)
-  }, [clinicProfessionals])
 
   const categories = sectionCategories[section] || []
   const activeCategory = filters.cat || ""
@@ -286,70 +237,6 @@ export default function DirectorioList({ section, filters }: Props) {
     }
     fetchBusinesses()
   }, [section, activeCategory, filters.q])
-
-  // Profesionales dentro de clínicas (solo sección health)
-  useEffect(() => {
-    if (section !== "health" || NO_PROFESSIONAL_CATS.includes(activeCategory)) {
-      setClinicProfessionals([])
-      return
-    }
-    const fetchClinicPros = async () => {
-      const supabase = createClient()
-      const { data } = await supabase
-        .from("businesses")
-        .select("name, slug, address, pueblo, professionals")
-        .eq("status", "active")
-        .eq("section", "health")
-        .not("professionals", "is", null)
-
-      const allowedGroups = SPECIALTY_TO_GROUPS[activeCategory] ?? null
-
-      const expanded: ClinicProfessional[] = (data || []).flatMap(clinic => {
-        const pros = (clinic.professionals as any[]) || []
-        return pros
-          .filter(p => p.name?.trim())
-          .filter(p => !allowedGroups || allowedGroups.some(g => normGroup(g) === normGroup(p.specialty_group || "")))
-          .filter(p => !filters.q ||
-            p.name.toLowerCase().includes(filters.q.toLowerCase()) ||
-            (p.specialty || "").toLowerCase().includes(filters.q.toLowerCase())
-          )
-          .map(p => ({
-            name: p.name,
-            specialty: p.specialty || "",
-            specialty_group: p.specialty_group || "",
-            description: p.description || "",
-            schedule: p.schedule || "",
-            contact: p.contact || "",
-            photo_url: p.photo_url || null,
-            clinic_name: clinic.name,
-            clinic_slug: clinic.slug,
-            clinic_address: clinic.address,
-            clinic_pueblo: (clinic as any).pueblo || null,
-          }))
-      })
-
-      const pueblosFilter = filters.pueblo ? filters.pueblo.split(",").filter(Boolean) : []
-      setClinicProfessionals(
-        pueblosFilter.length === 0
-          ? expanded
-          : expanded.filter(p => {
-              // Columna pueblo explícita (igual que el filtro de businesses)
-              if (p.clinic_pueblo) {
-                return pueblosFilter.some(pueblo => p.clinic_pueblo!.toLowerCase() === pueblo.toLowerCase())
-              }
-              // Fallback: buscar pueblo en el string de dirección
-              if (p.clinic_address?.trim()) {
-                return pueblosFilter.some(pueblo =>
-                  p.clinic_address!.toLowerCase().includes(pueblo.toLowerCase())
-                )
-              }
-              // Sin dirección ni pueblo → global
-              return true
-            })
-      )
-    }
-    fetchClinicPros()
-  }, [section, activeCategory, filters.q, filters.pueblo])
 
   // Filtro de pueblo client-side
   useEffect(() => {
@@ -663,119 +550,6 @@ export default function DirectorioList({ section, filters }: Props) {
           </>
         )}
       </div>
-
-      {/* ── Profesionales en clínicas ── */}
-      {section === "health" && clinicProfessionals.length > 0 && (
-        <div className="mt-10">
-          <SectionLabel icon={<Stethoscope size={11} />} label="Profesionales en clínicas" />
-          <div className="relative">
-            {clinicProfessionals.length > 1 && (
-              <>
-                <button
-                  onClick={() => scrollBy(scrollRefPros, "left")}
-                  className="md:hidden absolute left-0 top-1/2 -translate-y-1/2 z-10 w-8 h-8 flex items-center justify-center rounded-full transition-opacity duration-200"
-                  style={{ background: "rgba(45,69,48,0.85)", border: "1px solid rgba(163,177,138,0.4)", boxShadow: "0 2px 12px rgba(0,0,0,0.3)", opacity: atStartPros ? 0 : 1, pointerEvents: atStartPros ? "none" : "auto" }}
-                  aria-label="Anterior"
-                >
-                  <ChevronLeft size={16} color="#E1DBC9" />
-                </button>
-                <button
-                  onClick={() => scrollBy(scrollRefPros, "right")}
-                  className="md:hidden absolute right-0 top-1/2 -translate-y-1/2 z-10 w-8 h-8 flex items-center justify-center rounded-full transition-opacity duration-200"
-                  style={{ background: "rgba(45,69,48,0.85)", border: "1px solid rgba(163,177,138,0.4)", boxShadow: "0 2px 12px rgba(0,0,0,0.3)", opacity: atEndPros ? 0 : 1, pointerEvents: atEndPros ? "none" : "auto" }}
-                  aria-label="Siguiente"
-                >
-                  <ChevronRight size={16} color="#E1DBC9" />
-                </button>
-              </>
-            )}
-          <div ref={scrollRefPros} className="flex gap-4 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden snap-x snap-mandatory -mx-4 px-4 pb-6 md:mx-0 md:px-0 md:grid md:grid-cols-2 lg:grid-cols-3 md:overflow-x-visible md:pb-0 md:gap-5">
-            {clinicProfessionals.map((pro, i) => (
-              <AnimateIn
-                key={`${pro.clinic_slug}-${i}`}
-                direction="up"
-                delay={i * 0.04}
-                className="w-[82vw] flex-shrink-0 snap-center md:w-auto"
-              >
-                <Link
-                  href={`/directorio/health/${pro.clinic_slug}?prof=${encodeURIComponent(pro.name)}`}
-                  className="block rounded-2xl overflow-hidden shadow-sm transition-shadow hover:shadow-md"
-                  style={{ background: "#FFFFFF", border: "1px solid rgba(45,69,48,0.09)" }}
-                >
-                  {/* Imagen o avatar */}
-                  <div className="relative overflow-hidden aspect-[4/3] bg-stone-50">
-                    {pro.photo_url ? (
-                      <div className="w-full h-full bg-white flex items-center justify-center p-5">
-                        <div className="relative w-full h-full">
-                          <Image
-                            src={pro.photo_url}
-                            alt={pro.name}
-                            fill
-                            className="object-contain"
-                            sizes="(max-width: 768px) 82vw, (max-width: 1024px) 50vw, 33vw"
-                            quality={80}
-                          />
-                        </div>
-                      </div>
-                    ) : (
-                      <div className="w-full h-full flex items-center justify-center" style={{ background: "#E1DBC9" }}>
-                        <div
-                          className="w-14 h-14 rounded-2xl flex items-center justify-center font-serif text-2xl font-bold"
-                          style={{ background: "#2D4530", color: "#E1DBC9" }}
-                        >
-                          {pro.name[0]}
-                        </div>
-                      </div>
-                    )}
-                  </div>
-
-                  {/* Texto */}
-                  <div className="px-4 pt-3.5 pb-4" style={{ background: "#F5EFE3" }}>
-                    <h3 className="text-sm font-bold leading-snug mb-1.5 line-clamp-2" style={{ color: "#2D4530" }}>
-                      {pro.name}
-                    </h3>
-
-                    <div className="min-h-[24px]">
-                      {(pro.specialty || pro.specialty_group) && (
-                        <span
-                          className="inline-block text-[10px] font-semibold px-2 py-0.5 rounded-full mb-2 uppercase tracking-wide"
-                          style={{ background: "rgba(45,69,48,0.10)", color: "#2D4530" }}
-                        >
-                          {pro.specialty || pro.specialty_group}
-                        </span>
-                      )}
-                    </div>
-
-                    <div className="min-h-[32px]">
-                      {pro.description && (
-                        <p className="text-xs mb-2.5 leading-relaxed line-clamp-2" style={{ color: "rgba(45,69,48,0.60)" }}>
-                          {pro.description}
-                        </p>
-                      )}
-                    </div>
-
-                    <div className="flex items-center gap-1.5 mb-3">
-                      <Building2 size={10} className="flex-shrink-0" style={{ color: "rgba(45,69,48,0.45)" }} />
-                      <span className="text-xs truncate" style={{ color: "rgba(45,69,48,0.55)" }}>
-                        Atiende en {pro.clinic_name}
-                      </span>
-                    </div>
-
-                    <div
-                      className="flex items-center justify-between w-full px-3 py-2.5 rounded-xl text-xs font-semibold"
-                      style={{ background: "#2D4530", color: "#E1DBC9" }}
-                    >
-                      <span>Ver más</span>
-                      <ChevronRight size={13} />
-                    </div>
-                  </div>
-                </Link>
-              </AnimateIn>
-            ))}
-          </div>
-          </div>{/* /relative wrapper pros */}
-        </div>
-      )}
 
       {/* ── Portals ── */}
       {mounted && createPortal(

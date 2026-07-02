@@ -52,22 +52,6 @@ const COBERTURAS = [
   "Medifé", "Galeno", "Sancor Salud", "Omint", "Particular",
 ]
 
-const SPECIALTY_GROUPS = [
-  "Medicina", "Pediatría", "Psicología", "Kinesiología / Fisioterapia",
-  "Nutrición", "Fonoaudiología", "Cosmiatría", "Reflexología", "Osteopatía",
-  "Odontología", "Farmacia", "Laboratorio", "Otros",
-]
-
-interface Professional {
-  name: string
-  specialty_group: string
-  specialty: string
-  description: string
-  schedule: string
-  contact: string
-  photo_url: string | null
-}
-
 const ESPECIALIDADES_SUGERIDAS = [
   "Cardiología", "Clínica médica", "Dermatología", "Fonoaudiología",
   "Ginecología", "Kinesiología", "Neurología", "Nutrición", "Nutricionista",
@@ -148,7 +132,6 @@ export default function AdminNegocioForm() {
   const [galleryPhotos, setGalleryPhotos] = useState<(string | null)[]>([null, null, null])
   const [branches, setBranches] = useState<Array<{ address: string; pueblo: string }>>([])
   const [professionalType, setProfessionalType] = useState("")
-  const [professionals, setProfessionals] = useState<Professional[]>([])
   const [coordsInput, setCoordsInput] = useState("")
 
   const [form, setForm] = useState({
@@ -285,7 +268,6 @@ export default function AdminNegocioForm() {
       doctor_name: form.section === "health" ? form.doctor_name || null : null,
       medical_specialties: form.section === "health" ? form.medical_specialties : [],
       health_coverages: form.section === "health" ? form.health_coverages : [],
-      professionals: form.section === "health" ? professionals : [],
       has_24h_guard: form.section === "health" ? form.has_24h_guard : false,
       appointment_system: form.section === "health" ? form.appointment_system || null : null,
       group_name: form.group_name || null,
@@ -781,87 +763,11 @@ export default function AdminNegocioForm() {
               </div>
             </div>
 
-            {/* Lista de profesionales */}
-            <div className="pt-2 border-t border-stone-100">
-              <div className="flex items-center justify-between mb-3">
-                <label className="text-sm font-medium text-stone-700">Profesionales del establecimiento</label>
-                <button
-                  type="button"
-                  onClick={() => setProfessionals(prev => [...prev, { name: "", specialty_group: "Medicina", specialty: "", description: "", schedule: "", contact: "", photo_url: null }])}
-                  className="text-xs font-medium px-3 py-1.5 rounded-xl border border-primary-300 text-primary-600 hover:bg-primary-50 transition-colors"
-                >
-                  + Agregar profesional
-                </button>
-              </div>
-              {professionals.length === 0 && (
-                <p className="text-xs text-stone-400">Sin profesionales cargados. Usá "Agregar profesional" para cada médico o especialista.</p>
-              )}
-              <div className="space-y-3">
-                {professionals.map((pro, i) => (
-                  <div key={i} className="p-4 rounded-xl border border-stone-200 bg-stone-50 space-y-3">
-                    <div className="flex items-center justify-between">
-                      <span className="text-xs font-semibold text-stone-600">Profesional {i + 1}</span>
-                      <button type="button" onClick={() => setProfessionals(prev => prev.filter((_, idx) => idx !== i))}
-                        className="text-xs text-red-400 hover:text-red-500">Eliminar</button>
-                    </div>
-                    <div className="grid grid-cols-2 gap-3">
-                      <div className="col-span-2">
-                        <label className="block text-xs text-stone-500 mb-1">Nombre completo</label>
-                        <input type="text" value={pro.name}
-                          onChange={e => setProfessionals(prev => prev.map((p, idx) => idx === i ? { ...p, name: e.target.value } : p))}
-                          placeholder="Ej: Dra. Carolina Pereira"
-                          className="w-full px-3 py-2 rounded-lg border border-stone-200 text-stone-800 text-sm outline-none focus:ring-2 focus:ring-primary-300" />
-                      </div>
-                      <div>
-                        <label className="block text-xs text-stone-500 mb-1">Área</label>
-                        <select value={pro.specialty_group}
-                          onChange={e => setProfessionals(prev => prev.map((p, idx) => idx === i ? { ...p, specialty_group: e.target.value } : p))}
-                          className="w-full px-3 py-2 rounded-lg border border-stone-200 text-stone-800 text-sm outline-none focus:ring-2 focus:ring-primary-300 bg-white">
-                          {SPECIALTY_GROUPS.map(g => <option key={g} value={g}>{g}</option>)}
-                        </select>
-                      </div>
-                      <div>
-                        <label className="block text-xs text-stone-500 mb-1">Especialidad específica</label>
-                        <input type="text" value={pro.specialty}
-                          onChange={e => setProfessionals(prev => prev.map((p, idx) => idx === i ? { ...p, specialty: e.target.value } : p))}
-                          placeholder="Ej: Médica Clínica, Diabetóloga"
-                          className="w-full px-3 py-2 rounded-lg border border-stone-200 text-stone-800 text-sm outline-none focus:ring-2 focus:ring-primary-300" />
-                      </div>
-                      <div className="col-span-2">
-                        <label className="block text-xs text-stone-500 mb-1">Descripción / Enfoque</label>
-                        <input type="text" value={pro.description}
-                          onChange={e => setProfessionals(prev => prev.map((p, idx) => idx === i ? { ...p, description: e.target.value } : p))}
-                          placeholder="Ej: Sobrepeso, obesidad, clínica integrativa"
-                          className="w-full px-3 py-2 rounded-lg border border-stone-200 text-stone-800 text-sm outline-none focus:ring-2 focus:ring-primary-300" />
-                      </div>
-                      <div>
-                        <label className="block text-xs text-stone-500 mb-1">Días y horarios</label>
-                        <input type="text" value={pro.schedule}
-                          onChange={e => setProfessionals(prev => prev.map((p, idx) => idx === i ? { ...p, schedule: e.target.value } : p))}
-                          placeholder="Ej: Lunes y miércoles de 8 a 14 hs"
-                          className="w-full px-3 py-2 rounded-lg border border-stone-200 text-stone-800 text-sm outline-none focus:ring-2 focus:ring-primary-300" />
-                      </div>
-                      <div>
-                        <label className="block text-xs text-stone-500 mb-1">Contacto / Turnos</label>
-                        <input type="text" value={pro.contact}
-                          onChange={e => setProfessionals(prev => prev.map((p, idx) => idx === i ? { ...p, contact: e.target.value } : p))}
-                          placeholder="Teléfono o link de turnos"
-                          className="w-full px-3 py-2 rounded-lg border border-stone-200 text-stone-800 text-sm outline-none focus:ring-2 focus:ring-primary-300" />
-                      </div>
-                    </div>
-                    <div>
-                      <label className="block text-xs text-stone-500 mb-1">Foto del profesional (opcional)</label>
-                      <ImageUpload
-                        value={pro.photo_url ?? null}
-                        onChange={url => setProfessionals(prev => prev.map((p, idx) => idx === i ? { ...p, photo_url: url } : p))}
-                        folder="professionals"
-                        label=""
-                      />
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
+            <p className="text-xs text-stone-400 pt-2 border-t border-stone-100">
+              Para cargar cada médico/a o especialista de este lugar, creá una ficha propia para cada uno
+              (sección Salud) y completá "Grupo profesional" más abajo con el mismo ID en todos — así
+              quedan vinculados y se muestran entre sí como "quién más trabaja acá".
+            </p>
           </div>
         )}
 

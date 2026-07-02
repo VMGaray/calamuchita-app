@@ -37,16 +37,6 @@ type BusinessHour = {
   is_closed: boolean
 }
 
-interface Professional {
-  name: string
-  specialty_group: string
-  specialty: string
-  description: string
-  schedule: string
-  contact: string
-  photo_url: string | null
-}
-
 function calcIsOpen(hours: BusinessHour[], fallback: boolean): boolean {
   if (!hours || hours.length === 0) return fallback
   const now = new Date()
@@ -71,7 +61,6 @@ interface Business {
   phone: string | null
   whatsapp: string | null
   business_hours: BusinessHour[]
-  matchedProfessional?: Professional
 }
 
 interface Props {
@@ -189,23 +178,16 @@ export default function BuscarResults({ query, results }: Props) {
         {results.length > 0 && (
           <div className="space-y-3">
             {results.map((business, i) => {
-              const prof    = business.matchedProfessional
-              const isOpen  = calcIsOpen(business.business_hours, business.is_open)
-              // Clave única: para resultados de profesionales dos profs del mismo
-              // negocio tendrán el mismo id → diferenciamos con el nombre del prof.
-              const cardKey = business.id + (prof?.name ?? "")
+              const isOpen = calcIsOpen(business.business_hours, business.is_open)
 
               return (
-                <AnimateIn key={cardKey} direction="up" delay={i * 0.04}>
-                  <Link href={prof ? `${getDetailUrl(business)}?prof=${encodeURIComponent(prof.name)}` : getDetailUrl(business)}>
+                <AnimateIn key={business.id} direction="up" delay={i * 0.04}>
+                  <Link href={getDetailUrl(business)}>
                     <div className="bg-white rounded-2xl border border-stone-200 overflow-hidden flex items-center gap-4 p-4 hover:border-stone-300 transition-all hover:shadow-sm">
 
-                      {/* Avatar: foto del profesional si existe, sino logo/cover del negocio */}
+                      {/* Avatar: logo/cover del negocio */}
                       <div className="w-16 h-16 rounded-xl overflow-hidden flex-shrink-0 bg-stone-100">
-                        {prof?.photo_url ? (
-                          <Image src={prof.photo_url} alt={prof.name} width={64} height={64}
-                            className="w-full h-full object-cover object-top" />
-                        ) : business.logo_url ? (
+                        {business.logo_url ? (
                           <Image src={business.logo_url} alt={business.name} width={64} height={64}
                             className="w-full h-full object-cover" />
                         ) : business.cover_url ? (
@@ -214,69 +196,37 @@ export default function BuscarResults({ query, results }: Props) {
                         ) : (
                           <div className="w-full h-full flex items-center justify-center font-serif text-2xl"
                             style={{ color: "rgba(45,69,48,0.35)" }}>
-                            {(prof?.name ?? business.name)[0]}
+                            {business.name[0]}
                           </div>
                         )}
                       </div>
 
                       {/* Info */}
                       <div className="flex-1 min-w-0">
-                        {prof ? (
-                          // ── Card de profesional ──────────────────────────
-                          <>
-                            <div className="flex items-center gap-2 mb-0.5 flex-wrap">
-                              <h3 className="text-sm font-semibold text-stone-800">{prof.name}</h3>
-                              <span className="text-xs font-medium px-2 py-0.5 rounded-full bg-brand-pine/10 text-brand-pine">
-                                {prof.specialty_group}
-                              </span>
-                              {isOpen && (
-                                <span className="text-xs font-medium px-2 py-0.5 rounded-full bg-brand-pine/10 text-brand-pine">
-                                  Abierto
-                                </span>
-                              )}
-                            </div>
-                            <p className="text-xs text-stone-400 mb-1">en {business.name}</p>
-                            {(prof.specialty || prof.description) && (
-                              <p className="text-xs text-stone-500 line-clamp-1 leading-relaxed">
-                                {prof.specialty || prof.description}
-                              </p>
-                            )}
-                            {business.address && (
-                              <div className="flex items-center gap-1 mt-1">
-                                <MapPin size={10} className="text-stone-300 flex-shrink-0" />
-                                <span className="text-xs text-stone-400 truncate">{business.address}</span>
-                              </div>
-                            )}
-                          </>
-                        ) : (
-                          // ── Card de negocio normal ───────────────────────
-                          <>
-                            <div className="flex items-center gap-2 mb-1 flex-wrap">
-                              <h3 className="text-sm font-semibold text-stone-800">{business.name}</h3>
-                              <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${sectionColors[business.section]}`}>
-                                {sectionLabels[business.section]}
-                              </span>
-                              {isOpen && (
-                                <span className="text-xs font-medium px-2 py-0.5 rounded-full bg-brand-pine/10 text-brand-pine">
-                                  Abierto
-                                </span>
-                              )}
-                            </div>
-                            {business.subcategory && (
-                              <p className="text-xs text-stone-400 mb-1">{business.subcategory}</p>
-                            )}
-                            {business.description && (
-                              <p className="text-xs text-stone-500 line-clamp-1 leading-relaxed">
-                                {business.description}
-                              </p>
-                            )}
-                            {business.address && (
-                              <div className="flex items-center gap-1 mt-1">
-                                <MapPin size={10} className="text-stone-300 flex-shrink-0" />
-                                <span className="text-xs text-stone-400 truncate">{business.address}</span>
-                              </div>
-                            )}
-                          </>
+                        <div className="flex items-center gap-2 mb-1 flex-wrap">
+                          <h3 className="text-sm font-semibold text-stone-800">{business.name}</h3>
+                          <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${sectionColors[business.section]}`}>
+                            {sectionLabels[business.section]}
+                          </span>
+                          {isOpen && (
+                            <span className="text-xs font-medium px-2 py-0.5 rounded-full bg-brand-pine/10 text-brand-pine">
+                              Abierto
+                            </span>
+                          )}
+                        </div>
+                        {business.subcategory && (
+                          <p className="text-xs text-stone-400 mb-1">{business.subcategory}</p>
+                        )}
+                        {business.description && (
+                          <p className="text-xs text-stone-500 line-clamp-1 leading-relaxed">
+                            {business.description}
+                          </p>
+                        )}
+                        {business.address && (
+                          <div className="flex items-center gap-1 mt-1">
+                            <MapPin size={10} className="text-stone-300 flex-shrink-0" />
+                            <span className="text-xs text-stone-400 truncate">{business.address}</span>
+                          </div>
                         )}
                       </div>
 
