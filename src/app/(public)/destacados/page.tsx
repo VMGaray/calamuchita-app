@@ -78,13 +78,6 @@ export default async function DestacadosPage() {
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent opacity-80" />
 
-                    {/* Badge */}
-                    <div className="absolute top-3 left-3">
-                      <span className="px-2.5 py-0.5 rounded-full bg-yellow-500 text-black text-[9px] font-black uppercase tracking-tighter">
-                        Premium
-                      </span>
-                    </div>
-
                     {/* Info */}
                     <div className="absolute bottom-4 left-4 right-4">
                       <p className="text-yellow-500 text-[9px] font-bold uppercase tracking-[0.25em] mb-0.5">

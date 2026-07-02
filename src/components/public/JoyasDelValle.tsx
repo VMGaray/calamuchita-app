@@ -66,13 +66,6 @@ function FeaturedCard({ biz }: { biz: FeaturedBusiness }) {
           {/* Brillo en hover */}
           <div className="absolute inset-0 opacity-0 group-hover:opacity-25 transition-opacity duration-700 bg-gradient-to-tr from-transparent via-white to-transparent -translate-x-full group-hover:translate-x-full transform" />
 
-          {/* Badge Premium */}
-          <div className="absolute top-4 left-4">
-            <div className="px-3 py-1 rounded-full bg-yellow-500 text-black text-[10px] font-black uppercase tracking-tighter">
-              Premium
-            </div>
-          </div>
-
           {/* Info */}
           <div className="absolute bottom-5 left-5 right-5">
             <div className="flex items-center gap-2 mb-1">
