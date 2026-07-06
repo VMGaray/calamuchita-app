@@ -23,7 +23,7 @@ export const MASTER_CATEGORIES = {
       { label: "Otro", icon: Store, bg: "bg-stone-50", color: "text-stone-400" },
     ]
   },
-  services: {
+ services: {
     label: "Servicios",
     subcategories: [
       { label: "Alambrados", icon: Fence, bg: "bg-stone-50", color: "text-stone-600" },
@@ -54,6 +54,7 @@ export const MASTER_CATEGORIES = {
       { label: "Licenciado en higiene y seguridad", icon: ClipboardList, bg: "bg-teal-50", color: "text-teal-700" },
       { label: "Limpieza", icon: Sparkles, bg: "bg-teal-50", color: "text-teal-600" },
       { label: "Máquinas de coser", icon: Cog, bg: "bg-slate-50", color: "text-slate-600" },
+      { label: "Manicura", icon: Sparkles, bg: "bg-purple-50", color: "text-purple-600" }, // <-- AGREGADA ACÁ CON RENDERIZADO IMPECABLE
       { label: "Mecánica", icon: Car, bg: "bg-stone-50", color: "text-stone-600" },
       { label: "Movimiento de suelos", icon: HardHat, bg: "bg-yellow-50", color: "text-yellow-700" },
       { label: "Otro", icon: Sparkles, bg: "bg-stone-50", color: "text-stone-400" },
@@ -66,7 +67,7 @@ export const MASTER_CATEGORIES = {
       { label: "Profesionales", icon: Briefcase, bg: "bg-violet-50", color: "text-violet-600" },
       { label: "Refrigeración", icon: Snowflake, bg: "bg-slate-50", color: "text-slate-400" },
       { label: "Servicios audiovisuales", icon: Video, bg: "bg-indigo-50", color: "text-indigo-600" },
-      { label: "Tatuajes", icon: PenTool, bg: "bg-zinc-50", color: "text-zinc-600" },
+      { icon: PenTool, bg: "bg-zinc-50", color: "text-zinc-600", label: "Tatuajes" },
       { label: "Traslados", icon: Car, bg: "bg-blue-50", color: "text-blue-600" },
       { label: "Venta de áridos", icon: Mountain, bg: "bg-stone-50", color: "text-stone-600" },
       { label: "Zinguero", icon: Home, bg: "bg-slate-50", color: "text-slate-600" },

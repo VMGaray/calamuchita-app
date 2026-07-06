@@ -11,7 +11,7 @@ export const sectionCategories = {
     { label: "Varios", desc: "Otros locales gastronómicos", href: "/negocios?categoria=other", bg: "bg-brand-sand/50", color: "text-brand-charcoal" },
     { label: "Todos", desc: "Ver toda la gastronomía", href: "/negocios", bg: "bg-brand-sand/50", color: "text-brand-charcoal" },
   ],
-  services: [
+ services: [
     { label: "Alambrados", desc: "Cercos y tejidos perimetrales", href: "/directorio/services?cat=alambrados", bg: "bg-brand-slate/10", color: "text-brand-slate" },
     { label: "Alarmas-Seguridad", desc: "Sistemas de alarmas y seguridad", href: "/directorio/services?cat=alarmas", bg: "bg-brand-slate/10", color: "text-brand-slate" },
     { label: "Alquiler de autos", desc: "Alquiler de vehículos", href: "/directorio/services?cat=alquiler-autos", bg: "bg-brand-slate/10", color: "text-brand-slate" },
@@ -40,6 +40,7 @@ export const sectionCategories = {
     { label: "Licenciado en higiene y seguridad", desc: "Asesoramiento y capacitación en H&S", href: "/directorio/services?cat=licenciado-hys", bg: "bg-brand-pine/10", color: "text-brand-pine" },
     { label: "Limpieza", desc: "Servicio doméstico", href: "/directorio/services?cat=limpieza", bg: "bg-brand-slate/10", color: "text-brand-slate" },
     { label: "Máquinas de coser", desc: "Venta y reparación de máquinas de coser", href: "/directorio/services?cat=maquinas-coser", bg: "bg-brand-slate/10", color: "text-brand-slate" },
+    { label: "Manicura", desc: "Estética de uñas y belleza de manos", href: "/directorio/services?cat=manicura", bg: "bg-brand-slate/10", color: "text-brand-slate" },
     { label: "Mecánica", desc: "Talleres y gomería", href: "/directorio/services?cat=mecanica", bg: "bg-brand-charcoal/10", color: "text-brand-charcoal" },
     { label: "Movimiento de suelos", desc: "Excavaciones y nivelaciones", href: "/directorio/services?cat=movimiento", bg: "bg-brand-earth/10", color: "text-brand-earth" },
     { label: "Paisajismo y Jardines", desc: "Diseño y mantenimiento", href: "/directorio/services?cat=jardinero", bg: "bg-brand-pine/10", color: "text-brand-pine" },

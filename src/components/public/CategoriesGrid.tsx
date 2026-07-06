@@ -23,7 +23,7 @@ const categoryIcons: Record<string, any> = {
   "Mecánica": Car, "Construcción": Building, "Pintor": Paintbrush,
   "Herrero": Hammer, "Cerrajero": KeyRound, "Paisajismo y Jardines": Leaf,
   "Piletero": Waves, "Zinguero": Home, "Desinfecciones": Bug,
-  "Perforaciones": Droplets, "Limpieza": Sparkles,
+  "Perforaciones": Droplets, "Limpieza": Sparkles, "Manicura": Sparkles,
   "Clínicas y Consultorios": Stethoscope, "Farmacias": Pill,
   "Psicología": Brain, "Odontología": Smile, "Oftalmología": Eye,
   "Veterinarias": PawPrint, "Emergencias": AlertCircle,
