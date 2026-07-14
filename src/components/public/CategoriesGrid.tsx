@@ -10,8 +10,8 @@ import {
   KeyRound, Leaf, Waves, Home, Bug, Droplets, Sparkles,
   Stethoscope, Pill, Brain, Smile, Eye, PawPrint, AlertCircle,
   GraduationCap, BookOpen, Languages, Users, Music, Trophy,
-  Hotel, Map, Tent, Activity, Compass, PartyPopper, ChefHat,
-  Mic, Medal, Palette, Baby, Store, Salad, Shirt, Gem,
+  Hotel, Map, Tent, Activity, Compass, PartyPopper, ChefHat, ShieldCheck,
+  Mic, Medal, Wind, Palette, Baby, Store, Salad, Shirt, Gem,
   HardHat, MoreHorizontal, Clock3, Landmark, Lightbulb, Bus, Info, Tag, Wheat
 } from "lucide-react"
 
@@ -24,6 +24,7 @@ const categoryIcons: Record<string, any> = {
   "Herrero": Hammer, "Cerrajero": KeyRound, "Paisajismo y Jardines": Leaf,
   "Piletero": Waves, "Zinguero": Home, "Desinfecciones": Bug,
   "Perforaciones": Droplets, "Limpieza": Sparkles, "Manicura": Sparkles,
+  "Climatización": Wind, "Depilación": Sparkles, "Lavadero de autos": Droplets, "Seguros": ShieldCheck,
   "Clínicas y Consultorios": Stethoscope, "Farmacias": Pill,
   "Psicología": Brain, "Odontología": Smile, "Oftalmología": Eye,
   "Veterinarias": PawPrint, "Emergencias": AlertCircle,

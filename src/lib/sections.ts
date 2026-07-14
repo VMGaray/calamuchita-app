@@ -21,12 +21,14 @@ export const sectionCategories = {
     { label: "Bombas y Motores eléctricos", desc: "Bombas de agua y motores eléctricos", href: "/directorio/services?cat=bombas", bg: "bg-brand-slate/10", color: "text-brand-slate" },
     { label: "Carteles tallados", desc: "Señalética y carteles artesanales", href: "/directorio/services?cat=carteles", bg: "bg-brand-earth/10", color: "text-brand-earth" },
     { label: "Cerrajero", desc: "Cerraduras y llaves", href: "/directorio/services?cat=cerrajero", bg: "bg-brand-slate/10", color: "text-brand-slate" },
+    { label: "Climatización", desc: "Instalación y service de aire acondicionado y calefacción", href: "/directorio/services?cat=climatizacion", bg: "bg-brand-slate/10", color: "text-brand-slate" }, // <-- NUEVA
     { label: "Coaching", desc: "Coaching personal y profesional", href: "/directorio/services?cat=coaching", bg: "bg-brand-charcoal/10", color: "text-brand-charcoal" },
     { label: "Comisiones", desc: "Agentes y gestores inmobiliarios", href: "/directorio/services?cat=comisiones", bg: "bg-brand-pine/10", color: "text-brand-pine" },
     { label: "Compostura de calzado", desc: "Reparación y arreglo de zapatos", href: "/directorio/services?cat=compostura", bg: "bg-brand-earth/10", color: "text-brand-earth" },
     { label: "Construcción", desc: "Albañilería y reformas", href: "/directorio/services?cat=construccion", bg: "bg-brand-earth/10", color: "text-brand-earth" },
     { label: "Costurera/Modista", desc: "Confección y arreglos de ropa", href: "/directorio/services?cat=costurera", bg: "bg-brand-slate/10", color: "text-brand-slate" },
     { label: "Decoración y Terminaciones de Interiores", desc: "Diseño de interiores y terminaciones", href: "/directorio/services?cat=decoracion-interiores", bg: "bg-brand-earth/10", color: "text-brand-earth" },
+    { label: "Depilación", desc: "Estética y depilación sistema descartable o definitivo", href: "/directorio/services?cat=depilacion", bg: "bg-brand-slate/10", color: "text-brand-slate" }, // <-- NUEVA
     { label: "Desinfecciones", desc: "Plagas y fumigaciones", href: "/directorio/services?cat=desinfecciones", bg: "bg-brand-pine/10", color: "text-brand-pine" },
     { label: "Electricidad", desc: "Electricistas matriculados", href: "/directorio/services?cat=electricidad", bg: "bg-brand-slate/10", color: "text-brand-slate" },
     { label: "Energía Renovable", desc: "Paneles solares y energía limpia", href: "/directorio/services?cat=energia-renovable", bg: "bg-brand-charcoal/10", color: "text-brand-charcoal" },
@@ -37,6 +39,7 @@ export const sectionCategories = {
     { label: "Herrero", desc: "Herrería y soldadura", href: "/directorio/services?cat=herrero", bg: "bg-brand-charcoal/10", color: "text-brand-charcoal" },
     { label: "Higiene y seguridad laboral", desc: "Asesoramiento y capacitación en H&S", href: "/directorio/services?cat=higiene-seguridad", bg: "bg-brand-pine/10", color: "text-brand-pine" },
     { label: "Impermeabilizaciones", desc: "Techos, paredes y terrazas", href: "/directorio/services?cat=impermeabilizaciones", bg: "bg-brand-pine/10", color: "text-brand-pine" },
+    { label: "Lavadero de autos", desc: "Lavado artesanal, aspirado y estética vehicular", href: "/directorio/services?cat=lavadero-autos", bg: "bg-brand-slate/10", color: "text-brand-slate" }, // <-- NUEVA (Ubicada según la L)
     { label: "Licenciado en higiene y seguridad", desc: "Asesoramiento y capacitación en H&S", href: "/directorio/services?cat=licenciado-hys", bg: "bg-brand-pine/10", color: "text-brand-pine" },
     { label: "Limpieza", desc: "Servicio doméstico", href: "/directorio/services?cat=limpieza", bg: "bg-brand-slate/10", color: "text-brand-slate" },
     { label: "Máquinas de coser", desc: "Venta y reparación de máquinas de coser", href: "/directorio/services?cat=maquinas-coser", bg: "bg-brand-slate/10", color: "text-brand-slate" },
@@ -58,7 +61,7 @@ export const sectionCategories = {
     { label: "Zinguero", desc: "Techos y canaletas", href: "/directorio/services?cat=zinguero", bg: "bg-brand-slate/10", color: "text-brand-slate" },
     { label: "Varios", desc: "Otros servicios del valle", href: "/directorio/services?cat=varios", bg: "bg-brand-sand/50", color: "text-brand-charcoal" },
     { label: "Todos", desc: "Ver todos los servicios", href: "/directorio/services", bg: "bg-brand-sand/50", color: "text-brand-charcoal" },
-  ],
+],
   health: [
     { label: "Clínicas y Consultorios", desc: "Atención médica general", href: "/directorio/health?cat=clinicas", bg: "bg-brand-pine/10", color: "text-brand-pine" },
     { label: "Especialidades", desc: "Médicos especializados", href: "/directorio/health?cat=especialidades", bg: "bg-brand-slate/10", color: "text-brand-slate" },
@@ -117,6 +120,7 @@ export const sectionCategories = {
     { label: "Inmobiliarias", desc: "Propiedades y alquileres", href: "/directorio/commerce?cat=inmobiliarias", bg: "bg-brand-pine/10", color: "text-brand-pine" },
     { label: "Mascotas", desc: "Tiendas para mascotas", href: "/directorio/commerce?cat=mascotas", bg: "bg-brand-pine/10", color: "text-brand-pine" },
     { label: "Niños", desc: "Artículos infantiles", href: "/directorio/commerce?cat=ninos", bg: "bg-brand-earth/10", color: "text-brand-earth" },
+    { label: "Seguros", desc: "Productores, asesores y compañías de seguros", href: "/directorio/commerce?cat=seguros", bg: "bg-brand-pine/10", color: "text-brand-pine" },
     { label: "Tecnología", desc: "Electrónica y celulares", href: "/directorio/commerce?cat=tecnologia", bg: "bg-brand-charcoal/10", color: "text-brand-charcoal" },
     { label: "Vehículos", desc: "Repuestos y accesorios", href: "/directorio/commerce?cat=vehiculos", bg: "bg-brand-slate/10", color: "text-brand-slate" },
     { label: "Verdulería", desc: "Frutas y verduras frescas", href: "/directorio/commerce?cat=verduleria", bg: "bg-brand-pine/10", color: "text-brand-pine" },

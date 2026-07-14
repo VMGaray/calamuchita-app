@@ -35,12 +35,14 @@ export const MASTER_CATEGORIES = {
       { label: "Bombas y Motores eléctricos", icon: Cog, bg: "bg-cyan-50", color: "text-cyan-700" },
       { label: "Carteles tallados", icon: Tag, bg: "bg-amber-50", color: "text-amber-700" },
       { label: "Cerrajero", icon: KeyRound, bg: "bg-gray-50", color: "text-gray-600" },
+      { label: "Climatización", icon: Wind, bg: "bg-cyan-50", color: "text-cyan-600" }, // <-- NUEVA
       { label: "Coaching", icon: Target, bg: "bg-zinc-50", color: "text-zinc-600" },
       { label: "Comisiones", icon: CreditCard, bg: "bg-emerald-50", color: "text-emerald-700" },
       { label: "Compostura de calzado", icon: Scissors, bg: "bg-amber-50", color: "text-amber-700" },
       { label: "Construcción", icon: Building, bg: "bg-amber-50", color: "text-amber-600" },
       { label: "Costurera/Modista", icon: Scissors, bg: "bg-pink-50", color: "text-pink-600" },
       { label: "Decoración y Terminaciones de Interiores", icon: Sofa, bg: "bg-rose-50", color: "text-rose-600" },
+      { label: "Depilación", icon: Sparkles, bg: "bg-pink-50", color: "text-pink-600" }, // <-- NUEVA
       { label: "Desinfecciones", icon: Bug, bg: "bg-lime-50", color: "text-lime-600" },
       { label: "Electricidad", icon: Zap, bg: "bg-yellow-50", color: "text-yellow-600" },
       { label: "Energía Renovable", icon: Sun, bg: "bg-slate-50", color: "text-slate-600" },
@@ -51,10 +53,11 @@ export const MASTER_CATEGORIES = {
       { label: "Herrero", icon: Hammer, bg: "bg-zinc-50", color: "text-zinc-600" },
       { label: "Higiene y seguridad laboral", icon: ShieldCheck, bg: "bg-emerald-50", color: "text-emerald-600" },
       { label: "Impermeabilizaciones", icon: Waves, bg: "bg-teal-50", color: "text-teal-700" },
+      { label: "Lavadero de autos", icon: Droplets, bg: "bg-blue-50", color: "text-blue-600" }, // <-- NUEVA
       { label: "Licenciado en higiene y seguridad", icon: ClipboardList, bg: "bg-teal-50", color: "text-teal-700" },
       { label: "Limpieza", icon: Sparkles, bg: "bg-teal-50", color: "text-teal-600" },
       { label: "Máquinas de coser", icon: Cog, bg: "bg-slate-50", color: "text-slate-600" },
-      { label: "Manicura", icon: Sparkles, bg: "bg-purple-50", color: "text-purple-600" }, // <-- AGREGADA ACÁ CON RENDERIZADO IMPECABLE
+      { label: "Manicura", icon: Sparkles, bg: "bg-purple-50", color: "text-purple-600" },
       { label: "Mecánica", icon: Car, bg: "bg-stone-50", color: "text-stone-600" },
       { label: "Movimiento de suelos", icon: HardHat, bg: "bg-yellow-50", color: "text-yellow-700" },
       { label: "Otro", icon: Sparkles, bg: "bg-stone-50", color: "text-stone-400" },
@@ -67,7 +70,7 @@ export const MASTER_CATEGORIES = {
       { label: "Profesionales", icon: Briefcase, bg: "bg-violet-50", color: "text-violet-600" },
       { label: "Refrigeración", icon: Snowflake, bg: "bg-slate-50", color: "text-slate-400" },
       { label: "Servicios audiovisuales", icon: Video, bg: "bg-indigo-50", color: "text-indigo-600" },
-      { icon: PenTool, bg: "bg-zinc-50", color: "text-zinc-600", label: "Tatuajes" },
+      { label: "Tatuajes", icon: PenTool, bg: "bg-zinc-50", color: "text-zinc-600" },
       { label: "Traslados", icon: Car, bg: "bg-blue-50", color: "text-blue-600" },
       { label: "Venta de áridos", icon: Mountain, bg: "bg-stone-50", color: "text-stone-600" },
       { label: "Zinguero", icon: Home, bg: "bg-slate-50", color: "text-slate-600" },
@@ -78,6 +81,7 @@ export const MASTER_CATEGORIES = {
     subcategories: [
       { label: "Aberturas de aluminio", icon: Frame, bg: "bg-slate-50", color: "text-slate-600" },
       { label: "Accesorios", icon: Gem, bg: "bg-pink-50", color: "text-pink-600" },
+      { label: "Cuero Argentino", icon: Briefcase, bg: "bg-stone-50", color: "text-stone-600" }, // <-- Ubicado según la C
       { label: "Fábrica de Espumantes", icon: Wine, bg: "bg-rose-50", color: "text-rose-700" },
       { label: "Forrajería", icon: Package, bg: "bg-amber-50", color: "text-amber-700" },
       { label: "Hogar", icon: Armchair, bg: "bg-orange-50", color: "text-orange-700" },
@@ -87,11 +91,11 @@ export const MASTER_CATEGORIES = {
       { label: "Mascotas", icon: Dog, bg: "bg-amber-50", color: "text-amber-600" },
       { label: "Niños", icon: Baby, bg: "bg-indigo-50", color: "text-indigo-600" },
       { label: "Salud", icon: HeartPulse, bg: "bg-green-50", color: "text-green-600" },
+      { label: "Seguros", icon: ShieldCheck, bg: "bg-emerald-50", color: "text-emerald-700" }, // <-- NUEVA SUBCATEGORÍA
       { label: "Tecnología", icon: Smartphone, bg: "bg-blue-50", color: "text-blue-600" },
       { label: "Vehículos", icon: Car, bg: "bg-red-50", color: "text-red-600" },
       { label: "Verdulería", icon: Leaf, bg: "bg-green-50", color: "text-green-600" },
       { label: "Veterinarias", icon: Dog, bg: "bg-teal-50", color: "text-teal-600" },
-      { label: "Cuero Argentino", icon: Briefcase, bg: "bg-stone-50", color: "text-stone-600" },
       { label: "Otro", icon: Store, bg: "bg-stone-50", color: "text-stone-400" },
     ]
   },
