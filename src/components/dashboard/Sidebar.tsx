@@ -4,8 +4,9 @@ import Link from "next/link"
 import { usePathname, useRouter } from "next/navigation"
 import { MapPin, LayoutDashboard, BookOpen, CalendarDays, ShoppingBag, Settings, LogOut, BarChart2, UtensilsCrossed } from "lucide-react"
 import { createClient } from "@/lib/supabase/client"
+import { useBusinessDashboard } from "@/lib/context/BusinessDashboardContext"
 
-const links = [
+const restauranteLinks = [
   { href: "/dashboard",               label: "Inicio",       icon: LayoutDashboard },
   { href: "/dashboard/menu-del-dia",  label: "Menú del día", icon: UtensilsCrossed },
   { href: "/dashboard/carta",         label: "Carta",        icon: BookOpen        },
@@ -15,9 +16,18 @@ const links = [
   { href: "/dashboard/configuracion", label: "Mi local",     icon: Settings        },
 ]
 
+const viandasLinks = [
+  { href: "/dashboard",               label: "Inicio",       icon: LayoutDashboard },
+  { href: "/dashboard/menu-del-dia",  label: "Menú del día", icon: UtensilsCrossed },
+  { href: "/dashboard/mi-carta",      label: "Mi carta",     icon: BookOpen        },
+  { href: "/dashboard/configuracion", label: "Mi local",     icon: Settings        },
+]
+
 export default function Sidebar() {
   const pathname = usePathname()
   const router = useRouter()
+  const { isRestaurante } = useBusinessDashboard()
+  const links = isRestaurante ? restauranteLinks : viandasLinks
 
   const handleLogout = async () => {
     const supabase = createClient()

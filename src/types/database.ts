@@ -47,6 +47,7 @@ export interface Business {
   logo_url: string | null
   cover_url: string | null
   menu_pdf_url: string | null
+  menu_photos_urls: string[]
   video_url: string | null
   menu_link: string | null      // ← nuevo
   accepts_reservations: boolean // ← nuevo

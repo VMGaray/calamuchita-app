@@ -5,6 +5,7 @@ import { createClient } from "@/lib/supabase/client"
 import { motion, AnimatePresence } from "framer-motion"
 import { ShoppingBag, Clock, CheckCircle, XCircle, Truck, RefreshCw } from "lucide-react"
 import { SkeletonList } from "@/components/ui/Skeleton"
+import { useBusinessDashboard } from "@/lib/context/BusinessDashboardContext"
 
 interface OrderItem {
   id: string
@@ -70,6 +71,7 @@ const STATUS_LABELS: Record<string, string> = {
 }
 
 export default function PedidosDashboard() {
+  const { isRestaurante } = useBusinessDashboard()
   const [orders, setOrders] = useState<Order[]>([])
   const [businessId, setBusinessId] = useState<string | null>(null)
   const [loading, setLoading] = useState(true)
@@ -88,6 +90,8 @@ export default function PedidosDashboard() {
   }, [])
 
   useEffect(() => {
+    if (!isRestaurante) { setLoading(false); return }
+
     const init = async () => {
       const supabase = createClient()
       const { data: { user } } = await supabase.auth.getUser()
@@ -120,7 +124,7 @@ export default function PedidosDashboard() {
       return () => { supabase.removeChannel(channel) }
     }
     init()
-  }, [fetchOrders])
+  }, [fetchOrders, isRestaurante])
 
   const handleUpdateStatus = async (orderId: string, newStatus: string) => {
     setUpdatingStatus(orderId)
@@ -152,6 +156,14 @@ export default function PedidosDashboard() {
     if (diffMin < 60) return `hace ${diffMin} min`
     return date.toLocaleTimeString("es-AR", { hour: "2-digit", minute: "2-digit" })
   }
+
+  if (!isRestaurante) return (
+    <div className="max-w-2xl">
+      <div className="bg-amber-50 border border-amber-200 rounded-2xl p-6 text-sm text-amber-700">
+        Esta función no está disponible para tu tipo de negocio.
+      </div>
+    </div>
+  )
 
   if (loading) return <div className="max-w-2xl"><SkeletonList count={3} /></div>
 

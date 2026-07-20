@@ -2,6 +2,9 @@ import { redirect } from "next/navigation"
 import { createClient } from "@/lib/supabase/server"
 import Sidebar from "@/components/dashboard/Sidebar"
 import DashboardPending from "@/components/dashboard/DashboardPending"
+import { BusinessDashboardProvider } from "@/lib/context/BusinessDashboardContext"
+import { isRestaurante } from "@/lib/utils/business"
+import { BusinessCategory } from "@/types/database"
 
 export default async function DashboardLayout({
   children,
@@ -17,6 +20,8 @@ export default async function DashboardLayout({
 
   const isBusiness = user.user_metadata?.role === "business"
 
+  let business: { id: string; category: BusinessCategory | null } | null = null
+
   if (!isBusiness) {
     const { data: profile } = await supabase
       .from("profiles")
@@ -28,12 +33,14 @@ export default async function DashboardLayout({
       redirect("/")
     }
   } else {
-    const { data: business } = await supabase
+    const { data } = await supabase
       .from("businesses")
-      .select("id")
+      .select("id, category")
       .eq("owner_id", user.id)
       .eq("status", "active")
       .maybeSingle()
+
+    business = data
 
     if (!business) {
       return (
@@ -48,10 +55,18 @@ export default async function DashboardLayout({
 
   return (
     <div className="min-h-screen flex flex-col md:flex-row bg-stone-50">
-      <Sidebar />
-      <main className="flex-1 p-4 md:p-8">
-        {children}
-      </main>
+      <BusinessDashboardProvider
+        value={{
+          businessId: business?.id ?? "",
+          category: business?.category ?? null,
+          isRestaurante: isRestaurante(business?.category),
+        }}
+      >
+        <Sidebar />
+        <main className="flex-1 p-4 md:p-8">
+          {children}
+        </main>
+      </BusinessDashboardProvider>
     </div>
   )
 }

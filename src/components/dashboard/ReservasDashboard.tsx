@@ -5,6 +5,7 @@ import { createClient } from "@/lib/supabase/client"
 import { motion, AnimatePresence } from "framer-motion"
 import { CalendarDays, Clock, Users, CheckCircle, XCircle, RefreshCw } from "lucide-react"
 import { SkeletonList } from "@/components/ui/Skeleton"
+import { useBusinessDashboard } from "@/lib/context/BusinessDashboardContext"
 
 interface Reservation {
   id: string
@@ -42,6 +43,7 @@ const DAYS = ["Dom", "Lun", "Mar", "Mié", "Jue", "Vie", "Sáb"]
 const MONTHS = ["ene", "feb", "mar", "abr", "may", "jun", "jul", "ago", "sep", "oct", "nov", "dic"]
 
 export default function ReservasDashboard() {
+  const { isRestaurante } = useBusinessDashboard()
   const [reservations, setReservations] = useState<Reservation[]>([])
   const [businessId, setBusinessId] = useState<string | null>(null)
   const [loading, setLoading] = useState(true)
@@ -61,6 +63,8 @@ export default function ReservasDashboard() {
   }, [])
 
   useEffect(() => {
+    if (!isRestaurante) { setLoading(false); return }
+
     const init = async () => {
       const supabase = createClient()
       const { data: { user } } = await supabase.auth.getUser()
@@ -91,7 +95,7 @@ export default function ReservasDashboard() {
       return () => { supabase.removeChannel(channel) }
     }
     init()
-  }, [fetchReservations])
+  }, [fetchReservations, isRestaurante])
 
   const handleUpdateStatus = async (resId: string, newStatus: string) => {
     setUpdatingStatus(resId)
@@ -129,6 +133,14 @@ export default function ReservasDashboard() {
   }
 
   const formatTime = (timeStr: string) => timeStr.slice(0, 5)
+
+  if (!isRestaurante) return (
+    <div className="max-w-2xl">
+      <div className="bg-amber-50 border border-amber-200 rounded-2xl p-6 text-sm text-amber-700">
+        Esta función no está disponible para tu tipo de negocio.
+      </div>
+    </div>
+  )
 
   if (loading) return <div className="max-w-2xl"><SkeletonList count={3} /></div>
 

@@ -3,8 +3,9 @@
 import { useState, useEffect } from "react"
 import { createClient } from "@/lib/supabase/client"
 import { motion } from "framer-motion"
-import { ShoppingBag, CalendarDays, UtensilsCrossed, TrendingUp, Clock } from "lucide-react"
+import { ShoppingBag, CalendarDays, UtensilsCrossed, TrendingUp, Clock, BookOpen, Settings } from "lucide-react"
 import Link from "next/link"
+import { useBusinessDashboard } from "@/lib/context/BusinessDashboardContext"
 
 interface Stats {
   ordersToday: number
@@ -26,6 +27,7 @@ interface RecentOrder {
 }
 
 export default function DashboardHome() {
+  const { isRestaurante } = useBusinessDashboard()
   const [stats, setStats] = useState<Stats>({
     ordersToday: 0,
     ordersPending: 0,
@@ -72,6 +74,20 @@ export default function DashboardHome() {
       setIsOpen(business.is_open)
 
       const today = new Date().toISOString().split("T")[0]
+
+      if (!isRestaurante) {
+        const { data: menu } = await supabase
+          .from("daily_menus")
+          .select("is_published")
+          .eq("business_id", business.id)
+          .eq("date", today)
+          .single()
+
+        setStats(prev => ({ ...prev, menuPublished: menu?.is_published || false }))
+        setLoading(false)
+        return
+      }
+
       const startOfMonth = new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString()
 
       const { data: ordersToday } = await supabase
@@ -118,7 +134,7 @@ export default function DashboardHome() {
     }
 
     fetchData()
-  }, [])
+  }, [isRestaurante])
 
   const handleToggleOpen = async () => {
     if (!businessId) return
@@ -166,6 +182,8 @@ export default function DashboardHome() {
       {/* Stats cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
 
+        {isRestaurante && (
+        <>
         {/* Pedidos hoy */}
         <Link href="/dashboard/pedidos">
           <motion.div
@@ -240,9 +258,72 @@ export default function DashboardHome() {
             </div>
           </motion.div>
         </Link>
+        </>
+        )}
+
+        {!isRestaurante && (
+        <>
+        {/* Menú del día */}
+        <Link href="/dashboard/menu-del-dia">
+          <motion.div
+            whileHover={{ y: -2 }}
+            className="bg-white rounded-2xl border border-stone-200 p-6 cursor-pointer hover:border-stone-300 transition-colors"
+          >
+            <div className="flex items-center gap-2 mb-4">
+              <div className="w-8 h-8 rounded-xl flex items-center justify-center"
+                style={{ background: "rgba(45,69,48,0.1)" }}>
+                <UtensilsCrossed size={16} style={{ color: "#2D4530" }} />
+              </div>
+              <p className="text-xs text-stone-400 uppercase tracking-wider">Menú del día</p>
+            </div>
+            <div className="flex items-center gap-2">
+              <div className={`w-2 h-2 rounded-full ${stats.menuPublished ? "bg-green-400" : "bg-stone-300"}`} />
+              <p className="text-sm font-medium" style={{ color: stats.menuPublished ? "#16a34a" : "#78716c" }}>
+                {stats.menuPublished ? "Publicado" : "Sin publicar"}
+              </p>
+            </div>
+          </motion.div>
+        </Link>
+
+        {/* Mi carta */}
+        <Link href="/dashboard/mi-carta">
+          <motion.div
+            whileHover={{ y: -2 }}
+            className="bg-white rounded-2xl border border-stone-200 p-6 cursor-pointer hover:border-stone-300 transition-colors"
+          >
+            <div className="flex items-center gap-2 mb-4">
+              <div className="w-8 h-8 rounded-xl flex items-center justify-center"
+                style={{ background: "rgba(45,69,48,0.1)" }}>
+                <BookOpen size={16} style={{ color: "#2D4530" }} />
+              </div>
+              <p className="text-xs text-stone-400 uppercase tracking-wider">Mi carta</p>
+            </div>
+            <p className="text-sm font-medium text-stone-500">Cargá tus platos, un PDF o fotos</p>
+          </motion.div>
+        </Link>
+
+        {/* Mi local */}
+        <Link href="/dashboard/configuracion">
+          <motion.div
+            whileHover={{ y: -2 }}
+            className="bg-white rounded-2xl border border-stone-200 p-6 cursor-pointer hover:border-stone-300 transition-colors"
+          >
+            <div className="flex items-center gap-2 mb-4">
+              <div className="w-8 h-8 rounded-xl flex items-center justify-center"
+                style={{ background: "rgba(45,69,48,0.1)" }}>
+                <Settings size={16} style={{ color: "#2D4530" }} />
+              </div>
+              <p className="text-xs text-stone-400 uppercase tracking-wider">Mi local</p>
+            </div>
+            <p className="text-sm font-medium text-stone-500">Datos, horarios y fotos</p>
+          </motion.div>
+        </Link>
+        </>
+        )}
       </div>
 
       {/* Stat del mes */}
+      {isRestaurante && (
       <div className="bg-white rounded-2xl border border-stone-200 p-6 mb-6">
         <div className="flex items-center gap-2 mb-2">
           <TrendingUp size={16} style={{ color: "#2D4530" }} />
@@ -253,6 +334,7 @@ export default function DashboardHome() {
           <span className="text-sm font-sans font-normal text-stone-400 ml-2">pedidos</span>
         </p>
       </div>
+      )}
 
       {/* Toggle abierto/cerrado */}
       <div className="bg-white rounded-2xl border border-stone-200 p-6 mb-6">
@@ -282,7 +364,7 @@ export default function DashboardHome() {
       </div>
 
       {/* Pedidos recientes */}
-      {recentOrders.length > 0 && (
+      {isRestaurante && recentOrders.length > 0 && (
         <div className="bg-white rounded-2xl border border-stone-200 p-6">
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-2">
