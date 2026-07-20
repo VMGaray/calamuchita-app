@@ -84,6 +84,9 @@ export default function BusinessesGrid() {
     viandas: "Viandas",
     panaderia: "Panadería",
     sushi: "Sushi",
+    comida_para_llevar: "Comida para llevar",
+    pizzeria: "Pizzería",
+    hamburgueseria: "Hamburguesería",
     other: "Gastronomía",
   }
 

@@ -12,12 +12,13 @@ import {
   GraduationCap, BookOpen, Languages, Users, Music, Trophy,
   Hotel, Map, Tent, Activity, Compass, PartyPopper, ChefHat, ShieldCheck,
   Mic, Medal, Wind, Palette, Baby, Store, Salad, Shirt, Gem,
-  HardHat, MoreHorizontal, Clock3, Landmark, Lightbulb, Bus, Info, Tag, Wheat
+  HardHat, MoreHorizontal, Clock3, Landmark, Lightbulb, Bus, Info, Tag, Wheat, Pizza, Beef, Package
 } from "lucide-react"
 
 const categoryIcons: Record<string, any> = {
   "Todos": MoreHorizontal,
   "Restaurantes": Utensils, "Cafés": Coffee, "Viandas": ShoppingBag, "Panadería": Wheat,
+  "Sushi": Salad, "Comida para llevar": Package, "Pizzería": Pizza, "Hamburguesería": Beef,
   "Bares": Beer, "Delivery": Bike, "Abierto ahora": Clock, "Varios": MoreHorizontal,
   "Plomería": Wrench, "Electricidad": Zap, "Gasista": Flame,
   "Mecánica": Car, "Construcción": Building, "Pintor": Paintbrush,

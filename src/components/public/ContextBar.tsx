@@ -25,6 +25,10 @@ const SUBCAT_LABELS: Record<string, string> = {
   cafe_bar:      "Bar/Café",
   viandas:       "Viandas",
   panaderia:     "Panadería",
+  sushi:         "Sushi",
+  comida_para_llevar: "Comida para llevar",
+  pizzeria:      "Pizzería",
+  hamburgueseria: "Hamburguesería",
   bar:           "Bares",
   other:         "Varios",
   // services

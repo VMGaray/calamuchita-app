@@ -99,6 +99,15 @@ const SYNONYMS: Record<string, string[]> = {
   estetica:       ["Estética"],
   esteticista:    ["Estética"],
   belleza:        ["Estética"],
+  pizza:          ["Pizzería"],
+  pizzas:         ["Pizzería"],
+  pizzeria:       ["Pizzería"],
+  hamburguesa:    ["Hamburguesería"],
+  hamburguesas:   ["Hamburguesería"],
+  hamburgueseria: ["Hamburguesería"],
+  burger:         ["Hamburguesería"],
+  "para llevar":  ["Comida para llevar"],
+  viandas:        ["Comida para llevar", "Viandas"],
 }
 
 function findMatchingSubcategories(q: string): string[] {

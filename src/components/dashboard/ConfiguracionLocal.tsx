@@ -10,7 +10,11 @@ const categoryOptions = [
   { value: "restaurant", label: "Restaurante" },
   { value: "cafe_bar", label: "Bar/Café" },
   { value: "viandas", label: "Viandas" },
-  { value: "hamburguesas", label: "Hamburgueserías" },
+  { value: "panaderia", label: "Panadería" },
+  { value: "sushi", label: "Sushi" },
+  { value: "comida_para_llevar", label: "Comida para llevar" },
+  { value: "pizzeria", label: "Pizzería" },
+  { value: "hamburgueseria", label: "Hamburguesería" },
   { value: "other", label: "Otro" },
 ]
 

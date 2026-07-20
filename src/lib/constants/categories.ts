@@ -4,7 +4,7 @@ import {
   Brain, AlertCircle, FlaskConical, Stethoscope, Ambulance,
   GraduationCap, BookOpen, Languages, Users, Music, Trophy, Palette,
   Hotel, Map, Tent, Activity, Compass, Bike, Plane,
-  Utensils, Coffee, Beer, Wine, ShoppingBag, Clock, Wheat,
+  Utensils, Coffee, Beer, Wine, ShoppingBag, Clock, Wheat, Pizza, Beef,
   Truck, Mountain, Printer, CreditCard, Briefcase,
   Dumbbell, PersonStanding, Timer, Wind, Tag, Video, ShieldCheck, ClipboardList, Cog, Snowflake, Bone, Sofa, Target, FileText, Fence, Cake, Sun, PenTool, Brush, Frame
 } from "lucide-react"
@@ -20,6 +20,9 @@ export const MASTER_CATEGORIES = {
       { label: "Viandas", icon: ShoppingBag, bg: "bg-blue-50", color: "text-blue-600" },
       { label: "Panadería", icon: Wheat, bg: "bg-amber-50", color: "text-amber-700" },
       { label: "Sushi", icon: Soup, bg: "bg-stone-50", color: "text-stone-600" },
+      { label: "Comida para llevar", icon: Package, bg: "bg-blue-50", color: "text-blue-600" },
+      { label: "Pizzería", icon: Pizza, bg: "bg-amber-50", color: "text-amber-700" },
+      { label: "Hamburguesería", icon: Beef, bg: "bg-orange-50", color: "text-orange-600" },
       { label: "Otro", icon: Store, bg: "bg-stone-50", color: "text-stone-400" },
     ]
   },

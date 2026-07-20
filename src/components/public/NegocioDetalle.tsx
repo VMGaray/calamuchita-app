@@ -177,7 +177,9 @@ export default function NegocioDetalle({ business, promotions = [] }: Props) {
   const nextPhoto    = () => setPhotoIdx(i => (i + 1) % photos.length)
   const CATEGORY_LABELS: Record<string, string> = {
     restaurant: "Restaurante", cafe_bar: "Bar/Café", cafe: "Café", bar: "Bar",
-    viandas: "Viandas", panaderia: "Panadería", sushi: "Sushi", other: "Gastronomía",
+    viandas: "Viandas", panaderia: "Panadería", sushi: "Sushi",
+    comida_para_llevar: "Comida para llevar", pizzeria: "Pizzería", hamburgueseria: "Hamburguesería",
+    other: "Gastronomía",
   }
   const categoryLabel = business.subcategory || CATEGORY_LABELS[business.category] || "Gastronomía"
   const isOpen        = calcIsOpenNow(business.business_hours ?? [])

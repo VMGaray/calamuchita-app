@@ -1,5 +1,5 @@
 export type Role = 'customer' | 'business' | 'admin'
-export type BusinessCategory = 'restaurant' | 'cafe_bar' | 'cafe' | 'viandas' | 'bar' | 'panaderia' | 'sushi' | 'other'
+export type BusinessCategory = 'restaurant' | 'cafe_bar' | 'cafe' | 'viandas' | 'bar' | 'panaderia' | 'sushi' | 'comida_para_llevar' | 'pizzeria' | 'hamburgueseria' | 'other'
 export type BusinessStatus = 'pending' | 'active' | 'suspended'
 export type BusinessType = 'gastronomy' | 'directory'
 export type BusinessSection =

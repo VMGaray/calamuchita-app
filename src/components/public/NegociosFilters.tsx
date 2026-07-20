@@ -9,6 +9,9 @@ const categories = [
   { key: "cafe", label: "Cafés" },
   { key: "viandas", label: "Viandas" },
   { key: "bar", label: "Bares" },
+  { key: "comida_para_llevar", label: "Comida para llevar" },
+  { key: "pizzeria", label: "Pizzería" },
+  { key: "hamburgueseria", label: "Hamburguesería" },
 ]
 
 const pillActive = {
