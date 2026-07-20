@@ -4,6 +4,7 @@ import { useEffect, useState } from "react"
 import { createClient } from "@/lib/supabase/client"
 import { CheckCircle, XCircle, Clock, User, Store } from "lucide-react"
 import { BusinessCategory } from "@/types/database"
+import { GASTRONOMY_CATEGORIES } from "@/lib/constants/gastronomyCategories"
 
 interface PendingRegistration {
   id: string
@@ -12,22 +13,9 @@ interface PendingRegistration {
   full_name: string | null
   business_name: string
   phone: string | null
+  category: string | null
   created_at: string
 }
-
-const CATEGORY_OPTIONS: { value: BusinessCategory; label: string }[] = [
-  { value: "restaurant",          label: "Restaurante" },
-  { value: "cafe_bar",            label: "Bar/Café" },
-  { value: "cafe",                label: "Café" },
-  { value: "bar",                 label: "Bar" },
-  { value: "sushi",               label: "Sushi" },
-  { value: "pizzeria",            label: "Pizzería" },
-  { value: "hamburgueseria",      label: "Hamburguesería" },
-  { value: "viandas",             label: "Viandas" },
-  { value: "comida_para_llevar",  label: "Comida para llevar" },
-  { value: "panaderia",           label: "Panadería" },
-  { value: "other",               label: "Otro" },
-]
 
 const toSlug = (name: string) =>
   name.toLowerCase().normalize("NFD")
@@ -63,7 +51,7 @@ export default function AdminSolicitudes() {
     setRegistrations(regs)
     setSelectedCategory(prev => {
       const next = { ...prev }
-      for (const reg of regs) if (!next[reg.id]) next[reg.id] = "other"
+      for (const reg of regs) if (!next[reg.id]) next[reg.id] = (reg.category as BusinessCategory) || "other"
       return next
     })
     setLoading(false)
@@ -164,7 +152,7 @@ export default function AdminSolicitudes() {
                         onChange={e => setSelectedCategory(prev => ({ ...prev, [reg.id]: e.target.value as BusinessCategory }))}
                         className="text-xs px-2.5 py-1.5 rounded-lg border border-stone-200 text-stone-700 outline-none focus:border-stone-400 bg-white"
                       >
-                        {CATEGORY_OPTIONS.map(opt => (
+                        {GASTRONOMY_CATEGORIES.map(opt => (
                           <option key={opt.value} value={opt.value}>{opt.label}</option>
                         ))}
                       </select>

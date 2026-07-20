@@ -4,6 +4,8 @@ import { Suspense, useState } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
 import { createClient } from "@/lib/supabase/client"
 import { MapPin } from "lucide-react"
+import { GASTRONOMY_CATEGORY_GROUPS } from "@/lib/constants/gastronomyCategories"
+import { BusinessCategory } from "@/types/database"
 
 type View = "login" | "register" | "forgot" | "registered"
 
@@ -44,6 +46,7 @@ function GastronomicosContent() {
   const [phone, setPhone]                     = useState("")
   const [regPassword, setRegPassword]         = useState("")
   const [confirmPassword, setConfirmPassword] = useState("")
+  const [category, setCategory]               = useState<BusinessCategory | "">("")
   const [regLoading, setRegLoading]           = useState(false)
   const [regError, setRegError]               = useState<string | null>(null)
 
@@ -82,6 +85,7 @@ function GastronomicosContent() {
     if (!regEmail.trim())     { setRegError("Ingresá tu email."); return }
     if (regPassword.length < 6) { setRegError("La contraseña debe tener al menos 6 caracteres."); return }
     if (regPassword !== confirmPassword) { setRegError("Las contraseñas no coinciden."); return }
+    if (!category) { setRegError("Elegí el tipo de negocio."); return }
 
     setRegLoading(true)
     setRegError(null)
@@ -115,6 +119,7 @@ function GastronomicosContent() {
         full_name: fullName,
         business_name: businessName,
         phone: phone || null,
+        category,
       })
     }
 
@@ -346,6 +351,24 @@ function GastronomicosContent() {
                   placeholder="Repetí tu contraseña"
                   className="w-full px-4 py-2.5 rounded-xl border border-stone-200 text-stone-800 text-sm outline-none focus:ring-2 focus:ring-[#A3B18A]/50"
                 />
+              </div>
+
+              <div>
+                <label className="block text-xs font-medium text-stone-600 mb-1">¿Qué tipo de negocio sos?</label>
+                <select
+                  value={category}
+                  onChange={e => setCategory(e.target.value as BusinessCategory)}
+                  className="w-full px-4 py-2.5 rounded-xl border border-stone-200 text-stone-800 text-sm outline-none focus:ring-2 focus:ring-[#A3B18A]/50 bg-white"
+                >
+                  <option value="" disabled>Elegí una opción</option>
+                  {GASTRONOMY_CATEGORY_GROUPS.map(({ group, options }) => (
+                    <optgroup key={group} label={group}>
+                      {options.map(opt => (
+                        <option key={opt.value} value={opt.value}>{opt.label}</option>
+                      ))}
+                    </optgroup>
+                  ))}
+                </select>
               </div>
 
               <div className="rounded-xl px-4 py-3 text-sm" style={{ background: "#F5F2EB" }}>
