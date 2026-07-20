@@ -43,6 +43,12 @@ const nextConfig: NextConfig = {
       },
     ]
   },
+  async redirects() {
+    return [
+      { source: "/login", destination: "/gastronomicos", permanent: false },
+      { source: "/registro", destination: "/gastronomicos", permanent: false },
+    ]
+  },
 }
 
 export default withPWA(nextConfig)
