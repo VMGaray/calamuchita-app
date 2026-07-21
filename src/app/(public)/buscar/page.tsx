@@ -32,6 +32,8 @@ const SYNONYMS: Record<string, string[]> = {
   pintor:         ["Pintor"],
   cerrajero:      ["Cerrajero"],
   herrero:        ["Herrero"],
+  tapicero:       ["Tapicería"],
+  tapiceria:      ["Tapicería"],
   mecanico:       ["Mecánica"],
   mecanica:       ["Mecánica"],
   veterinario:    ["Veterinarias"],

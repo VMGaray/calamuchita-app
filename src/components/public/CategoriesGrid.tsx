@@ -12,7 +12,8 @@ import {
   GraduationCap, BookOpen, Languages, Users, Music, Trophy,
   Hotel, Map, Tent, Activity, Compass, PartyPopper, ChefHat, ShieldCheck,
   Mic, Medal, Wind, Palette, Baby, Store, Salad, Shirt, Gem,
-  HardHat, MoreHorizontal, Clock3, Landmark, Lightbulb, Bus, Info, Tag, Wheat, Pizza, Beef, Package
+  HardHat, MoreHorizontal, Clock3, Landmark, Lightbulb, Bus, Info, Tag, Wheat, Pizza, Beef, Package,
+  Armchair,
 } from "lucide-react"
 
 const categoryIcons: Record<string, any> = {
@@ -40,6 +41,7 @@ const categoryIcons: Record<string, any> = {
   "Artesanías": Gem, "Ferreterías": HardHat, "Carteles tallados": Tag,
   "Farmacias de turno": Clock3, "Municipalidad": Landmark,
   "Cooperativas": Lightbulb, "Transporte": Bus, "Turismo oficial": Info,
+  "Tapicería": Armchair,
 }
 
 const bentoSizes = [

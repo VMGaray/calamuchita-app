@@ -58,6 +58,7 @@ export const sectionCategories = {
     { label: "Profesionales", desc: "Contadores, abogados, arquitectos y más", href: "/directorio/services?cat=profesionales", bg: "bg-violet-100", color: "text-violet-700" },
     { label: "Refrigeración", desc: "Aire acondicionado y cámaras frías", href: "/directorio/services?cat=refrigeracion", bg: "bg-brand-slate/10", color: "text-brand-slate" },
     { label: "Servicios audiovisuales", desc: "Fotografía, video y producción", href: "/directorio/services?cat=audiovisuales", bg: "bg-brand-slate/10", color: "text-brand-slate" },
+    { label: "Tapicería", desc: "Tapizado y restauración de muebles", href: "/directorio/services?cat=tapiceria", bg: "bg-brand-earth/10", color: "text-brand-earth" },
     { label: "Tatuajes", desc: "Estudios de tatuajes y piercing", href: "/directorio/services?cat=tatuajes", bg: "bg-brand-charcoal/10", color: "text-brand-charcoal" },
     { label: "Traslados", desc: "Transporte de personas", href: "/directorio/services?cat=traslados", bg: "bg-brand-earth/10", color: "text-brand-earth" },
     { label: "Venta de áridos", desc: "Arena, piedra y materiales", href: "/directorio/services?cat=aridos", bg: "bg-brand-slate/10", color: "text-brand-slate" },

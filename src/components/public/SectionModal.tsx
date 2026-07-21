@@ -29,7 +29,7 @@ const categoryIcons: Record<string, any> = {
   "Electricidad": Zap, "Energía Renovable": Sun, "Gasista": Flame, "Herrero": Hammer, "Paisajismo y Jardines": Leaf,
   "Limpieza": Sparkles, "Mecánica": Car, "Perforaciones": Droplets, "Piletero": Waves,
   "Pintor": Paintbrush, "Plomería": Wrench, "Zinguero": Home, "Profesionales": Briefcase, "Carteles tallados": Tag,
-  "Costurera/Modista": Scissors, "Escuela de Equitación": Activity, "Tatuajes": PenTool, "Traslados": Car, "Servicios audiovisuales": Video,
+  "Costurera/Modista": Scissors, "Escuela de Equitación": Activity, "Tapicería": Armchair, "Tatuajes": PenTool, "Traslados": Car, "Servicios audiovisuales": Video,
   "Higiene y seguridad laboral": ShieldCheck, "Licenciado en higiene y seguridad": ClipboardList,
   "Bombas y Motores eléctricos": Cog,
   "Refrigeración": Snowflake,

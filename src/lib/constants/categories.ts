@@ -73,6 +73,7 @@ export const MASTER_CATEGORIES = {
       { label: "Profesionales", icon: Briefcase, bg: "bg-violet-50", color: "text-violet-600" },
       { label: "Refrigeración", icon: Snowflake, bg: "bg-slate-50", color: "text-slate-400" },
       { label: "Servicios audiovisuales", icon: Video, bg: "bg-indigo-50", color: "text-indigo-600" },
+      { label: "Tapicería", icon: Armchair, bg: "bg-amber-50", color: "text-amber-700" },
       { label: "Tatuajes", icon: PenTool, bg: "bg-zinc-50", color: "text-zinc-600" },
       { label: "Traslados", icon: Car, bg: "bg-blue-50", color: "text-blue-600" },
       { label: "Venta de áridos", icon: Mountain, bg: "bg-stone-50", color: "text-stone-600" },
