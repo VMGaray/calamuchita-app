@@ -41,7 +41,6 @@ const PAGE_SIZE = 12
 
 const categoryLabel: Record<string, string> = {
   restaurant: "Restaurante",
-  cafe_bar: "Bar/Café",
   cafe: "Café",
   bar: "Bar",
   viandas: "Viandas",

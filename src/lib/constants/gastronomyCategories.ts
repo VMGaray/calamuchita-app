@@ -3,7 +3,6 @@ import { BusinessCategory } from "@/types/database"
 export const GASTRONOMY_CATEGORY_GROUPS: { group: string; options: { value: BusinessCategory; label: string }[] }[] = [
   { group: "Gastronómicos con salón", options: [
     { value: "restaurant", label: "Restaurante" },
-    { value: "cafe_bar", label: "Café & Bar" },
     { value: "cafe", label: "Café" },
     { value: "bar", label: "Bar" },
     { value: "sushi", label: "Sushi" },

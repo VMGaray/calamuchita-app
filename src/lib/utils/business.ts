@@ -1,7 +1,7 @@
 import { BusinessCategory } from "@/types/database"
 
 const RESTAURANT_CATEGORIES: BusinessCategory[] = [
-  "restaurant", "cafe_bar", "cafe", "bar", "sushi", "pizzeria", "hamburgueseria",
+  "restaurant", "cafe", "bar", "sushi", "pizzeria", "hamburgueseria",
 ]
 
 export function isRestaurante(category: BusinessCategory | null | undefined): boolean {

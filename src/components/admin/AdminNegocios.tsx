@@ -17,10 +17,11 @@ const sectionLabels: Record<string, string> = {
 }
 
 // La gastronomía no usa `subcategory` — guarda su categoría en el campo `category`
-// (restaurant, cafe_bar, etc.), por eso necesita su propio mapeo a etiqueta legible.
+// (restaurant, cafe, etc.), por eso necesita su propio mapeo a etiqueta legible.
 const gastronomyCategoryLabels: Record<string, string> = {
   restaurant: "Restaurante",
-  cafe_bar:   "Bar/Café",
+  cafe:       "Café",
+  bar:        "Bar",
   viandas:    "Viandas",
   panaderia:  "Panadería",
   sushi:      "Sushi",

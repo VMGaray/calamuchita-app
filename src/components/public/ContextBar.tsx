@@ -22,7 +22,6 @@ const SUBCAT_LABELS: Record<string, string> = {
   // gastronomy
   restaurant:    "Restaurantes",
   cafe:          "Cafés",
-  cafe_bar:      "Bar/Café",
   viandas:       "Viandas",
   panaderia:     "Panadería",
   sushi:         "Sushi",
