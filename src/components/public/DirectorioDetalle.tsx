@@ -33,7 +33,7 @@ const DAY_SHORT = ["Dom", "Lun", "Mar", "Mié", "Jue", "Vie", "Sáb"]
 
 const SECTION_TITLES: Record<string, string> = {
   gastronomy: "Gastronomía", services: "Servicios", health: "Salud",
-  education: "Educación", tourism: "Turismo", commerce: "Comercios",
+  education: "Educación", sports: "Deportes", tourism: "Turismo", commerce: "Comercios",
   events: "Eventos", info: "Info útil",
 }
 
@@ -178,12 +178,12 @@ export default function DirectorioDetalle({ business, section, promotions = [] }
           1 — PORTADA FULL-WIDTH
       ═══════════════════════════════════════════════════════════════ */}
       <div
-        className="relative w-full h-64 sm:h-72 overflow-hidden"
+        className="relative w-full h-56 sm:h-72 overflow-hidden"
         style={{ background: "#1a2e1c", cursor: coverUrl ? "zoom-in" : undefined }}
         onClick={() => { if (coverUrl) setLightboxSrc(coverUrl) }}
       >
         {coverUrl ? (
-          <Image src={coverUrl} alt={business.name} fill priority className="object-contain" sizes="100vw" quality={85} />
+          <Image src={coverUrl} alt={business.name} fill priority className="object-cover" sizes="100vw" quality={85} />
         ) : (
           <div className="w-full h-full flex items-center justify-center"
             style={{ background: "linear-gradient(135deg, #2D4530 0%, #4A6741 55%, #3D5C3A 100%)" }}>

@@ -21,19 +21,21 @@ export default function CategoryPageHeader({ title, description }: Props) {
         style={{ color: "rgba(255,255,255,0.80)" }}
       />
 
-      <div
-        className="inline-flex items-center gap-1.5 mb-2 px-3 py-1 rounded-full text-xs font-medium"
-        style={{
-          background: "rgba(255,255,255,0.15)",
-          color: "rgba(255,255,255,0.90)",
-          backdropFilter: "blur(8px)",
-          WebkitBackdropFilter: "blur(8px)"
-        }}
-      >
-        <MapPin size={11} />
-        {localidad}
-      </div>
-      
+      {localidad && (
+        <div
+          className="inline-flex items-center gap-1.5 mb-2 px-3 py-1 rounded-full text-xs font-medium"
+          style={{
+            background: "rgba(255,255,255,0.15)",
+            color: "rgba(255,255,255,0.90)",
+            backdropFilter: "blur(8px)",
+            WebkitBackdropFilter: "blur(8px)"
+          }}
+        >
+          <MapPin size={11} />
+          {localidad}
+        </div>
+      )}
+
       <h1 className="font-serif text-3xl md:text-5xl text-white mb-1 drop-shadow-md" 
           style={{ textShadow: "0 2px 20px rgba(0,0,0,0.80)" }}>
         {title}

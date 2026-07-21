@@ -10,9 +10,11 @@ interface Props {
 }
 
 const sectionTitles: Record<string, string> = {
+  gastronomy: "Gastronomía",
   services: "Servicios",
   health: "Salud",
   education: "Educación",
+  sports: "Deportes",
   tourism: "Turismo",
   commerce: "Comercios",
   events: "Eventos",
@@ -20,9 +22,11 @@ const sectionTitles: Record<string, string> = {
 }
 
 const sectionDescs: Record<string, string> = {
+  gastronomy: "Restaurantes, cafés, viandas y más del Valle de Calamuchita",
   services: "Plomeros, electricistas, mecánicos y más del Valle de Calamuchita",
   health: "Médicos, farmacias, veterinarias y más",
   education: "Colegios, institutos, maestras particulares y más",
+  sports: "Clubes, canchas, clases y actividades deportivas",
   tourism: "Alojamiento, excursiones, actividades y más",
   commerce: "Almacenes, dietéticas, artesanías y más",
   events: "Festivales, recitales, ferias y más",

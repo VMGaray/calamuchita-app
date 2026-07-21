@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect } from "react"
+import { Suspense, useEffect } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import Link from "next/link"
 import { usePathname, useSearchParams } from "next/navigation"
@@ -110,7 +110,7 @@ function ActiveFiltersBar({ activeCategory, section }: { activeCategory: { label
   )
 }
 
-export default function SectionModal({ section, onClose }: Props) {
+function SectionModalInner({ section, onClose }: Props) {
   const isVisible = section !== null && section !== "events"
   const categories = isVisible ? sectionCategories[section!] : []
   const activeCategory = useActiveCategory(categories)
@@ -277,5 +277,13 @@ export default function SectionModal({ section, onClose }: Props) {
         </>
       )}
     </AnimatePresence>
+  )
+}
+
+export default function SectionModal(props: Props) {
+  return (
+    <Suspense fallback={null}>
+      <SectionModalInner {...props} />
+    </Suspense>
   )
 }

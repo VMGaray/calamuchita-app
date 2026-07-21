@@ -37,6 +37,29 @@ export default function LocalidadSelectorWidget() {
 
       {/* Locality pills */}
       <div className="flex flex-wrap gap-2">
+        <motion.button
+          onClick={() => setLocalidad("")}
+          whileHover={{ y: -2 }}
+          whileTap={{ scale: 0.95 }}
+          transition={{ type: "spring", stiffness: 400, damping: 22 }}
+          className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-sm font-medium transition-shadow"
+          style={
+            !localidad
+              ? {
+                  background: "#2D4530",
+                  color: "#E1DBC9",
+                  boxShadow: "0 4px 14px rgba(45,69,48,0.28)",
+                }
+              : {
+                  background: "rgba(255,255,255,0.70)",
+                  color: "rgba(45,69,48,0.70)",
+                  border: "1px solid rgba(45,69,48,0.12)",
+                }
+          }
+        >
+          {!localidad && <Check size={11} strokeWidth={2.5} />}
+          Todas
+        </motion.button>
         {shown.map(loc => {
           const active = localidad === loc
           return (
@@ -82,20 +105,25 @@ export default function LocalidadSelectorWidget() {
       </div>
 
       {/* Confirmation */}
-      <AnimatePresence>
-        {localidad && (
-          <motion.p
-            initial={{ opacity: 0, y: 4 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0 }}
-            className="text-xs mt-4"
-            style={{ color: "rgba(45,69,48,0.80)" }}
-          >
-            Mostrando info para{" "}
-            <strong style={{ color: "#2D4530" }}>{localidad}</strong>.
-            {" "}Tu elección se guarda automáticamente.
-          </motion.p>
-        )}
+      <AnimatePresence mode="wait">
+        <motion.p
+          key={localidad || "todas"}
+          initial={{ opacity: 0, y: 4 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0 }}
+          className="text-xs mt-4"
+          style={{ color: "rgba(45,69,48,0.80)" }}
+        >
+          {localidad ? (
+            <>
+              Mostrando info para{" "}
+              <strong style={{ color: "#2D4530" }}>{localidad}</strong>.
+              {" "}Tu elección se guarda automáticamente.
+            </>
+          ) : (
+            "Mostrando información de todo el valle. Elegí una localidad para filtrar."
+          )}
+        </motion.p>
       </AnimatePresence>
     </div>
   )

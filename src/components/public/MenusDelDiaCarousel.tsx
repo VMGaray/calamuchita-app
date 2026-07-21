@@ -140,7 +140,7 @@ export default function MenusDelDiaCarousel() {
 
   // Re-ordena sin refetch cuando cambia la localidad: los del pueblo activo van primero
   const menus = useMemo(() => {
-    if (!allMenus.length) return allMenus
+    if (!allMenus.length || !localidad) return allMenus
     const localidadLower = localidad.toLowerCase()
     return [...allMenus].sort((a, b) => {
       const aMatch = a.business.address?.toLowerCase().includes(localidadLower) ?? false
@@ -405,7 +405,7 @@ export default function MenusDelDiaCarousel() {
             transition={{ duration: 0.2 }}
             className="text-center text-xs text-brand-pine/40 mt-6 uppercase tracking-widest"
           >
-            {menus.filter(m => m.business.address?.toLowerCase().includes(localidad.toLowerCase())).length > 0
+            {localidad && menus.filter(m => m.business.address?.toLowerCase().includes(localidad.toLowerCase())).length > 0
               ? `Mostrando primero: ${localidad}`
               : "Mostrando todo el valle"}
           </motion.p>

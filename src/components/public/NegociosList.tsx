@@ -37,6 +37,8 @@ interface Props {
   params: { categoria?: string; abierto?: string; delivery?: string; takeaway?: string; q?: string }
 }
 
+const PAGE_SIZE = 12
+
 const categoryLabel: Record<string, string> = {
   restaurant: "Restaurante",
   cafe_bar: "Bar/Café",
@@ -68,6 +70,7 @@ function calcIsOpen(hours: BusinessHour[], fallback: boolean): boolean {
 export default function NegociosList({ params }: Props) {
   const [businesses, setBusinesses] = useState<Business[]>([])
   const [loading, setLoading] = useState(true)
+  const [visibleCount, setVisibleCount] = useState(PAGE_SIZE)
   const [atStart, setAtStart] = useState(true)
   const [atEnd, setAtEnd] = useState(false)
   const resultsRef = useRef<HTMLDivElement>(null)
@@ -124,6 +127,7 @@ export default function NegociosList({ params }: Props) {
       }
 
       setBusinesses(result)
+      setVisibleCount(PAGE_SIZE)
       setLoading(false)
     }
 
@@ -158,10 +162,13 @@ export default function NegociosList({ params }: Props) {
     )
   }
 
+  const visibleBusinesses = businesses.slice(0, visibleCount)
+  const hasMore = visibleCount < businesses.length
+
   return (
     <div ref={resultsRef} className="scroll-mt-28">
       <p className="text-xs mb-4 font-medium" style={{ color: "rgba(255,255,255,0.60)" }}>
-        {businesses.length} resultado{businesses.length !== 1 ? "s" : ""}
+        Mostrando {visibleBusinesses.length} de {businesses.length} resultado{businesses.length !== 1 ? "s" : ""}
       </p>
 
       {/* Wrapper relativo solo en mobile para posicionar las flechas */}
@@ -200,7 +207,7 @@ export default function NegociosList({ params }: Props) {
         )}
 
       <div ref={scrollRef} className="flex gap-4 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden snap-x snap-mandatory -mx-4 px-4 pb-6 md:mx-0 md:px-0 md:grid md:grid-cols-2 lg:grid-cols-3 md:overflow-x-visible md:pb-0">
-        {businesses.map((biz, i) => {
+        {visibleBusinesses.map((biz, i) => {
           const { id, name, slug, category, subcategory, address, cover_url, is_open, offers_delivery, offers_takeaway, description, business_hours, is_premium } = biz
           const isOpen = calcIsOpen(business_hours, is_open)
 
@@ -315,6 +322,23 @@ export default function NegociosList({ params }: Props) {
           )
         })}
       </div>
+      </div>
+
+      {/* ── Paginación: cargar más ── */}
+      <div className="flex flex-col items-center mt-6">
+        {hasMore ? (
+          <button
+            onClick={() => setVisibleCount(v => v + PAGE_SIZE)}
+            className="px-6 py-2.5 rounded-full text-sm font-semibold transition-opacity hover:opacity-90"
+            style={{ background: "#2D4530", color: "#E1DBC9" }}
+          >
+            Cargar más resultados
+          </button>
+        ) : businesses.length > PAGE_SIZE ? (
+          <p className="text-xs" style={{ color: "rgba(255,255,255,0.50)" }}>
+            Mostraste todos los resultados
+          </p>
+        ) : null}
       </div>
     </div>
   )

@@ -36,6 +36,8 @@ interface Props {
   filters: { cat?: string; q?: string; pueblo?: string }
 }
 
+const PAGE_SIZE = 12
+
 const pueblos = [
   "Villa General Belgrano",
   "Los Reartes",
@@ -156,6 +158,7 @@ export default function DirectorioList({ section, filters }: Props) {
   const { localidad, setLocalidad, hydrated } = useLocalidad()
   const [allBusinesses, setAllBusinesses] = useState<Business[]>([])
   const [businesses, setBusinesses] = useState<Business[]>([])
+  const [visibleCount, setVisibleCount] = useState(PAGE_SIZE)
   const [loading, setLoading] = useState(true)
   const [search, setSearch] = useState(filters.q || "")
   const [showPueblos, setShowPueblos] = useState(false)
@@ -262,6 +265,9 @@ export default function DirectorioList({ section, filters }: Props) {
       })
     )
   }, [allBusinesses, filters.pueblo])
+
+  // Reinicia la paginación cada vez que cambia el resultado filtrado
+  useEffect(() => { setVisibleCount(PAGE_SIZE) }, [businesses])
 
   useEffect(() => {
     if (isFirstRender.current) { isFirstRender.current = false; return }
@@ -410,7 +416,7 @@ export default function DirectorioList({ section, filters }: Props) {
         ) : (
           <>
             <p className="text-xs mb-4 font-medium" style={{ color: "rgba(255,255,255,0.60)" }}>
-              {businesses.length} resultado{businesses.length !== 1 ? "s" : ""}
+              Mostrando {Math.min(visibleCount, businesses.length)} de {businesses.length} resultado{businesses.length !== 1 ? "s" : ""}
             </p>
 
             {/* Carrusel en mobile, grilla en desktop */}
@@ -436,7 +442,7 @@ export default function DirectorioList({ section, filters }: Props) {
                 </>
               )}
             <div ref={scrollRef} className="flex gap-4 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden snap-x snap-mandatory -mx-4 px-4 pb-6 md:mx-0 md:px-0 md:grid md:grid-cols-2 lg:grid-cols-3 md:overflow-x-visible md:pb-0 md:gap-5">
-              {businesses.map((business, i) => (
+              {businesses.slice(0, visibleCount).map((business, i) => (
                 <AnimateIn
                   key={business.id}
                   direction="up"
@@ -547,6 +553,23 @@ export default function DirectorioList({ section, filters }: Props) {
               ))}
             </div>
             </div>{/* /relative wrapper */}
+
+            {/* ── Paginación: cargar más ── */}
+            <div className="flex flex-col items-center mt-6">
+              {visibleCount < businesses.length ? (
+                <button
+                  onClick={() => setVisibleCount(v => v + PAGE_SIZE)}
+                  className="px-6 py-2.5 rounded-full text-sm font-semibold transition-opacity hover:opacity-90"
+                  style={{ background: "#2D4530", color: "#E1DBC9" }}
+                >
+                  Cargar más resultados
+                </button>
+              ) : businesses.length > PAGE_SIZE ? (
+                <p className="text-xs" style={{ color: "rgba(255,255,255,0.50)" }}>
+                  Mostraste todos los resultados
+                </p>
+              ) : null}
+            </div>
           </>
         )}
       </div>

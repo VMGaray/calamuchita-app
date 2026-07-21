@@ -18,6 +18,7 @@ const SHORT: Record<string, string> = {
 }
 
 function short(loc: string) {
+  if (!loc) return "Todas"
   return SHORT[loc] || loc.split(" ").slice(0, 2).join(" ")
 }
 
@@ -104,6 +105,23 @@ export default function FloatingLocalidadButton() {
 
               {/* List */}
               <div className="overflow-y-auto flex-1 py-2">
+                <button
+                  onClick={() => { setLocalidad(""); setOpen(false) }}
+                  className="w-full flex items-center gap-3 px-5 py-3.5 text-left"
+                  style={!localidad ? { background: "rgba(163,177,138,0.18)" } : undefined}
+                >
+                  <MapPin
+                    size={14}
+                    style={{ color: !localidad ? "#A3B18A" : "rgba(225,219,201,0.35)", flexShrink: 0 }}
+                  />
+                  <span
+                    className="text-sm flex-1"
+                    style={{ color: !localidad ? "#E1DBC9" : "rgba(225,219,201,0.70)", fontWeight: !localidad ? 500 : 400 }}
+                  >
+                    Todas las localidades
+                  </span>
+                  {!localidad && <Check size={14} style={{ color: "#A3B18A", flexShrink: 0 }} />}
+                </button>
                 {LOCALIDADES.map((loc) => {
                   const isActive = loc === localidad
                   const hasImage = activeLocalidadImages.has(loc)

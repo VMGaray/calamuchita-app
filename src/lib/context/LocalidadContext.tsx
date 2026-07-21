@@ -1,7 +1,6 @@
 "use client"
 
 import { createContext, useContext, useEffect, useState } from "react"
-import { MAIN_LOCALIDADES } from "@/lib/constants/telefonos"
 
 const LS_KEY = "calamuchita_localidad"
 
@@ -14,7 +13,8 @@ type LocalidadContextValue = {
 const LocalidadContext = createContext<LocalidadContextValue | null>(null)
 
 export function LocalidadProvider({ children }: { children: React.ReactNode }) {
-  const [localidad, setLocalidadState] = useState(MAIN_LOCALIDADES[0])
+  // "" representa "Todas las localidades" — es el estado por defecto al entrar a la app
+  const [localidad, setLocalidadState] = useState("")
   const [hydrated, setHydrated] = useState(false)
 
   useEffect(() => {

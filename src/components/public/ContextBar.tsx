@@ -165,7 +165,7 @@ function ContextBarInner() {
         className="text-[11px] font-medium whitespace-nowrap flex-shrink-0"
         style={{ color: "rgba(225,219,201,0.75)" }}
       >
-        {localidad}
+        {localidad || "Todas"}
       </span>
 
       {/* Separador › Sección */}

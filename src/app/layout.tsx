@@ -8,12 +8,12 @@ export const viewport: Viewport = {
   themeColor: "#2D4530",
   width: "device-width",
   initialScale: 1,
-  maximumScale: 1,
 }
 
 import ClientOnly from "@/components/ui/ClientOnly"
 import PageTransition from "@/components/ui/PageTransition"
 import ScrollToTop from "@/components/ui/ScrollToTop"
+import BackToTopButton from "@/components/ui/BackToTopButton"
 import InstallPrompt from "@/components/ui/InstallPrompt" // ✨ Importamos el cartel de instalación
 
 export const metadata: Metadata = {
@@ -59,9 +59,10 @@ export default function RootLayout({
         <PageTransition>
           {children}
         </PageTransition>
-        
+        <BackToTopButton />
+
         {/* ✨ Inyectamos el cartel en la raíz para que vigile toda la navegación */}
-        <InstallPrompt /> 
+        <InstallPrompt />
       </body>
     </html>
   )

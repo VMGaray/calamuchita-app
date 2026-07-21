@@ -192,41 +192,8 @@ export default function CalamuchitaSale({
         </h2>
       </AnimateIn>
 
-      {/* ── MOBILE: carrusel con flechas ── */}
-      <div className="md:hidden relative">
-        {promotions.length > 1 && (
-          <>
-            <button
-              onClick={() => scrollBy("left")}
-              className="absolute left-0 top-1/2 -translate-y-1/2 z-10 w-8 h-8 flex items-center justify-center rounded-full transition-opacity duration-200"
-              style={{
-                background: "rgba(184,92,56,0.85)",
-                border: "1px solid rgba(196,164,128,0.5)",
-                boxShadow: "0 2px 12px rgba(0,0,0,0.15)",
-                opacity: atStart ? 0 : 1,
-                pointerEvents: atStart ? "none" : "auto",
-              }}
-              aria-label="Anterior"
-            >
-              <ChevronLeft size={16} color="#FFFAF4" />
-            </button>
-            <button
-              onClick={() => scrollBy("right")}
-              className="absolute right-0 top-1/2 -translate-y-1/2 z-10 w-8 h-8 flex items-center justify-center rounded-full transition-opacity duration-200"
-              style={{
-                background: "rgba(184,92,56,0.85)",
-                border: "1px solid rgba(196,164,128,0.5)",
-                boxShadow: "0 2px 12px rgba(0,0,0,0.15)",
-                opacity: atEnd ? 0 : 1,
-                pointerEvents: atEnd ? "none" : "auto",
-              }}
-              aria-label="Siguiente"
-            >
-              <ChevronRight size={16} color="#FFFAF4" />
-            </button>
-          </>
-        )}
-
+      {/* ── MOBILE: carrusel con flechas debajo (swipe es la interacción principal) ── */}
+      <div className="md:hidden">
         <div
           ref={scrollRef}
           className="flex gap-4 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden snap-x snap-mandatory -mx-2 px-2 pb-2"
@@ -237,6 +204,35 @@ export default function CalamuchitaSale({
             </div>
           ))}
         </div>
+
+        {promotions.length > 1 && (
+          <div className="flex items-center justify-center gap-3 mt-3">
+            <button
+              onClick={() => scrollBy("left")}
+              disabled={atStart}
+              className="w-8 h-8 flex items-center justify-center rounded-full transition-opacity duration-200 disabled:opacity-30"
+              style={{
+                background: "rgba(184,92,56,0.85)",
+                border: "1px solid rgba(196,164,128,0.5)",
+              }}
+              aria-label="Anterior"
+            >
+              <ChevronLeft size={16} color="#FFFAF4" />
+            </button>
+            <button
+              onClick={() => scrollBy("right")}
+              disabled={atEnd}
+              className="w-8 h-8 flex items-center justify-center rounded-full transition-opacity duration-200 disabled:opacity-30"
+              style={{
+                background: "rgba(184,92,56,0.85)",
+                border: "1px solid rgba(196,164,128,0.5)",
+              }}
+              aria-label="Siguiente"
+            >
+              <ChevronRight size={16} color="#FFFAF4" />
+            </button>
+          </div>
+        )}
       </div>
 
       {/* ── DESKTOP: grilla original ── */}
