@@ -91,7 +91,7 @@ export default async function HomePage() {
     // traemos NOVEDADES_LIMIT + 1 solo para saber si hay que mostrar "Ver todas"
     supabase
       .from("novedades")
-      .select("id, title, content, image_url, expires_at, created_at, published")
+      .select("id, title, content, image_url, locality, expires_at, created_at, published")
       .order("created_at", { ascending: false })
       .limit(NOVEDADES_LIMIT + 1),
   ])

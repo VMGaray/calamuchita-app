@@ -17,7 +17,7 @@ export default async function NovedadesPage() {
   // published=true y no vencidas ya las filtra la policy RLS de lectura pública
   const { data } = await supabase
     .from("novedades")
-    .select("id, title, content, image_url, expires_at, created_at, published")
+    .select("id, title, content, image_url, locality, expires_at, created_at, published")
     .order("created_at", { ascending: false })
 
   const novedades = (data as Novedad[] | null) ?? []
@@ -76,6 +76,11 @@ export default async function NovedadesPage() {
                     <p className="text-xs text-stone-600 leading-relaxed whitespace-pre-line">
                       {n.content}
                     </p>
+                  )}
+                  {n.locality && (
+                    <span className="text-[10px] font-semibold ml-auto mt-0.5" style={{ color: ACCENT }}>
+                      {n.locality}
+                    </span>
                   )}
                 </div>
               </div>

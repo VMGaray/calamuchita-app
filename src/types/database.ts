@@ -260,6 +260,7 @@ export interface Novedad {
   title: string | null
   content: string | null
   image_url: string | null
+  locality: string | null
   expires_at: string | null
   created_at: string
   published: boolean

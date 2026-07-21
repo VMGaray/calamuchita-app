@@ -34,20 +34,27 @@ function NovedadCard({ n }: { n: Novedad }) {
           </h3>
         )}
         {n.content && (
-          <>
-            <p className={`text-xs text-stone-600 leading-relaxed ${expanded ? "" : "line-clamp-3"}`}>
-              {n.content}
-            </p>
+          <p className={`text-xs text-stone-600 leading-relaxed ${expanded ? "" : "line-clamp-3"}`}>
+            {n.content}
+          </p>
+        )}
+        {(isLong || n.locality) && (
+          <div className="flex items-center mt-0.5">
             {isLong && (
               <button
                 onClick={() => setExpanded(e => !e)}
-                className="self-start text-[10px] font-bold mt-0.5 hover:opacity-70 transition-opacity"
+                className="text-[10px] font-bold hover:opacity-70 transition-opacity"
                 style={{ color: ACCENT }}
               >
                 {expanded ? "Ver menos" : "Ver más"}
               </button>
             )}
-          </>
+            {n.locality && (
+              <span className="text-[10px] font-semibold ml-auto" style={{ color: ACCENT }}>
+                {n.locality}
+              </span>
+            )}
+          </div>
         )}
       </div>
     </div>
@@ -66,12 +73,6 @@ export default function Novedades({ novedades, hasMore }: Props) {
     <section>
       <div className="flex items-end justify-between mb-6">
         <div>
-          <p
-            className="text-[10px] font-black uppercase tracking-[0.22em] mb-1.5"
-            style={{ color: ACCENT }}
-          >
-            Al día
-          </p>
           <h2 className="font-serif text-2xl md:text-3xl font-bold" style={{ color: ACCENT }}>
             Novedades
           </h2>

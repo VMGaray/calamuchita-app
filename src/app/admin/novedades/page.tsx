@@ -7,9 +7,10 @@ import { AnimatePresence, motion } from "framer-motion"
 import { createClient } from "@/lib/supabase/client"
 import ImageUpload from "@/components/ui/ImageUpload"
 import { Novedad } from "@/types/database"
+import { LOCALIDADES } from "@/lib/constants/telefonos"
 import {
   ArrowLeft, Plus, X, Pencil, Trash2, Sparkles,
-  Loader2, ImageIcon, CalendarDays,
+  Loader2, ImageIcon, CalendarDays, MapPin,
 } from "lucide-react"
 
 const ACCENT = "#6B7A5E"
@@ -17,6 +18,7 @@ const ACCENT = "#6B7A5E"
 interface FormState {
   title: string
   content: string
+  locality: string
   expires_at: string
   image_url: string | null
   published: boolean
@@ -25,6 +27,7 @@ interface FormState {
 const EMPTY_FORM: FormState = {
   title: "",
   content: "",
+  locality: "",
   expires_at: "",
   image_url: null,
   published: true,
@@ -89,6 +92,7 @@ export default function AdminNovedadesPage() {
     setForm({
       title: n.title ?? "",
       content: n.content ?? "",
+      locality: n.locality ?? "",
       expires_at: toDatetimeLocal(n.expires_at),
       image_url: n.image_url,
       published: n.published,
@@ -118,6 +122,7 @@ export default function AdminNovedadesPage() {
     const payload = {
       title:      form.title.trim() || null,
       content:    form.content.trim() || null,
+      locality:   form.locality || null,
       image_url:  safeImageUrl,
       expires_at: form.expires_at ? new Date(form.expires_at).toISOString() : null,
       published:  form.published,
@@ -372,6 +377,23 @@ export default function AdminNovedadesPage() {
                       placeholder="Detalle breve de la novedad..."
                       className={`${INPUT} resize-none`}
                     />
+                  </div>
+
+                  <div>
+                    <label className="block text-[10px] font-black uppercase tracking-[0.18em] text-stone-400 mb-2">
+                      <MapPin size={10} className="inline mr-1" />
+                      Localidad (opcional)
+                    </label>
+                    <select
+                      value={form.locality}
+                      onChange={e => set("locality")(e.target.value)}
+                      className={`${INPUT} bg-white`}
+                    >
+                      <option value="">Sin localidad específica</option>
+                      {LOCALIDADES.map(loc => (
+                        <option key={loc} value={loc}>{loc}</option>
+                      ))}
+                    </select>
                   </div>
 
                   <div>
