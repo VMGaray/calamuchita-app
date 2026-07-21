@@ -1,7 +1,9 @@
 "use client"
 
+import { useEffect, useState } from "react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
+import { createClient } from "@/lib/supabase/client"
 import {
   MapPin,
   LayoutDashboard,
@@ -35,9 +37,29 @@ const links = [
 
 export default function AdminSidebar() {
   const pathname = usePathname()
+  const [pendingCount, setPendingCount] = useState(0)
 
   const isActive = (href: string) =>
     href === "/admin" ? pathname === "/admin" : pathname.startsWith(href)
+
+  useEffect(() => {
+    const supabase = createClient()
+
+    const fetchCount = async () => {
+      const { count } = await supabase
+        .from("pending_registrations")
+        .select("id", { count: "exact", head: true })
+      setPendingCount(count ?? 0)
+    }
+    fetchCount()
+
+    const channel = supabase
+      .channel("pending-registrations-badge")
+      .on("postgres_changes", { event: "*", schema: "public", table: "pending_registrations" }, fetchCount)
+      .subscribe()
+
+    return () => { supabase.removeChannel(channel) }
+  }, [])
 
   return (
     <>
@@ -71,6 +93,11 @@ export default function AdminSidebar() {
               >
                 <Icon size={12} />
                 {label}
+                {href === "/admin/solicitudes" && pendingCount > 0 && (
+                  <span className="bg-red-500 text-white text-xs rounded-full px-1.5 py-0.5 leading-none">
+                    {pendingCount}
+                  </span>
+                )}
               </Link>
             )
           })}
@@ -121,6 +148,11 @@ export default function AdminSidebar() {
               >
                 <Icon size={16} />
                 {label}
+                {href === "/admin/solicitudes" && pendingCount > 0 && (
+                  <span className="bg-red-500 text-white text-xs rounded-full px-1.5 py-0.5 leading-none">
+                    {pendingCount}
+                  </span>
+                )}
               </Link>
             )
           })}

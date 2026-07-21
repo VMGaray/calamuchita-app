@@ -5,6 +5,7 @@ import { createClient } from "@/lib/supabase/client"
 import { CheckCircle, XCircle, Clock, User, Store } from "lucide-react"
 import { BusinessCategory } from "@/types/database"
 import { GASTRONOMY_CATEGORIES } from "@/lib/constants/gastronomyCategories"
+import { sendEmail, approvedEmailHtml, rejectedEmailHtml } from "@/lib/email"
 
 interface PendingRegistration {
   id: string
@@ -86,6 +87,15 @@ export default function AdminSolicitudes() {
     await supabase.from("pending_registrations").delete().eq("id", reg.id)
     setRegistrations(prev => prev.filter(r => r.id !== reg.id))
     setProcessing(null)
+
+    sendEmail({
+      to: reg.email,
+      subject: "¡Tu negocio ya está activo en Calamuchita App! 🎉",
+      html: approvedEmailHtml({
+        businessName: reg.business_name,
+        profileUrl: `${window.location.origin}/negocios/${slug}`,
+      }),
+    })
   }
 
   const handleReject = async (reg: PendingRegistration) => {
@@ -95,6 +105,12 @@ export default function AdminSolicitudes() {
     await supabase.from("pending_registrations").delete().eq("id", reg.id)
     setRegistrations(prev => prev.filter(r => r.id !== reg.id))
     setProcessing(null)
+
+    sendEmail({
+      to: reg.email,
+      subject: "Tu solicitud en Calamuchita App",
+      html: rejectedEmailHtml({ businessName: reg.business_name }),
+    })
   }
 
   const formatDate = (dateStr: string) =>
