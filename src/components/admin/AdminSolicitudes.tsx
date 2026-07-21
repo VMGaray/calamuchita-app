@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react"
 import { createClient } from "@/lib/supabase/client"
-import { CheckCircle, XCircle, Clock, User, Store } from "lucide-react"
+import { CheckCircle, XCircle, Clock, User, Store, Tag } from "lucide-react"
 import { BusinessCategory } from "@/types/database"
 import { GASTRONOMY_CATEGORIES } from "@/lib/constants/gastronomyCategories"
 import { sendEmail, approvedEmailHtml, rejectedEmailHtml } from "@/lib/email"
@@ -36,11 +36,18 @@ const generateSlug = async (name: string, supabase: ReturnType<typeof createClie
   }
 }
 
+// Resuelve la categoría elegida por el negocio a un valor válido del enum;
+// si falta o quedó un valor viejo/inválido, cae a "other" en vez de bloquear el alta.
+const resolveCategory = (category: string | null): BusinessCategory =>
+  (GASTRONOMY_CATEGORIES.find(opt => opt.value === category)?.value as BusinessCategory) ?? "other"
+
+const categoryLabel = (category: string | null): string =>
+  GASTRONOMY_CATEGORIES.find(opt => opt.value === category)?.label ?? "Sin categoría"
+
 export default function AdminSolicitudes() {
   const [registrations, setRegistrations] = useState<PendingRegistration[]>([])
   const [loading, setLoading] = useState(true)
   const [processing, setProcessing] = useState<string | null>(null)
-  const [selectedCategory, setSelectedCategory] = useState<Record<string, BusinessCategory>>({})
 
   const fetchRegistrations = async () => {
     const supabase = createClient()
@@ -48,13 +55,7 @@ export default function AdminSolicitudes() {
       .from("pending_registrations")
       .select("*")
       .order("created_at", { ascending: false })
-    const regs = (data as PendingRegistration[]) ?? []
-    setRegistrations(regs)
-    setSelectedCategory(prev => {
-      const next = { ...prev }
-      for (const reg of regs) if (!next[reg.id]) next[reg.id] = (reg.category as BusinessCategory) || "other"
-      return next
-    })
+    setRegistrations((data as PendingRegistration[]) ?? [])
     setLoading(false)
   }
 
@@ -72,7 +73,7 @@ export default function AdminSolicitudes() {
       owner_id: reg.user_id,
       section: "gastronomy",
       type: "gastronomy",
-      category: selectedCategory[reg.id] || "other",
+      category: resolveCategory(reg.category),
       status: "active",
       is_open: false,
       phone: reg.phone || null,
@@ -161,17 +162,12 @@ export default function AdminSolicitudes() {
                     </div>
                     <div className="mt-3">
                       <label className="block text-[10px] font-medium text-stone-400 uppercase tracking-wider mb-1">
-                        Categoría
+                        Categoría elegida
                       </label>
-                      <select
-                        value={selectedCategory[reg.id] ?? "other"}
-                        onChange={e => setSelectedCategory(prev => ({ ...prev, [reg.id]: e.target.value as BusinessCategory }))}
-                        className="text-xs px-2.5 py-1.5 rounded-lg border border-stone-200 text-stone-700 outline-none focus:border-stone-400 bg-white"
-                      >
-                        {GASTRONOMY_CATEGORIES.map(opt => (
-                          <option key={opt.value} value={opt.value}>{opt.label}</option>
-                        ))}
-                      </select>
+                      <div className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-stone-50 border border-stone-100">
+                        <Tag size={11} className="text-stone-400" />
+                        <span className="text-xs font-medium text-stone-700">{categoryLabel(reg.category)}</span>
+                      </div>
                     </div>
                   </div>
                 </div>
