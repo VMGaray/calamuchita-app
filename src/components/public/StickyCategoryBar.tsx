@@ -161,7 +161,7 @@ export default function StickyCategoryBar({ stickyOffset = 0 }: Props) {
               {/* Lista de categorías con acordeón */}
               <div className="flex-1 overflow-y-auto px-4 pb-12">
                 {categories.map(({ key, label, icon: Icon }, idx) => {
-                  const hasSubs    = key !== "events" && key !== "sports" && !!sectionCategories[key as SectionKey]
+                  const hasSubs    = key !== "events" && !!sectionCategories[key as SectionKey]
                   const isExpanded = expandedCat === key
                   const isLast     = idx === categories.length - 1
 

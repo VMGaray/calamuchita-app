@@ -226,11 +226,11 @@ export default function NegocioDetalle({ business, promotions = [] }: Props) {
         {/* Gradiente inferior para transición suave */}
         <div className="absolute inset-x-0 bottom-0 h-20 bg-gradient-to-t from-[#F0EBE0] to-transparent pointer-events-none" />
 
-        {/* Botón volver — flota sobre la imagen */}
+        {/* Botón volver — fondo semitransparente, legible sobre la foto sin taparla */}
         <a
           href={backHref}
-          className="absolute top-20 left-4 z-10 flex items-center gap-2 px-3 py-2 rounded-full text-sm font-semibold text-white transition-opacity hover:opacity-80 active:opacity-60"
-          style={{ background: "rgba(0,0,0,0.28)", backdropFilter: "blur(8px)", WebkitBackdropFilter: "blur(8px)" }}
+          className="absolute top-4 left-4 z-10 flex items-center gap-2 px-3 py-2 rounded-full text-sm font-semibold text-white transition-colors hover:bg-black/60 active:opacity-60"
+          style={{ background: "rgba(0,0,0,0.4)", backdropFilter: "blur(4px)", WebkitBackdropFilter: "blur(4px)" }}
         >
           <ArrowLeft size={15} strokeWidth={2.5} />
           <span>{backLabel}</span>
