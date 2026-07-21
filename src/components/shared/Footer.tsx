@@ -137,9 +137,20 @@ export default function Footer() {
 
         <div className="mt-10 pt-6 flex flex-col md:flex-row justify-between items-center gap-2"
           style={{ borderTop: "1px solid rgba(225,219,201,0.07)" }}>
-          <p className="text-xs" style={{ color: "rgba(225,219,201,0.55)" }}>
-            <Link href="/login" style={{ color: "inherit" }}>©</Link> 2026 Calamuchita App · Valle de Calamuchita, Córdoba
-          </p>
+          <div className="flex flex-col items-center md:items-start gap-1">
+            <p className="text-xs" style={{ color: "rgba(225,219,201,0.55)" }}>
+              © 2026 Calamuchita App · Valle de Calamuchita, Córdoba
+            </p>
+            <Link
+              href="/gastronomicos"
+              className="text-xs transition-colors"
+              style={{ color: "rgba(225,219,201,0.3)" }}
+              onMouseEnter={e => (e.currentTarget.style.color = "rgba(225,219,201,0.6)")}
+              onMouseLeave={e => (e.currentTarget.style.color = "rgba(225,219,201,0.3)")}
+            >
+              Ingreso gastronómico →
+            </Link>
+          </div>
           <a
             href="https://vmg-setup-ai.vercel.app/"
             target="_blank"
