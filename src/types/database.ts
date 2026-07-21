@@ -254,3 +254,13 @@ export interface TransportCompany {
   is_active: boolean
   created_at: string
 }
+
+export interface Novedad {
+  id: string
+  title: string | null
+  content: string | null
+  image_url: string | null
+  expires_at: string | null
+  created_at: string
+  published: boolean
+}

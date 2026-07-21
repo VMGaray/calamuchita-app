@@ -19,6 +19,7 @@ import {
   ExternalLink,
   UserPlus,
   UtensilsCrossed,
+  Sparkles,
 } from "lucide-react"
 
 const links = [
@@ -27,6 +28,7 @@ const links = [
   { href: "/admin/solicitudes",            label: "Solicitudes",           icon: UserPlus        },
   { href: "/admin/eventos",                label: "Eventos",               icon: CalendarDays    },
   { href: "/admin/identidad-calamuchitana",label: "Identidad Calamuchitana",icon: Newspaper      },
+  { href: "/admin/novedades",              label: "Novedades",             icon: Sparkles        },
   { href: "/admin/stats",                  label: "Estadísticas",          icon: BarChart2       },
   { href: "/admin/promociones",            label: "Promociones",           icon: BadgePercent    },
   { href: "/admin/suscripciones",          label: "Suscripciones",         icon: CreditCard      },
