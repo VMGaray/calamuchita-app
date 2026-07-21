@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react"
 import Link from "next/link"
 import { motion } from "framer-motion"
-import { MapPin } from "lucide-react"
+import { MapPin, UtensilsCrossed } from "lucide-react"
 import AnimateIn from "@/components/ui/AnimateIn"
 import { createClient } from "@/lib/supabase/client"
 import { Playfair_Display } from "next/font/google"
@@ -143,11 +143,12 @@ export default function Footer() {
             </p>
             <Link
               href="/gastronomicos"
-              className="text-xs transition-colors"
+              className="text-xs transition-colors inline-flex items-center gap-1"
               style={{ color: "rgba(225,219,201,0.3)" }}
               onMouseEnter={e => (e.currentTarget.style.color = "rgba(225,219,201,0.6)")}
               onMouseLeave={e => (e.currentTarget.style.color = "rgba(225,219,201,0.3)")}
             >
+              <UtensilsCrossed size={12} style={{ color: "inherit" }} />
               Ingreso gastronómico →
             </Link>
           </div>
