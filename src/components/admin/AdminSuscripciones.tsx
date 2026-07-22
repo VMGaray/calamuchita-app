@@ -9,6 +9,7 @@ import { Subscription, SubscriptionStatus, BillingCycle } from "@/types/database
 
 interface SubRow extends Subscription {
   businesses: { name: string; slug: string } | null
+  created_at: string
 }
 
 interface BusinessOption {
@@ -37,8 +38,20 @@ const CYCLE_LABEL: Record<BillingCycle, string> = {
   yearly:  "Anual",
 }
 
+// Estado del negocio que corresponde a cada estado de suscripción.
+// 'overdue' no está mapeado a propósito: el negocio sigue visible mientras está vencido.
+const BUSINESS_STATUS_FOR_SUB: Partial<Record<SubscriptionStatus, "active" | "suspended">> = {
+  cancelled: "suspended",
+  active:    "active",
+  trial:     "active",
+}
+
 function fmt(iso: string) {
   return new Date(iso).toLocaleDateString("es-AR", { day: "2-digit", month: "short", year: "numeric" })
+}
+
+function fmtAlta(iso: string) {
+  return new Date(iso).toLocaleDateString("es-AR", { day: "2-digit", month: "2-digit", year: "numeric" })
 }
 
 const EMPTY_FORM = {
@@ -90,6 +103,19 @@ function SubForm({
     } else {
       await supabase.from("subscriptions").insert([payload])
     }
+
+    const newBusinessStatus = BUSINESS_STATUS_FOR_SUB[form.status]
+    if (newBusinessStatus) {
+      const { error: bizError } = await supabase
+        .from("businesses")
+        .update({ status: newBusinessStatus })
+        .eq("id", form.business_id)
+      if (bizError) {
+        console.error("Error al actualizar el estado del negocio:", bizError)
+        alert("La suscripción se guardó, pero no se pudo actualizar el estado del negocio. Revisalo manualmente.")
+      }
+    }
+
     setSaving(false)
     onSaved()
   }
@@ -214,13 +240,15 @@ export default function AdminSuscripciones() {
   const [subs, setSubs] = useState<SubRow[]>([])
   const [businesses, setBusinesses] = useState<BusinessOption[]>([])
   const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
   const [filter, setFilter] = useState<SubscriptionStatus | "all">("all")
   const [showForm, setShowForm] = useState(false)
   const [editing, setEditing] = useState<SubRow | null>(null)
 
   const fetchAll = async () => {
     const supabase = createClient()
-    const [{ data: subsData }, { data: bizData }] = await Promise.all([
+    setError(null)
+    const [{ data: subsData, error: subsError }, { data: bizData, error: bizError }] = await Promise.all([
       supabase
         .from("subscriptions")
         .select("*, businesses(name, slug)")
@@ -231,6 +259,11 @@ export default function AdminSuscripciones() {
         .eq("status", "active")
         .order("name"),
     ])
+    if (subsError) console.error("Error al traer suscripciones:", subsError)
+    if (bizError) console.error("Error al traer negocios:", bizError)
+    if (subsError || bizError) {
+      setError(subsError?.message || bizError?.message || "No se pudieron cargar las suscripciones")
+    }
     setSubs((subsData as SubRow[]) || [])
     setBusinesses(bizData || [])
     setLoading(false)
@@ -279,6 +312,12 @@ export default function AdminSuscripciones() {
           <Plus size={14} /> Nueva
         </button>
       </div>
+
+      {error && (
+        <div className="bg-red-50 text-red-600 text-sm px-4 py-3 rounded-xl">
+          No se pudieron cargar las suscripciones: {error}
+        </div>
+      )}
 
       {/* Resumen rápido */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
@@ -342,6 +381,9 @@ export default function AdminSuscripciones() {
                   </span>
                   <span className="text-xs text-stone-400">
                     {fmt(sub.current_period_start)} → {fmt(sub.current_period_end)}
+                  </span>
+                  <span className="text-[10px] text-stone-300">
+                    Alta: {fmtAlta(sub.created_at)}
                   </span>
                   {sub.notes && (
                     <span className="text-xs text-stone-400 italic truncate max-w-[160px]">{sub.notes}</span>
