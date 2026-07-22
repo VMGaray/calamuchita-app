@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react"
 import { createClient } from "@/lib/supabase/client"
 import { CreditCard, Plus, Pencil, Trash2, X } from "lucide-react"
-import { Subscription, SubscriptionStatus, BillingCycle } from "@/types/database"
+import { Subscription, SubscriptionStatus, BillingCycle, BusinessSection, BusinessCategory } from "@/types/database"
 
 // ─── tipos ───────────────────────────────────────────────────────────────────
 
@@ -15,6 +15,8 @@ interface SubRow extends Subscription {
 interface BusinessOption {
   id: string
   name: string
+  section: BusinessSection
+  category: BusinessCategory | null
 }
 
 // ─── helpers ─────────────────────────────────────────────────────────────────
@@ -46,12 +48,58 @@ const BUSINESS_STATUS_FOR_SUB: Partial<Record<SubscriptionStatus, "active" | "su
   trial:     "active",
 }
 
+// Día de corte mensual según la sección del negocio.
+const CUTOFF_DAY_BY_SECTION: Record<BusinessSection, number> = {
+  services:   5,
+  health:     5,
+  gastronomy: 10,
+  events:     10,
+  info:       10,
+  commerce:   15,
+  tourism:    15,
+  sports:     15,
+  education:  15,
+}
+
+// Categorías gastronómicas "premium" — el resto de gastronomía cae en el precio default.
+const GASTRONOMY_PREMIUM_CATEGORIES = new Set<BusinessCategory>([
+  "restaurant", "cafe", "bar", "sushi", "pizzeria", "hamburgueseria",
+])
+
 function fmt(iso: string) {
   return new Date(iso).toLocaleDateString("es-AR", { day: "2-digit", month: "short", year: "numeric" })
 }
 
 function fmtAlta(iso: string) {
   return new Date(iso).toLocaleDateString("es-AR", { day: "2-digit", month: "2-digit", year: "numeric" })
+}
+
+function toISODate(d: Date): string {
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`
+}
+
+// Días entre hoy y la fecha dada (positivo = futuro, negativo = pasado).
+function daysDiff(iso: string): number {
+  const target = new Date(iso + "T00:00:00")
+  const today = new Date(toISODate(new Date()) + "T00:00:00")
+  return Math.round((target.getTime() - today.getTime()) / 86400000)
+}
+
+// Próxima fecha de corte para el día del mes dado, a partir de `from`.
+// Si `from` ya alcanzó o pasó el día de corte de este mes, salta al mes siguiente.
+function nextCutoffDate(cutoffDay: number, from: Date): string {
+  const year = from.getFullYear()
+  const month = from.getMonth()
+  const target = from.getDate() >= cutoffDay
+    ? new Date(year, month + 1, cutoffDay)
+    : new Date(year, month, cutoffDay)
+  return toISODate(target)
+}
+
+function defaultPriceFor(section: BusinessSection, category: BusinessCategory | null): number {
+  if (section === "gastronomy" && category && GASTRONOMY_PREMIUM_CATEGORIES.has(category)) return 30000
+  if (section === "health") return 25000
+  return 17000
 }
 
 const EMPTY_FORM = {
@@ -92,6 +140,24 @@ function SubForm({
   )
   const [saving, setSaving] = useState(false)
   const set = (k: string, v: string | number) => setForm(p => ({ ...p, [k]: v }))
+
+  // Al elegir negocio en un alta nueva, precarga fecha de corte y precio según su sección/categoría.
+  const handleBusinessSelect = (id: string) => {
+    const biz = businesses.find(b => b.id === id)
+    if (initial || !biz) {
+      set("business_id", id)
+      return
+    }
+    const today = new Date()
+    const cutoffDay = CUTOFF_DAY_BY_SECTION[biz.section] ?? 15
+    setForm(p => ({
+      ...p,
+      business_id: id,
+      current_period_start: toISODate(today),
+      current_period_end: nextCutoffDate(cutoffDay, today),
+      price: defaultPriceFor(biz.section, biz.category),
+    }))
+  }
 
   const handleSave = async () => {
     if (!form.business_id || !form.current_period_end) return
@@ -137,7 +203,7 @@ function SubForm({
           <label className="block text-xs font-medium text-stone-600 mb-1">Negocio *</label>
           <select
             value={form.business_id}
-            onChange={e => set("business_id", e.target.value)}
+            onChange={e => handleBusinessSelect(e.target.value)}
             className="w-full px-3 py-2 rounded-xl border border-stone-200 text-sm bg-white outline-none focus:ring-2 focus:ring-[#A3B18A]/50"
           >
             <option value="">Seleccionar negocio…</option>
@@ -244,6 +310,54 @@ export default function AdminSuscripciones() {
   const [filter, setFilter] = useState<SubscriptionStatus | "all">("all")
   const [showForm, setShowForm] = useState(false)
   const [editing, setEditing] = useState<SubRow | null>(null)
+  const [autoSuspendedCount, setAutoSuspendedCount] = useState(0)
+
+  // Vencidas 1-5 días → 'overdue'. Vencidas +5 días → 'cancelled' y el negocio se suspende.
+  const checkVencimientos = async () => {
+    const supabase = createClient()
+    const todayISO = toISODate(new Date())
+
+    const { data: dueSubs, error: dueError } = await supabase
+      .from("subscriptions")
+      .select("id, business_id, current_period_end")
+      .in("status", ["active", "overdue"])
+      .lt("current_period_end", todayISO)
+
+    if (dueError) {
+      console.error("Error al chequear vencimientos:", dueError)
+      return
+    }
+    if (!dueSubs || dueSubs.length === 0) return
+
+    const overdueIds: string[] = []
+    const cancelledIds: string[] = []
+    const cancelledBusinessIds: string[] = []
+
+    for (const s of dueSubs) {
+      const daysLate = -daysDiff(s.current_period_end)
+      if (daysLate > 5) {
+        cancelledIds.push(s.id)
+        cancelledBusinessIds.push(s.business_id)
+      } else {
+        overdueIds.push(s.id)
+      }
+    }
+
+    if (overdueIds.length > 0) {
+      const { error } = await supabase.from("subscriptions").update({ status: "overdue" }).in("id", overdueIds)
+      if (error) console.error("Error al marcar suscripciones vencidas:", error)
+    }
+
+    if (cancelledIds.length > 0) {
+      const { error: subError } = await supabase.from("subscriptions").update({ status: "cancelled" }).in("id", cancelledIds)
+      if (subError) console.error("Error al cancelar suscripciones:", subError)
+
+      const { error: bizError } = await supabase.from("businesses").update({ status: "suspended" }).in("id", cancelledBusinessIds)
+      if (bizError) console.error("Error al suspender negocios:", bizError)
+    }
+
+    setAutoSuspendedCount(cancelledBusinessIds.length)
+  }
 
   const fetchAll = async () => {
     const supabase = createClient()
@@ -255,7 +369,7 @@ export default function AdminSuscripciones() {
         .order("current_period_end", { ascending: true }),
       supabase
         .from("businesses")
-        .select("id, name")
+        .select("id, name, section, category")
         .eq("status", "active")
         .order("name"),
     ])
@@ -269,7 +383,7 @@ export default function AdminSuscripciones() {
     setLoading(false)
   }
 
-  useEffect(() => { fetchAll() }, [])
+  useEffect(() => { checkVencimientos().then(() => fetchAll()) }, [])
 
   const handleDelete = async (id: string) => {
     if (!confirm("¿Eliminar esta suscripción?")) return
@@ -316,6 +430,12 @@ export default function AdminSuscripciones() {
       {error && (
         <div className="bg-red-50 text-red-600 text-sm px-4 py-3 rounded-xl">
           No se pudieron cargar las suscripciones: {error}
+        </div>
+      )}
+
+      {autoSuspendedCount > 0 && (
+        <div className="bg-amber-50 text-amber-700 text-sm px-4 py-3 rounded-xl">
+          Se suspendieron {autoSuspendedCount} negocio{autoSuspendedCount === 1 ? "" : "s"} por falta de pago.
         </div>
       )}
 
@@ -374,6 +494,12 @@ export default function AdminSuscripciones() {
                   <span className="text-[10px] text-stone-400 px-2 py-0.5 rounded-full bg-stone-50 border border-stone-100">
                     {CYCLE_LABEL[sub.billing_cycle]}
                   </span>
+                  {sub.status !== "cancelled" && sub.status !== "overdue" &&
+                    daysDiff(sub.current_period_end) >= 0 && daysDiff(sub.current_period_end) <= 3 && (
+                    <span className="text-[10px] font-medium px-2 py-0.5 rounded-full bg-yellow-50 text-yellow-700">
+                      ⚠️ Vence pronto
+                    </span>
+                  )}
                 </div>
                 <div className="flex items-center gap-3 mt-0.5 flex-wrap">
                   <span className="text-xs text-stone-500 font-medium">
