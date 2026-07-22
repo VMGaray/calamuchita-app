@@ -67,7 +67,7 @@ export default function AdminSolicitudes() {
 
     const slug = await generateSlug(reg.business_name, supabase)
 
-    const { error } = await supabase.from("businesses").insert({
+    const { data: newBusiness, error } = await supabase.from("businesses").insert({
       name: reg.business_name,
       slug,
       owner_id: reg.user_id,
@@ -77,12 +77,41 @@ export default function AdminSolicitudes() {
       status: "active",
       is_open: false,
       phone: reg.phone || null,
-    })
+    }).select("id").single()
 
     if (error) {
       alert("Error al aprobar: " + error.message)
       setProcessing(null)
       return
+    }
+
+    if (newBusiness) {
+      const { data: existingSub } = await supabase
+        .from("subscriptions")
+        .select("id")
+        .eq("business_id", newBusiness.id)
+        .maybeSingle()
+
+      if (!existingSub) {
+        const today = new Date()
+        const periodEnd = new Date(today)
+        periodEnd.setDate(periodEnd.getDate() + 30)
+
+        const { error: subError } = await supabase.from("subscriptions").insert({
+          business_id: newBusiness.id,
+          status: "trial",
+          billing_cycle: "monthly",
+          price: 0,
+          current_period_start: today.toISOString().split("T")[0],
+          current_period_end: periodEnd.toISOString().split("T")[0],
+          notes: "Alta por solicitud gastronómica",
+        })
+
+        if (subError) {
+          console.error("Error al crear suscripción automática:", subError)
+          alert("Negocio creado pero no se pudo crear la suscripción, creala manualmente")
+        }
+      }
     }
 
     await supabase.from("pending_registrations").delete().eq("id", reg.id)

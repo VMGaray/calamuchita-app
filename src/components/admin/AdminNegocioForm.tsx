@@ -284,6 +284,38 @@ export default function AdminNegocioForm() {
       return
     }
 
+    const { data: newBusiness } = await supabase
+      .from("businesses").select("id").eq("slug", uniqueSlug).single()
+
+    if (newBusiness) {
+      const { data: existingSub } = await supabase
+        .from("subscriptions")
+        .select("id")
+        .eq("business_id", newBusiness.id)
+        .maybeSingle()
+
+      if (!existingSub) {
+        const today = new Date()
+        const periodEnd = new Date(today)
+        periodEnd.setDate(periodEnd.getDate() + 30)
+
+        const { error: subError } = await supabase.from("subscriptions").insert({
+          business_id: newBusiness.id,
+          status: "trial",
+          billing_cycle: "monthly",
+          price: 0,
+          current_period_start: today.toISOString().split("T")[0],
+          current_period_end: periodEnd.toISOString().split("T")[0],
+          notes: "Alta manual por admin",
+        })
+
+        if (subError) {
+          console.error("Error al crear suscripción automática:", subError)
+          alert("Negocio creado pero no se pudo crear la suscripción, creala manualmente")
+        }
+      }
+    }
+
     const validPhotos = galleryPhotos.filter(Boolean) as string[]
     const horariosExpanded = expandHorariosForSave(horarios)
     if (horariosExpanded.length > 0 || validPhotos.length > 0 || branches.length > 0) {
