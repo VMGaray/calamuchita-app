@@ -10,7 +10,7 @@ import { ShoppingBag, MapPin, Check } from "lucide-react"
 import {
   Utensils, Coffee, Beer, Bike, Clock, Package, Soup,
   Wrench, Zap, Flame, Car, Building, Paintbrush, Hammer, KeyRound, Leaf, Waves, Home, Bug, Droplets, Sparkles, Shield, Truck, Mountain, HardHat, Scissors, Video, ShieldCheck, ClipboardList,
-  Stethoscope, Pill, Brain, Smile, Eye, PawPrint, AlertCircle, Ambulance,
+  Stethoscope, Pill, Brain, Smile, Eye, PawPrint, AlertCircle, Ambulance, Hand,
   GraduationCap, BookOpen, Languages, Users, Music, Trophy,
   Hotel, Map, Tent, Activity, Compass, Plane,
   PartyPopper, ChefHat, Mic, Medal, Wind, Palette, Baby,
@@ -21,7 +21,7 @@ import {
 
 const categoryIcons: Record<string, any> = {
   "Restaurantes": Utensils, "Bar/Café": Coffee, "Viandas": ShoppingBag, "Panadería": Wheat, "Sushi": Soup,
-  "Comida para llevar": Package, "Pizzería": Pizza, "Hamburguesería": Beef,
+  "Comida para llevar": Package, "Pizzería": Pizza, "Hamburguesería": Beef, "Pastelería": Cake,
   "Delivery": Bike, "Take Away": Package, "Abierto ahora": Clock,
   "Alambrados": Fence, "Alarmas-Seguridad": Shield, "Animación Cumpleaños": Cake, "Artista plástica": Brush, "Cerrajero": KeyRound, "Construcción": Building,
   "Fletes": Truck, "Movimiento de suelos": HardHat, "Venta de áridos": Mountain, "Desinfecciones": Bug,
@@ -45,7 +45,7 @@ const categoryIcons: Record<string, any> = {
   "Trekking / Montaña": Mountain, "Yoga / Pilates": Sparkles, "Gimnasio": Dumbbell,
   "Artes marciales": Shield, "Running": Timer,
   "Clínicas y Consultorios": Building, "Especialidades": Stethoscope, "Estética": Sparkles,
-  "Hospitales y Dispensarios": AlertCircle, "Laboratorios": FlaskConical,
+  "Hospitales y Dispensarios": AlertCircle, "Laboratorios": FlaskConical, "Masajes": Hand,
   "Psicología": Brain, "Terapias alternativas": Leaf, "Traslado de pacientes": Ambulance,
   "Arte y Música": Music, "Colegios": GraduationCap, "Deporte": Trophy,
   "Idiomas": Languages, "Maestras/os Particulares": Users, "Universidad/Terciario": BookOpen,

@@ -45,6 +45,7 @@ const categoryLabel: Record<string, string> = {
   bar: "Bar",
   viandas: "Viandas",
   panaderia: "Panadería",
+  pasteleria: "Pastelería",
   sushi: "Sushi",
   comida_para_llevar: "Comida para llevar",
   pizzeria: "Pizzería",
@@ -109,7 +110,7 @@ export default function NegociosList({ params }: Props) {
         .eq("status", "active")
         .eq("section", "gastronomy")
 
-      if (params.categoria) query = query.eq("category", params.categoria)
+      if (params.categoria) query = query.or(`category.eq.${params.categoria},categories.cs.{"${params.categoria}"}`)
       // "abierto" ya NO filtra en DB — lo calculamos cliente con los horarios reales
       if (params.delivery === "true") query = query.eq("offers_delivery", true)
       if (params.takeaway === "true") query = query.eq("offers_takeaway", true)

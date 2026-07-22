@@ -28,6 +28,7 @@ const gastronomyCategories: { value: BusinessCategory; label: string }[] = [
   { value: "bar",        label: "Bar" },
   { value: "viandas",    label: "Viandas" },
   { value: "panaderia",  label: "Panadería" },
+  { value: "pasteleria", label: "Pastelería" },
   { value: "sushi",      label: "Sushi" },
   { value: "comida_para_llevar", label: "Comida para llevar" },
   { value: "pizzeria",   label: "Pizzería" },
@@ -143,7 +144,6 @@ export default function AdminNegocioForm() {
     slug: "",
     description: "",
     section: "services" as BusinessSection,
-    category: "other" as BusinessCategory,
     categories: [] as string[],
     address: "",
     pueblo: "",
@@ -244,9 +244,9 @@ export default function AdminNegocioForm() {
       description: form.description || null,
       section: form.section,
       type: form.section === "gastronomy" ? "gastronomy" : "directory",
-      category: form.section === "gastronomy" ? form.category : null,
+      category: form.section === "gastronomy" ? (finalCategories[0] as BusinessCategory) || "other" : null,
       categories: finalCategories,
-      subcategory: finalCategories[0] || null,
+      subcategory: form.section === "gastronomy" ? null : (finalCategories[0] || null),
       address: fullAddress || null,
       pueblo: form.pueblo || null,
       latitude: coords?.lat ?? null,
@@ -377,12 +377,14 @@ export default function AdminNegocioForm() {
           {/* Categoría gastronomía */}
           {isGastronomy && (
             <div className="mt-4">
-              <label className="block text-sm font-medium text-stone-700 mb-2">Categoría</label>
-              <div className="flex gap-2 flex-wrap">
+              <label className="block text-sm font-medium text-stone-700 mb-1">
+                Categoría <span className="text-stone-400 font-normal">(podés elegir más de una)</span>
+              </label>
+              <div className="flex gap-2 flex-wrap mt-2">
                 {gastronomyCategories.map(({ value, label }) => (
-                  <button key={value} onClick={() => handleChange("category", value)}
+                  <button key={value} type="button" onClick={() => toggleCategory(value)}
                     className={`py-1.5 px-3 rounded-xl text-xs font-medium border transition-colors ${
-                      form.category === value
+                      form.categories.includes(value)
                         ? "bg-primary-500 text-white border-primary-500"
                         : "bg-white text-stone-600 border-stone-200 hover:border-primary-300"
                     }`}>

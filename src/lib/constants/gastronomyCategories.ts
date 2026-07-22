@@ -15,6 +15,7 @@ export const GASTRONOMY_CATEGORY_GROUPS: { group: string; options: { value: Busi
   ]},
   { group: "Otros", options: [
     { value: "panaderia", label: "Panadería" },
+    { value: "pasteleria", label: "Pastelería" },
     { value: "other", label: "Otro" },
   ]},
 ]

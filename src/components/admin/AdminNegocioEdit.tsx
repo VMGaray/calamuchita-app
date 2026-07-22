@@ -30,6 +30,7 @@ const gastronomyCategories: { value: BusinessCategory; label: string }[] = [
   { value: "bar",        label: "Bar" },
   { value: "viandas",    label: "Viandas" },
   { value: "panaderia",  label: "Panadería" },
+  { value: "pasteleria", label: "Pastelería" },
   { value: "sushi",      label: "Sushi" },
   { value: "comida_para_llevar", label: "Comida para llevar" },
   { value: "pizzeria",   label: "Pizzería" },
@@ -120,7 +121,6 @@ export default function AdminNegocioEdit({ id }: Props) {
     slug: "",
     description: "",
     section: "services" as BusinessSection,
-    category: "other" as BusinessCategory,
     subcategory: "",
     address: "",
     pueblo: "",
@@ -164,7 +164,6 @@ export default function AdminNegocioEdit({ id }: Props) {
           slug: business.slug || "",
           description: business.description || "",
           section: business.section || "services",
-          category: business.category || "other",
           subcategory: business.subcategory || "",
           address: addressParts[0]?.trim() || "",
           pueblo: business.pueblo || addressParts[1]?.trim() || "",
@@ -195,7 +194,11 @@ export default function AdminNegocioEdit({ id }: Props) {
         const profType = cats.find((c: string) => PROFESIONALES_OPTIONS.includes(c)) || ""
         setProfessionalType(profType)
         const nonProfCats = cats.filter((c: string) => !PROFESIONALES_OPTIONS.includes(c))
-        setSelectedCategories(nonProfCats.length > 0 ? nonProfCats : (business.subcategory ? [business.subcategory] : []))
+        setSelectedCategories(
+          nonProfCats.length > 0 ? nonProfCats
+          : business.section === "gastronomy" && business.category ? [business.category]
+          : business.subcategory ? [business.subcategory] : []
+        )
         if (business.latitude && business.longitude) {
           setCoordsInput(`${business.latitude}, ${business.longitude}`)
         }
@@ -257,8 +260,8 @@ export default function AdminNegocioEdit({ id }: Props) {
         slug: form.slug,
         description: form.description || null,
         section: form.section,
-        category: form.section === "gastronomy" ? form.category : null,
-        subcategory: updatedCategories[0] || null,
+        category: form.section === "gastronomy" ? (updatedCategories[0] as BusinessCategory) || "other" : null,
+        subcategory: form.section === "gastronomy" ? null : (updatedCategories[0] || null),
         categories: updatedCategories,
         address: fullAddress || null,
         pueblo: form.pueblo || null,
@@ -389,14 +392,17 @@ export default function AdminNegocioEdit({ id }: Props) {
           </div>
           {form.section === "gastronomy" && (
             <div className="mt-4">
-              <label className="block text-sm font-medium text-stone-700 mb-2">Categoría</label>
-              <div className="flex gap-2 flex-wrap">
+              <label className="block text-sm font-medium text-stone-700 mb-1">
+                Categoría <span className="text-stone-400 font-normal">(podés elegir más de una)</span>
+              </label>
+              <div className="flex gap-2 flex-wrap mt-2">
                 {gastronomyCategories.map(({ value, label }) => (
                   <button
                     key={value}
-                    onClick={() => handleChange("category", value)}
+                    type="button"
+                    onClick={() => toggleCategory(value)}
                     className={`py-1.5 px-3 rounded-xl text-xs font-medium border transition-colors ${
-                      form.category === value
+                      selectedCategories.includes(value)
                         ? "bg-primary-500 text-white border-primary-500"
                         : "bg-white text-stone-600 border-stone-200 hover:border-primary-300"
                     }`}

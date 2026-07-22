@@ -12,6 +12,7 @@ const categoryOptions = [
   { value: "bar", label: "Bar" },
   { value: "viandas", label: "Viandas" },
   { value: "panaderia", label: "Panadería" },
+  { value: "pasteleria", label: "Pastelería" },
   { value: "sushi", label: "Sushi" },
   { value: "comida_para_llevar", label: "Comida para llevar" },
   { value: "pizzeria", label: "Pizzería" },

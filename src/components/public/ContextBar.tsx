@@ -24,6 +24,7 @@ const SUBCAT_LABELS: Record<string, string> = {
   cafe:          "Cafés",
   viandas:       "Viandas",
   panaderia:     "Panadería",
+  pasteleria:    "Pastelería",
   sushi:         "Sushi",
   comida_para_llevar: "Comida para llevar",
   pizzeria:      "Pizzería",
@@ -81,6 +82,7 @@ const SUBCAT_LABELS: Record<string, string> = {
   estetica:      "Estética",
   hospitales:    "Hospitales",
   laboratorios:  "Laboratorios",
+  masajes:       "Masajes",
   terapias:      "Terapias alternativas",
   traslado:      "Traslado de pacientes",
   // education
