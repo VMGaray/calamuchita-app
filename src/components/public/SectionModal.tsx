@@ -23,7 +23,7 @@ const categoryIcons: Record<string, any> = {
   "Restaurantes": Utensils, "Bar/Café": Coffee, "Viandas": ShoppingBag, "Panadería": Wheat, "Sushi": Soup,
   "Comida para llevar": Package, "Pizzería": Pizza, "Hamburguesería": Beef, "Pastelería": Cake,
   "Delivery": Bike, "Take Away": Package, "Abierto ahora": Clock,
-  "Alambrados": Fence, "Alarmas-Seguridad": Shield, "Animación Cumpleaños": Cake, "Animación de eventos": PartyPopper, "Artista plástica": Brush, "Cerrajero": KeyRound, "Construcción": Building,
+  "Alambrados": Fence, "Alarmas-Seguridad": Shield, "Animación Cumpleaños": Cake, "Ambientación de eventos": PartyPopper, "Artista plástica": Brush, "Cerrajero": KeyRound, "Construcción": Building,
   "Fletes": Truck, "Movimiento de suelos": HardHat, "Venta de áridos": Mountain, "Desinfecciones": Bug,
   "Decoración y Terminaciones de Interiores": Sofa, "Seguros": ShieldCheck,
   "Electricidad": Zap, "Energía Renovable": Sun, "Gasista": Flame, "Herrero": Hammer, "Paisajismo y Jardines": Leaf,

@@ -34,7 +34,7 @@ export const MASTER_CATEGORIES = {
       { label: "Alarmas-Seguridad", icon: Shield, bg: "bg-blue-50", color: "text-blue-600" },
       { label: "Alquiler de autos", icon: Car, bg: "bg-blue-50", color: "text-blue-600" },
       { label: "Animación Cumpleaños", icon: Cake, bg: "bg-gray-50", color: "text-gray-600" },
-      { label: "Animación de eventos", icon: PartyPopper, bg: "bg-zinc-50", color: "text-zinc-600" },
+      { label: "Ambientación de eventos", icon: PartyPopper, bg: "bg-zinc-50", color: "text-zinc-600" },
       { label: "Artista plástica", icon: Brush, bg: "bg-slate-50", color: "text-slate-600" },
       { label: "Auxilio y Remolque", icon: AlertCircle, bg: "bg-orange-50", color: "text-orange-600" },
       { label: "Bombas y Motores eléctricos", icon: Cog, bg: "bg-cyan-50", color: "text-cyan-700" },

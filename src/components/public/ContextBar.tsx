@@ -35,7 +35,7 @@ const SUBCAT_LABELS: Record<string, string> = {
   alambrados:    "Alambrados",
   alarmas:       "Alarmas-Seguridad",
   "animacion-cumpleanos": "Animación Cumpleaños",
-  "animacion-eventos": "Animación de eventos",
+  "ambientacion-eventos": "Ambientación de eventos",
   "artista-plastica": "Artista plástica",
   cerrajero:     "Cerrajero",
   climatizacion: "Climatización",
