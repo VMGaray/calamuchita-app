@@ -78,6 +78,7 @@ export const sectionCategories = {
     { label: "Osteopatía", desc: "Terapia manual y osteopática", href: "/directorio/health?cat=osteopatia", bg: "bg-brand-earth/10", color: "text-brand-earth" },
     { label: "Psicología", desc: "Psicólogos y salud mental", href: "/directorio/health?cat=psicologia", bg: "bg-brand-slate/10", color: "text-brand-slate" },
     { label: "Terapias alternativas", desc: "Kinesiología, acupuntura y más", href: "/directorio/health?cat=terapias", bg: "bg-brand-pine/10", color: "text-brand-pine" },
+    { label: "Terapias complementarias", desc: "Reiki, reflexología y otras terapias complementarias", href: "/directorio/health?cat=terapias-complementarias", bg: "bg-brand-slate/10", color: "text-brand-slate" },
     { label: "Traslado de pacientes", desc: "Ambulancias y traslados", href: "/directorio/health?cat=traslado", bg: "bg-brand-slate/10", color: "text-brand-slate" },
     { label: "Todos", desc: "Ver todos los servicios de salud", href: "/directorio/health", bg: "bg-brand-sand/50", color: "text-brand-charcoal" },
   ],
