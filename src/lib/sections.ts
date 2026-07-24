@@ -20,6 +20,7 @@ export const sectionCategories = {
     { label: "Alarmas-Seguridad", desc: "Sistemas de alarmas y seguridad", href: "/directorio/services?cat=alarmas", bg: "bg-brand-slate/10", color: "text-brand-slate" },
     { label: "Alquiler de autos", desc: "Alquiler de vehículos", href: "/directorio/services?cat=alquiler-autos", bg: "bg-brand-slate/10", color: "text-brand-slate" },
     { label: "Animación Cumpleaños", desc: "Shows y animación para fiestas infantiles", href: "/directorio/services?cat=animacion-cumpleanos", bg: "bg-brand-charcoal/10", color: "text-brand-charcoal" },
+    { label: "Animación de eventos", desc: "Animación y entretenimiento para eventos y fiestas", href: "/directorio/services?cat=animacion-eventos", bg: "bg-brand-slate/10", color: "text-brand-slate" },
     { label: "Artista plástica", desc: "Pintura, escultura y arte visual", href: "/directorio/services?cat=artista-plastica", bg: "bg-brand-slate/10", color: "text-brand-slate" },
     { label: "Auxilio y Remolque", desc: "Auxilio mecánico y remolque en ruta", href: "/directorio/services?cat=auxilio", bg: "bg-brand-earth/10", color: "text-brand-earth" },
     { label: "Bombas y Motores eléctricos", desc: "Bombas de agua y motores eléctricos", href: "/directorio/services?cat=bombas", bg: "bg-brand-slate/10", color: "text-brand-slate" },
