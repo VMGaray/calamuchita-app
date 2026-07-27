@@ -16,7 +16,7 @@ import {
   PartyPopper, ChefHat, Mic, Medal, Wind, Palette, Baby,
   Store, Salad, Shirt, Gem, MoreHorizontal,
   Clock3, Landmark, Lightbulb, Bus, Info,
-  Armchair, Dog, Smartphone, FlaskConical, Printer, Briefcase, Dumbbell, Timer, Tag, Wheat, Wine, Cog, Snowflake, CreditCard, Sofa, Target, FileText, Fence, Cake, Sun, PenTool, Brush, Frame, Pizza, Beef, Flower2
+  Armchair, Dog, Smartphone, FlaskConical, Printer, Briefcase, Dumbbell, Timer, Tag, Wheat, Wine, Cog, Snowflake, CreditCard, Sofa, Target, FileText, Fence, Cake, Sun, PenTool, Brush, Frame, Pizza, Beef, Flower2, Footprints
 } from "lucide-react"
 
 const categoryIcons: Record<string, any> = {
@@ -46,7 +46,7 @@ const categoryIcons: Record<string, any> = {
   "Artes marciales": Shield, "Running": Timer,
   "Clínicas y Consultorios": Building, "Especialidades": Stethoscope, "Estética": Sparkles,
   "Hospitales y Dispensarios": AlertCircle, "Laboratorios": FlaskConical, "Masajes": Hand,
-  "Psicología": Brain, "Terapias alternativas": Leaf, "Terapias complementarias": Flower2, "Traslado de pacientes": Ambulance,
+  "Psicología": Brain, "Psicomotricista": Footprints, "Terapias alternativas": Leaf, "Terapias complementarias": Flower2, "Traslado de pacientes": Ambulance,
   "Arte y Música": Music, "Colegios": GraduationCap, "Deporte": Trophy,
   "Idiomas": Languages, "Maestras/os Particulares": Users, "Universidad/Terciario": BookOpen,
   "Actividades y Paseos": Activity, "Agencia de Viajes": Plane,

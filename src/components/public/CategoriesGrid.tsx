@@ -13,7 +13,7 @@ import {
   Hotel, Map, Tent, Activity, Compass, PartyPopper, ChefHat, ShieldCheck,
   Mic, Medal, Wind, Palette, Baby, Store, Salad, Shirt, Gem,
   HardHat, MoreHorizontal, Clock3, Landmark, Lightbulb, Bus, Info, Tag, Wheat, Pizza, Beef, Package,
-  Armchair, Cake,
+  Armchair, Cake, Footprints,
 } from "lucide-react"
 
 const categoryIcons: Record<string, any> = {
@@ -28,7 +28,7 @@ const categoryIcons: Record<string, any> = {
   "Perforaciones": Droplets, "Limpieza": Sparkles, "Manicura": Sparkles,
   "Climatización": Wind, "Depilación": Sparkles, "Lavadero de autos": Droplets, "Seguros": ShieldCheck,
   "Clínicas y Consultorios": Stethoscope, "Farmacias": Pill, "Masajes": Hand,
-  "Psicología": Brain, "Odontología": Smile, "Oftalmología": Eye,
+  "Psicología": Brain, "Psicomotricista": Footprints, "Odontología": Smile, "Oftalmología": Eye,
   "Veterinarias": PawPrint, "Emergencias": AlertCircle,
   "Colegios": GraduationCap, "Institutos": BookOpen,
   "Idiomas": Languages, "Maestras particulares": Users,

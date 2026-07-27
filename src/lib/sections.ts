@@ -77,6 +77,7 @@ export const sectionCategories = {
     { label: "Masajes", desc: "Masajes terapéuticos y relajantes", href: "/directorio/health?cat=masajes", bg: "bg-brand-pine/10", color: "text-brand-pine" },
     { label: "Osteopatía", desc: "Terapia manual y osteopática", href: "/directorio/health?cat=osteopatia", bg: "bg-brand-earth/10", color: "text-brand-earth" },
     { label: "Psicología", desc: "Psicólogos y salud mental", href: "/directorio/health?cat=psicologia", bg: "bg-brand-slate/10", color: "text-brand-slate" },
+    { label: "Psicomotricista", desc: "Estimulación y desarrollo psicomotor", href: "/directorio/health?cat=psicomotricista", bg: "bg-brand-charcoal/10", color: "text-brand-charcoal" },
     { label: "Terapias alternativas", desc: "Kinesiología, acupuntura y más", href: "/directorio/health?cat=terapias", bg: "bg-brand-pine/10", color: "text-brand-pine" },
     { label: "Terapias complementarias", desc: "Reiki, reflexología y otras terapias complementarias", href: "/directorio/health?cat=terapias-complementarias", bg: "bg-brand-slate/10", color: "text-brand-slate" },
     { label: "Traslado de pacientes", desc: "Ambulancias y traslados", href: "/directorio/health?cat=traslado", bg: "bg-brand-slate/10", color: "text-brand-slate" },

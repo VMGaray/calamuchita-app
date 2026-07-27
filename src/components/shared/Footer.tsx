@@ -122,7 +122,7 @@ export default function Footer() {
           <AnimateIn direction="up" delay={0.2}>
             <div>
               <motion.a
-                href="https://wa.me/5491145311047"
+                href="https://wa.me/5493546547950"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-block px-5 py-2.5 rounded-xl text-sm font-medium"

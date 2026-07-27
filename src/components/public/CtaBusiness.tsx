@@ -267,7 +267,7 @@ export default function CtaBusiness() {
         >
           {/* Botón Principal: WhatsApp */}
           <motion.a
-            href="https://wa.me/541145311047"
+            href="https://wa.me/543546547950"
             target="_blank"
             rel="noopener noreferrer"
             whileHover={{ scale: 1.03 }}

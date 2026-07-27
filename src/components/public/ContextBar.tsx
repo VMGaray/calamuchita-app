@@ -84,6 +84,7 @@ const SUBCAT_LABELS: Record<string, string> = {
   hospitales:    "Hospitales",
   laboratorios:  "Laboratorios",
   masajes:       "Masajes",
+  psicomotricista: "Psicomotricista",
   terapias:      "Terapias alternativas",
   "terapias-complementarias": "Terapias complementarias",
   traslado:      "Traslado de pacientes",
