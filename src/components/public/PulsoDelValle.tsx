@@ -2,7 +2,7 @@
 
 import Image from "next/image"
 import Link from "next/link"
-import { useRef } from "react"
+import { useRef, useState } from "react"
 import { ChevronLeft, ChevronRight, FileText } from "lucide-react"
 import type { EditorialPost } from "@/app/(public)/page"
 
@@ -24,6 +24,7 @@ interface Props {
 
 export default function PulsoDelValle({ posts }: Props) {
   const scrollRef = useRef<HTMLDivElement>(null)
+  const [activeIndex, setActiveIndex] = useState(0)
 
   if (posts.length === 0) return null
 
@@ -31,6 +32,25 @@ export default function PulsoDelValle({ posts }: Props) {
     const el = scrollRef.current
     if (!el) return
     el.scrollBy({ left: dir === "left" ? -296 : 296, behavior: "smooth" })
+  }
+
+  const scrollToIndex = (i: number) => {
+    const el = scrollRef.current
+    const card = el?.children[i] as HTMLElement | undefined
+    if (!el || !card) return
+    el.scrollTo({ left: card.offsetLeft, behavior: "smooth" })
+  }
+
+  const handleScroll = () => {
+    const el = scrollRef.current
+    if (!el) return
+    let closest = 0
+    let closestDist = Infinity
+    Array.from(el.children).forEach((child, i) => {
+      const dist = Math.abs((child as HTMLElement).offsetLeft - el.scrollLeft)
+      if (dist < closestDist) { closestDist = dist; closest = i }
+    })
+    setActiveIndex(closest)
   }
 
   return (
@@ -86,6 +106,7 @@ export default function PulsoDelValle({ posts }: Props) {
       {/* ── Carousel ─────────────────────────────────────────────── */}
       <div
         ref={scrollRef}
+        onScroll={handleScroll}
         className="flex gap-4 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden snap-x snap-mandatory pb-2"
       >
         {posts.map((post, i) => {
@@ -164,6 +185,25 @@ export default function PulsoDelValle({ posts }: Props) {
           )
         })}
       </div>
+
+      {/* Dots — solo mobile, indican que hay más notas para deslizar */}
+      {posts.length > 1 && (
+        <div className="flex md:hidden items-center justify-center gap-1.5 mt-4">
+          {posts.map((post, i) => (
+            <button
+              key={post.id}
+              onClick={() => scrollToIndex(i)}
+              aria-label={`Ir a la nota ${i + 1}`}
+              className="rounded-full transition-all"
+              style={{
+                width: i === activeIndex ? 16 : 6,
+                height: 6,
+                background: i === activeIndex ? "#E1DBC9" : "rgba(225,219,201,0.35)",
+              }}
+            />
+          ))}
+        </div>
+      )}
     </section>
   )
 }

@@ -138,9 +138,6 @@ export default function Footer() {
         <div className="mt-10 pt-6 flex flex-col md:flex-row justify-between items-center gap-2"
           style={{ borderTop: "1px solid rgba(225,219,201,0.07)" }}>
           <div className="flex flex-col items-center md:items-start gap-1">
-            <p className="text-xs" style={{ color: "rgba(225,219,201,0.55)" }}>
-              © 2026 Calamuchita App · Valle de Calamuchita, Córdoba
-            </p>
             <Link
               href="/gastronomicos"
               className="text-xs transition-colors inline-flex items-center gap-1"
@@ -151,6 +148,9 @@ export default function Footer() {
               <UtensilsCrossed size={12} style={{ color: "inherit" }} />
               Ingreso gastronómico →
             </Link>
+            <p className="text-xs" style={{ color: "rgba(225,219,201,0.55)" }}>
+              © 2026 Calamuchita App · Valle de Calamuchita, Córdoba
+            </p>
           </div>
           <div className="flex items-center gap-4">
             <Link
@@ -171,17 +171,20 @@ export default function Footer() {
             >
               Eliminar mi cuenta
             </Link>
-            <a
-              href="https://vmg-setup-ai.vercel.app/"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-xs transition-colors"
-              style={{ color: "rgba(225,219,201,0.55)" }}
-              onMouseEnter={e => (e.currentTarget.style.color = "#E1DBC9")}
-              onMouseLeave={e => (e.currentTarget.style.color = "rgba(225,219,201,0.55)")}
-            >
-              VMG.Setup.Ai
-            </a>
+            <span className="text-xs inline-flex items-center gap-1" style={{ color: "rgba(225,219,201,0.55)" }}>
+              Desarrollado por
+              <a
+                href="https://vmg-setup-ai.vercel.app/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="transition-colors"
+                style={{ color: "rgba(225,219,201,0.55)" }}
+                onMouseEnter={e => (e.currentTarget.style.color = "#E1DBC9")}
+                onMouseLeave={e => (e.currentTarget.style.color = "rgba(225,219,201,0.55)")}
+              >
+                VMG.Setup.Ai
+              </a>
+            </span>
           </div>
         </div>
       </div>

@@ -1,3 +1,5 @@
+import BackButton from "@/components/ui/BackButton";
+
 export const metadata = {
   title: "Eliminar cuenta y datos | Calamuchita App",
   description: "Cómo solicitar la eliminación de tu cuenta y datos en Calamuchita App.",
@@ -8,6 +10,12 @@ export default function EliminarCuenta() {
     <main className="min-h-screen bg-neutral-950 text-neutral-200">
       <div className="mx-auto max-w-3xl px-6 py-16 sm:py-24">
         <header className="mb-12 border-b border-neutral-800 pb-8">
+          <BackButton
+            fallbackHref="/"
+            label="Volver"
+            className="mb-6 text-sm"
+            style={{ color: "rgba(255,255,255,0.55)" }}
+          />
           <p className="mb-2 text-sm font-medium uppercase tracking-wide text-amber-400">
             Calamuchita App
           </p>

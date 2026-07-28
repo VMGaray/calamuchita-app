@@ -7,6 +7,7 @@ import { MapPin } from "lucide-react"
 import { GASTRONOMY_CATEGORY_GROUPS } from "@/lib/constants/gastronomyCategories"
 import { BusinessCategory } from "@/types/database"
 import { sendEmail, newRegistrationEmailHtml } from "@/lib/email"
+import BackButton from "@/components/ui/BackButton"
 
 const ADMIN_NOTIFY_EMAIL = "vmg.setup.ai@gmail.com"
 
@@ -151,6 +152,15 @@ function GastronomicosContent() {
   return (
     <main className="min-h-screen flex items-center justify-center p-4" style={{ background: "#F5F2EB" }}>
       <div className="w-full max-w-sm">
+
+        {(view === "login" || view === "register") && (
+          <BackButton
+            fallbackHref="/"
+            label="Volver"
+            className="mb-4 text-sm"
+            style={{ color: "rgba(45,69,48,0.55)" }}
+          />
+        )}
 
         {/* Logo */}
         <div className="flex flex-col items-center gap-2 mb-8">
