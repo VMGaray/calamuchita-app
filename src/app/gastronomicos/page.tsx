@@ -410,7 +410,7 @@ function GastronomicosContent() {
 
               <p className="text-xs text-stone-500 text-center">
                 Al registrarte aceptás nuestra{' '}
-                <a href="/politica-de-privacidad" target="_blank" className="underline">
+                <a href="/politica-de-privacidad" target="_blank" rel="noopener noreferrer" className="underline">
                   Política de Privacidad
                 </a>
               </p>
