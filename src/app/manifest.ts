@@ -4,7 +4,7 @@ export default function manifest() {
   return {
     id: "/",
     name: "Calamuchita App",
-    short_name: "Calamuchita",
+    short_name: "Calamuchita App",
     description: "Todo el Valle de Calamuchita en un solo lugar. Gastronomía, servicios, turismo y más.",
     start_url: "/?utm_source=pwa&utm_medium=homescreen&utm_campaign=launch",
     scope: "/",
@@ -25,19 +25,13 @@ export default function manifest() {
         purpose: "any",
       },
       {
-        src: "/icons/icon-192.png",
-        sizes: "192x192",
-        type: "image/png",
-        purpose: "maskable",
-      },
-      {
         src: "/icons/icon-512.png",
         sizes: "512x512",
         type: "image/png",
         purpose: "any",
       },
       {
-        src: "/icons/icon-512.png",
+        src: "/icons/icon-512-maskable.png",
         sizes: "512x512",
         type: "image/png",
         purpose: "maskable",
