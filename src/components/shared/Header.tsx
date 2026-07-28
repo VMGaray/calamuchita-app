@@ -191,6 +191,10 @@ export default function Header() {
                               Panel admin
                             </Link>
                           )}
+                          <Link href="/eliminar-cuenta" onClick={() => setMenuOpen(false)}
+                            className="flex items-center gap-2 px-3 py-2 text-sm rounded-xl transition-colors text-red-600 hover:underline">
+                            Eliminar mi cuenta
+                          </Link>
                           <button onClick={handleLogout}
                             className="w-full flex items-center gap-2 px-3 py-2 text-sm rounded-xl transition-colors"
                             style={{ color: "#5E4B3B" }}>

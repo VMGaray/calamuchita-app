@@ -1,9 +1,3 @@
-// Colocar este archivo en: app/politica-de-privacidad/page.tsx
-// Quedará disponible en: https://tudominio.com/politica-de-privacidad
-//
-// Reemplazá los valores entre [corchetes] antes de publicar:
-// [DOMINIO], [EMAIL_CONTACTO], [NOMBRE_RESPONSABLE]
-
 export const metadata = {
   title: "Política de Privacidad | Calamuchita App",
   description: "Política de privacidad y tratamiento de datos personales de Calamuchita App.",
@@ -32,7 +26,7 @@ export default function PoliticaDePrivacidad() {
               (&quot;la App&quot;, &quot;nosotros&quot;) recopila, utiliza y
               protege la información de las personas que usan la plataforma,
               ya sea como usuarios finales, comensales o negocios del
-              directorio. Calamuchita App opera bajo [Victoria Garay],
+              directorio. Calamuchita App opera bajo Victoria Garay,
               con domicilio en Villa General Belgrano, Córdoba, Argentina, y
               cumple con lo establecido en la Ley N.º 25.326 de Protección de
               los Datos Personales de la República Argentina.
@@ -140,10 +134,10 @@ export default function PoliticaDePrivacidad() {
               actualizar o solicitar la eliminación de tu información
               personal. Podés ejercer estos derechos escribiéndonos a{" "}
               <a
-                href="mailto:[vmg.setup.ai@gmail.com]"
+                href="mailto:vmg.setup.ai@gmail.com"
                 className="text-amber-400 underline hover:text-amber-300"
               >
-                [vmg.setup.ai@gmail.com]
+                vmg.setup.ai@gmail.com
               </a>
               . La Agencia de Acceso a la Información Pública, en su carácter
               de Órgano de Control de la Ley N.º 25.326, tiene la atribución
@@ -184,10 +178,10 @@ export default function PoliticaDePrivacidad() {
               Si tenés preguntas sobre esta política o sobre el tratamiento
               de tus datos, escribinos a{" "}
               <a
-                href="mailto:[vmg.setup.ai@gmail.com]"
+                href="mailto:vmg.setup.ai@gmail.com"
                 className="text-amber-400 underline hover:text-amber-300"
               >
-                [vmg.setup.ai@gmail.com]
+                vmg.setup.ai@gmail.com
               </a>
               .
             </p>

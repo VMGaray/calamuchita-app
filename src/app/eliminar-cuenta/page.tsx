@@ -1,9 +1,3 @@
-// Colocar este archivo en: app/eliminar-cuenta/page.tsx
-// Quedará disponible en: https://tudominio.com/eliminar-cuenta
-//
-// Reemplazá los valores entre [corchetes] antes de publicar:
-// [EMAIL_CONTACTO]
-
 export const metadata = {
   title: "Eliminar cuenta y datos | Calamuchita App",
   description: "Cómo solicitar la eliminación de tu cuenta y datos en Calamuchita App.",
@@ -42,10 +36,10 @@ export default function EliminarCuenta() {
               <li>
                 Enviá un correo a{" "}
                 <a
-                  href="mailto:[vmg.setup.ai@gmail.com]?subject=Solicitud%20de%20eliminaci%C3%B3n%20de%20cuenta"
+                  href="mailto:vmg.setup.ai@gmail.com?subject=Solicitud%20de%20eliminaci%C3%B3n%20de%20cuenta"
                   className="text-amber-400 underline hover:text-amber-300"
                 >
-                  [vmg.setup.ai@gmail.com]
+                  vmg.setup.ai@gmail.com
                 </a>{" "}
                 desde la misma dirección de correo con la que te registraste
                 en la app.
@@ -96,10 +90,10 @@ export default function EliminarCuenta() {
             <p>
               Si tenés dudas sobre este proceso, escribinos a{" "}
               <a
-                href="mailto:[vmg.setup.ai@gmail.com]"
+                href="mailto:vmg.setup.ai@gmail.com"
                 className="text-amber-400 underline hover:text-amber-300"
               >
-                [vmg.setup.ai@gmail.com]
+                vmg.setup.ai@gmail.com
               </a>
               .
             </p>

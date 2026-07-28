@@ -152,17 +152,37 @@ export default function Footer() {
               Ingreso gastronómico →
             </Link>
           </div>
-          <a
-            href="https://vmg-setup-ai.vercel.app/"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-xs transition-colors"
-            style={{ color: "rgba(225,219,201,0.55)" }}
-            onMouseEnter={e => (e.currentTarget.style.color = "#E1DBC9")}
-            onMouseLeave={e => (e.currentTarget.style.color = "rgba(225,219,201,0.55)")}
-          >
-            VMG.Setup.Ai
-          </a>
+          <div className="flex items-center gap-4">
+            <Link
+              href="/politica-de-privacidad"
+              className="text-xs transition-colors"
+              style={{ color: "rgba(225,219,201,0.55)" }}
+              onMouseEnter={e => (e.currentTarget.style.color = "#E1DBC9")}
+              onMouseLeave={e => (e.currentTarget.style.color = "rgba(225,219,201,0.55)")}
+            >
+              Política de Privacidad
+            </Link>
+            <Link
+              href="/eliminar-cuenta"
+              className="text-xs transition-colors"
+              style={{ color: "rgba(225,219,201,0.55)" }}
+              onMouseEnter={e => (e.currentTarget.style.color = "#E1DBC9")}
+              onMouseLeave={e => (e.currentTarget.style.color = "rgba(225,219,201,0.55)")}
+            >
+              Eliminar mi cuenta
+            </Link>
+            <a
+              href="https://vmg-setup-ai.vercel.app/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-xs transition-colors"
+              style={{ color: "rgba(225,219,201,0.55)" }}
+              onMouseEnter={e => (e.currentTarget.style.color = "#E1DBC9")}
+              onMouseLeave={e => (e.currentTarget.style.color = "rgba(225,219,201,0.55)")}
+            >
+              VMG.Setup.Ai
+            </a>
+          </div>
         </div>
       </div>
     </footer>
