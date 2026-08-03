@@ -3,8 +3,11 @@
 import { useState, useEffect } from "react"
 import { createClient } from "@/lib/supabase/client"
 import { motion, AnimatePresence } from "framer-motion"
-import { Plus, Trash2, ChevronDown, ChevronUp, GripVertical, Edit2, Check, X } from "lucide-react"
+import { Plus, Trash2, ChevronDown, ChevronUp, GripVertical, Edit2, Check, X, BookOpen, FileText, Link2 } from "lucide-react"
 import { SkeletonCarta } from "@/components/ui/Skeleton"
+import PdfUpload from "@/components/ui/PdfUpload"
+
+type Mode = "manual" | "pdf" | "link" | null
 
 interface MenuItem {
   id: string
@@ -40,6 +43,12 @@ export default function CartaManager() {
   const [editingItem, setEditingItem] = useState<string | null>(null)
   const [editForm, setEditForm] = useState({ name: "", description: "", price: "" })
 
+  // Modo de carga
+  const [mode, setMode] = useState<Mode>(null)
+  const [choosingMode, setChoosingMode] = useState(false)
+  const [pdfUrl, setPdfUrl] = useState<string | null>(null)
+  const [linkValue, setLinkValue] = useState("")
+
   useEffect(() => {
     fetchData()
   }, [])
@@ -51,13 +60,15 @@ export default function CartaManager() {
 
     const { data: business } = await supabase
       .from("businesses")
-      .select("id")
+      .select("id, menu_pdf_url, menu_link")
       .eq("owner_id", user.id)
       .single()
 
     if (!business) { setLoading(false); return }
 
     setBusinessId(business.id)
+    setPdfUrl(business.menu_pdf_url)
+    setLinkValue(business.menu_link || "")
 
     const { data } = await supabase
       .from("menu_categories")
@@ -67,7 +78,54 @@ export default function CartaManager() {
 
     setCategories(data || [])
     if (data && data.length > 0) setExpandedCat(data[0].id)
+
+    if (data && data.length > 0) setMode("manual")
+    else if (business.menu_pdf_url) setMode("pdf")
+    else if (business.menu_link) setMode("link")
+
     setLoading(false)
+  }
+
+  // MODO DE CARGA
+
+  const clearOtherModes = async (keep: Exclude<Mode, null>) => {
+    if (!businessId) return
+    const supabase = createClient()
+
+    if (keep !== "manual" && categories.length > 0) {
+      await Promise.all(categories.map(c => supabase.from("menu_categories").delete().eq("id", c.id)))
+      setCategories([])
+      setExpandedCat(null)
+    }
+    if (keep !== "pdf" && pdfUrl) {
+      await supabase.from("businesses").update({ menu_pdf_url: null }).eq("id", businessId)
+      setPdfUrl(null)
+    }
+    if (keep !== "link" && linkValue) {
+      await supabase.from("businesses").update({ menu_link: null }).eq("id", businessId)
+      setLinkValue("")
+    }
+  }
+
+  const handlePickMode = async (picked: Exclude<Mode, null>) => {
+    if (mode && mode !== picked) {
+      const ok = confirm("Esto va a reemplazar tu carta actual. ¿Continuar?")
+      if (!ok) return
+      await clearOtherModes(picked)
+    }
+    setMode(picked)
+    setChoosingMode(false)
+  }
+
+  const handlePdfChange = async (url: string | null) => {
+    if (!businessId) return
+    setPdfUrl(url)
+    await createClient().from("businesses").update({ menu_pdf_url: url }).eq("id", businessId)
+  }
+
+  const handleLinkSave = async () => {
+    if (!businessId) return
+    await createClient().from("businesses").update({ menu_link: linkValue.trim() || null }).eq("id", businessId)
   }
 
   // CATEGORÍAS
@@ -199,23 +257,81 @@ export default function CartaManager() {
     </div>
   )
 
+  const modeLabel: Record<Exclude<Mode, null>, string> = {
+    manual: "Carga manual",
+    pdf: "PDF",
+    link: "Link externo",
+  }
+
+  const showPicker = !mode || choosingMode
+
   return (
     <div className="max-w-2xl">
       <div className="mb-8 flex items-center justify-between">
         <div>
           <h1 className="text-2xl text-stone-800 mb-1">Carta</h1>
-          <p className="text-stone-500 text-sm">Administrá las categorías y platos de tu menú</p>
+          <p className="text-stone-500 text-sm">Elegí cómo cargar el menú de tu local</p>
         </div>
-        <button
-          onClick={() => setAddingCat(true)}
-          className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium"
-          style={{ background: "#2D4530", color: "white" }}
-        >
-          <Plus size={16} />
-          Nueva categoría
-        </button>
+        <div className="flex items-center gap-2">
+          {mode === "manual" && !choosingMode && (
+            <button
+              onClick={() => setAddingCat(true)}
+              className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium"
+              style={{ background: "#2D4530", color: "white" }}
+            >
+              <Plus size={16} />
+              Nueva categoría
+            </button>
+          )}
+          {mode && !choosingMode && (
+            <button
+              onClick={() => setChoosingMode(true)}
+              className="text-xs font-medium px-3 py-2 rounded-xl border border-stone-200 text-stone-500 hover:border-stone-300 transition-colors"
+            >
+              Cambiar modo
+            </button>
+          )}
+        </div>
       </div>
 
+      {mode && !choosingMode && (
+        <div className="flex items-center gap-2 mb-6 px-4 py-2.5 rounded-xl bg-green-50 border border-green-200 w-fit">
+          <Check size={14} className="text-green-600" />
+          <span className="text-xs font-medium text-green-700">Modo activo: {modeLabel[mode]}</span>
+        </div>
+      )}
+
+      {showPicker && (
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
+          <button
+            onClick={() => handlePickMode("manual")}
+            className={`bg-white rounded-2xl border p-6 text-left transition-colors hover:border-stone-300 ${mode === "manual" ? "border-[#2D4530] ring-1 ring-[#2D4530]/30" : "border-stone-200"}`}
+          >
+            <BookOpen size={22} style={{ color: "#2D4530" }} className="mb-3" />
+            <p className="text-sm font-semibold text-stone-800 mb-1">Carga manual</p>
+            <p className="text-xs text-stone-400">Organizá tu carta por categorías (entradas, principales...) con nombre, descripción y precio</p>
+          </button>
+          <button
+            onClick={() => handlePickMode("pdf")}
+            className={`bg-white rounded-2xl border p-6 text-left transition-colors hover:border-stone-300 ${mode === "pdf" ? "border-[#2D4530] ring-1 ring-[#2D4530]/30" : "border-stone-200"}`}
+          >
+            <FileText size={22} style={{ color: "#2D4530" }} className="mb-3" />
+            <p className="text-sm font-semibold text-stone-800 mb-1">PDF</p>
+            <p className="text-xs text-stone-400">Subí un PDF con tu carta completa</p>
+          </button>
+          <button
+            onClick={() => handlePickMode("link")}
+            className={`bg-white rounded-2xl border p-6 text-left transition-colors hover:border-stone-300 ${mode === "link" ? "border-[#2D4530] ring-1 ring-[#2D4530]/30" : "border-stone-200"}`}
+          >
+            <Link2 size={22} style={{ color: "#2D4530" }} className="mb-3" />
+            <p className="text-sm font-semibold text-stone-800 mb-1">Link externo</p>
+            <p className="text-xs text-stone-400">Pegá un link a tu carta (web propia o Google Drive)</p>
+          </button>
+        </div>
+      )}
+
+      {mode === "manual" && !choosingMode && (
+      <>
       {/* Formulario nueva categoría */}
       <AnimatePresence>
         {addingCat && (
@@ -479,6 +595,48 @@ export default function CartaManager() {
               </AnimatePresence>
             </div>
           ))}
+        </div>
+      )}
+      </>
+      )}
+
+      {mode === "pdf" && !choosingMode && (
+        <div className="bg-white rounded-2xl border border-stone-200 p-6">
+          {pdfUrl ? (
+            <div className="flex items-center justify-between">
+              <a href={pdfUrl} target="_blank" rel="noopener noreferrer" className="text-sm text-primary-500 font-medium">
+                Ver PDF cargado
+              </a>
+              <button onClick={() => handlePdfChange(null)} className="text-red-400 hover:text-red-500 text-sm">
+                Quitar
+              </button>
+            </div>
+          ) : (
+            <PdfUpload onChange={handlePdfChange} />
+          )}
+        </div>
+      )}
+
+      {mode === "link" && !choosingMode && (
+        <div className="bg-white rounded-2xl border border-stone-200 p-6 space-y-3">
+          <label className="block text-sm font-medium text-stone-700">Link externo</label>
+          <div className="flex gap-2">
+            <input
+              type="url"
+              value={linkValue}
+              onChange={e => setLinkValue(e.target.value)}
+              onBlur={handleLinkSave}
+              placeholder="https://tu-carta.com o link de Google Drive"
+              className="flex-1 px-4 py-2.5 rounded-xl border border-stone-200 text-stone-800 text-sm outline-none focus:ring-2 focus:ring-primary-300"
+            />
+            <button
+              onClick={handleLinkSave}
+              className="px-4 py-2.5 rounded-xl text-sm font-medium"
+              style={{ background: "#2D4530", color: "white" }}
+            >
+              Guardar
+            </button>
+          </div>
         </div>
       )}
     </div>

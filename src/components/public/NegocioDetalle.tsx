@@ -115,7 +115,9 @@ export default function NegocioDetalle({ business, promotions = [] }: Props) {
 
   const hasInteractiveCarta = (business.menu_categories?.length ?? 0) > 0
   const hasPdfCarta         = !!business.menu_pdf_url
-  const hasMenu             = hasInteractiveCarta || hasPdfCarta
+  const hasLinkCarta        = !hasInteractiveCarta && !hasPdfCarta && !!business.menu_link
+  const hasFotosCarta       = !hasInteractiveCarta && !hasPdfCarta && !hasLinkCarta && (business.menu_photos_urls?.length ?? 0) > 0
+  const hasMenu             = hasInteractiveCarta || hasPdfCarta || hasLinkCarta || hasFotosCarta
   const todayMenu = business.daily_menus?.find((m: any) => {
     const today = new Date().toISOString().split("T")[0]
     return m.date === today && m.is_published
@@ -126,6 +128,10 @@ export default function NegocioDetalle({ business, promotions = [] }: Props) {
       cartaRef.current?.scrollIntoView({ behavior: "smooth", block: "start" })
     } else if (hasPdfCarta) {
       window.open(business.menu_pdf_url, "_blank")
+    } else if (hasLinkCarta) {
+      window.open(business.menu_link, "_blank")
+    } else if (hasFotosCarta) {
+      cartaRef.current?.scrollIntoView({ behavior: "smooth", block: "start" })
     }
   }
   const handleHacerPedido = () => {
@@ -548,6 +554,54 @@ export default function NegocioDetalle({ business, promotions = [] }: Props) {
                 </div>
                 <span style={{ color: "#2D4530", opacity: 0.5 }}>↗</span>
               </a>
+            </div>
+          )}
+
+          {/* Carta por link externo */}
+          {hasLinkCarta && (
+            <div ref={cartaRef} className="bg-white rounded-2xl border border-stone-200 p-5">
+              <p className="text-[10px] font-black uppercase tracking-[0.2em] mb-4" style={{ color: "rgba(45,69,48,0.42)" }}>Carta</p>
+              <a
+                href={business.menu_link}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-4 p-4 rounded-xl border border-stone-100 hover:border-[#2D4530]/30 transition-all"
+                style={{ background: "rgba(45,69,48,0.03)" }}
+              >
+                <div className="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0" style={{ background: "#2D4530" }}>
+                  <span className="text-xs font-black text-white">🔗</span>
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-semibold" style={{ color: "#2D4530" }}>Ver carta completa</p>
+                  <p className="text-xs mt-0.5" style={{ color: "rgba(45,69,48,0.50)" }}>Se abre en una nueva pestaña</p>
+                </div>
+                <span style={{ color: "#2D4530", opacity: 0.5 }}>↗</span>
+              </a>
+            </div>
+          )}
+
+          {/* Carta en fotos */}
+          {hasFotosCarta && (
+            <div ref={cartaRef} className="bg-white rounded-2xl border border-stone-200 p-5">
+              <p className="text-[10px] font-black uppercase tracking-[0.2em] mb-4" style={{ color: "rgba(45,69,48,0.42)" }}>Carta</p>
+              <div className="grid grid-cols-2 gap-3">
+                {business.menu_photos_urls.map((url: string, i: number) => (
+                  <a
+                    key={url}
+                    href={url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="relative aspect-[3/4] rounded-xl overflow-hidden border border-stone-100 block"
+                  >
+                    <Image
+                      src={url}
+                      alt={`Carta de ${business.name} ${i + 1}`}
+                      fill
+                      className="object-cover"
+                    />
+                  </a>
+                ))}
+              </div>
             </div>
           )}
 

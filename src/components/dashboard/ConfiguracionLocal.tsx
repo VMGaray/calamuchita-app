@@ -3,7 +3,6 @@
 import { useState, useEffect } from "react"
 import { createClient } from "@/lib/supabase/client"
 import ImageUpload from "@/components/ui/ImageUpload"
-import PdfUpload from "@/components/ui/PdfUpload"
 import HorariosEditor, { HorarioDay, mergeHorariosFromDB, expandHorariosForSave } from "@/components/ui/HorariosEditor"
 
 const categoryOptions = [
@@ -101,14 +100,12 @@ export default function ConfiguracionLocal() {
     whatsapp: "",
     instagram: "",
     facebook: "",
-    menu_link: "",
     offers_delivery: false,
     offers_takeaway: false,
     offers_dine_in: false,
     accepts_reservations: false,
     logo_url: null as string | null,
     cover_url: null as string | null,
-    menu_pdf_url: null as string | null,
     pet_friendly: false,
     payment_methods: [] as string[],
   })
@@ -139,14 +136,12 @@ export default function ConfiguracionLocal() {
           whatsapp: business.whatsapp || "",
           instagram: business.instagram || "",
           facebook: business.facebook || "",
-          menu_link: business.menu_link || "",
           offers_delivery: business.offers_delivery || false,
           offers_takeaway: business.offers_takeaway || false,
           offers_dine_in: business.offers_dine_in || false,
           accepts_reservations: business.accepts_reservations || false,
           logo_url: business.logo_url || null,
           cover_url: business.cover_url || null,
-          menu_pdf_url: business.menu_pdf_url || null,
           pet_friendly: business.pet_friendly || false,
           payment_methods: business.payment_methods || [],
         })
@@ -252,14 +247,12 @@ export default function ConfiguracionLocal() {
       whatsapp: form.whatsapp || null,
       instagram: form.instagram || null,
       facebook: form.facebook || null,
-      menu_link: form.menu_link || null,
       offers_delivery: form.offers_delivery,
       offers_takeaway: form.offers_takeaway,
       offers_dine_in: form.offers_dine_in,
       accepts_reservations: form.accepts_reservations,
       logo_url: form.logo_url,
       cover_url: form.cover_url,
-      menu_pdf_url: form.menu_pdf_url || null,
       pet_friendly: form.pet_friendly,
       payment_methods: form.payment_methods,
       owner_id: user.id,
@@ -540,44 +533,6 @@ export default function ConfiguracionLocal() {
           </div>
         </div>
 
-        {/* Carta */}
-        <div className="bg-white rounded-2xl border border-stone-200 p-6 space-y-4">
-          <h2 className="text-sm font-medium text-stone-700">Carta</h2>
-          <p className="text-xs text-stone-400">Podés subir un PDF, pegar un link o cargar la carta directamente en la app.</p>
-
-          <div>
-            <label className="block text-sm font-medium text-stone-700 mb-1">Link externo</label>
-            <input
-              type="url"
-              value={form.menu_link}
-              onChange={(e) => handleChange("menu_link", e.target.value)}
-              placeholder="https://tu-carta.com o link de Google Drive"
-              className="w-full px-4 py-2.5 rounded-xl border border-stone-200 text-stone-800 text-sm outline-none focus:ring-2 focus:ring-primary-300"
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-stone-700 mb-2">PDF de la carta</label>
-            {form.menu_pdf_url ? (
-              <div className="flex items-center justify-between p-4 bg-stone-50 rounded-xl border border-stone-200">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 bg-primary-100 rounded-xl flex items-center justify-center">
-                    <span className="text-primary-600 text-xs font-bold">PDF</span>
-                  </div>
-                  <div>
-                    <p className="text-sm font-medium text-stone-700">Carta subida</p>
-                    <a href={form.menu_pdf_url} target="_blank" rel="noopener noreferrer" className="text-xs text-primary-500">Ver PDF</a>
-                  </div>
-                </div>
-                <button onClick={() => handleChange("menu_pdf_url", null)} className="text-red-400 hover:text-red-500 text-sm">
-                  Eliminar
-                </button>
-              </div>
-            ) : (
-              <PdfUpload onChange={(url) => handleChange("menu_pdf_url", url)} />
-            )}
-          </div>
-        </div>
 
         {/* Fotos */}
         <div className="bg-white rounded-2xl border border-stone-200 p-6 space-y-4">
