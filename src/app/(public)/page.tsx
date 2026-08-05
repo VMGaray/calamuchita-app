@@ -1,11 +1,13 @@
 import JoyasDelValle from "@/components/public/JoyasDelValle"
 import CalamuchitaSale from "@/components/public/CalamuchitaSale"
+import PromosExclusivas from "@/components/public/PromosExclusivas"
 import PulsoDelValle from "@/components/public/PulsoDelValle"
 import Novedades from "@/components/public/Novedades"
 import CtaBusiness from "@/components/public/CtaBusiness"
 import LocalidadSelectorWidget from "@/components/public/LocalidadSelectorWidget"
 import { createClient } from "@/lib/supabase/server"
 import type { Novedad } from "@/types/database"
+import { sectionToCategoria, buildPromoDiscount, formatValidUntil, type Promo } from "@/components/public/PromoCoupon"
 
 const NOVEDADES_LIMIT = 5
 
@@ -24,6 +26,7 @@ type PromoBusiness = {
   name: string
   slug: string
   section: string
+  logo_url: string | null
 }
 
 type Promotion = {
@@ -34,6 +37,28 @@ type Promotion = {
   discount_label: string | null
   valid_until: string | null
   businesses: PromoBusiness | null
+}
+
+/** Mapea una fila de `promotions` (+ join a `businesses`) al shape que espera PromoCoupon. */
+function mapPromotionToPromo(promo: Promotion): Promo | null {
+  const biz = promo.businesses
+  if (!biz) return null // sin negocio asociado no hay a dónde llevar el "Ver promo"
+
+  const { descuento_valor, descuento_label } = buildPromoDiscount(
+    promo.discount_percentage,
+    promo.discount_label
+  )
+
+  return {
+    id: promo.id,
+    comercio: biz.name,
+    categoria: sectionToCategoria(biz.section),
+    logo_url: biz.logo_url,
+    descuento_valor,
+    descuento_label,
+    validez: formatValidUntil(promo.valid_until),
+    link: `/negocios/${biz.slug}`,
+  }
 }
 
 export type EditorialPost = {
@@ -71,8 +96,9 @@ export default async function HomePage() {
         title,
         description,
         discount_percentage,
+        discount_label,
         valid_until,
-        businesses(id, name, slug, section)
+        businesses(id, name, slug, section, logo_url)
       `)
       .eq("is_active", true)
       .gte("valid_until", today)
@@ -100,6 +126,14 @@ export default async function HomePage() {
     (featuredData as FeaturedBusiness[] | null) ?? []
   const activePromotions: Promotion[] =
     (promotionsData as Promotion[] | null) ?? []
+
+  // Mismo fetch que activePromotions, reordenado por vencimiento (las que vencen
+  // antes primero) sin tocar el orden que ya usa CalamuchitaSale (created_at desc).
+  const promosExclusivas: Promo[] = activePromotions
+    .slice()
+    .sort((a, b) => (a.valid_until ?? "9999-99-99").localeCompare(b.valid_until ?? "9999-99-99"))
+    .map(mapPromotionToPromo)
+    .filter((promo): promo is Promo => promo !== null)
   const editorialPosts: EditorialPost[] =
     (editorialData as EditorialPost[] | null) ?? []
   const allNovedades: Novedad[] =
@@ -127,6 +161,13 @@ export default async function HomePage() {
         {activePromotions.length > 0 && (
           <div className="rounded-3xl border border-[#2D4530]/40 bg-[#fdeee6] p-6 md:p-8 my-6 shadow-sm overflow-hidden">
             <CalamuchitaSale promotions={activePromotions} />
+          </div>
+        )}
+
+        {/* 3b — Promos exclusivas (cupones por categoría) */}
+        {promosExclusivas.length > 0 && (
+          <div className="rounded-3xl border border-[#2D4530]/40 bg-[#EDF3EE] p-6 md:p-8 my-6 shadow-sm overflow-hidden">
+            <PromosExclusivas promos={promosExclusivas} />
           </div>
         )}
 

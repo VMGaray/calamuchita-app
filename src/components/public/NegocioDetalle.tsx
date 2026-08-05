@@ -6,13 +6,20 @@ import { motion, AnimatePresence } from "framer-motion"
 import {
   Phone, AtSign, MapPin, Clock, Truck, ShoppingBag,
   UtensilsCrossed, ArrowLeft, Calendar, Globe,
-  Navigation, ChevronLeft, ChevronRight, X, Users, Tag, Share2,
+  Navigation, ChevronLeft, ChevronRight, X, Users,
 } from "lucide-react"
 import Image from "next/image"
 import CartaInteractiva from "@/components/public/CartaInteractiva"
 import { createClient } from "@/lib/supabase/client"
 import { normalizeArgPhone } from "@/lib/phone"
 import { extractYoutubeId } from "@/lib/utils/youtube"
+import PromoCoupon, {
+  promoFontVariables,
+  sectionToCategoria,
+  buildPromoDiscount,
+  formatValidUntil,
+  type Promo,
+} from "@/components/public/PromoCoupon"
 
 const DAY = ["Domingo", "Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado"]
 const GUEST_KEY = "calamuchita_app_guest"
@@ -368,37 +375,25 @@ export default function NegocioDetalle({ business, promotions = [] }: Props) {
 
           {/* ── Promociones ── */}
           {promotions.length > 0 && (
-            <div className="flex flex-col gap-3">
+            <div className={`${promoFontVariables} flex flex-col gap-4`}>
               {promotions.map(promo => {
-                const badge = promo.discount_label || (promo.discount_percentage ? `${promo.discount_percentage}% OFF` : "PROMO EXCLUSIVA")
-                const validDate = promo.valid_until
-                  ? new Date(promo.valid_until + "T12:00:00").toLocaleDateString("es-AR", { day: "numeric", month: "long", year: "numeric" })
-                  : null
-                const handleShare = async () => {
-                  const url  = `${window.location.origin}/negocios/${business.slug}`
-                  const text = `¡Mirá esta promo en Calamuchita App! ${business.name} tiene ${badge}. Entrá acá:`
-                  if (navigator.share) { await navigator.share({ title: "Calamuchita App", text, url }).catch(() => {}) }
-                  else { await navigator.clipboard.writeText(`${text} ${url}`) }
-                }
-                return (
-                  <div key={promo.id} className="rounded-3xl border border-[#2D4530]/40 overflow-hidden" style={{ background: "#F0F7F0" }}>
-                    <div className="px-6 py-4 flex items-center gap-3" style={{ background: "#2D4530" }}>
-                      <Tag size={16} className="text-yellow-400 shrink-0" />
-                      <span className="font-black text-xl tracking-tight text-yellow-400">{badge}</span>
-                      <span className="ml-auto text-xs font-semibold uppercase tracking-widest" style={{ color: "rgba(225,219,201,0.70)" }}>Promo activa</span>
-                    </div>
-                    <div className="px-6 py-5">
-                      <h3 className="font-bold text-base mb-2" style={{ color: "#2D4530" }}>{promo.title}</h3>
-                      {promo.description && <p className="text-sm leading-relaxed whitespace-pre-line" style={{ color: "rgba(45,69,48,0.75)" }}>{promo.description}</p>}
-                      <div className="flex items-center justify-between mt-4 pt-4 border-t border-[#2D4530]/10">
-                        {validDate && <span className="text-xs font-medium" style={{ color: "rgba(45,69,48,0.50)" }}>Válido hasta el <strong style={{ color: "#2D4530" }}>{validDate}</strong></span>}
-                        <button onClick={handleShare} className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold transition-opacity hover:opacity-70 ml-auto" style={{ background: "rgba(45,69,48,0.08)", color: "#2D4530" }}>
-                          <Share2 size={12} /> Compartir
-                        </button>
-                      </div>
-                    </div>
-                  </div>
+                const { descuento_valor, descuento_label } = buildPromoDiscount(
+                  promo.discount_percentage,
+                  promo.discount_label
                 )
+                const promoCoupon: Promo = {
+                  id: promo.id,
+                  comercio: business.name,
+                  categoria: sectionToCategoria(business.section),
+                  logo_url: business.logo_url ?? null,
+                  descuento_valor,
+                  descuento_label,
+                  validez: formatValidUntil(promo.valid_until),
+                  // Sin link: ya estamos en la página de este negocio, PromoCoupon
+                  // oculta el "Ver promo →" cuando promo.link es null.
+                  link: null,
+                }
+                return <PromoCoupon key={promo.id} promo={promoCoupon} />
               })}
             </div>
           )}
