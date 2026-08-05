@@ -70,7 +70,7 @@ export interface Promotion {
   business_id: string
   title: string
   description: string | null
-  discount_percent: number | null
+  discount_percentage: number | null
   discount_label: string | null
   valid_until: string
   is_active: boolean

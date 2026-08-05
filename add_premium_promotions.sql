@@ -3,16 +3,21 @@ ALTER TABLE businesses
   ADD COLUMN IF NOT EXISTS is_premium boolean DEFAULT false NOT NULL;
 
 -- 2. Crear tabla promotions
+-- Nota (2026-08): esta columna se llamaba "discount_percent" en la versión
+-- original de este archivo. La tabla real en Supabase usa "discount_percentage"
+-- (así la leen y escriben page.tsx, AdminPromociones.tsx, etc.), así que se
+-- corrigió acá para que este .sql sirva como referencia fiel si hay que
+-- recrear la tabla desde cero.
 CREATE TABLE IF NOT EXISTS promotions (
-  id              uuid        DEFAULT gen_random_uuid() PRIMARY KEY,
-  business_id     uuid        NOT NULL REFERENCES businesses(id) ON DELETE CASCADE,
-  title           text        NOT NULL,
-  description     text,
-  discount_percent integer,
-  discount_label  text,           -- Ej: "2x1", "30% OFF", "Envío gratis"
-  valid_until     date        NOT NULL,
-  is_active       boolean     DEFAULT true NOT NULL,
-  created_at      timestamptz DEFAULT now() NOT NULL
+  id                   uuid        DEFAULT gen_random_uuid() PRIMARY KEY,
+  business_id          uuid        NOT NULL REFERENCES businesses(id) ON DELETE CASCADE,
+  title                text        NOT NULL,
+  description          text,
+  discount_percentage  integer,
+  discount_label       text,           -- Ej: "2x1", "30% OFF", "Envío gratis"
+  valid_until          date        NOT NULL,
+  is_active            boolean     DEFAULT true NOT NULL,
+  created_at           timestamptz DEFAULT now() NOT NULL
 );
 
 -- 3. Row Level Security
