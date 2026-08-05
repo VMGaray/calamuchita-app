@@ -7,7 +7,7 @@ import CtaBusiness from "@/components/public/CtaBusiness"
 import LocalidadSelectorWidget from "@/components/public/LocalidadSelectorWidget"
 import { createClient } from "@/lib/supabase/server"
 import type { Novedad } from "@/types/database"
-import { sectionToCategoria, buildPromoDiscount, formatValidUntil, type Promo } from "@/components/public/PromoCoupon"
+import { sectionToCategoria, buildPromoDiscount, formatValidUntil, type Promo } from "@/lib/promos"
 
 const NOVEDADES_LIMIT = 5
 
