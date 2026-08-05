@@ -1,5 +1,4 @@
 import JoyasDelValle from "@/components/public/JoyasDelValle"
-import CalamuchitaSale from "@/components/public/CalamuchitaSale"
 import PromosExclusivas from "@/components/public/PromosExclusivas"
 import PulsoDelValle from "@/components/public/PulsoDelValle"
 import Novedades from "@/components/public/Novedades"
@@ -127,8 +126,8 @@ export default async function HomePage() {
   const activePromotions: Promotion[] =
     (promotionsData as Promotion[] | null) ?? []
 
-  // Mismo fetch que activePromotions, reordenado por vencimiento (las que vencen
-  // antes primero) sin tocar el orden que ya usa CalamuchitaSale (created_at desc).
+  // Deriva de activePromotions (mismo fetch, sin round-trip aparte), reordenado
+  // por vencimiento: las que vencen antes primero.
   const promosExclusivas: Promo[] = activePromotions
     .slice()
     .sort((a, b) => (a.valid_until ?? "9999-99-99").localeCompare(b.valid_until ?? "9999-99-99"))
@@ -157,14 +156,7 @@ export default async function HomePage() {
           </div>
         )}
 
-        {/* 3 — Promos */}
-        {activePromotions.length > 0 && (
-          <div className="rounded-3xl border border-[#2D4530]/40 bg-[#fdeee6] p-6 md:p-8 my-6 shadow-sm overflow-hidden">
-            <CalamuchitaSale promotions={activePromotions} />
-          </div>
-        )}
-
-        {/* 3b — Promos exclusivas (cupones por categoría) */}
+        {/* 3 — Promos exclusivas (cupones por categoría) */}
         {promosExclusivas.length > 0 && (
           <div className="rounded-3xl border border-[#2D4530]/40 bg-[#EDF3EE] p-6 md:p-8 my-6 shadow-sm overflow-hidden">
             <PromosExclusivas promos={promosExclusivas} />
