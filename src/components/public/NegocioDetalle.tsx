@@ -218,12 +218,41 @@ export default function NegocioDetalle({ business, promotions = [] }: Props) {
       {/* ═══════════════════════════════════════════════════════════════
           1 — PORTADA FULL-WIDTH
       ═══════════════════════════════════════════════════════════════ */}
-      <div className="relative w-full h-56 sm:h-72 overflow-hidden" style={{ background: "#1a2e1c" }}>
+      <div
+        className="relative w-full h-56 sm:h-72 md:h-auto md:aspect-[5/2] md:max-h-[340px] overflow-hidden"
+        style={{ background: "#1a2e1c" }}
+      >
         {coverUrl ? (
-          <Image
-            src={coverUrl} alt={business.name} fill priority
-            className="object-cover" sizes="100vw" quality={85}
-          />
+          <>
+            {/* Mobile/tablet angosto (hasta md): recorte cover simple, sin cambios. */}
+            <div className="absolute inset-0 z-0 md:hidden">
+              <Image
+                src={coverUrl} alt={business.name} fill priority
+                className="object-cover" sizes="100vw" quality={85}
+              />
+            </div>
+
+            {/* Desktop (md+): backdrop difuminado + imagen completa contenida.
+                Ambas capas van antes que los gradientes/botón en el DOM y con
+                z-0 explícito para no taparlos. */}
+            <div className="absolute inset-0 z-0 hidden md:block" aria-hidden="true">
+              <Image
+                src={coverUrl}
+                alt=""
+                fill
+                className="object-cover"
+                style={{ transform: "scale(1.15)", filter: "blur(20px) brightness(0.78) saturate(1.1)" }}
+                sizes="32px"
+                quality={45}
+              />
+            </div>
+            <div className="absolute inset-0 z-0 hidden md:flex items-center justify-center">
+              <Image
+                src={coverUrl} alt={business.name} fill priority
+                className="object-contain" sizes="100vw" quality={85}
+              />
+            </div>
+          </>
         ) : (
           <div className="w-full h-full flex items-center justify-center"
             style={{ background: "linear-gradient(135deg, #2D4530 0%, #4A6741 55%, #3D5C3A 100%)" }}>
@@ -235,9 +264,9 @@ export default function NegocioDetalle({ business, promotions = [] }: Props) {
           </div>
         )}
         {/* Gradiente superior para botón volver */}
-        <div className="absolute inset-x-0 top-0 h-28 bg-gradient-to-b from-black/45 to-transparent pointer-events-none" />
+        <div className="absolute inset-x-0 top-0 h-28 z-10 bg-gradient-to-b from-black/45 to-transparent pointer-events-none" />
         {/* Gradiente inferior para transición suave */}
-        <div className="absolute inset-x-0 bottom-0 h-20 bg-gradient-to-t from-[#F0EBE0] to-transparent pointer-events-none" />
+        <div className="absolute inset-x-0 bottom-0 h-20 z-10 bg-gradient-to-t from-[#F0EBE0] to-transparent pointer-events-none" />
 
         {/* Botón volver — fondo semitransparente, legible sobre la foto sin taparla */}
         <a
