@@ -1,8 +1,11 @@
 "use client"
 
+import { useState } from "react"
 import { Tag } from "lucide-react"
 import AnimateIn from "@/components/ui/AnimateIn"
-import PromoCoupon, {
+import PromoAccordionCard from "@/components/public/PromoAccordionCard"
+import PromoMasterDetail from "@/components/public/PromoMasterDetail"
+import {
   promoFontVariables,
   fontDisplay,
   fontBody,
@@ -33,6 +36,9 @@ export default function PromosExclusivas({
   subtitle = "Descuentos y beneficios pensados para vos, directo de los comercios del Valle de Calamuchita.",
   className = "",
 }: PromosExclusivasProps) {
+  // Estado interno: qué cupón del stack está abierto (uno solo a la vez).
+  const [openId, setOpenId] = useState<string | null>(null)
+
   if (!promos || promos.length === 0) return null
 
   return (
@@ -64,12 +70,23 @@ export default function PromosExclusivas({
         </div>
       </AnimateIn>
 
-      <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 sm:gap-6 lg:grid-cols-3">
+      {/* Mobile / tablet angosto: stack apilado tipo acordeón. */}
+      <ul className="mx-auto flex max-w-2xl flex-col lg:hidden">
         {promos.map((promo, i) => (
-          <AnimateIn key={promo.id} direction="up" delay={i * 0.06}>
-            <PromoCoupon promo={promo} onShare={onShare} />
-          </AnimateIn>
+          <PromoAccordionCard
+            key={promo.id}
+            promo={promo}
+            index={i}
+            isOpen={openId === promo.id}
+            onToggle={() => setOpenId((current) => (current === promo.id ? null : promo.id))}
+            onShare={onShare}
+          />
         ))}
+      </ul>
+
+      {/* Desktop (lg+): master-detail — lista compacta + detalle a la derecha. */}
+      <div className="hidden lg:block">
+        <PromoMasterDetail promos={promos} onShare={onShare} />
       </div>
     </section>
   )

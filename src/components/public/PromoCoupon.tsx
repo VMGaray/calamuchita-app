@@ -26,7 +26,8 @@ import {
 // cambios.
 export * from "@/lib/promos"
 
-function getInitials(name: string): string {
+// Exportados: reutilizados también por PromoAccordionCard (stack de la home).
+export function getInitials(name: string): string {
   const parts = name.trim().split(/\s+/).filter(Boolean)
   if (parts.length === 0) return "?"
   if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase()
@@ -34,7 +35,7 @@ function getInitials(name: string): string {
 }
 
 /** Achica la fuente del número grande si el texto es largo (ej "Envío Gratis"). */
-function getDiscountSizeClass(text: string): string {
+export function getDiscountSizeClass(text: string): string {
   const len = text.length
   if (len <= 4) return "text-4xl sm:text-5xl"
   if (len <= 7) return "text-3xl sm:text-4xl"
@@ -42,7 +43,7 @@ function getDiscountSizeClass(text: string): string {
   return "text-lg sm:text-xl"
 }
 
-function isExternalLink(href: string): boolean {
+export function isExternalLink(href: string): boolean {
   return /^https?:\/\//i.test(href)
 }
 

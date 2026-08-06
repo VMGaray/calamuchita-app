@@ -51,57 +51,18 @@ export const TEXT_MUTED = "#6B837A"
 export const BORDER = "#E4EBE6"
 export const GREEN_ACCENT = "#17A06A"
 
-/** Categorías soportadas → gradiente (var(--a) → var(--b)) usado en chip, iniciales y link. */
-export type CategoriaPromo =
-  | "gastronomia"
-  | "servicios"
-  | "salud"
-  | "comercios"
-  | "educacion"
-  | "tecnologia"
-  | "turismo"
-
-export const CATEGORY_COLORS: Record<CategoriaPromo, { a: string; b: string; label: string }> = {
-  gastronomia: { a: "#F59E0B", b: "#FB7185", label: "Gastronomía" },
-  servicios: { a: "#0B6E76", b: "#19BBA9", label: "Servicios" },
-  salud: { a: "#0E9F6E", b: "#34D399", label: "Salud" },
-  comercios: { a: "#0E4A34", b: "#17A06A", label: "Comercios" },
-  educacion: { a: "#3453C4", b: "#5C8DF5", label: "Educación" },
-  tecnologia: { a: "#6D3BD4", b: "#9B6BF5", label: "Tecnología" },
-  turismo: { a: "#0891B2", b: "#22D3EE", label: "Turismo" },
-}
-
-const DEFAULT_CATEGORY: CategoriaPromo = "comercios"
-
-/** Acepta valores sueltos de Supabase ("Gastronomía", "gastronomia", con o sin acentos) y los normaliza. */
-export function normalizeCategoria(input: string): CategoriaPromo {
-  const key = input
-    .normalize("NFD")
-    .replace(/[̀-ͯ]/g, "") // quita acentos (á → a, ó → o, etc.)
-    .trim()
-    .toLowerCase()
-
-  return (key in CATEGORY_COLORS ? key : DEFAULT_CATEGORY) as CategoriaPromo
-}
-
-/**
- * Traduce el rubro del negocio (BusinessSection de src/types/database.ts, en
- * inglés: "gastronomy", "health"...) a las claves en español de CATEGORY_COLORS.
- * "events" | "info" | "sports" no tienen color propio y caen al fallback
- * ("comercios" / verde) que ya resuelve normalizeCategoria().
- */
-const SECTION_TO_CATEGORIA: Record<string, CategoriaPromo> = {
-  gastronomy: "gastronomia",
-  health: "salud",
-  services: "servicios",
-  tourism: "turismo",
-  commerce: "comercios",
-  education: "educacion",
-}
-
-export function sectionToCategoria(section: string): CategoriaPromo {
-  return SECTION_TO_CATEGORIA[section] ?? DEFAULT_CATEGORY
-}
+// Color por categoría: fuente única en @/lib/categoriaColores, re-exportada
+// acá para que PromoCoupon/PromoAccordionCard/PromoMasterDetail (y quien
+// más importe de "@/lib/promos") sigan resolviendo el mismo import de
+// siempre. No dupliques esta lógica — si hace falta un tono nuevo o tocar
+// el fallback, editá categoriaColores.ts.
+export {
+  CATEGORY_COLORS,
+  normalizeCategoria,
+  sectionToCategoria,
+  type CategoriaPromo,
+  type CategoriaColor,
+} from "@/lib/categoriaColores"
 
 // ─────────────────────────────────────────────────────────────
 // Tipos
@@ -114,6 +75,8 @@ export interface Promo {
   logo_url: string | null
   descuento_valor: string | null
   descuento_label: string | null
+  /** Opcional: no todos los consumidores de Promo lo completan (ver NegocioDetalle). */
+  descripcion?: string | null
   validez: string | null
   link: string | null
 }

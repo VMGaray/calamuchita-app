@@ -55,6 +55,7 @@ function mapPromotionToPromo(promo: Promotion): Promo | null {
     logo_url: biz.logo_url,
     descuento_valor,
     descuento_label,
+    descripcion: promo.description,
     validez: formatValidUntil(promo.valid_until),
     link: `/negocios/${biz.slug}`,
   }
