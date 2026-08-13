@@ -475,22 +475,27 @@ CREATE TABLE transport_schedules (
 | Métrica | Dónde | Cómo |
 |---|---|---|
 | Vistas al perfil | Detalle de negocio | RPC `increment_view` al montar |
-| Clicks a WhatsApp | Botón sticky público | RPC `increment_lead` |
+| Contactos (WhatsApp, teléfono, reserva) | Botones de contacto público | Insert en `business_leads` (ver tabla más abajo) |
 
 ```sql
 ALTER TABLE businesses ADD COLUMN IF NOT EXISTS total_views integer NOT NULL DEFAULT 0;
-ALTER TABLE businesses ADD COLUMN IF NOT EXISTS total_leads integer NOT NULL DEFAULT 0;
 
 CREATE OR REPLACE FUNCTION increment_view(business_id uuid)
 RETURNS void LANGUAGE sql SECURITY DEFINER AS $$
   UPDATE businesses SET total_views = total_views + 1 WHERE id = business_id;
 $$;
 
-CREATE OR REPLACE FUNCTION increment_lead(business_id uuid)
-RETURNS void LANGUAGE sql SECURITY DEFINER AS $$
-  UPDATE businesses SET total_leads = total_leads + 1 WHERE id = business_id;
-$$;
+-- Policy necesaria para que el insert público a business_leads funcione
+-- (sin esto el insert falla en silencio y ningún contacto queda registrado):
+CREATE POLICY "Cualquiera puede registrar un lead"
+  ON business_leads FOR INSERT
+  TO anon, authenticated
+  WITH CHECK (true);
 ```
+
+`businesses.total_leads` existió como columna pero quedó sin uso real (solo la
+incrementaba un componente que nunca se renderizaba) — el panel admin y el
+dashboard del negocio calculan los contactos contando filas de `business_leads`.
 
 ---
 

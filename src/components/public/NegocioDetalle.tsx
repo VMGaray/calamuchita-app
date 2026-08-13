@@ -45,8 +45,8 @@ function FbIcon({ size = 14 }: { size?: number }) {
   )
 }
 
-function InfoRow({ icon, sublabel, label, href, external }: {
-  icon: React.ReactNode; sublabel: string; label: string; href?: string; external?: boolean
+function InfoRow({ icon, sublabel, label, href, external, onClick }: {
+  icon: React.ReactNode; sublabel: string; label: string; href?: string; external?: boolean; onClick?: () => void
 }) {
   const inner = (
     <div className="flex items-start gap-3 py-3 border-b border-stone-100 last:border-0">
@@ -60,7 +60,7 @@ function InfoRow({ icon, sublabel, label, href, external }: {
     </div>
   )
   if (href) return (
-    <a href={href} target={external ? "_blank" : undefined} rel={external ? "noopener noreferrer" : undefined} className="block hover:opacity-70 transition-opacity">{inner}</a>
+    <a href={href} target={external ? "_blank" : undefined} rel={external ? "noopener noreferrer" : undefined} onClick={onClick} className="block hover:opacity-70 transition-opacity">{inner}</a>
   )
   return inner
 }
@@ -351,7 +351,7 @@ export default function NegocioDetalle({ business, promotions = [] }: Props) {
               </a>
             )}
             {business.phone && (
-              <a href={`tel:${business.phone}`}
+              <a href={`tel:${business.phone}`} onClick={() => recordLead("phone")}
                 className="flex-1 flex items-center justify-center gap-2 py-3.5 rounded-2xl font-bold text-sm bg-white border-2 shadow-sm hover:opacity-80 transition-all"
                 style={{ color: "#2D4530", borderColor: "#2D4530" }}>
                 <Phone size={16} /> Llamar
@@ -361,7 +361,7 @@ export default function NegocioDetalle({ business, promotions = [] }: Props) {
 
           {/* ── Datos de contacto ── */}
           <div className="bg-white/50 rounded-2xl px-4 py-1">
-            {business.phone      && <InfoRow icon={<Phone size={14} style={{ color: "#2D4530" }} />}  sublabel="Teléfono"   label={business.phone}                                   href={`tel:${business.phone}`} />}
+            {business.phone      && <InfoRow icon={<Phone size={14} style={{ color: "#2D4530" }} />}  sublabel="Teléfono"   label={business.phone}  onClick={() => recordLead("phone")}                 href={`tel:${business.phone}`} />}
             {business.whatsapp && business.whatsapp !== business.phone && <InfoRow icon={<WaIcon size={14} />} sublabel="WhatsApp" label={business.whatsapp} href={waLink ?? undefined} external />}
             {instagramHandle     && <InfoRow icon={<AtSign size={14} style={{ color: "#2D4530" }} />} sublabel="Instagram"  label={`@${instagramHandle}`}                            href={`https://instagram.com/${instagramHandle}`} external />}
             {facebookUrl         && <InfoRow icon={<FbIcon size={14} />}                              sublabel="Facebook"   label={facebookUrl.replace(/^https?:\/\//, "")}           href={facebookUrl} external />}

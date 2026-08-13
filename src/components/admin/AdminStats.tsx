@@ -57,21 +57,30 @@ export default function AdminStats() {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    createClient()
-      .from("businesses")
-      .select("id, name, section, total_views, total_leads")
-      .eq("status", "active")
-      .order("total_views", { ascending: false })
-      .then(({ data }) => {
-        setBusinesses(
-          (data || []).map(b => ({
-            ...b,
-            total_views: b.total_views ?? 0,
-            total_leads: b.total_leads ?? 0,
-          }))
-        )
-        setLoading(false)
-      })
+    const supabase = createClient()
+    Promise.all([
+      supabase
+        .from("businesses")
+        .select("id, name, section, total_views")
+        .eq("status", "active")
+        .order("total_views", { ascending: false }),
+      // Los contactos (WhatsApp, teléfono, reserva) se registran acá, no en
+      // businesses.total_leads — esa columna quedó sin uso real.
+      supabase.from("business_leads").select("business_id"),
+    ]).then(([{ data: bizData }, { data: leadsData }]) => {
+      const leadsByBusiness = new Map<string, number>()
+      for (const lead of leadsData || []) {
+        leadsByBusiness.set(lead.business_id, (leadsByBusiness.get(lead.business_id) ?? 0) + 1)
+      }
+      setBusinesses(
+        (bizData || []).map(b => ({
+          ...b,
+          total_views: b.total_views ?? 0,
+          total_leads: leadsByBusiness.get(b.id) ?? 0,
+        }))
+      )
+      setLoading(false)
+    })
   }, [])
 
   if (loading) return <Skeleton />
