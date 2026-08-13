@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react"
 import Link from "next/link"
-import { Plus, Pencil, Trash2, Eye, ArrowUpDown, ArrowUp, ArrowDown, Star } from "lucide-react"
+import { Plus, Pencil, Trash2, Eye, ArrowUpDown, ArrowUp, ArrowDown, Star, Download } from "lucide-react"
 import { createClient } from "@/lib/supabase/client"
 import { Business } from "@/types/database"
 
@@ -125,6 +125,38 @@ export default function AdminNegocios() {
     setBusinesses(prev => prev.map(b => b.id === id ? { ...b, is_premium: !current } : b))
   }
 
+  const statusLabels: Record<string, string> = { active: "Activo", pending: "Pendiente", suspended: "Suspendido" }
+
+  function exportCSV() {
+    const rows = [
+      ["Nombre", "Sección", "Categoría", "Localidad", "Dirección", "Teléfono", "WhatsApp", "Instagram", "Facebook", "Estado", "Destacado", "Vistas", "Contactos WA", "Alta"],
+      ...filtered.map(b => [
+        b.name,
+        sectionLabels[b.section] ?? b.section,
+        getCategoryLabel(b),
+        b.pueblo ?? "",
+        b.address ?? "",
+        b.phone ?? "",
+        b.whatsapp ?? "",
+        b.instagram ?? "",
+        b.facebook ?? "",
+        statusLabels[b.status] ?? b.status,
+        b.is_premium ? "Sí" : "No",
+        b.total_views ?? 0,
+        b.total_leads ?? 0,
+        new Date(b.created_at).toLocaleDateString("es-AR"),
+      ]),
+    ]
+    const csv = rows.map(r => r.map(v => `"${String(v).replace(/"/g, '""')}"`).join(",")).join("\n")
+    const blob = new Blob(["﻿" + csv], { type: "text/csv;charset=utf-8;" })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement("a")
+    a.href = url
+    a.download = `negocios-calamuchita-${new Date().toISOString().slice(0, 10)}.csv`
+    a.click()
+    URL.revokeObjectURL(url)
+  }
+
   const handleSort = (key: SortKey) => {
     if (sortBy === key) {
       setSortDir(d => d === "desc" ? "asc" : "desc")
@@ -177,13 +209,22 @@ export default function AdminNegocios() {
           <h1 className="text-2xl text-stone-800 mb-1">Negocios</h1>
           <p className="text-stone-500">{businesses.length} negocios en total</p>
         </div>
-        <Link
-          href="/admin/negocios/nuevo"
-          className="flex items-center gap-2 bg-primary-500 hover:bg-primary-400 text-primary-100 px-4 py-2.5 rounded-xl text-sm font-medium transition-colors"
-        >
-          <Plus size={16} />
-          Nuevo negocio
-        </Link>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={exportCSV}
+            className="flex items-center gap-2 bg-white border border-stone-200 hover:border-primary-300 text-stone-600 px-4 py-2.5 rounded-xl text-sm font-medium transition-colors"
+          >
+            <Download size={16} />
+            Exportar CSV
+          </button>
+          <Link
+            href="/admin/negocios/nuevo"
+            className="flex items-center gap-2 bg-primary-500 hover:bg-primary-400 text-primary-100 px-4 py-2.5 rounded-xl text-sm font-medium transition-colors"
+          >
+            <Plus size={16} />
+            Nuevo negocio
+          </Link>
+        </div>
       </div>
 
       {/* Filtros por sección */}
