@@ -42,22 +42,30 @@ export default function AdminHome() {
         { count: events },
         { count: editorial },
         { count: pwaInstalls },
+        { data: leadsData },
       ] = await Promise.all([
         supabase.from("businesses").select("*", { count: "exact", head: true }).eq("status", "active"),
         supabase.from("businesses").select("*", { count: "exact", head: true }).eq("status", "pending"),
         supabase.from("profiles").select("*", { count: "exact", head: true }),
-        supabase.from("businesses").select("section, total_views, total_leads").eq("status", "active"),
+        supabase.from("businesses").select("id, section, total_views").eq("status", "active"),
         supabase.from("events").select("*", { count: "exact", head: true }),
         supabase.from("editorial_posts").select("*", { count: "exact", head: true }),
         supabase.from("pwa_installs").select("*", { count: "exact", head: true }),
+        // Los contactos reales viven en business_leads — businesses.total_leads no se actualiza.
+        supabase.from("business_leads").select("business_id"),
       ])
 
+      const leadsByBusiness = new Map<string, number>()
+      leadsData?.forEach((l: { business_id: string }) => {
+        leadsByBusiness.set(l.business_id, (leadsByBusiness.get(l.business_id) ?? 0) + 1)
+      })
+
       const sections: Record<string, SectionData> = {}
-      businesses?.forEach((b: { section: string; total_views?: number | null; total_leads?: number | null }) => {
+      businesses?.forEach((b: { id: string; section: string; total_views?: number | null }) => {
         if (!sections[b.section]) sections[b.section] = { count: 0, views: 0, leads: 0 }
         sections[b.section].count += 1
         sections[b.section].views += b.total_views ?? 0
-        sections[b.section].leads += b.total_leads ?? 0
+        sections[b.section].leads += leadsByBusiness.get(b.id) ?? 0
       })
 
       setStats({

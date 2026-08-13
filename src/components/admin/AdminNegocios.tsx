@@ -86,12 +86,20 @@ export default function AdminNegocios() {
 
   const fetchBusinesses = async () => {
     const supabase = createClient()
-    const { data } = await supabase
-      .from("businesses")
-      .select("*")
-      .neq("section", "info")
-      .order("created_at", { ascending: false })
-    setBusinesses(data || [])
+    const [{ data }, { data: leadsData }] = await Promise.all([
+      supabase
+        .from("businesses")
+        .select("*")
+        .neq("section", "info")
+        .order("created_at", { ascending: false }),
+      // Los contactos reales viven en business_leads — businesses.total_leads no se actualiza.
+      supabase.from("business_leads").select("business_id"),
+    ])
+    const leadsByBusiness = new Map<string, number>()
+    for (const lead of leadsData || []) {
+      leadsByBusiness.set(lead.business_id, (leadsByBusiness.get(lead.business_id) ?? 0) + 1)
+    }
+    setBusinesses((data || []).map(b => ({ ...b, total_leads: leadsByBusiness.get(b.id) ?? 0 })))
     setLoading(false)
   }
 
