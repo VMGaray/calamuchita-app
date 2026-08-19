@@ -24,6 +24,7 @@ export default function ReservaWhatsApp({ whatsapp, businessName }: Props) {
     const fullPhone = normalizeArgPhone(whatsapp)
 
     const message = encodeURIComponent(
+      `🌿 Te consulto desde Calamuchita App\n` +
       `Hola ${businessName}! 👋\n\n` +
       `Quiero hacer una reserva:\n` +
       `📅 Fecha: ${form.date}\n` +

@@ -233,7 +233,7 @@ export default function BuscarResults({ query, results }: Props) {
                       {/* WhatsApp rápido */}
                       {business.whatsapp && (
                         <a
-                          href={`https://wa.me/${normalizeArgPhone(business.whatsapp)}`}
+                          href={`https://wa.me/${normalizeArgPhone(business.whatsapp)}?text=${encodeURIComponent(`Hola! Te consulto desde Calamuchita App — ${business.name} 🌿`)}`}
                           target="_blank"
                           rel="noopener noreferrer"
                           onClick={e => e.stopPropagation()}

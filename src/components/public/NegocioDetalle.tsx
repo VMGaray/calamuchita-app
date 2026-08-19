@@ -146,7 +146,7 @@ export default function NegocioDetalle({ business, promotions = [] }: Props) {
       cartaRef.current?.scrollIntoView({ behavior: "smooth", block: "start" })
     } else if (waNumber) {
       recordLead("whatsapp")
-      window.open(`https://wa.me/${waNumber}?text=${encodeURIComponent(`Hola ${business.name}! Quiero hacer un pedido. ¿Me compartís el menú disponible? Gracias!`)}`, "_blank")
+      window.open(`https://wa.me/${waNumber}?text=${encodeURIComponent(`Hola! Te consulto desde Calamuchita App por ${business.name}. Quiero hacer un pedido. ¿Me compartís el menú disponible? Gracias!`)}`, "_blank")
     }
   }
 

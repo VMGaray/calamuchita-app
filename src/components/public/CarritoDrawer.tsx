@@ -100,6 +100,7 @@ export default function CarritoDrawer({
         .join("\n")
 
       const msg = [
+        `🌿 Te consulto desde *Calamuchita App*`,
         `🛒 *Nuevo pedido — ${business.name}*`,
         ``,
         `👤 *Cliente:* ${form.name}`,
@@ -112,8 +113,6 @@ export default function CarritoDrawer({
         ``,
         `💰 *Total: $${total.toLocaleString("es-AR")}*`,
         form.notes ? `\n📝 *Nota:* ${form.notes}` : "",
-        ``,
-        `_Pedido registrado en Calamuchita App_`,
       ].filter(Boolean).join("\n")
 
       if (business.whatsapp) {
