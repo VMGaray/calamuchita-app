@@ -110,10 +110,13 @@ const SUBCAT_LABELS: Record<string, string> = {
   indumentaria:  "Indumentaria",
   mascotas:      "Mascotas",
   ninos:         "Niños",
+  "peluqueria-canina": "Peluquería canina",
+  petshop:       "Petshop",
   seguros:       "Seguros",
   verduleria:    "Verdulería",
   tecnologia:    "Tecnología",
   vehiculos:     "Vehículos",
+  vivero:        "Vivero",
   cuero:         "Cuero Argentino",
   // events
   culturales:    "Culturales",

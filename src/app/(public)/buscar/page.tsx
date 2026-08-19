@@ -116,6 +116,16 @@ const SYNONYMS: Record<string, string[]> = {
   burger:         ["Hamburguesería"],
   "para llevar":  ["Comida para llevar"],
   viandas:        ["Comida para llevar", "Viandas"],
+  "peluqueria canina": ["Peluquería canina"],
+  "peluquero canino": ["Peluquería canina"],
+  "peluquera canina": ["Peluquería canina"],
+  "bano y peluqueria": ["Peluquería canina"],
+  petshop:        ["Petshop"],
+  "pet shop":     ["Petshop"],
+  vivero:         ["Vivero"],
+  viveros:        ["Vivero"],
+  plantas:        ["Vivero"],
+  plantines:      ["Vivero"],
 }
 
 function findMatchingSubcategories(q: string): string[] {
