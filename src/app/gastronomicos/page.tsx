@@ -6,10 +6,8 @@ import { createClient } from "@/lib/supabase/client"
 import { MapPin } from "lucide-react"
 import { GASTRONOMY_CATEGORY_GROUPS } from "@/lib/constants/gastronomyCategories"
 import { BusinessCategory } from "@/types/database"
-import { sendEmail, newRegistrationEmailHtml } from "@/lib/email"
+import { sendNewRegistrationNotification } from "@/lib/email"
 import BackButton from "@/components/ui/BackButton"
-
-const ADMIN_NOTIFY_EMAIL = "vmg.setup.ai@gmail.com"
 
 type View = "login" | "register" | "forgot" | "registered"
 
@@ -130,18 +128,13 @@ function GastronomicosContent() {
         .flatMap(g => g.options)
         .find(opt => opt.value === category)?.label ?? category
 
-      sendEmail({
-        to: ADMIN_NOTIFY_EMAIL,
-        subject: `Nueva solicitud de registro — ${businessName}`,
-        html: newRegistrationEmailHtml({
-          businessName,
-          fullName,
-          email: regEmail,
-          phone: phone || null,
-          category: categoryLabel,
-          createdAt: new Date().toLocaleString("es-AR"),
-          adminUrl: `${window.location.origin}/admin/solicitudes`,
-        }),
+      sendNewRegistrationNotification({
+        businessName,
+        fullName,
+        email: regEmail,
+        phone: phone || null,
+        category: categoryLabel,
+        adminUrl: `${window.location.origin}/admin/solicitudes`,
       })
     }
 
