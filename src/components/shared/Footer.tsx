@@ -59,32 +59,40 @@ export default function Footer() {
   }, [])
 
   useEffect(() => {
-    const check = () => {
-      const standalone = window.matchMedia('(display-mode: standalone)').matches ||
-                         (window.navigator as any).standalone === true
-      const hasPrompt = !!(window as any).__pwaPrompt
-      const ua = navigator.userAgent
-      const ios = /iPhone|iPad|iPod/.test(ua)
-      setCanInstall(!standalone && (hasPrompt || ios))
-    }
-    check()
-    window.addEventListener('beforeinstallprompt', check)
-    return () => window.removeEventListener('beforeinstallprompt', check)
+    const standalone = window.matchMedia('(display-mode: standalone)').matches ||
+                       (window.navigator as any).standalone === true
+    if (standalone) return
+
+    const ua = navigator.userAgent
+    const isMobile = /iPhone|iPad|iPod|Android/i.test(ua)
+    if (isMobile) setCanInstall(true)
+
+    // También mostrar si llega el evento en desktop
+    const onPrompt = () => setCanInstall(true)
+    window.addEventListener('beforeinstallprompt', onPrompt)
+    return () => window.removeEventListener('beforeinstallprompt', onPrompt)
   }, [])
 
   const handleInstallFromFooter = async () => {
     const ua = navigator.userAgent
     const ios = /iPhone|iPad|iPod/.test(ua)
+
     if (ios) {
-      alert('Para instalar: tocá Compartir ⬆ y después "Agregar a inicio"')
+      alert('Para instalar: tocá el ícono Compartir ⬆ en la barra de Safari y después tocá "Agregar a inicio"')
       return
     }
+
     const prompt = (window as any).__pwaPrompt
-    if (!prompt) return
-    prompt.prompt()
-    await prompt.userChoice
-    ;(window as any).__pwaPrompt = null
-    setCanInstall(false)
+    if (prompt) {
+      prompt.prompt()
+      await prompt.userChoice
+      ;(window as any).__pwaPrompt = null
+      setCanInstall(false)
+      return
+    }
+
+    // Sin prompt nativo disponible — instrucciones manuales Android/Chrome
+    alert('Para instalar: tocá los tres puntitos ⋮ arriba a la derecha en Chrome y elegí "Instalar app" o "Agregar a pantalla de inicio"')
   }
 
   return (
