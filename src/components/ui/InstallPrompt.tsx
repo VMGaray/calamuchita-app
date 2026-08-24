@@ -15,7 +15,7 @@ async function recordInstall() {
 }
 
 const DISMISS_KEY = 'pwa_banner_dismissed_at'
-const DISMISS_TTL = 7 * 24 * 60 * 60 * 1000 // 7 días
+const DISMISS_TTL = 1 * 24 * 60 * 60 * 1000 // 1 día
 
 function wasDismissed() {
   try {
@@ -60,6 +60,7 @@ export default function InstallPrompt() {
     // Android / Chrome Desktop: esperamos el evento nativo
     const onBeforeInstall = (e: Event) => {
       e.preventDefault()
+      ;(window as any).__pwaPrompt = e  // guardar globalmente
       setDeferredPrompt(e)
       setIsVisible(true)
     }

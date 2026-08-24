@@ -46,6 +46,7 @@ const sections = [
 
 export default function Footer() {
   const [pueblos, setPueblos] = useState<string[]>(FALLBACK_PUEBLOS)
+  const [canInstall, setCanInstall] = useState(false)
 
   useEffect(() => {
     createClient()
@@ -56,6 +57,35 @@ export default function Footer() {
         if (data && data.length > 0) setPueblos(data.map(l => l.name))
       })
   }, [])
+
+  useEffect(() => {
+    const check = () => {
+      const standalone = window.matchMedia('(display-mode: standalone)').matches ||
+                         (window.navigator as any).standalone === true
+      const hasPrompt = !!(window as any).__pwaPrompt
+      const ua = navigator.userAgent
+      const ios = /iPhone|iPad|iPod/.test(ua)
+      setCanInstall(!standalone && (hasPrompt || ios))
+    }
+    check()
+    window.addEventListener('beforeinstallprompt', check)
+    return () => window.removeEventListener('beforeinstallprompt', check)
+  }, [])
+
+  const handleInstallFromFooter = async () => {
+    const ua = navigator.userAgent
+    const ios = /iPhone|iPad|iPod/.test(ua)
+    if (ios) {
+      alert('Para instalar: tocá Compartir ⬆ y después "Agregar a inicio"')
+      return
+    }
+    const prompt = (window as any).__pwaPrompt
+    if (!prompt) return
+    prompt.prompt()
+    await prompt.userChoice
+    ;(window as any).__pwaPrompt = null
+    setCanInstall(false)
+  }
 
   return (
     <footer style={{ background: "#0e1a10", borderTop: "1px solid rgba(225,219,201,0.08)" }}>
@@ -185,6 +215,19 @@ export default function Footer() {
                 VMG.Setup.Ai
               </a>
             </span>
+            {canInstall && (
+              <button
+                onClick={handleInstallFromFooter}
+                className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium transition-all"
+                style={{
+                  background: "rgba(200,96,58,0.12)",
+                  color: "#c8603a",
+                  border: "1px solid rgba(200,96,58,0.25)"
+                }}
+              >
+                📲 Instalá la app
+              </button>
+            )}
           </div>
         </div>
       </div>
