@@ -173,70 +173,80 @@ export default function Footer() {
           </AnimateIn>
         </div>
 
-        <div className="mt-10 pt-6 flex flex-col md:flex-row justify-between items-center gap-2"
+        <div className="mt-10 pt-6 flex flex-col gap-4"
           style={{ borderTop: "1px solid rgba(225,219,201,0.07)" }}>
-          <div className="flex flex-col items-center md:items-start gap-1">
-            <Link
-              href="/gastronomicos"
-              className="text-xs transition-colors inline-flex items-center gap-1"
-              style={{ color: "rgba(225,219,201,0.3)" }}
-              onMouseEnter={e => (e.currentTarget.style.color = "rgba(225,219,201,0.6)")}
-              onMouseLeave={e => (e.currentTarget.style.color = "rgba(225,219,201,0.3)")}
-            >
-              <UtensilsCrossed size={12} style={{ color: "inherit" }} />
-              Ingreso gastronómico →
-            </Link>
-            <p className="text-xs" style={{ color: "rgba(225,219,201,0.55)" }}>
-              © 2026 Calamuchita App · Valle de Calamuchita, Córdoba
-            </p>
-          </div>
-          <div className="flex items-center gap-4">
-            <Link
-              href="/politica-de-privacidad"
-              className="text-xs transition-colors"
-              style={{ color: "rgba(225,219,201,0.55)" }}
-              onMouseEnter={e => (e.currentTarget.style.color = "#E1DBC9")}
-              onMouseLeave={e => (e.currentTarget.style.color = "rgba(225,219,201,0.55)")}
-            >
-              Política de Privacidad
-            </Link>
-            <Link
-              href="/eliminar-cuenta"
-              className="text-xs transition-colors"
-              style={{ color: "rgba(225,219,201,0.55)" }}
-              onMouseEnter={e => (e.currentTarget.style.color = "#E1DBC9")}
-              onMouseLeave={e => (e.currentTarget.style.color = "rgba(225,219,201,0.55)")}
-            >
-              Eliminar mi cuenta
-            </Link>
-            <span className="text-xs inline-flex items-center gap-1" style={{ color: "rgba(225,219,201,0.55)" }}>
-              Desarrollado por
-              <a
-                href="https://vmg-setup-ai.vercel.app/"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="transition-colors"
+
+          {/* Fila 1: copyright e ingreso gastronómico */}
+          <div className="flex flex-col md:flex-row justify-between items-center gap-2">
+            <div className="flex flex-col items-center md:items-start gap-1">
+              <Link
+                href="/gastronomicos"
+                className="text-xs transition-colors inline-flex items-center gap-1"
+                style={{ color: "rgba(225,219,201,0.3)" }}
+                onMouseEnter={e => (e.currentTarget.style.color = "rgba(225,219,201,0.6)")}
+                onMouseLeave={e => (e.currentTarget.style.color = "rgba(225,219,201,0.3)")}
+              >
+                <UtensilsCrossed size={12} style={{ color: "inherit" }} />
+                Ingreso gastronómico →
+              </Link>
+              <p className="text-xs" style={{ color: "rgba(225,219,201,0.55)" }}>
+                © 2026 Calamuchita App · Valle de Calamuchita, Córdoba
+              </p>
+            </div>
+
+            {/* Links legales */}
+            <div className="flex items-center gap-4 flex-wrap justify-center">
+              <Link
+                href="/politica-de-privacidad"
+                className="text-xs transition-colors"
                 style={{ color: "rgba(225,219,201,0.55)" }}
                 onMouseEnter={e => (e.currentTarget.style.color = "#E1DBC9")}
                 onMouseLeave={e => (e.currentTarget.style.color = "rgba(225,219,201,0.55)")}
               >
-                VMG.Setup.Ai
-              </a>
-            </span>
-            {canInstall && (
+                Política de Privacidad
+              </Link>
+              <Link
+                href="/eliminar-cuenta"
+                className="text-xs transition-colors"
+                style={{ color: "rgba(225,219,201,0.55)" }}
+                onMouseEnter={e => (e.currentTarget.style.color = "#E1DBC9")}
+                onMouseLeave={e => (e.currentTarget.style.color = "rgba(225,219,201,0.55)")}
+              >
+                Eliminar mi cuenta
+              </Link>
+              <span className="text-xs inline-flex items-center gap-1" style={{ color: "rgba(225,219,201,0.55)" }}>
+                Desarrollado por
+                <a
+                  href="https://vmg-setup-ai.vercel.app/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="transition-colors"
+                  style={{ color: "rgba(225,219,201,0.55)" }}
+                  onMouseEnter={e => (e.currentTarget.style.color = "#E1DBC9")}
+                  onMouseLeave={e => (e.currentTarget.style.color = "rgba(225,219,201,0.55)")}
+                >
+                  VMG.Setup.Ai
+                </a>
+              </span>
+            </div>
+          </div>
+
+          {/* Fila 2: botón instalar — solo en mobile, centrado y en su propia fila */}
+          {canInstall && (
+            <div className="flex justify-center md:justify-end">
               <button
                 onClick={handleInstallFromFooter}
-                className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium transition-all"
+                className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-medium transition-all"
                 style={{
-                  background: "rgba(200,96,58,0.12)",
+                  background: "rgba(200,96,58,0.15)",
                   color: "#c8603a",
-                  border: "1px solid rgba(200,96,58,0.25)"
+                  border: "1px solid rgba(200,96,58,0.3)"
                 }}
               >
                 📲 Instalá la app
               </button>
-            )}
-          </div>
+            </div>
+          )}
         </div>
       </div>
     </footer>
