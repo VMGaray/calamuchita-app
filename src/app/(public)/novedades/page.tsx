@@ -50,9 +50,10 @@ export default async function NovedadesPage() {
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             {novedades.map(n => (
-              <div
+              <Link
                 key={n.id}
-                className="bg-white rounded-2xl overflow-hidden shadow-sm flex flex-col"
+                href={`/novedades/${n.id}`}
+                className="bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-shadow flex flex-col"
                 style={{ borderLeft: `3px solid ${ACCENT}` }}
               >
                 {n.image_url && (
@@ -73,7 +74,7 @@ export default async function NovedadesPage() {
                     </h3>
                   )}
                   {n.content && (
-                    <p className="text-xs text-stone-600 leading-relaxed whitespace-pre-line">
+                    <p className="text-xs text-stone-600 leading-relaxed line-clamp-3">
                       {n.content}
                     </p>
                   )}
@@ -83,7 +84,7 @@ export default async function NovedadesPage() {
                     </span>
                   )}
                 </div>
-              </div>
+              </Link>
             ))}
           </div>
         )}

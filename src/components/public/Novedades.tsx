@@ -9,12 +9,12 @@ import type { Novedad } from "@/types/database"
 const ACCENT = "#6B7A5E"
 
 function NovedadCard({ n }: { n: Novedad }) {
-  const [expanded, setExpanded] = useState(false)
   const isLong = (n.content?.length ?? 0) > 140
 
   return (
-    <div
-      className="bg-white rounded-2xl overflow-hidden shadow-sm flex flex-col h-full"
+    <Link
+      href={`/novedades/${n.id}`}
+      className="bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-shadow flex flex-col h-full"
       style={{ borderLeft: `3px solid ${ACCENT}` }}
     >
       {n.image_url && (
@@ -35,20 +35,16 @@ function NovedadCard({ n }: { n: Novedad }) {
           </h3>
         )}
         {n.content && (
-          <p className={`text-xs text-stone-600 leading-relaxed ${expanded ? "" : "line-clamp-3"}`}>
+          <p className="text-xs text-stone-600 leading-relaxed line-clamp-3">
             {n.content}
           </p>
         )}
         {(isLong || n.locality) && (
           <div className="flex items-center mt-0.5">
             {isLong && (
-              <button
-                onClick={() => setExpanded(e => !e)}
-                className="text-[10px] font-bold hover:opacity-70 transition-opacity"
-                style={{ color: ACCENT }}
-              >
-                {expanded ? "Ver menos" : "Ver más"}
-              </button>
+              <span className="text-[10px] font-bold" style={{ color: ACCENT }}>
+                Ver más
+              </span>
             )}
             {n.locality && (
               <span className="text-[10px] font-semibold ml-auto" style={{ color: ACCENT }}>
@@ -58,7 +54,7 @@ function NovedadCard({ n }: { n: Novedad }) {
           </div>
         )}
       </div>
-    </div>
+    </Link>
   )
 }
 
