@@ -7,7 +7,7 @@ import { SkeletonBusinessGrid } from "@/components/ui/Skeleton"
 import { createClient } from "@/lib/supabase/client"
 import Link from "next/link"
 import Image from "next/image"
-import { ChevronLeft, ChevronRight } from "lucide-react"
+import { ChevronLeft, ChevronRight, Star } from "lucide-react"
 
 type BusinessHour = {
   day_of_week: number
@@ -31,6 +31,7 @@ interface Business {
   description: string | null
   business_hours: BusinessHour[]
   is_premium: boolean
+  is_featured_rubro: boolean
 }
 
 interface Props {
@@ -106,7 +107,7 @@ export default function NegociosList({ params }: Props) {
 
       let query = supabase
         .from("businesses")
-        .select("id, name, slug, category, subcategory, address, logo_url, cover_url, is_open, offers_delivery, offers_takeaway, description, is_premium, business_hours(day_of_week, opens_at, closes_at, is_closed)")
+        .select("id, name, slug, category, subcategory, address, logo_url, cover_url, is_open, offers_delivery, offers_takeaway, description, is_premium, is_featured_rubro, business_hours(day_of_week, opens_at, closes_at, is_closed)")
         .eq("status", "active")
         .eq("section", "gastronomy")
 
@@ -118,6 +119,7 @@ export default function NegociosList({ params }: Props) {
 
       const { data } = await query
         .order("is_premium", { ascending: false })
+        .order("is_featured_rubro", { ascending: false })
         .order("name")
       let result = (data || []) as Business[]
 
@@ -208,7 +210,7 @@ export default function NegociosList({ params }: Props) {
 
       <div ref={scrollRef} className="flex gap-4 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden snap-x snap-mandatory -mx-4 px-4 pb-6 md:mx-0 md:px-0 md:grid md:grid-cols-2 lg:grid-cols-3 md:overflow-x-visible md:pb-0">
         {visibleBusinesses.map((biz, i) => {
-          const { id, name, slug, category, subcategory, address, cover_url, is_open, offers_delivery, offers_takeaway, description, business_hours, is_premium } = biz
+          const { id, name, slug, category, subcategory, address, cover_url, is_open, offers_delivery, offers_takeaway, description, business_hours, is_premium, is_featured_rubro } = biz
           const isOpen = calcIsOpen(business_hours, is_open)
 
           return (
@@ -229,12 +231,25 @@ export default function NegociosList({ params }: Props) {
                       {/* shimmer: queda cubierto por la imagen una vez que carga */}
                       <div className="absolute inset-0 animate-pulse bg-gradient-to-r from-white/0 via-white/[0.07] to-white/0" />
 
-                      {is_premium && (
-                        <div
-                          className="absolute top-2.5 left-2.5 z-10 flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-tight"
-                          style={{ background: "#C9A44B", color: "#1a1a1a" }}
-                        >
-                          ★ Destacado
+                      {(is_premium || is_featured_rubro) && (
+                        <div className="absolute top-2.5 left-2.5 z-10 flex flex-col items-start gap-1.5">
+                          {is_premium && (
+                            <div
+                              className="flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-tight"
+                              style={{ background: "#C9A44B", color: "#1a1a1a" }}
+                            >
+                              ★ Destacado
+                            </div>
+                          )}
+                          {is_featured_rubro && (
+                            <div
+                              className="flex items-center gap-1 px-2 py-1 rounded-full text-xs font-semibold"
+                              style={{ background: "#3b82f6", color: "white" }}
+                            >
+                              <Star size={10} fill="currentColor" />
+                              Destacado
+                            </div>
+                          )}
                         </div>
                       )}
 

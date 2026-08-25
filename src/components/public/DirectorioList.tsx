@@ -11,7 +11,7 @@ import Card3D from "@/components/ui/Card3D"
 import { SkeletonBusinessGrid } from "@/components/ui/Skeleton"
 import { createClient } from "@/lib/supabase/client"
 import { sectionCategories, SectionKey } from "@/lib/sections"
-import { Phone, AtSign, MapPin, X, LayoutGrid, Check, ChevronLeft, ChevronRight } from "lucide-react"
+import { Phone, AtSign, MapPin, X, LayoutGrid, Check, ChevronLeft, ChevronRight, Star } from "lucide-react"
 import Link from "next/link"
 import Image from "next/image"
 
@@ -28,6 +28,7 @@ interface Business {
   cover_url: string | null
   description: string | null
   is_premium: boolean
+  is_featured_rubro: boolean
   medical_specialties: string[] | null
 }
 
@@ -219,7 +220,7 @@ export default function DirectorioList({ section, filters }: Props) {
       const supabase = createClient()
       let query = supabase
         .from("businesses")
-        .select("id, name, slug, subcategory, address, pueblo, phone, whatsapp, instagram, logo_url, cover_url, description, is_premium, medical_specialties")
+        .select("id, name, slug, subcategory, address, pueblo, phone, whatsapp, instagram, logo_url, cover_url, description, is_premium, is_featured_rubro, medical_specialties")
         .eq("status", "active")
         .eq("section", section)
 
@@ -234,6 +235,7 @@ export default function DirectorioList({ section, filters }: Props) {
 
       const { data } = await query
         .order("is_premium", { ascending: false })
+        .order("is_featured_rubro", { ascending: false })
         .order("name")
       setAllBusinesses(data || [])
       setLoading(false)
@@ -456,12 +458,25 @@ export default function DirectorioList({ section, filters }: Props) {
                   >
                     {/* ── Image area ── */}
                     <div className="relative overflow-hidden aspect-[4/3] bg-stone-50">
-                      {business.is_premium && (
-                        <div
-                          className="absolute top-2.5 left-2.5 z-10 flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-tight"
-                          style={{ background: "#C9A44B", color: "#1a1a1a" }}
-                        >
-                          ★ Destacado
+                      {(business.is_premium || business.is_featured_rubro) && (
+                        <div className="absolute top-2.5 left-2.5 z-10 flex flex-col items-start gap-1.5">
+                          {business.is_premium && (
+                            <div
+                              className="flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-tight"
+                              style={{ background: "#C9A44B", color: "#1a1a1a" }}
+                            >
+                              ★ Destacado
+                            </div>
+                          )}
+                          {business.is_featured_rubro && (
+                            <div
+                              className="flex items-center gap-1 px-2 py-1 rounded-full text-xs font-semibold"
+                              style={{ background: "#3b82f6", color: "white" }}
+                            >
+                              <Star size={10} fill="currentColor" />
+                              Destacado
+                            </div>
+                          )}
                         </div>
                       )}
                       {business.cover_url ? (

@@ -141,6 +141,7 @@ export default function AdminNegocioEdit({ id }: Props) {
     pet_friendly: false,
     payment_methods: [] as string[],
     is_premium: false,
+    is_featured_rubro: false,
     has_24h_guard: false,
     appointment_system: "",
     group_name: "",
@@ -184,6 +185,7 @@ export default function AdminNegocioEdit({ id }: Props) {
           pet_friendly: business.pet_friendly || false,
           payment_methods: business.payment_methods || [],
           is_premium: business.is_premium || false,
+          is_featured_rubro: business.is_featured_rubro || false,
           has_24h_guard: business.has_24h_guard || false,
           appointment_system: business.appointment_system || "",
           group_name: business.group_name || "",
@@ -284,6 +286,7 @@ export default function AdminNegocioEdit({ id }: Props) {
         pet_friendly: form.pet_friendly,
         payment_methods: form.payment_methods,
         is_premium: form.is_premium,
+        is_featured_rubro: form.is_featured_rubro,
         has_24h_guard: form.section === "health" ? form.has_24h_guard : false,
         appointment_system: form.section === "health" ? form.appointment_system || null : null,
         group_name: form.group_name || null,
@@ -811,7 +814,29 @@ export default function AdminNegocioEdit({ id }: Props) {
     </div>
   </div>
 )}
-        {/* Destacado en carrusel */}
+        {/* Destacado de Rubro */}
+        <div className={`rounded-2xl border-2 p-4 transition-colors ${form.is_featured_rubro ? "border-blue-400 bg-blue-50" : "border-stone-200 bg-white"}`}>
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${form.is_featured_rubro ? "bg-blue-100" : "bg-stone-100"}`}>
+                <Star size={18} fill={form.is_featured_rubro ? "currentColor" : "none"} className={form.is_featured_rubro ? "text-blue-500" : "text-stone-400"} />
+              </div>
+              <div>
+                <p className="text-sm font-semibold text-stone-800">Destacado de Rubro</p>
+                <p className="text-xs text-stone-500">Aparece primero en su categoría/rubro</p>
+              </div>
+            </div>
+            <button
+              type="button"
+              onClick={() => handleChange("is_featured_rubro", !form.is_featured_rubro)}
+              className={`relative w-12 h-6 rounded-full transition-colors flex-shrink-0 ${form.is_featured_rubro ? "bg-blue-400" : "bg-stone-200"}`}
+            >
+              <span className={`absolute top-0.5 left-0.5 w-5 h-5 rounded-full bg-white shadow transition-transform ${form.is_featured_rubro ? "translate-x-6" : "translate-x-0"}`} />
+            </button>
+          </div>
+        </div>
+
+        {/* Premium Carrusel Principal */}
         <div className={`rounded-2xl border-2 p-4 transition-colors ${form.is_premium ? "border-yellow-400 bg-yellow-50" : "border-stone-200 bg-white"}`}>
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
@@ -819,8 +844,8 @@ export default function AdminNegocioEdit({ id }: Props) {
                 <Star size={18} fill={form.is_premium ? "currentColor" : "none"} className={form.is_premium ? "text-yellow-500" : "text-stone-400"} />
               </div>
               <div>
-                <p className="text-sm font-semibold text-stone-800">Destacado en página principal</p>
-                <p className="text-xs text-stone-500">Aparece en el carrusel de Destacados del Valle</p>
+                <p className="text-sm font-semibold text-stone-800">Premium Carrusel Principal</p>
+                <p className="text-xs text-stone-500">Aparece primero en su rubro + en el carrusel de la home</p>
               </div>
             </div>
             <button
