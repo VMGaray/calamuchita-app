@@ -254,11 +254,20 @@ function SubForm({
         {/* Período */}
         <div className="grid grid-cols-2 gap-3">
           <div>
-            <label className="block text-xs font-medium text-stone-600 mb-1">Inicio período *</label>
+            <label className="block text-xs font-medium text-stone-600 mb-1">
+              Inicio período *
+              {initial && <span className="text-stone-300 font-normal ml-1">(fecha de alta, no se modifica)</span>}
+            </label>
             <input
-              type="date" value={form.current_period_start}
-              onChange={e => set("current_period_start", e.target.value)}
-              className="w-full px-3 py-2 rounded-xl border border-stone-200 text-sm outline-none focus:ring-2 focus:ring-[#A3B18A]/50"
+              type="date"
+              value={form.current_period_start}
+              onChange={e => !initial && set("current_period_start", e.target.value)}
+              readOnly={!!initial}
+              className={`w-full px-3 py-2 rounded-xl border text-sm outline-none ${
+                initial
+                  ? "border-stone-100 bg-stone-50 text-stone-400 cursor-not-allowed"
+                  : "border-stone-200 focus:ring-2 focus:ring-[#A3B18A]/50"
+              }`}
             />
           </div>
           <div>
@@ -308,6 +317,7 @@ export default function AdminSuscripciones() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [filter, setFilter] = useState<SubscriptionStatus | "all">("all")
+  const [search, setSearch] = useState("")
   const [showForm, setShowForm] = useState(false)
   const [editing, setEditing] = useState<SubRow | null>(null)
   const [autoSuspendedCount, setAutoSuspendedCount] = useState(0)
@@ -402,7 +412,8 @@ export default function AdminSuscripciones() {
     { key: "cancelled", label: "Canceladas"},
   ]
 
-  const filtered = filter === "all" ? subs : subs.filter(s => s.status === filter)
+  const filtered = (filter === "all" ? subs : subs.filter(s => s.status === filter))
+    .filter(s => !search || s.businesses?.name?.toLowerCase().includes(search.toLowerCase()))
 
   // contadores para el header
   const counts = {
@@ -464,6 +475,25 @@ export default function AdminSuscripciones() {
             {f.label}
           </button>
         ))}
+      </div>
+
+      {/* Buscador */}
+      <div className="relative">
+        <input
+          type="text"
+          value={search}
+          onChange={e => setSearch(e.target.value)}
+          placeholder="Buscar por nombre del comercio..."
+          className="w-full px-4 py-2.5 rounded-xl border border-stone-200 text-sm outline-none focus:ring-2 focus:ring-[#2D4530]/20 bg-white"
+        />
+        {search && (
+          <button
+            onClick={() => setSearch("")}
+            className="absolute right-3 top-1/2 -translate-y-1/2 text-stone-300 hover:text-stone-500"
+          >
+            <X size={14} />
+          </button>
+        )}
       </div>
 
       {/* Lista */}
