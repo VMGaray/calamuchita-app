@@ -177,9 +177,9 @@ export default function DirectorioDetalle({ business, section, promotions = [] }
   return (
     <div className="relative min-h-screen" style={{ background: "#F0EBE0" }}>
 
-      {/* HEADER verde con todo el contenido adentro */}
+      {/* HEADER verde con todo el contenido adentro — mobile: fila horizontal; oculto en desktop */}
       <div
-        className="relative w-full"
+        className="relative w-full md:hidden"
         style={{
           background: "linear-gradient(135deg, #2D4530 0%, #4A6D4F 100%)",
           minHeight: "160px",
@@ -242,47 +242,152 @@ export default function DirectorioDetalle({ business, section, promotions = [] }
         </div>
       </div>
 
-      <div className="max-w-lg mx-auto px-4 pt-5 pb-12 flex flex-col gap-y-5">
+      {/* Wrapper desktop 2 columnas / mobile 1 columna */}
+      <div className="md:flex md:min-h-screen">
 
-        {/* ── Botones WhatsApp / Llamar / Llegar ── */}
-        {hasBottomActions && (
-          <AnimateIn>
-            <div className="flex gap-3 max-w-lg mx-auto px-4 mt-4">
-              {waLink && (
-                <a href={waLink} target="_blank" rel="noopener noreferrer" onClick={() => recordLead("whatsapp")}
-                  className="flex-1 flex items-center justify-center gap-2 py-3.5 rounded-2xl font-bold text-sm text-white shadow-sm hover:brightness-105 active:scale-95 transition-all"
-                  style={{ background: "#25D366" }}>
-                  <WaIcon size={16} /> WhatsApp
-                </a>
-              )}
-              {business.phone && (
-                <a href={`tel:${business.phone}`} onClick={() => recordLead("phone")}
-                  className="flex-1 flex items-center justify-center gap-2 py-3.5 rounded-2xl font-bold text-sm bg-white border-2 shadow-sm hover:opacity-80 active:scale-95 transition-all"
-                  style={{ color: "#2D4530", borderColor: "#2D4530" }}>
-                  <Phone size={16} /> Llamar
-                </a>
-              )}
-              {(business.address || (business.latitude && business.longitude)) && (
-                <a
-                  href={
-                    business.latitude && business.longitude
-                      ? `https://www.google.com/maps/dir/?api=1&destination=${business.latitude},${business.longitude}`
-                      : `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(business.address)}`
-                  }
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-center justify-center gap-2 flex-1 py-3.5 rounded-2xl text-sm font-semibold border-2 transition-all hover:opacity-80 active:scale-95"
-                  style={{ borderColor: "#2D4530", color: "#2D4530", background: "white" }}
-                >
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <polygon points="3 11 22 2 13 21 11 13 3 11"/>
-                  </svg>
-                  Llegar
-                </a>
+        {/* COLUMNA IZQUIERDA — sticky en desktop, normal en mobile */}
+        <div className="md:w-80 md:shrink-0 md:sticky md:top-0 md:h-screen md:overflow-hidden">
+
+          {/* Header verde — desktop: ocupa toda la columna izquierda; oculto en mobile */}
+          <div
+            className="hidden md:flex relative md:flex-col md:items-center md:justify-center w-full h-full px-6 py-10"
+            style={{
+              background: "linear-gradient(135deg, #2D4530 0%, #4A6D4F 100%)",
+              minHeight: "200px",
+            }}
+          >
+            {/* Botón volver — solo en desktop arriba a la izquierda */}
+            <div className="absolute top-4 left-4">
+              <BackButton fallbackHref={backHref} label={backLabel} className="text-white text-sm font-semibold" />
+            </div>
+
+            {/* Logo */}
+            <div className="relative w-28 h-28 rounded-2xl overflow-hidden border-4 border-white shadow-xl mb-5 bg-white shrink-0">
+              {business.logo_url ? (
+                <button onClick={() => setLightboxSrc(business.logo_url)} className="w-full h-full cursor-zoom-in" aria-label="Ampliar logo">
+                  <Image
+                    src={business.logo_url}
+                    alt={business.name}
+                    fill
+                    className="object-contain p-2"
+                    sizes="112px"
+                    quality={85}
+                  />
+                </button>
+              ) : (
+                <div className="w-full h-full flex items-center justify-center text-3xl font-serif"
+                  style={{ color: "#2D4530" }}>
+                  {business.name?.[0]}
+                </div>
               )}
             </div>
-          </AnimateIn>
-        )}
+
+            {/* Nombre */}
+            <h1 className="text-white text-xl font-bold text-center leading-tight mb-1">
+              {business.name}
+            </h1>
+
+            {/* Subcategoría */}
+            {business.subcategory && (
+              <p className="text-white/70 text-sm text-center mb-2">
+                {business.subcategory}
+              </p>
+            )}
+
+            {/* Badge */}
+            {isOpenNow !== null && (
+              <span className={`text-xs font-semibold px-3 py-1 rounded-full ${
+                isOpenNow
+                  ? "bg-green-400/20 text-green-300 border border-green-400/40"
+                  : "bg-white/10 text-white/60 border border-white/20"
+              }`}>
+                {isOpenNow ? "● Abierto ahora" : "● Cerrado ahora"}
+              </span>
+            )}
+
+            {/* Botones — dentro de la columna izquierda en desktop */}
+            {hasBottomActions && (
+              <div className="flex flex-col gap-2 w-full mt-6">
+                {waLink && (
+                  <a href={waLink} target="_blank" rel="noopener noreferrer" onClick={() => recordLead("whatsapp")}
+                    className="flex items-center justify-center gap-2 w-full py-3 rounded-2xl text-sm font-semibold text-white hover:brightness-105 active:scale-95 transition-all"
+                    style={{ background: "#25D366" }}>
+                    <WaIcon size={16} /> WhatsApp
+                  </a>
+                )}
+                {business.phone && (
+                  <a href={`tel:${business.phone}`} onClick={() => recordLead("phone")}
+                    className="flex items-center justify-center gap-2 w-full py-3 rounded-2xl text-sm font-semibold border-2 bg-white hover:opacity-80 active:scale-95 transition-all"
+                    style={{ borderColor: "rgba(255,255,255,0.5)", color: "#2D4530" }}>
+                    <Phone size={16} /> Llamar
+                  </a>
+                )}
+                {(business.address || (business.latitude && business.longitude)) && (
+                  <a
+                    href={
+                      business.latitude && business.longitude
+                        ? `https://www.google.com/maps/dir/?api=1&destination=${business.latitude},${business.longitude}`
+                        : `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(business.address)}`
+                    }
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center justify-center gap-2 w-full py-3 rounded-2xl text-sm font-semibold border-2 bg-white hover:opacity-80 active:scale-95 transition-all"
+                    style={{ borderColor: "rgba(255,255,255,0.5)", color: "#2D4530" }}
+                  >
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <polygon points="3 11 22 2 13 21 11 13 3 11"/>
+                    </svg>
+                    Llegar
+                  </a>
+                )}
+              </div>
+            )}
+          </div>
+
+          {/* ── Botones WhatsApp / Llamar / Llegar — mobile: fila horizontal; oculto en desktop ── */}
+          {hasBottomActions && (
+            <AnimateIn>
+              <div className="flex gap-3 max-w-lg mx-auto px-4 mt-4 md:hidden">
+                {waLink && (
+                  <a href={waLink} target="_blank" rel="noopener noreferrer" onClick={() => recordLead("whatsapp")}
+                    className="flex-1 flex items-center justify-center gap-2 py-3.5 rounded-2xl font-bold text-sm text-white shadow-sm hover:brightness-105 active:scale-95 transition-all"
+                    style={{ background: "#25D366" }}>
+                    <WaIcon size={16} /> WhatsApp
+                  </a>
+                )}
+                {business.phone && (
+                  <a href={`tel:${business.phone}`} onClick={() => recordLead("phone")}
+                    className="flex-1 flex items-center justify-center gap-2 py-3.5 rounded-2xl font-bold text-sm bg-white border-2 shadow-sm hover:opacity-80 active:scale-95 transition-all"
+                    style={{ color: "#2D4530", borderColor: "#2D4530" }}>
+                    <Phone size={16} /> Llamar
+                  </a>
+                )}
+                {(business.address || (business.latitude && business.longitude)) && (
+                  <a
+                    href={
+                      business.latitude && business.longitude
+                        ? `https://www.google.com/maps/dir/?api=1&destination=${business.latitude},${business.longitude}`
+                        : `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(business.address)}`
+                    }
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center justify-center gap-2 flex-1 py-3.5 rounded-2xl text-sm font-semibold border-2 transition-all hover:opacity-80 active:scale-95"
+                    style={{ borderColor: "#2D4530", color: "#2D4530", background: "white" }}
+                  >
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <polygon points="3 11 22 2 13 21 11 13 3 11"/>
+                    </svg>
+                    Llegar
+                  </a>
+                )}
+              </div>
+            </AnimateIn>
+          )}
+        </div>
+
+        {/* COLUMNA DERECHA — scrolleable */}
+        <div className="md:flex-1 md:overflow-y-auto">
+      <div className="max-w-lg mx-auto px-4 pt-5 pb-12 flex flex-col gap-y-5">
 
         {/* ── Sobre nosotros ── */}
         {business.description && (
@@ -525,6 +630,9 @@ export default function DirectorioDetalle({ business, section, promotions = [] }
             </div>
           </AnimateIn>
         )}
+
+      </div>
+        </div>
 
       </div>
 
