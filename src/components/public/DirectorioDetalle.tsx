@@ -4,14 +4,16 @@ import { useEffect, useState } from "react"
 import { useSearchParams } from "next/navigation"
 import Image from "next/image"
 import {
-  Phone, AtSign, MapPin, Clock, ArrowLeft, Globe, CreditCard,
-  PawPrint, Truck, ShoppingBag, UtensilsCrossed, Star, Navigation,
+  Phone, AtSign, MapPin, Clock, Globe, CreditCard,
+  PawPrint, Truck, ShoppingBag, UtensilsCrossed, Star,
   Wifi, Car, ChevronLeft, ChevronRight, Tag, Share2, X, Building2,
 } from "lucide-react"
 import { motion, AnimatePresence } from "framer-motion"
 import { createClient } from "@/lib/supabase/client"
 import { normalizeArgPhone } from "@/lib/phone"
 import { extractYoutubeId } from "@/lib/utils/youtube"
+import AnimateIn from "@/components/ui/AnimateIn"
+import BackButton from "@/components/ui/BackButton"
 
 function WaIcon({ size = 14 }: { size?: number }) {
   return (
@@ -71,16 +73,6 @@ function FeatureBadge({ icon, label }: { icon: React.ReactNode; label: string })
   )
 }
 
-function calcIsOpenNow(hours: any[]): boolean {
-  if (!hours || hours.length === 0) return false
-  const arDate = new Date(new Date().toLocaleString("en-US", { timeZone: "America/Argentina/Buenos_Aires" }))
-  const day  = arDate.getDay()
-  const hhmm = `${String(arDate.getHours()).padStart(2, "0")}:${String(arDate.getMinutes()).padStart(2, "0")}`
-  const todayRows = hours.filter((h: any) => h.day_of_week === day && !h.is_closed)
-  if (todayRows.length === 0) return false
-  return todayRows.some((h: any) => hhmm >= h.opens_at.slice(0, 5) && hhmm < h.closes_at.slice(0, 5))
-}
-
 interface Promotion {
   id: string; title: string; description: string | null
   discount_percentage: number | null; discount_label: string | null; valid_until: string | null
@@ -92,15 +84,15 @@ export default function DirectorioDetalle({ business, section, promotions = [] }
   const searchParams = useSearchParams()
   const from     = searchParams.get("from")
 
-  const rawPhotos = ((business.business_photos ?? []) as any[])
+  const businessPhotoUrls = ((business.business_photos ?? []) as any[])
     .sort((a: any, b: any) => a.sort_order - b.sort_order)
-    .slice(0, 3)
     .map((p: any) => p.url as string)
-  const photos: string[] = rawPhotos.length > 0
-    ? rawPhotos
-    : business.cover_url ? [business.cover_url] : []
+  // El carrusel combina la tapa (si existe) + todas las fotos cargadas del negocio
+  const photos: string[] = [
+    ...(business.cover_url ? [business.cover_url] : []),
+    ...businessPhotoUrls,
+  ]
 
-  const [photoIdx,       setPhotoIdx]       = useState(0)
   const [lightboxIdx,    setLightboxIdx]    = useState<number | null>(null)
   const [lightboxSrc,    setLightboxSrc]    = useState<string | null>(null)
   const [lightboxTouchX, setLightboxTouchX] = useState<number | null>(null)
@@ -143,17 +135,12 @@ export default function DirectorioDetalle({ business, section, promotions = [] }
       : null
 
   const todayIdx  = new Date(new Date().toLocaleString("en-US", { timeZone: "America/Argentina/Buenos_Aires" })).getDay()
-  const todayRows = (business.business_hours ?? []).filter((h: any) => h.day_of_week === todayIdx)
-  const todayIsClosed = todayRows.length > 0 && todayRows.every((h: any) => h.is_closed)
-  const isOpenNow     = calcIsOpenNow(business.business_hours ?? [])
-  const hasHoursData  = todayRows.length > 0
 
   const instagramHandle = business.instagram?.replace(/^@|https?:\/\/(www\.)?instagram\.com\//g, "").replace(/\/$/, "")
   const facebookUrl     = business.facebook
     ? (/^https?:\/\//.test(business.facebook) ? business.facebook : `https://facebook.com/${business.facebook.replace(/^@/, "")}`)
     : null
   const websiteUrl      = business.menu_link || business.website
-  const categoryLabel   = business.subcategory || business.category || SECTION_TITLES[section] || "Comercio"
   const branches: any[] = Array.isArray(business.branches) ? business.branches : []
 
   const hasFeatures =
@@ -166,94 +153,141 @@ export default function DirectorioDetalle({ business, section, promotions = [] }
     const arr = byDay.get(h.day_of_week) ?? []; arr.push(h); byDay.set(h.day_of_week, arr)
   }
 
-  const coverUrl     = business.cover_url || photos[0] || null
-  const prevPhoto    = () => setPhotoIdx(i => (i - 1 + photos.length) % photos.length)
-  const nextPhoto    = () => setPhotoIdx(i => (i + 1) % photos.length)
-
   const backHref  = from === "/destacados" ? "/#destacados" : `/directorio/${section || business?.section || "services"}`
   const backLabel = from === "/destacados" ? "Destacados" : (SECTION_TITLES[section] ?? "Volver")
-  const hasBottomActions = waLink || business.phone || mapsLink
+  const hasBottomActions = waLink || business.phone || business.address || (business.latitude && business.longitude)
+
+  const cardClass = "bg-white rounded-2xl border border-stone-100 p-4"
+
+  const calcIsOpenNow = () => {
+    if (!business.business_hours?.length) return null
+    const now = new Date()
+    const todayIdx = now.getDay()
+    const todayHours = business.business_hours.find((h: any) => h.day_of_week === todayIdx)
+    if (!todayHours || todayHours.is_closed) return false
+    const [openH, openM] = todayHours.opens_at.split(":").map(Number)
+    const [closeH, closeM] = todayHours.closes_at.split(":").map(Number)
+    const nowMinutes = now.getHours() * 60 + now.getMinutes()
+    const openMinutes = openH * 60 + openM
+    const closeMinutes = closeH * 60 + closeM
+    return nowMinutes >= openMinutes && nowMinutes < closeMinutes
+  }
+  const isOpenNow = calcIsOpenNow()
 
   return (
     <div className="relative min-h-screen" style={{ background: "#F0EBE0" }}>
 
-      {/* ═══════════════════════════════════════════════════════════════
-          1 — PORTADA FULL-WIDTH
-      ═══════════════════════════════════════════════════════════════ */}
+      {/* HEADER verde con todo el contenido adentro */}
       <div
-        className="relative w-full h-56 sm:h-72 overflow-hidden"
-        style={{ background: "#1a2e1c", cursor: coverUrl ? "zoom-in" : undefined }}
-        onClick={() => { if (coverUrl) setLightboxSrc(coverUrl) }}
+        className="relative w-full"
+        style={{
+          background: "linear-gradient(135deg, #2D4530 0%, #4A6D4F 100%)",
+          minHeight: "160px",
+        }}
       >
-        {coverUrl ? (
-          <Image src={coverUrl} alt={business.name} fill priority className="object-cover" sizes="100vw" quality={85} />
-        ) : (
-          <div className="w-full h-full flex items-center justify-center"
-            style={{ background: "linear-gradient(135deg, #2D4530 0%, #4A6741 55%, #3D5C3A 100%)" }}>
-            {business.logo_url && (
-              <div className="relative w-28 h-28 opacity-20">
-                <Image src={business.logo_url} alt="" fill className="object-contain" sizes="112px" />
+        {/* Botón volver */}
+        <div className="absolute top-4 left-4">
+          <BackButton
+            fallbackHref={backHref}
+            label={backLabel}
+            className="text-white text-sm font-semibold px-3 py-2 rounded-full"
+            style={{ background: "rgba(0,0,0,0.18)", backdropFilter: "blur(4px)", WebkitBackdropFilter: "blur(4px)" }}
+          />
+        </div>
+
+        {/* Logo + info en fila horizontal */}
+        <div className="flex items-center gap-4 px-6 pb-8 pt-16 w-full max-w-lg mx-auto">
+
+          {/* Logo cuadrado redondeado */}
+          <div className="relative w-24 h-24 rounded-2xl overflow-hidden border-4 border-white shadow-xl bg-white shrink-0">
+            {business.logo_url ? (
+              <button onClick={() => setLightboxSrc(business.logo_url)} className="w-full h-full cursor-zoom-in" aria-label="Ampliar logo">
+                <Image
+                  src={business.logo_url}
+                  alt={business.name}
+                  fill
+                  className="object-contain p-2"
+                  sizes="96px"
+                  quality={85}
+                />
+              </button>
+            ) : (
+              <div className="w-full h-full flex items-center justify-center text-3xl font-serif"
+                style={{ color: "#2D4530" }}>
+                {business.name?.[0]}
               </div>
             )}
           </div>
-        )}
-        <div className="absolute inset-x-0 top-0 h-28 bg-gradient-to-b from-black/45 to-transparent pointer-events-none" />
-        <div className="absolute inset-x-0 bottom-0 h-20 bg-gradient-to-t from-[#F0EBE0] to-transparent pointer-events-none" />
 
-        {/* Botón volver — fondo semitransparente, legible sobre la foto sin taparla */}
-        <a
-          href={backHref}
-          onClick={e => e.stopPropagation()}
-          className="absolute top-4 left-4 z-10 flex items-center gap-2 px-3 py-2 rounded-full text-sm font-semibold text-white transition-colors hover:bg-black/60 active:opacity-60"
-          style={{ background: "rgba(0,0,0,0.4)", backdropFilter: "blur(4px)", WebkitBackdropFilter: "blur(4px)" }}
-        >
-          <ArrowLeft size={15} strokeWidth={2.5} />
-          <span>{backLabel}</span>
-        </a>
+          {/* Texto derecha */}
+          <div className="flex flex-col gap-1.5 min-w-0">
+            <h1 className="text-white text-xl font-bold leading-tight">
+              {business.name}
+            </h1>
+            {business.subcategory && (
+              <p className="text-white/70 text-sm leading-tight">
+                {business.subcategory}
+              </p>
+            )}
+            {isOpenNow !== null && (
+              <span className={`text-xs font-semibold px-3 py-1 rounded-full self-start ${
+                isOpenNow
+                  ? "bg-green-400/20 text-green-300 border border-green-400/40"
+                  : "bg-white/10 text-white/60 border border-white/20"
+              }`}>
+                {isOpenNow ? "● Abierto ahora" : "● Cerrado ahora"}
+              </span>
+            )}
+          </div>
+        </div>
       </div>
 
-      {/* ═══════════════════════════════════════════════════════════════
-          2 — FLOAT SHEET
-      ═══════════════════════════════════════════════════════════════ */}
-      <div className="-mt-8 rounded-t-[32px] relative z-10 pb-12" style={{ background: "#F0EBE0" }}>
-        <div className="max-w-2xl mx-auto px-5 pt-6 flex flex-col gap-y-5">
+      <div className="max-w-lg mx-auto px-4 pt-5 pb-12 flex flex-col gap-y-5">
 
-          {/* ── Nombre + logo + badges ── */}
-          <div className="flex items-start gap-4">
-            <div className="flex-1 min-w-0">
-              <h1 className="text-2xl md:text-3xl font-bold leading-tight tracking-tight" style={{ color: "#2D4530" }}>
-                {business.name}
-              </h1>
-              <div className="flex items-center gap-2 flex-wrap mt-2.5">
-                <span className="text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-wider" style={{ background: "rgba(45,69,48,0.10)", color: "#2D4530" }}>
-                  {categoryLabel}
-                </span>
-                {hasHoursData && (
-                  <span className={`text-[10px] font-bold px-3 py-1 rounded-full flex items-center gap-1.5 ${
-                    isOpenNow ? "text-green-700 bg-green-50 border border-green-200"
-                    : todayIsClosed ? "text-stone-500 bg-stone-100"
-                    : "text-red-600 bg-red-50 border border-red-200"
-                  }`}>
-                    <span className={`w-1.5 h-1.5 rounded-full inline-block ${isOpenNow ? "bg-green-500" : todayIsClosed ? "bg-stone-400" : "bg-red-500"}`} />
-                    {todayIsClosed ? "Cerrado hoy" : isOpenNow ? "Abierto ahora" : "Cerrado ahora"}
-                  </span>
-                )}
-              </div>
+        {/* ── Botones WhatsApp / Llamar / Llegar ── */}
+        {hasBottomActions && (
+          <AnimateIn>
+            <div className="flex gap-3 max-w-lg mx-auto px-4 mt-4">
+              {waLink && (
+                <a href={waLink} target="_blank" rel="noopener noreferrer" onClick={() => recordLead("whatsapp")}
+                  className="flex-1 flex items-center justify-center gap-2 py-3.5 rounded-2xl font-bold text-sm text-white shadow-sm hover:brightness-105 active:scale-95 transition-all"
+                  style={{ background: "#25D366" }}>
+                  <WaIcon size={16} /> WhatsApp
+                </a>
+              )}
+              {business.phone && (
+                <a href={`tel:${business.phone}`} onClick={() => recordLead("phone")}
+                  className="flex-1 flex items-center justify-center gap-2 py-3.5 rounded-2xl font-bold text-sm bg-white border-2 shadow-sm hover:opacity-80 active:scale-95 transition-all"
+                  style={{ color: "#2D4530", borderColor: "#2D4530" }}>
+                  <Phone size={16} /> Llamar
+                </a>
+              )}
+              {(business.address || (business.latitude && business.longitude)) && (
+                <a
+                  href={
+                    business.latitude && business.longitude
+                      ? `https://www.google.com/maps/dir/?api=1&destination=${business.latitude},${business.longitude}`
+                      : `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(business.address)}`
+                  }
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center justify-center gap-2 flex-1 py-3.5 rounded-2xl text-sm font-semibold border-2 transition-all hover:opacity-80 active:scale-95"
+                  style={{ borderColor: "#2D4530", color: "#2D4530", background: "white" }}
+                >
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <polygon points="3 11 22 2 13 21 11 13 3 11"/>
+                  </svg>
+                  Llegar
+                </a>
+              )}
             </div>
-            {business.logo_url && (
-              <button
-                onClick={() => setLightboxSrc(business.logo_url)}
-                className="w-20 h-20 rounded-2xl bg-white border border-stone-100 shadow-sm p-2 shrink-0 relative overflow-hidden cursor-zoom-in hover:ring-2 hover:ring-[#2D4530]/25 transition-all"
-                aria-label="Ampliar logo"
-              >
-                <Image src={business.logo_url} alt={`Logo de ${business.name}`} fill className="object-contain p-1" sizes="80px" quality={85} />
-              </button>
-            )}
-          </div>
+          </AnimateIn>
+        )}
 
-          {/* ── Sobre nosotros ── */}
-          {business.description && (
-            <div>
+        {/* ── Sobre nosotros ── */}
+        {business.description && (
+          <AnimateIn>
+            <div className={cardClass}>
               <p className="text-[10px] font-black uppercase tracking-[0.22em] mb-2" style={{ color: "rgba(45,69,48,0.42)" }}>
                 Sobre nosotros
               </p>
@@ -261,53 +295,37 @@ export default function DirectorioDetalle({ business, section, promotions = [] }
                 {business.description}
               </p>
             </div>
-          )}
+          </AnimateIn>
+        )}
 
-          {/* ── Desktop: botones de acción ── */}
-          <div className="hidden md:flex gap-3">
-            {waLink && (
-              <a href={waLink} target="_blank" rel="noopener noreferrer" onClick={() => recordLead("whatsapp")}
-                className="flex-1 flex items-center justify-center gap-2 py-3.5 rounded-2xl font-bold text-sm text-white shadow-sm hover:brightness-105 transition-all"
-                style={{ background: "#25D366" }}>
-                <WaIcon size={16} /> WhatsApp
-              </a>
-            )}
-            {mapsLink && (
-              <a href={mapsLink} target="_blank" rel="noopener noreferrer"
-                className="flex-1 flex items-center justify-center gap-2 py-3.5 rounded-2xl font-bold text-sm shadow-sm hover:opacity-90 transition-all"
-                style={{ background: "#2D4530", color: "#E1DBC9" }}>
-                <Navigation size={16} /> Llegar
-              </a>
-            )}
-            {business.phone && (
-              <a href={`tel:${business.phone}`} onClick={() => recordLead("phone")}
-                className="flex-1 flex items-center justify-center gap-2 py-3.5 rounded-2xl font-bold text-sm bg-white border-2 shadow-sm hover:opacity-80 transition-all"
-                style={{ color: "#2D4530", borderColor: "#2D4530" }}>
-                <Phone size={16} /> Llamar
-              </a>
-            )}
-          </div>
+        {/* ── Contacto ── */}
+        {(business.phone || (business.whatsapp && business.whatsapp !== business.phone) || instagramHandle || facebookUrl || websiteUrl || business.address || branches.length > 0) && (
+          <AnimateIn>
+            <div className={cardClass}>
+              <p className="text-[10px] font-black uppercase tracking-[0.2em] mb-1" style={{ color: "rgba(45,69,48,0.40)" }}>Contacto</p>
+              <div>
+                {business.phone      && <InfoRow icon={<Phone size={14} style={{ color: "#2D4530" }} />}  sublabel="Teléfono"   label={business.phone}  onClick={() => recordLead("phone")}                 href={`tel:${business.phone}`} />}
+                {business.whatsapp && business.whatsapp !== business.phone && <InfoRow icon={<WaIcon size={14} />} sublabel="WhatsApp" label={business.whatsapp} onClick={() => recordLead("whatsapp")} href={waLink ?? undefined} external />}
+                {instagramHandle     && <InfoRow icon={<AtSign size={14} style={{ color: "#2D4530" }} />} sublabel="Instagram"  label={`@${instagramHandle}`}                            href={`https://instagram.com/${instagramHandle}`} external />}
+                {facebookUrl         && <InfoRow icon={<FbIcon size={14} />}                              sublabel="Facebook"   label={facebookUrl.replace(/^https?:\/\//, "")}           href={facebookUrl} external />}
+                {websiteUrl          && <InfoRow icon={<Globe size={14} style={{ color: "#2D4530" }} />}  sublabel="Sitio web"  label={websiteUrl.replace(/^https?:\/\//, "")}            href={websiteUrl} external />}
+                {business.address    && <InfoRow icon={<MapPin size={14} style={{ color: "#2D4530" }} />} sublabel="Dirección"  label={business.address} href={mapsLink ?? undefined} external />}
+                {branches.map((branch: any, i: number) => (
+                  <InfoRow key={i}
+                    icon={<MapPin size={14} style={{ color: "#2D4530", opacity: 0.5 }} />}
+                    sublabel={`Sucursal${branches.length > 1 ? ` ${i + 1}` : ""}`}
+                    label={branch.pueblo ? `${branch.pueblo}${branch.address ? ` — ${branch.address}` : ""}` : branch.address ?? ""}
+                  />
+                ))}
+              </div>
+            </div>
+          </AnimateIn>
+        )}
 
-          {/* ── Datos de contacto ── */}
-          <div className="bg-white/50 rounded-2xl px-4 py-1">
-            {business.phone      && <InfoRow icon={<Phone size={14} style={{ color: "#2D4530" }} />}  sublabel="Teléfono"   label={business.phone}  onClick={() => recordLead("phone")}                 href={`tel:${business.phone}`} />}
-            {business.whatsapp && business.whatsapp !== business.phone && <InfoRow icon={<WaIcon size={14} />} sublabel="WhatsApp" label={business.whatsapp} onClick={() => recordLead("whatsapp")} href={waLink ?? undefined} external />}
-            {instagramHandle     && <InfoRow icon={<AtSign size={14} style={{ color: "#2D4530" }} />} sublabel="Instagram"  label={`@${instagramHandle}`}                            href={`https://instagram.com/${instagramHandle}`} external />}
-            {facebookUrl         && <InfoRow icon={<FbIcon size={14} />}                              sublabel="Facebook"   label={facebookUrl.replace(/^https?:\/\//, "")}           href={facebookUrl} external />}
-            {websiteUrl          && <InfoRow icon={<Globe size={14} style={{ color: "#2D4530" }} />}  sublabel="Sitio web"  label={websiteUrl.replace(/^https?:\/\//, "")}            href={websiteUrl} external />}
-            {business.address    && <InfoRow icon={<MapPin size={14} style={{ color: "#2D4530" }} />} sublabel="Dirección"  label={business.address} />}
-            {branches.map((branch: any, i: number) => (
-              <InfoRow key={i}
-                icon={<MapPin size={14} style={{ color: "#2D4530", opacity: 0.5 }} />}
-                sublabel={`Sucursal${branches.length > 1 ? ` ${i + 1}` : ""}`}
-                label={branch.pueblo ? `${branch.pueblo}${branch.address ? ` — ${branch.address}` : ""}` : branch.address ?? ""}
-              />
-            ))}
-          </div>
-
-          {/* ── Forma parte de (grupo profesional) ── */}
-          {business.group_name && business.group_id && groupMembers.length > 0 && (
-            <div className="bg-white/50 rounded-2xl p-4">
+        {/* ── Forma parte de (grupo profesional) ── */}
+        {business.group_name && business.group_id && groupMembers.length > 0 && (
+          <AnimateIn>
+            <div className={cardClass}>
               <div className="flex items-center gap-2 mb-3">
                 <Building2 size={13} style={{ color: "rgba(45,69,48,0.40)" }} />
                 <p className="text-[10px] font-black uppercase tracking-[0.2em]" style={{ color: "rgba(45,69,48,0.40)" }}>
@@ -323,12 +341,12 @@ export default function DirectorioDetalle({ business, section, promotions = [] }
                     style={{ background: "#FAFAF9" }}
                   >
                     {member.logo_url ? (
-                      <div className="relative w-14 h-14 rounded-xl overflow-hidden flex-shrink-0 bg-white">
+                      <div className="relative w-14 h-14 rounded-xl overflow-hidden shrink-0 bg-white">
                         <Image src={member.logo_url} alt={member.name} fill className="object-contain p-1" sizes="56px" />
                       </div>
                     ) : (
                       <div
-                        className="w-14 h-14 rounded-xl flex-shrink-0 flex items-center justify-center font-serif text-xl font-bold"
+                        className="w-14 h-14 rounded-xl shrink-0 flex items-center justify-center font-serif text-xl font-bold"
                         style={{ background: "#2D4530", color: "#E1DBC9" }}
                       >
                         {member.name?.[0] ?? "?"}
@@ -342,11 +360,13 @@ export default function DirectorioDetalle({ business, section, promotions = [] }
                 ))}
               </div>
             </div>
-          )}
+          </AnimateIn>
+        )}
 
-          {/* ── Horarios ── */}
-          {byDay.size > 0 && (
-            <div className="bg-white/50 rounded-2xl p-4">
+        {/* ── Horarios ── */}
+        {byDay.size > 0 && (
+          <AnimateIn>
+            <div className={cardClass}>
               <div className="flex items-center gap-2 mb-3">
                 <Clock size={13} style={{ color: "rgba(45,69,48,0.40)" }} />
                 <p className="text-[10px] font-black uppercase tracking-[0.2em]" style={{ color: "rgba(45,69,48,0.40)" }}>Horarios</p>
@@ -373,11 +393,23 @@ export default function DirectorioDetalle({ business, section, promotions = [] }
                   )
                 })}
               </div>
+              {(business.has_24h_guard || business.appointment_system) && (
+                <div className="mt-3 pt-3 border-t border-stone-100">
+                  {business.has_24h_guard && (
+                    <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold" style={{ background: "rgba(45,69,48,0.08)", color: "#2D4530" }}>
+                      ✦ Guardia 24 hs
+                    </span>
+                  )}
+                  {business.appointment_system && <p className="text-xs text-stone-500 mt-2">{business.appointment_system}</p>}
+                </div>
+              )}
             </div>
-          )}
+          </AnimateIn>
+        )}
 
-          {/* ── Promociones ── */}
-          {promotions.length > 0 && (
+        {/* ── Promociones ── */}
+        {promotions.length > 0 && (
+          <AnimateIn>
             <div className="flex flex-col gap-3">
               {promotions.map(promo => {
                 const badge = promo.discount_label || (promo.discount_percentage ? `${promo.discount_percentage}% OFF` : "PROMO EXCLUSIVA")
@@ -391,7 +423,7 @@ export default function DirectorioDetalle({ business, section, promotions = [] }
                   else { await navigator.clipboard.writeText(`${text} ${url}`) }
                 }
                 return (
-                  <div key={promo.id} className="rounded-3xl border border-[#2D4530]/40 overflow-hidden" style={{ background: "#F0F7F0" }}>
+                  <div key={promo.id} className="rounded-2xl border border-[#2D4530]/40 overflow-hidden" style={{ background: "#F0F7F0" }}>
                     <div className="px-6 py-4 flex items-center gap-3" style={{ background: "#2D4530" }}>
                       <Tag size={16} className="text-yellow-400 shrink-0" />
                       <span className="font-black text-xl tracking-tight text-yellow-400">{badge}</span>
@@ -411,89 +443,67 @@ export default function DirectorioDetalle({ business, section, promotions = [] }
                 )
               })}
             </div>
-          )}
+          </AnimateIn>
+        )}
 
-          {/* ── Características ── */}
-          {hasFeatures && (
-            <div className="bg-white/50 rounded-2xl p-4">
-              <p className="text-[10px] font-black uppercase tracking-[0.2em] mb-3" style={{ color: "rgba(45,69,48,0.40)" }}>Características</p>
-              <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-                {business.offers_delivery      && <FeatureBadge icon={<Truck size={13} />}           label="Delivery" />}
-                {business.offers_takeaway      && <FeatureBadge icon={<ShoppingBag size={13} />}     label="Take away" />}
-                {business.offers_dine_in       && <FeatureBadge icon={<UtensilsCrossed size={13} />} label="En el lugar" />}
-                {business.accepts_reservations && <FeatureBadge icon={<Star size={13} />}            label="Reservas" />}
-                {business.pet_friendly         && <FeatureBadge icon={<PawPrint size={13} />}        label="Pet friendly" />}
-                {business.wifi                 && <FeatureBadge icon={<Wifi size={13} />}            label="Wi-Fi" />}
-                {business.parking              && <FeatureBadge icon={<Car size={13} />}             label="Estacionamiento" />}
-              </div>
-            </div>
-          )}
-
-          {/* ── Formas de pago ── */}
-          {business.payment_methods?.length > 0 && (
-            <div className="bg-white/50 rounded-2xl p-4">
-              <div className="flex items-center gap-2 mb-3">
-                <CreditCard size={13} style={{ color: "rgba(45,69,48,0.40)" }} />
-                <p className="text-[10px] font-black uppercase tracking-[0.2em]" style={{ color: "rgba(45,69,48,0.40)" }}>Formas de pago</p>
-              </div>
-              <div className="flex flex-wrap gap-2">
-                {business.payment_methods.map((method: string) => (
-                  <span key={method} className="px-3 py-1.5 rounded-xl text-xs font-medium" style={{ background: "rgba(45,69,48,0.07)", color: "#2D4530", border: "1px solid rgba(45,69,48,0.10)" }}>
-                    {PAYMENT_LABELS[method] ?? method}
+        {/* ── Servicios (características + formas de pago) ── */}
+        {(hasFeatures || business.payment_methods?.length > 0) && (
+          <AnimateIn>
+            <div className={cardClass}>
+              <p className="text-[10px] font-black uppercase tracking-[0.2em] mb-3" style={{ color: "rgba(45,69,48,0.40)" }}>Servicios</p>
+              {hasFeatures && (
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                  {business.offers_delivery      && <FeatureBadge icon={<Truck size={13} />}           label="Delivery" />}
+                  {business.offers_takeaway      && <FeatureBadge icon={<ShoppingBag size={13} />}     label="Take away" />}
+                  {business.offers_dine_in       && <FeatureBadge icon={<UtensilsCrossed size={13} />} label="En el lugar" />}
+                  {business.accepts_reservations && <FeatureBadge icon={<Star size={13} />}            label="Reservas" />}
+                  {business.pet_friendly         && <FeatureBadge icon={<PawPrint size={13} />}        label="Pet friendly" />}
+                  {business.wifi                 && <FeatureBadge icon={<Wifi size={13} />}            label="Wi-Fi" />}
+                  {business.parking              && <FeatureBadge icon={<Car size={13} />}             label="Estacionamiento" />}
+                </div>
+              )}
+              {business.payment_methods?.length > 0 && (
+                <div className={`flex flex-wrap gap-2 ${hasFeatures ? "mt-3 pt-3 border-t border-stone-100" : ""}`}>
+                  <span className="w-full flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wider mb-1" style={{ color: "rgba(45,69,48,0.40)" }}>
+                    <CreditCard size={12} /> Formas de pago
                   </span>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* ═══════════════════════════════════════════════════════════
-              5 — CARRUSEL DE FOTOS
-          ═══════════════════════════════════════════════════════════ */}
-          {photos.length > 0 && (
-            <div className="flex flex-col gap-y-3">
-              <div className="flex items-center gap-3">
-                <span className="h-px flex-1 bg-stone-200/80" />
-                <span className="text-[10px] font-bold uppercase tracking-[0.2em] px-3 py-1 rounded-full shrink-0" style={{ background: "rgba(45,69,48,0.10)", color: "#2D4530" }}>
-                  {categoryLabel}
-                </span>
-                <span className="h-px flex-1 bg-stone-200/80" />
-              </div>
-
-              <div className="flex items-center gap-2">
-                {photos.length > 1 && (
-                  <button onClick={prevPhoto} aria-label="Foto anterior" className="shrink-0 w-10 h-10 rounded-full flex items-center justify-center border-2 border-[#2D4530] text-[#2D4530] hover:bg-[#2D4530] hover:text-[#E1DBC9] transition-all active:scale-90">
-                    <ChevronLeft size={18} />
-                  </button>
-                )}
-                <button
-                  onClick={() => setLightboxIdx(photoIdx)}
-                  className="flex-1 aspect-[4/3] sm:aspect-video rounded-2xl overflow-hidden relative bg-white cursor-zoom-in"
-                  aria-label="Ampliar foto"
-                >
-                  <div className="absolute inset-0 animate-pulse bg-gradient-to-r from-stone-100 via-stone-50 to-stone-100" />
-                  <Image src={photos[photoIdx]} alt={`${business.name} — foto ${photoIdx + 1} de ${photos.length}`} fill priority={photoIdx === 0} className="object-contain" sizes="(max-width: 640px) calc(100vw - 40px), 640px" quality={85} />
-                </button>
-                {photos.length > 1 && (
-                  <button onClick={nextPhoto} aria-label="Foto siguiente" className="shrink-0 w-10 h-10 rounded-full flex items-center justify-center border-2 border-[#2D4530] text-[#2D4530] hover:bg-[#2D4530] hover:text-[#E1DBC9] transition-all active:scale-90">
-                    <ChevronRight size={18} />
-                  </button>
-                )}
-              </div>
-
-              {photos.length > 1 && (
-                <div className="flex items-center justify-center gap-2 h-4">
-                  {photos.map((_, i) => (
-                    <button key={i} onClick={() => setPhotoIdx(i)} className="h-1.5 rounded-full transition-all duration-300"
-                      style={{ width: i === photoIdx ? 20 : 6, background: i === photoIdx ? "#2D4530" : "rgba(45,69,48,0.22)" }} />
+                  {business.payment_methods.map((method: string) => (
+                    <span key={method} className="px-3 py-1.5 rounded-xl text-xs font-medium" style={{ background: "rgba(45,69,48,0.07)", color: "#2D4530", border: "1px solid rgba(45,69,48,0.10)" }}>
+                      {PAYMENT_LABELS[method] ?? method}
+                    </span>
                   ))}
                 </div>
               )}
-              <p className="text-center text-xs text-stone-400 font-medium leading-snug">{business.name}{business.address ? ` · ${business.address}` : ""}</p>
             </div>
-          )}
+          </AnimateIn>
+        )}
 
-          {/* ── Video de YouTube ── */}
-          {business.video_url && extractYoutubeId(business.video_url) && (
+        {/* ═══════════════════════════════════════════════════════════
+            CARRUSEL DE FOTOS (cover_url + business_photos)
+        ═══════════════════════════════════════════════════════════ */}
+        {photos.length > 0 && (
+          <AnimateIn>
+            <div className="flex flex-col gap-y-3">
+              <p className="text-[10px] font-black uppercase tracking-[0.2em]" style={{ color: "rgba(45,69,48,0.40)" }}>Fotos</p>
+              <div className="flex gap-3 overflow-x-auto pb-2">
+                {photos.map((src, i) => (
+                  <button
+                    key={i}
+                    onClick={() => setLightboxIdx(i)}
+                    className="relative w-48 aspect-square rounded-2xl overflow-hidden shrink-0 bg-stone-100 cursor-zoom-in"
+                    aria-label={`Ampliar foto ${i + 1}`}
+                  >
+                    <Image src={src} alt={`${business.name} — foto ${i + 1} de ${photos.length}`} fill priority={i === 0} className="object-cover" sizes="192px" quality={85} />
+                  </button>
+                ))}
+              </div>
+            </div>
+          </AnimateIn>
+        )}
+
+        {/* ── Video de YouTube ── */}
+        {business.video_url && extractYoutubeId(business.video_url) && (
+          <AnimateIn>
             <div className="flex flex-col gap-y-3">
               <div className="flex items-center gap-3">
                 <span className="h-px flex-1 bg-stone-200/80" />
@@ -513,48 +523,9 @@ export default function DirectorioDetalle({ business, section, promotions = [] }
                 />
               </div>
             </div>
-          )}
+          </AnimateIn>
+        )}
 
-          {/* ── Guardia y turnos (salud) ── */}
-          {(business.has_24h_guard || business.appointment_system) && (
-            <div className="bg-white/50 rounded-2xl p-4">
-              {business.has_24h_guard && (
-                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold" style={{ background: "rgba(45,69,48,0.08)", color: "#2D4530" }}>
-                  ✦ Guardia 24 hs
-                </span>
-              )}
-              {business.appointment_system && <p className="text-xs text-stone-500 mt-2">{business.appointment_system}</p>}
-            </div>
-          )}
-
-          {/* ── Botonera de contacto (mobile) ── */}
-          {hasBottomActions && (
-            <div className="md:hidden flex gap-3">
-              {waLink && (
-                <a href={waLink} target="_blank" rel="noopener noreferrer" onClick={() => recordLead("whatsapp")}
-                  className="flex-1 flex items-center justify-center gap-2 py-3.5 rounded-2xl text-sm font-bold text-white shadow-sm active:scale-95 transition-all hover:brightness-105"
-                  style={{ background: "#25D366" }}>
-                  <WaIcon size={16} /> WhatsApp
-                </a>
-              )}
-              {business.phone && (
-                <a href={`tel:${business.phone}`} onClick={() => recordLead("phone")}
-                  className="flex-1 flex items-center justify-center gap-2 py-3.5 rounded-2xl text-sm font-bold border-2 bg-white active:scale-95 transition-all hover:opacity-80"
-                  style={{ color: "#2D4530", borderColor: "#2D4530" }}>
-                  <Phone size={16} /> Llamar
-                </a>
-              )}
-              {mapsLink && (
-                <a href={mapsLink} target="_blank" rel="noopener noreferrer"
-                  className="flex-1 flex items-center justify-center gap-2 py-3.5 rounded-2xl text-sm font-bold shadow-sm active:scale-95 transition-all hover:opacity-90"
-                  style={{ background: "#2D4530", color: "#E1DBC9" }}>
-                  <Navigation size={16} /> Llegar
-                </a>
-              )}
-            </div>
-          )}
-
-        </div>
       </div>
 
       {/* ─── LIGHTBOX galería ───────────────────────────────────────── */}
@@ -571,7 +542,7 @@ export default function DirectorioDetalle({ business, section, promotions = [] }
               const diff = lightboxTouchX - e.changedTouches[0].clientX
               if (Math.abs(diff) > 50) {
                 const next = diff > 0 ? (lightboxIdx + 1) % photos.length : (lightboxIdx - 1 + photos.length) % photos.length
-                setLightboxIdx(next); setPhotoIdx(next)
+                setLightboxIdx(next)
               }
               setLightboxTouchX(null)
             }}
@@ -593,10 +564,10 @@ export default function DirectorioDetalle({ business, section, promotions = [] }
             </motion.div>
             {photos.length > 1 && (
               <>
-                <button onClick={e => { e.stopPropagation(); const next = (lightboxIdx - 1 + photos.length) % photos.length; setLightboxIdx(next); setPhotoIdx(next) }}
+                <button onClick={e => { e.stopPropagation(); const next = (lightboxIdx - 1 + photos.length) % photos.length; setLightboxIdx(next) }}
                   aria-label="Foto anterior" className="absolute left-3 top-1/2 -translate-y-1/2 z-20 w-12 h-12 rounded-full flex items-center justify-center"
                   style={{ background: "rgba(255,255,255,0.20)", color: "#fff" }}><ChevronLeft size={22} /></button>
-                <button onClick={e => { e.stopPropagation(); const next = (lightboxIdx + 1) % photos.length; setLightboxIdx(next); setPhotoIdx(next) }}
+                <button onClick={e => { e.stopPropagation(); const next = (lightboxIdx + 1) % photos.length; setLightboxIdx(next) }}
                   aria-label="Foto siguiente" className="absolute right-3 top-1/2 -translate-y-1/2 z-20 w-12 h-12 rounded-full flex items-center justify-center"
                   style={{ background: "rgba(255,255,255,0.20)", color: "#fff" }}><ChevronRight size={22} /></button>
               </>
@@ -604,7 +575,7 @@ export default function DirectorioDetalle({ business, section, promotions = [] }
             {photos.length > 1 && (
               <div className="absolute bottom-6 left-0 right-0 flex justify-center gap-2 z-20">
                 {photos.map((_, i) => (
-                  <button key={i} onClick={e => { e.stopPropagation(); setLightboxIdx(i); setPhotoIdx(i) }} aria-label={`Ver foto ${i + 1}`}
+                  <button key={i} onClick={e => { e.stopPropagation(); setLightboxIdx(i) }} aria-label={`Ver foto ${i + 1}`}
                     className="h-1.5 rounded-full transition-all duration-300"
                     style={{ width: i === lightboxIdx ? 20 : 6, background: i === lightboxIdx ? "#fff" : "rgba(255,255,255,0.40)" }} />
                 ))}
