@@ -4,7 +4,7 @@ import { useEffect, useState } from "react"
 import { useSearchParams } from "next/navigation"
 import Image from "next/image"
 import {
-  Phone, AtSign, MapPin, Clock, Globe, CreditCard,
+  Phone, MapPin, CreditCard, AtSign, Globe,
   PawPrint, Truck, ShoppingBag, UtensilsCrossed, Star,
   Wifi, Car, ChevronLeft, ChevronRight, Tag, Share2, X, Building2,
 } from "lucide-react"
@@ -31,8 +31,6 @@ function FbIcon({ size = 14 }: { size?: number }) {
   )
 }
 
-const DAY_SHORT = ["Dom", "Lun", "Mar", "Mié", "Jue", "Vie", "Sáb"]
-
 const SECTION_TITLES: Record<string, string> = {
   gastronomy: "Gastronomía", services: "Servicios", health: "Salud",
   education: "Educación", sports: "Deportes", tourism: "Turismo", commerce: "Comercios",
@@ -42,26 +40,6 @@ const SECTION_TITLES: Record<string, string> = {
 const PAYMENT_LABELS: Record<string, string> = {
   efectivo: "Efectivo", debito: "Débito", credito: "Crédito",
   transferencia: "Transferencia", mercadopago: "Mercado Pago", qr: "QR",
-}
-
-function InfoRow({ icon, sublabel, label, href, external, onClick }: {
-  icon: React.ReactNode; sublabel: string; label: string; href?: string; external?: boolean; onClick?: () => void
-}) {
-  const inner = (
-    <div className="flex items-start gap-3 py-3 border-b border-stone-100 last:border-0">
-      <div className="w-8 h-8 rounded-lg bg-stone-50 border border-stone-100 flex items-center justify-center shrink-0 mt-0.5">
-        {icon}
-      </div>
-      <div className="min-w-0 flex-1">
-        <p className="text-[10px] font-bold uppercase tracking-wider text-stone-400 mb-0.5">{sublabel}</p>
-        <p className="text-sm font-semibold leading-snug break-words" style={{ color: "#2D4530" }}>{label}</p>
-      </div>
-    </div>
-  )
-  if (href) return (
-    <a href={href} target={external ? "_blank" : undefined} rel={external ? "noopener noreferrer" : undefined} onClick={onClick} className="block hover:opacity-70 transition-opacity">{inner}</a>
-  )
-  return inner
 }
 
 function FeatureBadge({ icon, label }: { icon: React.ReactNode; label: string }) {
@@ -127,13 +105,6 @@ export default function DirectorioDetalle({ business, section, promotions = [] }
     ? `https://wa.me/${waNum}?text=${encodeURIComponent(`Hola! Te consulto desde Calamuchita App — ${business.name} 🌿`)}`
     : null
 
-  const mapsLink =
-    business.latitude && business.longitude
-      ? `https://www.google.com/maps/search/?api=1&query=${business.latitude},${business.longitude}`
-      : typeof business.address === "string" && business.address.trim()
-      ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${business.name} ${business.address.trim()}`)}`
-      : null
-
   const todayIdx  = new Date(new Date().toLocaleString("en-US", { timeZone: "America/Argentina/Buenos_Aires" })).getDay()
 
   const instagramHandle = business.instagram?.replace(/^@|https?:\/\/(www\.)?instagram\.com\//g, "").replace(/\/$/, "")
@@ -141,17 +112,10 @@ export default function DirectorioDetalle({ business, section, promotions = [] }
     ? (/^https?:\/\//.test(business.facebook) ? business.facebook : `https://facebook.com/${business.facebook.replace(/^@/, "")}`)
     : null
   const websiteUrl      = business.menu_link || business.website
-  const branches: any[] = Array.isArray(business.branches) ? business.branches : []
 
   const hasFeatures =
     business.offers_delivery || business.offers_takeaway || business.offers_dine_in ||
     business.accepts_reservations || business.pet_friendly || business.wifi || business.parking
-
-  const sortedHours = [...(business.business_hours ?? [])].sort((a: any, b: any) => a.day_of_week - b.day_of_week)
-  const byDay = new Map<number, any[]>()
-  for (const h of sortedHours) {
-    const arr = byDay.get(h.day_of_week) ?? []; arr.push(h); byDay.set(h.day_of_week, arr)
-  }
 
   const backHref  = from === "/destacados" ? "/#destacados" : `/directorio/${section || business?.section || "services"}`
   const backLabel = from === "/destacados" ? "Destacados" : (SECTION_TITLES[section] ?? "Volver")
@@ -246,15 +210,12 @@ export default function DirectorioDetalle({ business, section, promotions = [] }
       <div className="md:flex md:min-h-screen">
 
         {/* COLUMNA IZQUIERDA — sticky en desktop, normal en mobile */}
-        <div className="md:w-80 md:shrink-0 md:sticky md:top-0 md:h-screen md:overflow-hidden">
+        <div className="md:w-80 md:shrink-0 md:sticky md:top-0 md:h-screen md:flex md:flex-col">
 
           {/* Header verde — desktop: ocupa toda la columna izquierda; oculto en mobile */}
           <div
-            className="hidden md:flex relative md:flex-col md:items-center md:justify-center w-full h-full px-6 py-10"
-            style={{
-              background: "linear-gradient(135deg, #2D4530 0%, #4A6D4F 100%)",
-              minHeight: "200px",
-            }}
+            className="hidden md:flex relative w-full flex-1 flex-col px-6 py-6 overflow-y-auto"
+            style={{ background: "linear-gradient(135deg, #2D4530 0%, #4A6D4F 100%)" }}
           >
             {/* Botón volver — solo en desktop arriba a la izquierda */}
             <div className="absolute top-4 left-4">
@@ -262,7 +223,7 @@ export default function DirectorioDetalle({ business, section, promotions = [] }
             </div>
 
             {/* Logo */}
-            <div className="relative w-28 h-28 rounded-2xl overflow-hidden border-4 border-white shadow-xl mb-5 bg-white shrink-0">
+            <div className="relative w-40 h-40 rounded-2xl overflow-hidden border-4 border-white shadow-xl mb-5 bg-white shrink-0 mt-16">
               {business.logo_url ? (
                 <button onClick={() => setLightboxSrc(business.logo_url)} className="w-full h-full cursor-zoom-in" aria-label="Ampliar logo">
                   <Image
@@ -270,7 +231,7 @@ export default function DirectorioDetalle({ business, section, promotions = [] }
                     alt={business.name}
                     fill
                     className="object-contain p-2"
-                    sizes="112px"
+                    sizes="160px"
                     quality={85}
                   />
                 </button>
@@ -342,6 +303,39 @@ export default function DirectorioDetalle({ business, section, promotions = [] }
                 )}
               </div>
             )}
+
+            {/* Horarios — en columna izquierda desktop */}
+            {business.business_hours?.length > 0 && (
+              <div className="mt-6 w-full">
+                <p className="text-white/60 text-xs uppercase tracking-wider mb-3 flex items-center gap-1">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+                  Horarios
+                </p>
+                <div className="space-y-1.5">
+                  {[0,1,2,3,4,5,6].map(dayIdx => {
+                    const h = business.business_hours.find((x: any) => x.day_of_week === dayIdx)
+                    const isToday = dayIdx === todayIdx
+                    const dayNames = ["Dom","Lun","Mar","Mié","Jue","Vie","Sáb"]
+                    return (
+                      <div key={dayIdx} className={`flex justify-between text-xs ${isToday ? "text-white font-bold" : "text-white/50"}`}>
+                        <span>{dayNames[dayIdx]}</span>
+                        <span>{!h || h.is_closed ? "Cerrado" : `${h.opens_at?.slice(0,5)} — ${h.closes_at?.slice(0,5)}`}</span>
+                      </div>
+                    )
+                  })}
+                </div>
+                {(business.has_24h_guard || business.appointment_system) && (
+                  <div className="mt-3 pt-3 border-t border-white/10">
+                    {business.has_24h_guard && (
+                      <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-white/10 text-white/80">
+                        ✦ Guardia 24 hs
+                      </span>
+                    )}
+                    {business.appointment_system && <p className="text-xs text-white/50 mt-2">{business.appointment_system}</p>}
+                  </div>
+                )}
+              </div>
+            )}
           </div>
 
           {/* ── Botones WhatsApp / Llamar / Llegar — mobile: fila horizontal; oculto en desktop ── */}
@@ -389,40 +383,110 @@ export default function DirectorioDetalle({ business, section, promotions = [] }
         <div className="md:flex-1 md:overflow-y-auto">
       <div className="max-w-lg mx-auto px-4 pt-5 pb-12 flex flex-col gap-y-5">
 
-        {/* ── Sobre nosotros ── */}
-        {business.description && (
+        {/* Fila: Sobre nosotros + Contacto */}
+        <AnimateIn>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-start">
+
+            {/* Sobre nosotros */}
+            {business.description && (
+              <div className={`${cardClass} min-h-[200px]`}>
+                <p className="text-xs font-semibold uppercase tracking-wider text-stone-400 mb-2">Sobre nosotros</p>
+                <p className="text-sm text-stone-600 leading-relaxed">{business.description}</p>
+              </div>
+            )}
+
+            {/* Contacto */}
+            {(business.phone || business.whatsapp || instagramHandle || facebookUrl || websiteUrl || business.address) && (
+              <div className={`${cardClass} min-h-[200px]`}>
+                <p className="text-xs font-semibold uppercase tracking-wider text-stone-400 mb-3">Contacto</p>
+                <div className="space-y-2.5">
+                  {business.phone && (
+                    <a href={`tel:${business.phone}`} onClick={() => recordLead("phone")} className="flex items-center gap-2 text-sm text-stone-600 hover:text-[#2D4530]">
+                      <Phone size={14} />
+                      {business.phone}
+                    </a>
+                  )}
+                  {instagramHandle && (
+                    <a href={`https://instagram.com/${instagramHandle}`} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-sm text-stone-600 hover:text-[#2D4530]">
+                      <AtSign size={14} />
+                      @{instagramHandle}
+                    </a>
+                  )}
+                  {facebookUrl && (
+                    <a href={facebookUrl} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-sm text-stone-600 hover:text-[#2D4530]">
+                      <FbIcon size={14} />
+                      Facebook
+                    </a>
+                  )}
+                  {websiteUrl && (
+                    <a href={websiteUrl} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-sm text-stone-600 hover:text-[#2D4530]">
+                      <Globe size={14} />
+                      Sitio web
+                    </a>
+                  )}
+                  {business.address && (
+                    <div className="flex items-start gap-2 text-sm text-stone-600">
+                      <MapPin size={14} className="mt-0.5 shrink-0" />
+                      {business.address}
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+          </div>
+        </AnimateIn>
+
+        {/* ═══════════════════════════════════════════════════════════
+            CARRUSEL DE FOTOS (cover_url + business_photos)
+        ═══════════════════════════════════════════════════════════ */}
+        {photos.length > 0 && (
           <AnimateIn>
-            <div className={cardClass}>
-              <p className="text-[10px] font-black uppercase tracking-[0.22em] mb-2" style={{ color: "rgba(45,69,48,0.42)" }}>
-                Sobre nosotros
-              </p>
-              <p className="text-sm leading-relaxed" style={{ color: "rgba(45,69,48,0.72)" }}>
-                {business.description}
-              </p>
+            <div className="flex flex-col gap-y-3">
+              <p className="text-[10px] font-black uppercase tracking-[0.2em]" style={{ color: "rgba(45,69,48,0.40)" }}>Fotos</p>
+              <div className="flex gap-3 overflow-x-auto pb-2">
+                {photos.map((src, i) => (
+                  <button
+                    key={i}
+                    onClick={() => setLightboxIdx(i)}
+                    className="relative w-48 aspect-square rounded-2xl overflow-hidden shrink-0 bg-stone-100 cursor-zoom-in"
+                    aria-label={`Ampliar foto ${i + 1}`}
+                  >
+                    <Image src={src} alt={`${business.name} — foto ${i + 1} de ${photos.length}`} fill priority={i === 0} className="object-cover" sizes="192px" quality={85} />
+                  </button>
+                ))}
+              </div>
             </div>
           </AnimateIn>
         )}
 
-        {/* ── Contacto ── */}
-        {(business.phone || (business.whatsapp && business.whatsapp !== business.phone) || instagramHandle || facebookUrl || websiteUrl || business.address || branches.length > 0) && (
+        {/* ── Servicios (características + formas de pago) ── */}
+        {(hasFeatures || business.payment_methods?.length > 0) && (
           <AnimateIn>
             <div className={cardClass}>
-              <p className="text-[10px] font-black uppercase tracking-[0.2em] mb-1" style={{ color: "rgba(45,69,48,0.40)" }}>Contacto</p>
-              <div>
-                {business.phone      && <InfoRow icon={<Phone size={14} style={{ color: "#2D4530" }} />}  sublabel="Teléfono"   label={business.phone}  onClick={() => recordLead("phone")}                 href={`tel:${business.phone}`} />}
-                {business.whatsapp && business.whatsapp !== business.phone && <InfoRow icon={<WaIcon size={14} />} sublabel="WhatsApp" label={business.whatsapp} onClick={() => recordLead("whatsapp")} href={waLink ?? undefined} external />}
-                {instagramHandle     && <InfoRow icon={<AtSign size={14} style={{ color: "#2D4530" }} />} sublabel="Instagram"  label={`@${instagramHandle}`}                            href={`https://instagram.com/${instagramHandle}`} external />}
-                {facebookUrl         && <InfoRow icon={<FbIcon size={14} />}                              sublabel="Facebook"   label={facebookUrl.replace(/^https?:\/\//, "")}           href={facebookUrl} external />}
-                {websiteUrl          && <InfoRow icon={<Globe size={14} style={{ color: "#2D4530" }} />}  sublabel="Sitio web"  label={websiteUrl.replace(/^https?:\/\//, "")}            href={websiteUrl} external />}
-                {business.address    && <InfoRow icon={<MapPin size={14} style={{ color: "#2D4530" }} />} sublabel="Dirección"  label={business.address} href={mapsLink ?? undefined} external />}
-                {branches.map((branch: any, i: number) => (
-                  <InfoRow key={i}
-                    icon={<MapPin size={14} style={{ color: "#2D4530", opacity: 0.5 }} />}
-                    sublabel={`Sucursal${branches.length > 1 ? ` ${i + 1}` : ""}`}
-                    label={branch.pueblo ? `${branch.pueblo}${branch.address ? ` — ${branch.address}` : ""}` : branch.address ?? ""}
-                  />
-                ))}
-              </div>
+              <p className="text-[10px] font-black uppercase tracking-[0.2em] mb-3" style={{ color: "rgba(45,69,48,0.40)" }}>Servicios</p>
+              {hasFeatures && (
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                  {business.offers_delivery      && <FeatureBadge icon={<Truck size={13} />}           label="Delivery" />}
+                  {business.offers_takeaway      && <FeatureBadge icon={<ShoppingBag size={13} />}     label="Take away" />}
+                  {business.offers_dine_in       && <FeatureBadge icon={<UtensilsCrossed size={13} />} label="En el lugar" />}
+                  {business.accepts_reservations && <FeatureBadge icon={<Star size={13} />}            label="Reservas" />}
+                  {business.pet_friendly         && <FeatureBadge icon={<PawPrint size={13} />}        label="Pet friendly" />}
+                  {business.wifi                 && <FeatureBadge icon={<Wifi size={13} />}            label="Wi-Fi" />}
+                  {business.parking              && <FeatureBadge icon={<Car size={13} />}             label="Estacionamiento" />}
+                </div>
+              )}
+              {business.payment_methods?.length > 0 && (
+                <div className={`flex flex-wrap gap-2 ${hasFeatures ? "mt-3 pt-3 border-t border-stone-100" : ""}`}>
+                  <span className="w-full flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wider mb-1" style={{ color: "rgba(45,69,48,0.40)" }}>
+                    <CreditCard size={12} /> Formas de pago
+                  </span>
+                  {business.payment_methods.map((method: string) => (
+                    <span key={method} className="px-3 py-1.5 rounded-xl text-xs font-medium" style={{ background: "rgba(45,69,48,0.07)", color: "#2D4530", border: "1px solid rgba(45,69,48,0.10)" }}>
+                      {PAYMENT_LABELS[method] ?? method}
+                    </span>
+                  ))}
+                </div>
+              )}
             </div>
           </AnimateIn>
         )}
@@ -468,50 +532,6 @@ export default function DirectorioDetalle({ business, section, promotions = [] }
           </AnimateIn>
         )}
 
-        {/* ── Horarios ── */}
-        {byDay.size > 0 && (
-          <AnimateIn>
-            <div className={cardClass}>
-              <div className="flex items-center gap-2 mb-3">
-                <Clock size={13} style={{ color: "rgba(45,69,48,0.40)" }} />
-                <p className="text-[10px] font-black uppercase tracking-[0.2em]" style={{ color: "rgba(45,69,48,0.40)" }}>Horarios</p>
-              </div>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-8">
-                {Array.from(byDay.entries()).map(([day, rows]) => {
-                  const isToday = day === todayIdx
-                  const first   = rows[0]
-                  const second  = rows[1]
-                  const timeStr = first.is_closed
-                    ? "Cerrado"
-                    : second
-                    ? `${first.opens_at.slice(0, 5)}–${first.closes_at.slice(0, 5)} · ${second.opens_at.slice(0, 5)}–${second.closes_at.slice(0, 5)}`
-                    : `${first.opens_at.slice(0, 5)} — ${first.closes_at.slice(0, 5)}`
-                  return (
-                    <div key={day} className="flex justify-between items-center py-1.5 border-b border-stone-50 last:border-0 text-sm">
-                      <span className="font-medium" style={{ color: isToday ? "#2D4530" : "rgba(45,69,48,0.45)", fontWeight: isToday ? 700 : 400 }}>
-                        {DAY_SHORT[day]}
-                      </span>
-                      <span style={{ color: isToday ? "#2D4530" : first.is_closed ? "#C4B9A8" : "rgba(45,69,48,0.60)", fontWeight: isToday ? 700 : 400 }}>
-                        {timeStr}
-                      </span>
-                    </div>
-                  )
-                })}
-              </div>
-              {(business.has_24h_guard || business.appointment_system) && (
-                <div className="mt-3 pt-3 border-t border-stone-100">
-                  {business.has_24h_guard && (
-                    <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold" style={{ background: "rgba(45,69,48,0.08)", color: "#2D4530" }}>
-                      ✦ Guardia 24 hs
-                    </span>
-                  )}
-                  {business.appointment_system && <p className="text-xs text-stone-500 mt-2">{business.appointment_system}</p>}
-                </div>
-              )}
-            </div>
-          </AnimateIn>
-        )}
-
         {/* ── Promociones ── */}
         {promotions.length > 0 && (
           <AnimateIn>
@@ -547,61 +567,6 @@ export default function DirectorioDetalle({ business, section, promotions = [] }
                   </div>
                 )
               })}
-            </div>
-          </AnimateIn>
-        )}
-
-        {/* ── Servicios (características + formas de pago) ── */}
-        {(hasFeatures || business.payment_methods?.length > 0) && (
-          <AnimateIn>
-            <div className={cardClass}>
-              <p className="text-[10px] font-black uppercase tracking-[0.2em] mb-3" style={{ color: "rgba(45,69,48,0.40)" }}>Servicios</p>
-              {hasFeatures && (
-                <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-                  {business.offers_delivery      && <FeatureBadge icon={<Truck size={13} />}           label="Delivery" />}
-                  {business.offers_takeaway      && <FeatureBadge icon={<ShoppingBag size={13} />}     label="Take away" />}
-                  {business.offers_dine_in       && <FeatureBadge icon={<UtensilsCrossed size={13} />} label="En el lugar" />}
-                  {business.accepts_reservations && <FeatureBadge icon={<Star size={13} />}            label="Reservas" />}
-                  {business.pet_friendly         && <FeatureBadge icon={<PawPrint size={13} />}        label="Pet friendly" />}
-                  {business.wifi                 && <FeatureBadge icon={<Wifi size={13} />}            label="Wi-Fi" />}
-                  {business.parking              && <FeatureBadge icon={<Car size={13} />}             label="Estacionamiento" />}
-                </div>
-              )}
-              {business.payment_methods?.length > 0 && (
-                <div className={`flex flex-wrap gap-2 ${hasFeatures ? "mt-3 pt-3 border-t border-stone-100" : ""}`}>
-                  <span className="w-full flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wider mb-1" style={{ color: "rgba(45,69,48,0.40)" }}>
-                    <CreditCard size={12} /> Formas de pago
-                  </span>
-                  {business.payment_methods.map((method: string) => (
-                    <span key={method} className="px-3 py-1.5 rounded-xl text-xs font-medium" style={{ background: "rgba(45,69,48,0.07)", color: "#2D4530", border: "1px solid rgba(45,69,48,0.10)" }}>
-                      {PAYMENT_LABELS[method] ?? method}
-                    </span>
-                  ))}
-                </div>
-              )}
-            </div>
-          </AnimateIn>
-        )}
-
-        {/* ═══════════════════════════════════════════════════════════
-            CARRUSEL DE FOTOS (cover_url + business_photos)
-        ═══════════════════════════════════════════════════════════ */}
-        {photos.length > 0 && (
-          <AnimateIn>
-            <div className="flex flex-col gap-y-3">
-              <p className="text-[10px] font-black uppercase tracking-[0.2em]" style={{ color: "rgba(45,69,48,0.40)" }}>Fotos</p>
-              <div className="flex gap-3 overflow-x-auto pb-2">
-                {photos.map((src, i) => (
-                  <button
-                    key={i}
-                    onClick={() => setLightboxIdx(i)}
-                    className="relative w-48 aspect-square rounded-2xl overflow-hidden shrink-0 bg-stone-100 cursor-zoom-in"
-                    aria-label={`Ampliar foto ${i + 1}`}
-                  >
-                    <Image src={src} alt={`${business.name} — foto ${i + 1} de ${photos.length}`} fill priority={i === 0} className="object-cover" sizes="192px" quality={85} />
-                  </button>
-                ))}
-              </div>
             </div>
           </AnimateIn>
         )}
