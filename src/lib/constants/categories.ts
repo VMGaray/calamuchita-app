@@ -1,7 +1,7 @@
 import {
   Wrench, Zap, Flame, Car, Building, Paintbrush, Hammer, KeyRound, Leaf, Waves, Home, Bug, Sparkles, Droplets, Shield, Scissors, Soup,
   Store, Shirt, Gem, HardHat, Baby, Smartphone, Armchair, Dog, HeartPulse, Package,
-  Brain, AlertCircle, FlaskConical, Stethoscope, Ambulance, Hand,
+  Brain, AlertCircle, FlaskConical, Stethoscope, Ambulance, Hand, Scan,
   GraduationCap, BookOpen, Languages, Users, Music, Trophy, Palette,
   Hotel, Map, Tent, Activity, Compass, Bike, Plane,
   Utensils, Coffee, Beer, Wine, ShoppingBag, Clock, Wheat, Pizza, Beef,
@@ -120,6 +120,7 @@ export const MASTER_CATEGORIES = {
       { label: "Osteopatía", icon: Bone, bg: "bg-amber-50", color: "text-amber-600" },
       { label: "Psicología", icon: Brain, bg: "bg-indigo-50", color: "text-indigo-600" },
       { label: "Psicomotricista", icon: Footprints, bg: "bg-slate-50", color: "text-slate-600" },
+      { label: "Radiología", icon: Scan, bg: "bg-stone-50", color: "text-stone-600" },
       { label: "Terapias alternativas", icon: Leaf, bg: "bg-green-50", color: "text-green-600" },
       { label: "Terapias complementarias", icon: Flower2, bg: "bg-gray-50", color: "text-gray-600" },
       { label: "Traslado de pacientes", icon: Ambulance, bg: "bg-sky-50", color: "text-sky-600" },

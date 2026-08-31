@@ -10,7 +10,7 @@ import { ShoppingBag, MapPin, Check } from "lucide-react"
 import {
   Utensils, Coffee, Beer, Bike, Clock, Package, Soup,
   Wrench, Zap, Flame, Car, Building, Paintbrush, Hammer, KeyRound, Leaf, Waves, Home, Bug, Droplets, Sparkles, Shield, Truck, Mountain, HardHat, Scissors, Video, ShieldCheck, ClipboardList,
-  Stethoscope, Pill, Brain, Smile, Eye, PawPrint, AlertCircle, Ambulance, Hand,
+  Stethoscope, Pill, Brain, Smile, Eye, PawPrint, AlertCircle, Ambulance, Hand, Scan,
   GraduationCap, BookOpen, Languages, Users, Music, Trophy,
   Hotel, Map, Tent, Activity, Compass, Plane,
   PartyPopper, ChefHat, Mic, Medal, Wind, Palette, Baby,
@@ -46,7 +46,7 @@ const categoryIcons: Record<string, any> = {
   "Artes marciales": Shield, "Running": Timer,
   "Clínicas y Consultorios": Building, "Especialidades": Stethoscope, "Estética": Sparkles,
   "Hospitales y Dispensarios": AlertCircle, "Laboratorios": FlaskConical, "Masajes": Hand,
-  "Psicología": Brain, "Psicomotricista": Footprints, "Terapias alternativas": Leaf, "Terapias complementarias": Flower2, "Traslado de pacientes": Ambulance,
+  "Psicología": Brain, "Psicomotricista": Footprints, "Radiología": Scan, "Terapias alternativas": Leaf, "Terapias complementarias": Flower2, "Traslado de pacientes": Ambulance,
   "Arte y Música": Music, "Colegios": GraduationCap, "Deporte": Trophy,
   "Idiomas": Languages, "Maestras/os Particulares": Users, "Universidad/Terciario": BookOpen,
   "Actividades y Paseos": Activity, "Agencia de Viajes": Plane,
