@@ -6,6 +6,7 @@ import { motion, AnimatePresence } from "framer-motion"
 import { Plus, Trash2, ChevronDown, ChevronUp, GripVertical, Edit2, Check, X, BookOpen, FileText, Link2 } from "lucide-react"
 import { SkeletonCarta } from "@/components/ui/Skeleton"
 import PdfUpload from "@/components/ui/PdfUpload"
+import { normalizeUrl } from "@/lib/normalizeUrl"
 
 type Mode = "manual" | "pdf" | "link" | null
 
@@ -125,7 +126,9 @@ export default function CartaManager() {
 
   const handleLinkSave = async () => {
     if (!businessId) return
-    await createClient().from("businesses").update({ menu_link: linkValue.trim() || null }).eq("id", businessId)
+    const normalized = normalizeUrl(linkValue)
+    setLinkValue(normalized || "")
+    await createClient().from("businesses").update({ menu_link: normalized }).eq("id", businessId)
   }
 
   // CATEGORÍAS

@@ -8,6 +8,7 @@ import { MASTER_CATEGORIES } from "@/lib/constants/categories"
 import ImageUpload from "@/components/ui/ImageUpload"
 import PdfUpload from "@/components/ui/PdfUpload"
 import { isValidYoutubeUrl } from "@/lib/utils/youtube"
+import { normalizeUrl } from "@/lib/normalizeUrl"
 import HorariosEditor, { HorarioDay, expandHorariosForSave, mergeHorariosFromDB, defaultHorarios } from "@/components/ui/HorariosEditor"
 import { ArrowLeft, Star } from "lucide-react"
 import QRMarketing from "@/components/admin/QRMarketing"
@@ -282,7 +283,7 @@ export default function AdminNegocioEdit({ id }: Props) {
         menu_pdf_url: form.menu_pdf_url || null,
         video_url: form.video_url || null,
         status: form.status,
-        menu_link: form.menu_link || null,
+        menu_link: normalizeUrl(form.menu_link),
         pet_friendly: form.pet_friendly,
         payment_methods: form.payment_methods,
         is_premium: form.is_premium,

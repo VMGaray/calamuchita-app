@@ -12,6 +12,7 @@ import Image from "next/image"
 import CartaInteractiva from "@/components/public/CartaInteractiva"
 import { createClient } from "@/lib/supabase/client"
 import { normalizeArgPhone } from "@/lib/phone"
+import { normalizeUrl } from "@/lib/normalizeUrl"
 import { extractYoutubeId } from "@/lib/utils/youtube"
 import PromoCoupon, {
   promoFontVariables,
@@ -120,9 +121,12 @@ export default function NegocioDetalle({ business, promotions = [] }: Props) {
     ? `https://wa.me/${waNumber}?text=${encodeURIComponent(`Hola! Me contacto desde Calamuchita App por el negocio ${business.name}.`)}`
     : null
 
+  const websiteUrl = normalizeUrl(business.website)
+  const menuLinkUrl = normalizeUrl(business.menu_link)
+
   const hasInteractiveCarta = (business.menu_categories?.length ?? 0) > 0
   const hasPdfCarta         = !!business.menu_pdf_url
-  const hasLinkCarta        = !hasInteractiveCarta && !hasPdfCarta && !!business.menu_link
+  const hasLinkCarta        = !hasInteractiveCarta && !hasPdfCarta && !!menuLinkUrl
   const hasFotosCarta       = !hasInteractiveCarta && !hasPdfCarta && !hasLinkCarta && (business.menu_photos_urls?.length ?? 0) > 0
   const hasMenu             = hasInteractiveCarta || hasPdfCarta || hasLinkCarta || hasFotosCarta
   const todayMenu = business.daily_menus?.find((m: any) => {
@@ -136,7 +140,7 @@ export default function NegocioDetalle({ business, promotions = [] }: Props) {
     } else if (hasPdfCarta) {
       window.open(business.menu_pdf_url, "_blank")
     } else if (hasLinkCarta) {
-      window.open(business.menu_link, "_blank")
+      window.open(menuLinkUrl!, "_blank")
     } else if (hasFotosCarta) {
       cartaRef.current?.scrollIntoView({ behavior: "smooth", block: "start" })
     }
@@ -365,7 +369,7 @@ export default function NegocioDetalle({ business, promotions = [] }: Props) {
             {business.whatsapp && business.whatsapp !== business.phone && <InfoRow icon={<WaIcon size={14} />} sublabel="WhatsApp" label={business.whatsapp} href={waLink ?? undefined} external />}
             {instagramHandle     && <InfoRow icon={<AtSign size={14} style={{ color: "#2D4530" }} />} sublabel="Instagram"  label={`@${instagramHandle}`}                            href={`https://instagram.com/${instagramHandle}`} external />}
             {facebookUrl         && <InfoRow icon={<FbIcon size={14} />}                              sublabel="Facebook"   label={facebookUrl.replace(/^https?:\/\//, "")}           href={facebookUrl} external />}
-            {business.website    && <InfoRow icon={<Globe size={14} style={{ color: "#2D4530" }} />}  sublabel="Web"        label={business.website.replace(/^https?:\/\//, "")}     href={business.website} external />}
+            {websiteUrl          && <InfoRow icon={<Globe size={14} style={{ color: "#2D4530" }} />}  sublabel="Web"        label={websiteUrl.replace(/^https?:\/\//, "")}            href={websiteUrl} external />}
             {business.address    && <InfoRow icon={<MapPin size={14} style={{ color: "#2D4530" }} />} sublabel="Dirección"  label={business.address} />}
           </div>
 
@@ -586,7 +590,7 @@ export default function NegocioDetalle({ business, promotions = [] }: Props) {
             <div ref={cartaRef} className="bg-white rounded-2xl border border-stone-200 p-5">
               <p className="text-[10px] font-black uppercase tracking-[0.2em] mb-4" style={{ color: "rgba(45,69,48,0.42)" }}>Carta</p>
               <a
-                href={business.menu_link}
+                href={menuLinkUrl!}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="flex items-center gap-4 p-4 rounded-xl border border-stone-100 hover:border-[#2D4530]/30 transition-all"

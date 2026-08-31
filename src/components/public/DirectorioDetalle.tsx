@@ -11,6 +11,7 @@ import {
 import { motion, AnimatePresence } from "framer-motion"
 import { createClient } from "@/lib/supabase/client"
 import { normalizeArgPhone } from "@/lib/phone"
+import { normalizeUrl } from "@/lib/normalizeUrl"
 import { extractYoutubeId } from "@/lib/utils/youtube"
 import AnimateIn from "@/components/ui/AnimateIn"
 import BackButton from "@/components/ui/BackButton"
@@ -111,7 +112,7 @@ export default function DirectorioDetalle({ business, section, promotions = [] }
   const facebookUrl     = business.facebook
     ? (/^https?:\/\//.test(business.facebook) ? business.facebook : `https://facebook.com/${business.facebook.replace(/^@/, "")}`)
     : null
-  const websiteUrl      = business.menu_link || business.website
+  const websiteUrl      = normalizeUrl(business.menu_link || business.website)
 
   const hasFeatures =
     business.offers_delivery || business.offers_takeaway || business.offers_dine_in ||

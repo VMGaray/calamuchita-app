@@ -15,6 +15,7 @@ import BackButton from "@/components/ui/BackButton"
 import { LOCALIDADES, MAIN_LOCALIDADES } from "@/lib/constants/telefonos"
 import { useLocalidad } from "@/lib/context/LocalidadContext"
 import { createClient } from "@/lib/supabase/client"
+import { normalizeUrl } from "@/lib/normalizeUrl"
 import type { ServicePhone, TransportCompany } from "@/types/database"
 
 interface DBService {
@@ -131,7 +132,7 @@ function TransportCompanyCard({ company }: { company: TransportCompany }) {
               )}
               {company.website && (
                 <a
-                  href={company.website}
+                  href={normalizeUrl(company.website)!}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold transition-opacity active:opacity-80"

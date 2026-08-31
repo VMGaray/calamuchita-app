@@ -8,6 +8,7 @@ import { MASTER_CATEGORIES } from "@/lib/constants/categories"
 import ImageUpload from "@/components/ui/ImageUpload"
 import PdfUpload from "@/components/ui/PdfUpload"
 import { isValidYoutubeUrl } from "@/lib/utils/youtube"
+import { normalizeUrl } from "@/lib/normalizeUrl"
 import HorariosEditor, { HorarioDay, expandHorariosForSave, defaultHorarios } from "@/components/ui/HorariosEditor"
 
 const sections: { value: BusinessSection; label: string }[] = [
@@ -255,7 +256,7 @@ export default function AdminNegocioForm() {
       whatsapp: form.whatsapp || null,
       instagram: form.instagram || null,
       facebook: form.facebook || null,
-      menu_link: form.menu_link || null,
+      menu_link: normalizeUrl(form.menu_link),
       offers_delivery: form.offers_delivery,
       offers_takeaway: form.offers_takeaway,
       offers_dine_in: form.offers_dine_in,

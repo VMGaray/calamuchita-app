@@ -4,6 +4,7 @@ import { useEffect, useState } from "react"
 import { createClient } from "@/lib/supabase/client"
 import { Plus, Trash2, Pencil, Globe, Phone, MapPin, Navigation } from "lucide-react"
 import { TransportCompany } from "@/types/database"
+import { normalizeUrl } from "@/lib/normalizeUrl"
 
 const EMPTY_FORM = {
   name: "", description: "", phone: "", website: "", address: "", coordinates: "",
@@ -56,7 +57,7 @@ export default function AdminTransporte() {
       name:        form.name.trim(),
       description: form.description.trim()  || null,
       phone:       form.phone.trim()        || null,
-      website:     form.website.trim()      || null,
+      website:     normalizeUrl(form.website),
       address:     form.address.trim()      || null,
       coordinates: form.coordinates.trim()  || null,
     }
