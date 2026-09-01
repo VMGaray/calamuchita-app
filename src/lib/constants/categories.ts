@@ -5,7 +5,7 @@ import {
   GraduationCap, BookOpen, Languages, Users, Music, Trophy, Palette,
   Hotel, Map, Tent, Activity, Compass, Bike, Plane,
   Utensils, Coffee, Beer, Wine, ShoppingBag, Clock, Wheat, Pizza, Beef,
-  Truck, Mountain, Printer, CreditCard, Briefcase,
+  Truck, Mountain, Printer, CreditCard, Briefcase, Gift,
   Dumbbell, PersonStanding, Timer, Wind, Tag, Video, ShieldCheck, ClipboardList, Cog, Snowflake, Bone, Sofa, Target, FileText, Fence, Cake, Sun, PenTool, Brush, Frame, PartyPopper, Flower2, Footprints, PawPrint, Sprout
 } from "lucide-react"
 
@@ -96,8 +96,10 @@ export const MASTER_CATEGORIES = {
       { label: "Inmobiliarias", icon: Building, bg: "bg-blue-50", color: "text-blue-600" },
       { label: "Mascotas", icon: Dog, bg: "bg-amber-50", color: "text-amber-600" },
       { label: "Niños", icon: Baby, bg: "bg-indigo-50", color: "text-indigo-600" },
+      { label: "Pagos y Agencias", icon: CreditCard, bg: "bg-stone-50", color: "text-stone-600" },
       { label: "Peluquería canina", icon: Scissors, bg: "bg-pink-50", color: "text-pink-600" },
       { label: "Petshop", icon: PawPrint, bg: "bg-amber-50", color: "text-amber-600" },
+      { label: "Regalería", icon: Gift, bg: "bg-stone-50", color: "text-stone-600" },
       { label: "Salud", icon: HeartPulse, bg: "bg-green-50", color: "text-green-600" },
       { label: "Seguros", icon: ShieldCheck, bg: "bg-emerald-50", color: "text-emerald-700" }, // <-- NUEVA SUBCATEGORÍA
       { label: "Tecnología", icon: Smartphone, bg: "bg-blue-50", color: "text-blue-600" },

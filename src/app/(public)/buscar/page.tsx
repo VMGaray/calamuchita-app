@@ -126,6 +126,16 @@ const SYNONYMS: Record<string, string[]> = {
   viveros:        ["Vivero"],
   plantas:        ["Vivero"],
   plantines:      ["Vivero"],
+  pagos:          ["Pagos y Agencias"],
+  pago:           ["Pagos y Agencias"],
+  rapipago:       ["Pagos y Agencias"],
+  "pago facil":   ["Pagos y Agencias"],
+  cobranzas:      ["Pagos y Agencias"],
+  regaleria:      ["Regalería"],
+  regalos:        ["Regalería"],
+  regalo:         ["Regalería"],
+  souvenirs:      ["Regalería"],
+  bazar:          ["Regalería"],
 }
 
 function findMatchingSubcategories(q: string): string[] {
