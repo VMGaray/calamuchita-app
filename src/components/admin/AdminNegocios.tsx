@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react"
 import Link from "next/link"
-import { Plus, Pencil, Trash2, Eye, ArrowUpDown, ArrowUp, ArrowDown, Star, Download } from "lucide-react"
+import { Plus, Pencil, Trash2, Eye, ArrowUpDown, ArrowUp, ArrowDown, Star, Download, Search, X } from "lucide-react"
 import { createClient } from "@/lib/supabase/client"
 import { Business } from "@/types/database"
 
@@ -30,6 +30,16 @@ const gastronomyCategoryLabels: Record<string, string> = {
   pizzeria:   "Pizzería",
   hamburgueseria: "Hamburguesería",
   other:      "Otro",
+}
+
+// Quita acentos y normaliza mayúsculas para que la búsqueda encuentre
+// "panaderia" aunque el usuario escriba "panadería" (o viceversa).
+function normalize(s: string): string {
+  return s
+    .normalize("NFD")
+    .replace(/[̀-ͯ]/g, "")
+    .toLowerCase()
+    .trim()
 }
 
 function getCategoryLabel(b: Business): string {
@@ -81,6 +91,7 @@ export default function AdminNegocios() {
   const [filter, setFilter] = useState("")
   const [puebloFilter, setPuebloFilter] = useState("")
   const [categoryFilter, setCategoryFilter] = useState("")
+  const [search, setSearch] = useState("")
   const [sortBy, setSortBy] = useState<SortKey>("created_at")
   const [sortDir, setSortDir] = useState<SortDir>("desc")
 
@@ -166,7 +177,19 @@ export default function AdminNegocios() {
     }
   }
 
-  const bySection = filter ? businesses.filter(b => b.section === filter) : businesses
+  const bySearch = search
+    ? businesses.filter(b => {
+        const q = normalize(search)
+        return (
+          normalize(b.name).includes(q) ||
+          normalize(b.address || "").includes(q) ||
+          normalize(b.pueblo || "").includes(q) ||
+          (b.phone || "").includes(q) ||
+          (b.whatsapp || "").includes(q)
+        )
+      })
+    : businesses
+  const bySection = filter ? bySearch.filter(b => b.section === filter) : bySearch
   const byPueblo  = puebloFilter ? bySection.filter(b => (b.pueblo || "Sin localidad") === puebloFilter) : bySection
 
   const puebloCounts = bySection.reduce((acc, b) => {
@@ -227,6 +250,27 @@ export default function AdminNegocios() {
         </div>
       </div>
 
+      {/* Búsqueda */}
+      <div className="relative mb-4 max-w-md">
+        <Search size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-stone-400" />
+        <input
+          type="text"
+          value={search}
+          onChange={e => setSearch(e.target.value)}
+          placeholder="Buscar por nombre, dirección, localidad o teléfono..."
+          className="w-full pl-10 pr-9 py-2.5 rounded-xl border border-stone-200 text-sm text-stone-700 outline-none focus:ring-2 focus:ring-primary-300 bg-white"
+        />
+        {search && (
+          <button
+            onClick={() => setSearch("")}
+            className="absolute right-3 top-1/2 -translate-y-1/2 text-stone-400 hover:text-red-500 transition-colors"
+            title="Limpiar búsqueda"
+          >
+            <X size={15} />
+          </button>
+        )}
+      </div>
+
       {/* Filtros por sección */}
       <div className="flex gap-2 mb-4 flex-wrap">
         <button
@@ -235,10 +279,10 @@ export default function AdminNegocios() {
             filter === "" ? "bg-primary-500 text-primary-100 border-primary-500" : "bg-white text-stone-600 border-stone-200 hover:border-primary-300"
           }`}
         >
-          Todos ({businesses.length})
+          Todos ({bySearch.length})
         </button>
         {Object.entries(sectionLabels).map(([key, label]) => {
-          const count = businesses.filter(b => b.section === key).length
+          const count = bySearch.filter(b => b.section === key).length
           if (count === 0) return null
           return (
             <button
@@ -300,7 +344,7 @@ export default function AdminNegocios() {
         <SortButton label="Contactos" sortKey="total_leads" current={sortBy} dir={sortDir} onClick={handleSort} />
       </div>
 
-      {(puebloFilter || categoryFilter) && (
+      {(search || puebloFilter || categoryFilter) && (
         <p className="text-xs text-stone-400 mb-3">Mostrando {filtered.length} de {businesses.length} negocios</p>
       )}
 
