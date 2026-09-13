@@ -2,9 +2,11 @@
 
 import Link from "next/link"
 import { usePathname, useRouter } from "next/navigation"
+import { useState } from "react"
 import { MapPin, LayoutDashboard, BookOpen, CalendarDays, ShoppingBag, Settings, LogOut, BarChart2, UtensilsCrossed } from "lucide-react"
 import { createClient } from "@/lib/supabase/client"
 import { useBusinessDashboard } from "@/lib/context/BusinessDashboardContext"
+import ConfirmModal from "@/components/ui/ConfirmModal"
 
 const restauranteLinks = [
   { href: "/dashboard",               label: "Inicio",       icon: LayoutDashboard },
@@ -28,6 +30,7 @@ export default function Sidebar() {
   const router = useRouter()
   const { isRestaurante } = useBusinessDashboard()
   const links = isRestaurante ? restauranteLinks : viandasLinks
+  const [logoutConfirmOpen, setLogoutConfirmOpen] = useState(false)
 
   const handleLogout = async () => {
     const supabase = createClient()
@@ -62,7 +65,7 @@ export default function Sidebar() {
             )
           })}
           <button
-            onClick={handleLogout}
+            onClick={() => setLogoutConfirmOpen(true)}
             className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs whitespace-nowrap flex-shrink-0 text-red-400 bg-red-50 ml-auto"
           >
             <LogOut size={13} />
@@ -116,7 +119,7 @@ export default function Sidebar() {
             Eliminar mi cuenta
           </Link>
           <button
-            onClick={handleLogout}
+            onClick={() => setLogoutConfirmOpen(true)}
             className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-red-400 hover:bg-red-50 hover:text-red-500 transition-colors"
           >
             <LogOut size={16} />
@@ -124,6 +127,16 @@ export default function Sidebar() {
           </button>
         </div>
       </aside>
+
+      <ConfirmModal
+        open={logoutConfirmOpen}
+        title="Cerrar sesión"
+        message="¿Seguro que querés cerrar sesión?"
+        confirmLabel="Cerrar sesión"
+        variant="danger"
+        onConfirm={() => { setLogoutConfirmOpen(false); handleLogout() }}
+        onCancel={() => setLogoutConfirmOpen(false)}
+      />
     </>
   )
 }
