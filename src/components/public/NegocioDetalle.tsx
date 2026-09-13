@@ -223,7 +223,7 @@ export default function NegocioDetalle({ business, promotions = [] }: Props) {
           1 — PORTADA FULL-WIDTH
       ═══════════════════════════════════════════════════════════════ */}
       <div
-        className="relative w-full h-56 sm:h-72 md:h-auto md:aspect-[5/2] md:max-h-[340px] overflow-hidden"
+        className="relative w-full h-56 sm:h-72 md:h-auto md:aspect-[5/2] md:max-h-[340px] max-h-[40vh] overflow-hidden"
         style={{ background: "#1a2e1c" }}
       >
         {coverUrl ? (

@@ -71,7 +71,7 @@ export default function PromosExclusivas({
       </AnimateIn>
 
       {/* Mobile / tablet angosto: stack apilado tipo acordeón. */}
-      <ul className="mx-auto flex max-w-2xl flex-col lg:hidden">
+      <ul className="flex w-full flex-col lg:hidden">
         {promos.map((promo, i) => (
           <PromoAccordionCard
             key={promo.id}
