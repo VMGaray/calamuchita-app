@@ -6,6 +6,7 @@ import { useState, useEffect } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import { createClient } from "@/lib/supabase/client"
 import { useRouter, usePathname } from "next/navigation"
+import ConfirmModal from "@/components/ui/ConfirmModal"
 
 export default function Header() {
   const router = useRouter()
@@ -13,6 +14,7 @@ export default function Header() {
   const [user, setUser] = useState<any>(null)
   const [profile, setProfile] = useState<any>(null)
   const [menuOpen, setMenuOpen] = useState(false)
+  const [logoutConfirmOpen, setLogoutConfirmOpen] = useState(false)
 
   // El header necesita fondo sólido cuando no hay hero oscuro detrás.
   // usePathname() se actualiza en cada navegación cliente, a diferencia de
@@ -132,6 +134,7 @@ export default function Header() {
           {/* ── DERECHA: Auth ── */}
           <div className="flex items-center gap-2 sm:gap-3 flex-shrink-0 pointer-events-auto">
             {user ? (
+              <>
               <div className="relative">
                 <motion.button
                   onClick={() => setMenuOpen(!menuOpen)}
@@ -199,7 +202,7 @@ export default function Header() {
                             className="flex items-center gap-2 px-3 py-2 text-sm rounded-xl transition-colors text-red-600 hover:underline">
                             Eliminar mi cuenta
                           </Link>
-                          <button onClick={handleLogout}
+                          <button onClick={() => { setMenuOpen(false); setLogoutConfirmOpen(true) }}
                             className="w-full flex items-center gap-2 px-3 py-2 text-sm rounded-xl transition-colors"
                             style={{ color: "#5E4B3B" }}>
                             Cerrar sesión
@@ -210,6 +213,17 @@ export default function Header() {
                   )}
                 </AnimatePresence>
               </div>
+
+              <ConfirmModal
+                open={logoutConfirmOpen}
+                title="Cerrar sesión"
+                message="¿Seguro que querés cerrar sesión?"
+                confirmLabel="Cerrar sesión"
+                variant="danger"
+                onConfirm={() => { setLogoutConfirmOpen(false); handleLogout() }}
+                onCancel={() => setLogoutConfirmOpen(false)}
+              />
+              </>
             ) : null}
           </div>
 

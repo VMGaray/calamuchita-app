@@ -6,6 +6,7 @@ import { motion } from "framer-motion"
 import { MapPin, UtensilsCrossed } from "lucide-react"
 import AnimateIn from "@/components/ui/AnimateIn"
 import { createClient } from "@/lib/supabase/client"
+import { isInstalledApp } from "@/lib/pwa"
 import { Playfair_Display } from "next/font/google"
 
 const playfair = Playfair_Display({
@@ -59,9 +60,7 @@ export default function Footer() {
   }, [])
 
   useEffect(() => {
-    const standalone = window.matchMedia('(display-mode: standalone)').matches ||
-                       (window.navigator as any).standalone === true
-    if (standalone) return
+    if (isInstalledApp()) return
 
     const ua = navigator.userAgent
     const isMobile = /iPhone|iPad|iPod|Android/i.test(ua)

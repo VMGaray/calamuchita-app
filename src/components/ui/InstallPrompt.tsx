@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { createClient } from '@/lib/supabase/client';
+import { isInstalledApp } from '@/lib/pwa';
 
 async function recordInstall() {
   try {
@@ -36,11 +37,8 @@ export default function InstallPrompt() {
   const recorded = useRef(false);
 
   useEffect(() => {
-    // Ya instalada como PWA — no mostrar
-    const standalone =
-      window.matchMedia('(display-mode: standalone)').matches ||
-      (window.navigator as any).standalone === true
-    if (standalone) return;
+    // Ya instalada como PWA o TWA — no mostrar
+    if (isInstalledApp()) return;
 
     // El usuario ya cerró el banner recientemente
     if (wasDismissed()) return;

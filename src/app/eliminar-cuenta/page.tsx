@@ -5,6 +5,12 @@ export const metadata = {
   description: "Cómo solicitar la eliminación de tu cuenta y datos en Calamuchita App.",
 };
 
+const DELETE_REQUEST_MAILTO = `mailto:vmg.setup.ai@gmail.com?subject=${encodeURIComponent(
+  "Solicitud de eliminación de cuenta – Calamuchita App"
+)}&body=${encodeURIComponent(
+  "Hola,\n\nQuiero solicitar la eliminación de mi cuenta y mis datos de Calamuchita App.\n\nEmail de mi cuenta: \n\nGracias."
+)}`;
+
 export default function EliminarCuenta() {
   return (
     <main className="min-h-screen bg-neutral-950 text-neutral-200">
@@ -34,6 +40,12 @@ export default function EliminarCuenta() {
               personales asociados, podés solicitarlo en cualquier momento
               siguiendo los pasos descritos en esta página.
             </p>
+            <a
+              href={DELETE_REQUEST_MAILTO}
+              className="mt-6 inline-flex items-center gap-2 rounded-xl bg-amber-400 px-6 py-3 text-sm font-semibold text-neutral-950 transition-colors hover:bg-amber-300"
+            >
+              Solicitar eliminación de mi cuenta
+            </a>
           </section>
 
           <section>

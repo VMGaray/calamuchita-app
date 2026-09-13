@@ -1,15 +1,61 @@
 "use client"
 
-import React, { useState, useEffect } from 'react'
-import Map, { Marker, NavigationControl, Popup, ViewStateChangeEvent } from 'react-map-gl/mapbox'
+import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react'
+import Map, { Marker, NavigationControl, Popup, Source, Layer, MapRef, ViewStateChangeEvent, MapMouseEvent, LayerProps } from 'react-map-gl/mapbox'
+import type { GeoJSONSource } from 'mapbox-gl'
 import 'mapbox-gl/dist/mapbox-gl.css'
 import { useGeolocation } from "@/lib/hooks/useGeolocation"
 import { createClient } from "@/lib/supabase/client"
-import { MapPin, Utensils, Info, ArrowLeft } from "lucide-react"
+import { MapPin, Info, ArrowLeft } from "lucide-react"
 import Link from "next/link"
 import Image from "next/image"
 
 const MAPBOX_TOKEN = process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN
+
+const BUSINESSES_SOURCE_ID = "businesses"
+
+// Layers del patrón estándar de Mapbox GL para clustering:
+// círculos de cluster (con la cantidad) + círculo para puntos individuales.
+const clusterLayer: LayerProps = {
+  id: "clusters",
+  type: "circle",
+  source: BUSINESSES_SOURCE_ID,
+  filter: ["has", "point_count"],
+  paint: {
+    "circle-color": ["step", ["get", "point_count"], "#6B8F70", 10, "#4A6741", 30, "#2D4530"],
+    "circle-radius": ["step", ["get", "point_count"], 18, 10, 24, 30, 30],
+    "circle-stroke-width": 2,
+    "circle-stroke-color": "#ffffff",
+  },
+}
+
+const clusterCountLayer: LayerProps = {
+  id: "cluster-count",
+  type: "symbol",
+  source: BUSINESSES_SOURCE_ID,
+  filter: ["has", "point_count"],
+  layout: {
+    "text-field": ["get", "point_count_abbreviated"],
+    "text-font": ["DIN Offc Pro Medium", "Arial Unicode MS Bold"],
+    "text-size": 13,
+  },
+  paint: {
+    "text-color": "#ffffff",
+  },
+}
+
+const unclusteredPointLayer: LayerProps = {
+  id: "unclustered-point",
+  type: "circle",
+  source: BUSINESSES_SOURCE_ID,
+  filter: ["!", ["has", "point_count"]],
+  paint: {
+    "circle-color": "#2D4530",
+    "circle-radius": 8,
+    "circle-stroke-width": 2,
+    "circle-stroke-color": "#ffffff",
+  },
+}
 
 export default function GeneralMapPage() {
   const { location, loading: geoLoading } = useGeolocation()
@@ -20,6 +66,7 @@ export default function GeneralMapPage() {
     longitude: -64.5622,
     zoom: 13
   })
+  const mapRef = useRef<MapRef>(null)
 
   // 1. Cargamos los negocios con coordenadas desde Supabase
   useEffect(() => {
@@ -48,6 +95,48 @@ export default function GeneralMapPage() {
     }
   }, [location])
 
+  // GeoJSON derivado de los negocios — lo que consume el Source con cluster: true
+  const businessesGeoJSON = useMemo(() => ({
+    type: "FeatureCollection" as const,
+    features: businesses.map(b => ({
+      type: "Feature" as const,
+      properties: {
+        id: b.id,
+        name: b.name,
+        slug: b.slug,
+        logo_url: b.logo_url,
+        category: b.category,
+        section: b.section,
+      },
+      geometry: {
+        type: "Point" as const,
+        coordinates: [b.longitude, b.latitude],
+      },
+    })),
+  }), [businesses])
+
+  // Click en un cluster → expandimos zoom hasta separarlo. Click en un punto → abrimos el popup.
+  const handleMapClick = useCallback((event: MapMouseEvent) => {
+    const feature = event.features?.[0]
+    if (!feature || feature.geometry.type !== "Point") return
+    const [longitude, latitude] = feature.geometry.coordinates
+
+    if (feature.layer?.id === "clusters") {
+      const clusterId = feature.properties?.cluster_id
+      const source = mapRef.current?.getSource(BUSINESSES_SOURCE_ID) as GeoJSONSource | undefined
+      source?.getClusterExpansionZoom(clusterId, (err, zoom) => {
+        if (err || zoom == null) return
+        setViewState(prev => ({ ...prev, latitude, longitude, zoom }))
+      })
+      return
+    }
+
+    if (feature.layer?.id === "unclustered-point") {
+      const props = feature.properties as Record<string, any>
+      setSelectedBusiness({ ...props, latitude, longitude })
+    }
+  }, [])
+
   if (geoLoading) return (
     <div className="h-screen w-full flex items-center justify-center bg-[#E1DBC9]/20">
       <p className="font-serif text-brand-pine animate-pulse text-lg">Ubicando comercios en el Valle...</p>
@@ -57,8 +146,11 @@ export default function GeneralMapPage() {
   return (
     <div className="h-[calc(100vh-80px)] w-full relative">
       <Map
+        ref={mapRef}
         {...viewState}
         onMove={(evt: ViewStateChangeEvent) => setViewState(evt.viewState)}
+        onClick={handleMapClick}
+        interactiveLayerIds={["clusters", "unclustered-point"]}
         style={{ width: '100%', height: '100%' }}
         mapStyle="mapbox://styles/mapbox/light-v11"
         mapboxAccessToken={MAPBOX_TOKEN}
@@ -75,26 +167,19 @@ export default function GeneralMapPage() {
           </Marker>
         )}
 
-        {/* Marcadores de los Comercios */}
-        {businesses.map(b => (
-          <Marker 
-            key={b.id} 
-            latitude={b.latitude} 
-            longitude={b.longitude} 
-            anchor="bottom"
-            onClick={(e: { originalEvent: MouseEvent }) => {
-              e.originalEvent.stopPropagation();
-              setSelectedBusiness(b);
-            }}
-          >
-            <div className="cursor-pointer group">
-              <div className="bg-brand-pine text-white p-2 rounded-full shadow-lg group-hover:bg-brand-olive transition-colors border-2 border-white">
-                {b.section === 'gastronomy' ? <Utensils size={16} /> : <MapPin size={16} />}
-              </div>
-              <div className="absolute -top-1 left-1/2 -translate-x-1/2 w-0 h-0 border-l-[6px] border-l-transparent border-r-[6px] border-r-transparent border-t-[8px] border-t-white shadow-sm" />
-            </div>
-          </Marker>
-        ))}
+        {/* Comercios agrupados en clusters — patrón estándar de Mapbox GL */}
+        <Source
+          id={BUSINESSES_SOURCE_ID}
+          type="geojson"
+          data={businessesGeoJSON}
+          cluster={true}
+          clusterMaxZoom={14}
+          clusterRadius={50}
+        >
+          <Layer {...clusterLayer} />
+          <Layer {...clusterCountLayer} />
+          <Layer {...unclusteredPointLayer} />
+        </Source>
 
         {/* Ventana de información al hacer clic (Popup) */}
         {selectedBusiness && (
