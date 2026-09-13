@@ -28,6 +28,11 @@ export default function RegisterForm() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
+  const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const cleaned = e.target.value.replace(/[^\d\s\-+]/g, "")
+    setPhone(cleaned)
+  }
+
   const handleRegister = async () => {
     if (password !== confirmPassword) {
       setError("Las contraseñas no coinciden.")
@@ -39,6 +44,11 @@ export default function RegisterForm() {
     }
     if (accountType === "business" && !businessName.trim()) {
       setError("Ingresá el nombre del comercio.")
+      return
+    }
+    const phoneDigitsOnly = phone.replace(/\D/g, "")
+    if (phone.trim() && phoneDigitsOnly.length < 8) {
+      setError("Ingresá un número de teléfono válido.")
       return
     }
 
@@ -161,7 +171,7 @@ export default function RegisterForm() {
         <input
           type="tel"
           value={phone}
-          onChange={e => setPhone(e.target.value)}
+          onChange={handlePhoneChange}
           placeholder="3546 123456"
           className="w-full px-4 py-2.5 rounded-xl border border-stone-200 text-stone-800 placeholder:text-stone-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
         />

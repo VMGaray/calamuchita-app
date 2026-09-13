@@ -3,7 +3,7 @@
 import { Suspense, useState } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
 import { createClient } from "@/lib/supabase/client"
-import { MapPin } from "lucide-react"
+import { MapPin, Eye, EyeOff } from "lucide-react"
 import { GASTRONOMY_CATEGORY_GROUPS } from "@/lib/constants/gastronomyCategories"
 import { BusinessCategory } from "@/types/database"
 import { sendNewRegistrationNotification } from "@/lib/email"
@@ -34,6 +34,7 @@ function GastronomicosContent() {
   const [loginError, setLoginError]     = useState<string | null>(
     linkExpired ? "El enlace expiró. Iniciá sesión para continuar." : null
   )
+  const [showPassword, setShowPassword] = useState(false)
 
   // Forgot password
   const [forgotEmail, setForgotEmail]         = useState("")
@@ -51,6 +52,8 @@ function GastronomicosContent() {
   const [category, setCategory]               = useState<BusinessCategory | "">("")
   const [regLoading, setRegLoading]           = useState(false)
   const [regError, setRegError]               = useState<string | null>(null)
+  const [showRegPassword, setShowRegPassword]         = useState(false)
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false)
 
   const handleLogin = async () => {
     if (!email || !password) { setLoginError("Completá todos los campos."); return }
@@ -81,12 +84,19 @@ function GastronomicosContent() {
     setForgotSent(true)
   }
 
+  const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const cleaned = e.target.value.replace(/[^\d\s\-+]/g, "")
+    setPhone(cleaned)
+  }
+
   const handleRegister = async () => {
     if (!fullName.trim())     { setRegError("Ingresá tu nombre."); return }
     if (!businessName.trim()) { setRegError("Ingresá el nombre del comercio."); return }
     if (!regEmail.trim())     { setRegError("Ingresá tu email."); return }
     if (regPassword.length < 6) { setRegError("La contraseña debe tener al menos 6 caracteres."); return }
     if (regPassword !== confirmPassword) { setRegError("Las contraseñas no coinciden."); return }
+    const phoneDigitsOnly = phone.replace(/\D/g, "")
+    if (phone.trim() && phoneDigitsOnly.length < 8) { setRegError("Ingresá un número de teléfono válido."); return }
     if (!category) { setRegError("Elegí el tipo de negocio."); return }
 
     setRegLoading(true)
@@ -269,15 +279,25 @@ function GastronomicosContent() {
                     ¿Olvidaste tu contraseña?
                   </button>
                 </div>
-                <input
-                  type="password"
-                  value={password}
-                  onChange={e => setPassword(e.target.value)}
-                  onKeyDown={e => e.key === "Enter" && handleLogin()}
-                  placeholder="••••••••"
-                  autoComplete="current-password"
-                  className="w-full px-4 py-2.5 rounded-xl border border-stone-200 text-stone-800 text-sm outline-none focus:ring-2 focus:ring-[#A3B18A]/50"
-                />
+                <div className="relative">
+                  <input
+                    type={showPassword ? "text" : "password"}
+                    value={password}
+                    onChange={e => setPassword(e.target.value)}
+                    onKeyDown={e => e.key === "Enter" && handleLogin()}
+                    placeholder="••••••••"
+                    autoComplete="current-password"
+                    className="w-full px-4 py-2.5 rounded-xl border border-stone-200 text-stone-800 text-sm outline-none focus:ring-2 focus:ring-[#A3B18A]/50 pr-10"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(v => !v)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-stone-400 hover:text-stone-600"
+                    tabIndex={-1}
+                  >
+                    {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                  </button>
+                </div>
               </div>
 
               <button
@@ -349,7 +369,7 @@ function GastronomicosContent() {
                 <input
                   type="tel"
                   value={phone}
-                  onChange={e => setPhone(e.target.value)}
+                  onChange={handlePhoneChange}
                   placeholder="3546 123456"
                   className="w-full px-4 py-2.5 rounded-xl border border-stone-200 text-stone-800 text-sm outline-none focus:ring-2 focus:ring-[#A3B18A]/50"
                 />
@@ -357,24 +377,44 @@ function GastronomicosContent() {
 
               <div>
                 <label className="block text-xs font-medium text-stone-600 mb-1">Contraseña</label>
-                <input
-                  type="password"
-                  value={regPassword}
-                  onChange={e => setRegPassword(e.target.value)}
-                  placeholder="Mínimo 6 caracteres"
-                  className="w-full px-4 py-2.5 rounded-xl border border-stone-200 text-stone-800 text-sm outline-none focus:ring-2 focus:ring-[#A3B18A]/50"
-                />
+                <div className="relative">
+                  <input
+                    type={showRegPassword ? "text" : "password"}
+                    value={regPassword}
+                    onChange={e => setRegPassword(e.target.value)}
+                    placeholder="Mínimo 6 caracteres"
+                    className="w-full px-4 py-2.5 rounded-xl border border-stone-200 text-stone-800 text-sm outline-none focus:ring-2 focus:ring-[#A3B18A]/50 pr-10"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowRegPassword(v => !v)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-stone-400 hover:text-stone-600"
+                    tabIndex={-1}
+                  >
+                    {showRegPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                  </button>
+                </div>
               </div>
 
               <div>
                 <label className="block text-xs font-medium text-stone-600 mb-1">Confirmá la contraseña</label>
-                <input
-                  type="password"
-                  value={confirmPassword}
-                  onChange={e => setConfirmPassword(e.target.value)}
-                  placeholder="Repetí tu contraseña"
-                  className="w-full px-4 py-2.5 rounded-xl border border-stone-200 text-stone-800 text-sm outline-none focus:ring-2 focus:ring-[#A3B18A]/50"
-                />
+                <div className="relative">
+                  <input
+                    type={showConfirmPassword ? "text" : "password"}
+                    value={confirmPassword}
+                    onChange={e => setConfirmPassword(e.target.value)}
+                    placeholder="Repetí tu contraseña"
+                    className="w-full px-4 py-2.5 rounded-xl border border-stone-200 text-stone-800 text-sm outline-none focus:ring-2 focus:ring-[#A3B18A]/50 pr-10"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowConfirmPassword(v => !v)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-stone-400 hover:text-stone-600"
+                    tabIndex={-1}
+                  >
+                    {showConfirmPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                  </button>
+                </div>
               </div>
 
               <div>
