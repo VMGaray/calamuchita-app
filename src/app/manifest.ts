@@ -10,7 +10,7 @@ export default function manifest() {
     scope: "/",
     display: "standalone",
     display_override: ["window-controls-overlay", "standalone", "minimal-ui"],
-    orientation: "portrait",
+    orientation: "any",
     background_color: "#F5F0E8",
     theme_color: "#2D4530",
     categories: ["travel", "food", "lifestyle"],
