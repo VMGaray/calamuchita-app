@@ -45,7 +45,7 @@ export default function ImageUpload({
       // 2. Upload con desestructuración completa — data puede ser null si falla
       const { data: uploadData, error: uploadError } = await supabase.storage
         .from(bucket)
-        .upload(fileName, file, { upsert: true })
+        .upload(fileName, file, { upsert: true, cacheControl: "31536000" })
 
       // 3. Guardia doble: chequear tanto uploadError como uploadData nulo
       if (uploadError || !uploadData) {
