@@ -73,7 +73,7 @@ export default function AdminEventosPage() {
           const fileName = `${Date.now()}-${file.name}`
           const { error: uploadError } = await supabase.storage
             .from("event-images")
-            .upload(fileName, file)
+            .upload(fileName, file, { cacheControl: "31536000" })
 
           if (uploadError) throw uploadError
 

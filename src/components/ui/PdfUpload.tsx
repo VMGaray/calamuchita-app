@@ -35,7 +35,7 @@ export default function PdfUpload({ onChange }: Props) {
 
     const { error: uploadError } = await supabase.storage
       .from("businesses")
-      .upload(fileName, file, { upsert: true })
+      .upload(fileName, file, { upsert: true, cacheControl: "31536000" })
 
     if (uploadError) {
       setError("Error al subir el PDF")

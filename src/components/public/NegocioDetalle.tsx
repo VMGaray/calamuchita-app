@@ -94,6 +94,18 @@ export default function NegocioDetalle({ business, promotions = [] }: Props) {
   const [lightboxTouchX, setLightboxTouchX] = useState<number | null>(null)
   const [showReserva,    setShowReserva]    = useState(false)
   const [reservaForm,    setReservaForm]    = useState<ReservaForm>(EMPTY_FORM)
+  const [isDesktop,      setIsDesktop]      = useState(false)
+
+  // Detección de breakpoint por JS (no solo CSS) para no montar en el DOM
+  // — y por lo tanto no descargar — las variantes de portada que no se ven.
+  // Coincide con el breakpoint "md" de Tailwind (768px).
+  useEffect(() => {
+    const mql = window.matchMedia("(min-width: 768px)")
+    setIsDesktop(mql.matches)
+    const onChange = (e: MediaQueryListEvent) => setIsDesktop(e.matches)
+    mql.addEventListener("change", onChange)
+    return () => mql.removeEventListener("change", onChange)
+  }, [])
 
   useEffect(() => {
     if (lightboxIdx === null && !lightboxSrc) return
@@ -227,36 +239,41 @@ export default function NegocioDetalle({ business, promotions = [] }: Props) {
         style={{ background: "#1a2e1c" }}
       >
         {coverUrl ? (
-          <>
-            {/* Mobile/tablet angosto (hasta md): recorte cover simple, sin cambios. */}
-            <div className="absolute inset-0 z-0 md:hidden">
+          isDesktop ? (
+            <>
+              {/* Desktop (md+): backdrop difuminado + imagen completa contenida.
+                  Ambas capas van antes que los gradientes/botón en el DOM y con
+                  z-0 explícito para no taparlos. Solo se monta en desktop —
+                  así no se descarga la portada dos veces de más. */}
+              <div className="absolute inset-0 z-0" aria-hidden="true">
+                <Image
+                  src={coverUrl}
+                  alt=""
+                  fill
+                  className="object-cover"
+                  style={{ transform: "scale(1.15)", filter: "blur(20px) brightness(0.78) saturate(1.1)" }}
+                  sizes="32px"
+                  quality={45}
+                />
+              </div>
+              <div className="absolute inset-0 z-0 flex items-center justify-center">
+                <Image
+                  src={coverUrl} alt={business.name} fill priority
+                  className="object-contain" sizes="100vw" quality={85}
+                />
+              </div>
+            </>
+          ) : (
+            /* Mobile/tablet angosto (hasta md): recorte cover simple, sin cambios.
+               Única variante montada por debajo de md — evita bajar la misma
+               portada varias veces. */
+            <div className="absolute inset-0 z-0">
               <Image
                 src={coverUrl} alt={business.name} fill priority
                 className="object-cover" sizes="100vw" quality={85}
               />
             </div>
-
-            {/* Desktop (md+): backdrop difuminado + imagen completa contenida.
-                Ambas capas van antes que los gradientes/botón en el DOM y con
-                z-0 explícito para no taparlos. */}
-            <div className="absolute inset-0 z-0 hidden md:block" aria-hidden="true">
-              <Image
-                src={coverUrl}
-                alt=""
-                fill
-                className="object-cover"
-                style={{ transform: "scale(1.15)", filter: "blur(20px) brightness(0.78) saturate(1.1)" }}
-                sizes="32px"
-                quality={45}
-              />
-            </div>
-            <div className="absolute inset-0 z-0 hidden md:flex items-center justify-center">
-              <Image
-                src={coverUrl} alt={business.name} fill priority
-                className="object-contain" sizes="100vw" quality={85}
-              />
-            </div>
-          </>
+          )
         ) : (
           <div className="w-full h-full flex items-center justify-center"
             style={{ background: "linear-gradient(135deg, #2D4530 0%, #4A6741 55%, #3D5C3A 100%)" }}>
