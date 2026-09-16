@@ -2,7 +2,7 @@ import type { Metadata } from "next"
 import { Suspense } from "react"
 import DirectorioDetalle from "@/components/public/DirectorioDetalle"
 import { createClient } from "@/lib/supabase/server"
-import { notFound } from "next/navigation"
+import { notFound, redirect } from "next/navigation"
 
 interface Props {
   params: Promise<{ section: string; slug: string }>
@@ -18,7 +18,7 @@ function buildPromoLabel(promo: { discount_label?: string | null; discount_perce
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const { slug, section } = await params
+  const { slug } = await params
   const supabase = await createClient()
   const today = new Date().toISOString().split("T")[0]
 
@@ -29,7 +29,6 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       promotions (discount_label, discount_percentage, valid_until, is_active)
     `)
     .eq("slug", slug)
-    .eq("section", section)
     .eq("status", "active")
     .single()
 
@@ -81,11 +80,18 @@ export default async function DirectorioDetallePage({ params }: Props) {
       business_photos (*)
     `)
     .eq("slug", slug)
-    .eq("section", section)
     .eq("status", "active")
     .single()
 
   if (!business) notFound()
+
+  // El slug es único en toda la tabla; el section de la URL es solo
+  // para mostrar el breadcrumb/back correcto. Si un negocio fue
+  // recategorizado, redirigimos a la URL canónica en vez de romper
+  // links viejos compartidos con la sección anterior.
+  if (business.section !== section) {
+    redirect(`/directorio/${business.section}/${slug}`)
+  }
 
   const { data: promotionsData } = await supabase
     .from("promotions")
