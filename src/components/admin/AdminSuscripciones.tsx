@@ -11,8 +11,9 @@ import {
   STATUS_STYLE, SUBSCRIPTION_GRACE_DAYS, SUBSCRIPTION_STATUSES, VISIBLE_STATUSES,
 } from "@/lib/constants/subscriptions"
 import {
-  bulkBlockReason, chunk, daysUntil, formatARS, formatDate, isPastGrace, isTrialDateExpired,
-  normalizeSubscriptionStatus, saveLeavesExpired, toISODate,
+  bulkBlockReason, chunk, computeRenewedEnd, daysUntil, formatARS, formatDate, isExpiringSoon, isPastGrace,
+  isRenewable, isTrialDateExpired, normalizeSubscriptionStatus, renewalBase, saveLeavesExpired, toDateKey,
+  todayInArgentina, toISODate,
 } from "@/lib/utils/subscriptions"
 
 // ─── tipos ───────────────────────────────────────────────────────────────────
@@ -33,7 +34,13 @@ interface BusinessOption {
   category: BusinessCategory | null
 }
 
-type StatusFilter = SubscriptionStatus | "all" | "trial_expired"
+type StatusFilter = SubscriptionStatus | "all" | "trial_expired" | "expiring"
+
+// Botones de renovación de cada fila. Va resaltado el que coincide con el ciclo de cobro.
+const RENEW_OPTIONS: { months: 1 | 12; cycle: BillingCycle; label: string }[] = [
+  { months: 1,  cycle: "monthly", label: "+1 mes" },
+  { months: 12, cycle: "yearly",  label: "+1 año" },
+]
 
 // ─── helpers ─────────────────────────────────────────────────────────────────
 
@@ -495,6 +502,15 @@ function SubForm({
 
 // ─── Acción masiva ───────────────────────────────────────────────────────────
 
+interface RenewPlan {
+  sub: SubRow
+  months: 1 | 12
+  currentEnd: string
+  newEnd: string
+  // true cuando el fin ya pasó los días de gracia y la renovación se cuenta desde hoy
+  fromToday: boolean
+}
+
 interface BulkPlan {
   target: SubscriptionStatus
   apply: SubRow[]
@@ -522,6 +538,12 @@ export default function AdminSuscripciones() {
   // Fin de período que el diálogo aplica a todas las filas (solo active/discount/complimentary).
   const [bulkEnd, setBulkEnd] = useState("")
   const [bulkNoEnd, setBulkNoEnd] = useState(false)
+  const [renewPlan, setRenewPlan] = useState<RenewPlan | null>(null)
+  const [renewingId, setRenewingId] = useState<string | null>(null)
+  const [notice, setNotice] = useState<string | null>(null)
+
+  // Hoy en Argentina como "YYYY-MM-DD": la misma fecha que usa la base para vencer.
+  const today = todayInArgentina()
 
   // La carga devuelve los datos y el estado se aplica aparte, dentro de un .then():
   // así el efecto de montaje no llama a setState de forma síncrona.
@@ -575,6 +597,42 @@ export default function AdminSuscripciones() {
   const openNew = () => { setEditing(null); setShowForm(true) }
   const openEdit = (sub: SubRow) => { setEditing(sub); setShowForm(true) }
 
+  // Renovar: primero se muestra la confirmación con el cambio de fecha; no se guarda nada
+  // hasta Confirmar.
+  const openRenew = (sub: SubRow, months: 1 | 12) => {
+    const currentEnd = toDateKey(sub.current_period_end)
+    const newEnd = computeRenewedEnd(sub.current_period_end, months, today)
+    if (!currentEnd || !newEnd) return
+    setRenewPlan({ sub, months, currentEnd, newEnd, fromToday: renewalBase(currentEnd, today) !== currentEnd })
+  }
+
+  // Solo actualiza current_period_end de esa fila: status, precio, ciclo, notas, motivo y
+  // businesses.status no se tocan. Si falla, se avisa y la pantalla queda como estaba.
+  const runRenew = async (plan: RenewPlan) => {
+    setRenewPlan(null)
+    setNotice(null)
+    setRenewingId(plan.sub.id)
+    const { data, error: renewError } = await createClient()
+      .from("subscriptions")
+      .update({ current_period_end: plan.newEnd })
+      .eq("id", plan.sub.id)
+      .select("id")
+
+    if (renewError || !data || data.length === 0) {
+      console.error("Error al renovar la suscripción:", renewError)
+      alert(`No se pudo renovar la suscripción: ${renewError?.message ?? "no se encontró la fila para actualizar"}`)
+      setRenewingId(null)
+      return
+    }
+
+    // Recarga: effective_status, contadores y filtros se recalculan (una Vencida vuelve a Activa).
+    await fetchAll()
+    setRenewingId(null)
+    if (plan.sub.businesses?.status === "suspended") {
+      setNotice(`${plan.sub.businesses.name}: Renovada, pero el negocio sigue suspendido en Negocios: no se ve en la app hasta reactivarlo.`)
+    }
+  }
+
   // Cambiar cualquier filtro descarta la selección: la acción masiva solo afecta lo que se ve.
   const changeFilter = (f: StatusFilter) => { setFilter(f); setSelected(new Set()) }
   const changeSection = (s: BusinessSection | "all") => { setSectionFilter(s); setSelected(new Set()) }
@@ -589,6 +647,8 @@ export default function AdminSuscripciones() {
   const filtered = subs.filter(s => {
     if (filter === "trial_expired") {
       if (!isTrialDateExpired(s.eff, s.current_period_end)) return false
+    } else if (filter === "expiring") {
+      if (!isExpiringSoon(s.status, s.current_period_end, today)) return false
     } else if (filter !== "all" && s.eff !== filter) {
       return false
     }
@@ -596,6 +656,10 @@ export default function AdminSuscripciones() {
     if (query && !s.businesses?.name?.toLowerCase().includes(query)) return false
     return true
   })
+  // "Por vencer": las que hay que renovar primero, arriba (fin de período ascendente).
+  if (filter === "expiring") {
+    filtered.sort((a, b) => (toDateKey(a.current_period_end) ?? "").localeCompare(toDateKey(b.current_period_end) ?? ""))
+  }
 
   // Contadores y tarjeta de ingreso: sobre todas las suscripciones, sin filtros.
   const counts = SUBSCRIPTION_STATUSES.reduce(
@@ -603,6 +667,7 @@ export default function AdminSuscripciones() {
     {} as Record<SubscriptionStatus, number>,
   )
   const trialExpiredCount = subs.filter(s => isTrialDateExpired(s.eff, s.current_period_end)).length
+  const expiringCount = subs.filter(s => isExpiringSoon(s.status, s.current_period_end, today)).length
   const monthlyRevenue = subs
     .filter(s => s.eff === "active" || s.eff === "discount")
     .reduce((sum, s) => sum + Number(s.monthly_price ?? 0), 0)
@@ -787,6 +852,15 @@ export default function AdminSuscripciones() {
         </div>
       )}
 
+      {notice && (
+        <div className="flex items-start justify-between gap-3 bg-amber-50 text-amber-700 text-sm px-4 py-3 rounded-xl">
+          <span>{notice}</span>
+          <button onClick={() => setNotice(null)} aria-label="Cerrar aviso" className="text-amber-500 hover:text-amber-700 shrink-0">
+            <X size={14} />
+          </button>
+        </div>
+      )}
+
       {/* Resumen rápido */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
         {SUBSCRIPTION_STATUSES.map(s => (
@@ -817,6 +891,16 @@ export default function AdminSuscripciones() {
             {f.label}
           </button>
         ))}
+        <button
+          onClick={() => changeFilter("expiring")}
+          className={`px-3 py-1.5 rounded-xl text-xs border transition-colors ${
+            filter === "expiring"
+              ? "bg-[#2D4530] text-white border-[#2D4530]"
+              : "bg-yellow-50 text-yellow-700 border-yellow-200 hover:border-yellow-300"
+          }`}
+        >
+          Por vencer ({expiringCount})
+        </button>
         <button
           onClick={() => changeFilter("trial_expired")}
           className={`px-3 py-1.5 rounded-xl text-xs border transition-colors ${
@@ -978,6 +1062,25 @@ export default function AdminSuscripciones() {
                   </div>
                 </div>
 
+                {isRenewable(sub.status, sub.current_period_end) && (
+                  <div className="flex items-center gap-1 shrink-0">
+                    {RENEW_OPTIONS.map(opt => (
+                      <button
+                        key={opt.months}
+                        onClick={() => openRenew(sub, opt.months)}
+                        disabled={renewingId !== null || renewPlan !== null}
+                        aria-label={`Renovar ${sub.businesses?.name ?? "suscripción"} ${opt.label}`}
+                        className={`px-2 py-1 rounded-lg text-[11px] transition-colors disabled:opacity-40 disabled:cursor-not-allowed ${
+                          sub.billing_cycle === opt.cycle
+                            ? "bg-[#2D4530] text-white font-medium hover:bg-[#3a5a3e]"
+                            : "border border-stone-200 text-stone-500 hover:bg-stone-50"
+                        }`}
+                      >
+                        {renewingId === sub.id && sub.billing_cycle === opt.cycle ? "…" : opt.label}
+                      </button>
+                    ))}
+                  </div>
+                )}
                 <button
                   onClick={() => openEdit(sub)}
                   className="w-7 h-7 flex items-center justify-center rounded-lg hover:bg-stone-100 text-stone-300 hover:text-stone-500 transition-colors"
@@ -1006,6 +1109,28 @@ export default function AdminSuscripciones() {
       )}
 
       {bulkPlan && renderBulkDialog(bulkPlan)}
+
+      {renewPlan && (
+        <ChoiceDialog
+          title="Renovar suscripción"
+          actions={[
+            { label: "Confirmar", tone: "primary", onClick: () => runRenew(renewPlan) },
+            { label: "Cancelar", tone: "ghost", onClick: () => setRenewPlan(null) },
+          ]}
+        >
+          <p className="font-medium text-stone-700">{renewPlan.sub.businesses?.name ?? "—"}</p>
+          <p>
+            Vence: {formatDate(renewPlan.currentEnd, "numeric")} → Nuevo vencimiento:{" "}
+            <span className="font-medium text-stone-700">{formatDate(renewPlan.newEnd, "numeric")}</span>
+            <span className="text-stone-400"> ({renewPlan.months === 12 ? "+1 año" : "+1 mes"})</span>
+          </p>
+          {renewPlan.fromToday && (
+            <p className="text-xs text-stone-400">
+              El fin ya pasó los {SUBSCRIPTION_GRACE_DAYS} días de gracia, así que se cuenta desde hoy.
+            </p>
+          )}
+        </ChoiceDialog>
+      )}
     </div>
   )
 }
