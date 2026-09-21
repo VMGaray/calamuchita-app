@@ -15,7 +15,10 @@ export type BusinessSection =
 export type OrderType = 'takeaway' | 'delivery'
 export type OrderStatus = 'pending' | 'confirmed' | 'ready' | 'completed' | 'cancelled'
 export type ReservationStatus = 'pending' | 'confirmed' | 'rejected' | 'completed' | 'no_show'
-export type SubscriptionStatus = 'trial' | 'active' | 'overdue' | 'cancelled'
+export type SubscriptionStatus = 'trial' | 'active' | 'discount' | 'complimentary' | 'free' | 'expired' | 'suspended'
+// Lo que puede traer la base: 'overdue' y 'cancelled' quedan como legado en el enum
+// de Postgres, pero la UI nunca los ofrece (ver normalizeSubscriptionStatus).
+export type SubscriptionStatusDb = SubscriptionStatus | 'overdue' | 'cancelled'
 export type BillingCycle = 'monthly' | 'yearly'
 
 export interface Profile {
@@ -160,12 +163,13 @@ export interface Reservation {
 export interface Subscription {
   id: string
   business_id: string
-  status: SubscriptionStatus
+  status: SubscriptionStatusDb
   price: number
   billing_cycle: BillingCycle
   current_period_start: string
-  current_period_end: string
+  current_period_end: string | null   // null = sin vencimiento (estado 'free')
   notes: string | null
+  reason: string | null
 }
 
 export interface UsefulContact {
