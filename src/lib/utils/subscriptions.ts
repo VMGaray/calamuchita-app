@@ -1,6 +1,6 @@
 import type { SubscriptionStatus } from "@/types/database"
 import {
-  AUTO_EXPIRING_STATUSES, STATUS_FIELDS, SUBSCRIPTION_GRACE_DAYS, SUBSCRIPTION_STATUSES,
+  AUTO_EXPIRING_STATUSES, EXPIRING_SOON_DAYS, STATUS_FIELDS, SUBSCRIPTION_GRACE_DAYS, SUBSCRIPTION_STATUSES,
 } from "@/lib/constants/subscriptions"
 
 // La base todavía puede devolver 'overdue' y 'cancelled' (legado del enum): se
@@ -83,6 +83,100 @@ export function bulkBlockReason(
   if (fields.priceRequired && !(Number(sub.price) > 0)) return "price"
   if (fields.endRequired && !AUTO_EXPIRING_STATUSES.has(target) && !parseDate(sub.current_period_end)) return "end"
   return null
+}
+
+// ─── Renovación ──────────────────────────────────────────────────────────────
+// Todo este bloque trabaja con fechas como texto "YYYY-MM-DD" y aritmética en UTC:
+// sin hora ni zona, así ninguna zona horaria del navegador puede correr un día.
+
+const pad2 = (n: number) => String(n).padStart(2, "0")
+const daysInMonth = (year: number, month: number) => new Date(Date.UTC(year, month, 0)).getUTCDate()
+const formatISO = (year: number, month: number, day: number) => `${String(year).padStart(4, "0")}-${pad2(month)}-${pad2(day)}`
+
+function parseISOParts(iso: string | null | undefined): { year: number; month: number; day: number } | null {
+  const match = /^(\d{4})-(\d{2})-(\d{2})(?:$|T)/.exec(iso ?? "")
+  if (!match) return null
+  const year = Number(match[1])
+  const month = Number(match[2])
+  const day = Number(match[3])
+  if (month < 1 || month > 12 || day < 1 || day > daysInMonth(year, month)) return null
+  return { year, month, day }
+}
+
+// "YYYY-MM-DD" normalizado (descarta una hora si la trae), o null si no es una fecha válida.
+export function toDateKey(iso: string | null | undefined): string | null {
+  const p = parseISOParts(iso)
+  return p ? formatISO(p.year, p.month, p.day) : null
+}
+
+// Fecha de hoy en Argentina (la misma que usa la base para vencer), como "YYYY-MM-DD".
+export function todayInArgentina(now: Date = new Date()): string {
+  const parts = new Intl.DateTimeFormat("en-US", {
+    timeZone: "America/Argentina/Buenos_Aires", year: "numeric", month: "2-digit", day: "2-digit",
+  }).formatToParts(now)
+  const get = (type: string) => parts.find(p => p.type === type)?.value ?? ""
+  return `${get("year")}-${get("month")}-${get("day")}`
+}
+
+export function addDaysISO(iso: string | null | undefined, days: number): string | null {
+  const p = parseISOParts(iso)
+  if (!p) return null
+  const d = new Date(Date.UTC(p.year, p.month - 1, p.day + days))
+  return formatISO(d.getUTCFullYear(), d.getUTCMonth() + 1, d.getUTCDate())
+}
+
+// Suma meses sin desbordar al mes siguiente: si el día no existe en el mes destino, cae en
+// el último día de ese mes (31/01 + 1 mes = 28/02, o 29/02 en bisiesto).
+export function addMonthsISO(iso: string | null | undefined, months: number): string | null {
+  const p = parseISOParts(iso)
+  if (!p) return null
+  const total = p.year * 12 + (p.month - 1) + months
+  const year = Math.floor(total / 12)
+  const month = total - year * 12 + 1
+  return formatISO(year, month, Math.min(p.day, daysInMonth(year, month)))
+}
+
+// Día desde el que se cuenta la renovación. Si el fin todavía está vigente o dentro de la
+// gracia (fin + días de gracia >= hoy), se parte del fin: pagar antes o unos días tarde no
+// mueve el calendario de cobro. Si ya venció más allá de la gracia, se parte de hoy.
+export function renewalBase(currentEnd: string | null | undefined, today: string): string | null {
+  const end = toDateKey(currentEnd)
+  const now = toDateKey(today)
+  if (!end || !now) return null
+  const graceLimit = addDaysISO(end, SUBSCRIPTION_GRACE_DAYS)
+  return graceLimit !== null && graceLimit >= now ? end : now
+}
+
+// Nuevo fin de período tras renovar `months` meses (1 o 12), o null si no hay nada que
+// renovar (fin nulo o inválido) o los datos no son válidos.
+export function computeRenewedEnd(
+  currentEnd: string | null | undefined,
+  months: number,
+  today: string,
+): string | null {
+  if (!Number.isInteger(months) || months < 1) return null
+  const base = renewalBase(currentEnd, today)
+  return base ? addMonthsISO(base, months) : null
+}
+
+// Renovable: estado GUARDADO active/discount/complimentary y con fin de período. Las que hoy
+// figuran como Vencidas por fecha siguen siéndolo; expired/overdue/cancelled, trial, free y
+// suspended no, ni complimentary sin vencimiento.
+export function isRenewable(storedStatus: string, periodEnd: string | null | undefined): boolean {
+  return (AUTO_EXPIRING_STATUSES as ReadonlySet<string>).has(storedStatus) && toDateKey(periodEnd) !== null
+}
+
+// "Por vencer": renovable con fin <= hoy + N días (incluye las ya vencidas).
+export function isExpiringSoon(
+  storedStatus: string,
+  periodEnd: string | null | undefined,
+  today: string,
+  days: number = EXPIRING_SOON_DAYS,
+): boolean {
+  if (!isRenewable(storedStatus, periodEnd)) return false
+  const end = toDateKey(periodEnd)
+  const limit = addDaysISO(today, days)
+  return end !== null && limit !== null && end <= limit
 }
 
 export function formatARS(amount: number): string {
