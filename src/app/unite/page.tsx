@@ -14,6 +14,20 @@ export default function UnitePage() {
 
   return (
     <main className="min-h-screen bg-[#FDFCF9] pb-24">
+      <style jsx>{`
+        @keyframes fadeInUp {
+          from { opacity: 0; transform: translateY(28px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+        .plan-card {
+          animation: fadeInUp 0.6s cubic-bezier(0.22, 1, 0.36, 1) both;
+        }
+        .plan-grid > div:nth-child(1) { animation-delay: 0.05s; }
+        .plan-grid > div:nth-child(2) { animation-delay: 0.15s; }
+        .plan-grid > div:nth-child(3) { animation-delay: 0.25s; }
+        .plan-grid > div:nth-child(4) { animation-delay: 0.35s; }
+        .plan-grid > div:nth-child(5) { animation-delay: 0.45s; }
+      `}</style>
       {/* Encabezado Principal */}
       <div className="bg-[#2D4530] pt-16 pb-14 px-6 rounded-b-[40px] shadow-lg text-center relative">
         <Link 
@@ -34,13 +48,13 @@ export default function UnitePage() {
         {/* ═══════════════════════════════════════════════════════════════════
             GRID PRINCIPAL DE 5 PLANES COMERCIALES
            ═══════════════════════════════════════════════════════════════════ */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6 items-stretch">
+        <div className="plan-grid grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6 items-stretch">
           
           {/* PLAN 1: Gastronómico Básico */}
-          <div className="bg-white rounded-[32px] p-6 border border-stone-200/70 shadow-sm hover:shadow-md transition-all flex flex-col justify-between h-full relative">
+          <div className="plan-card group bg-white rounded-[32px] p-6 border border-stone-200/70 shadow-sm hover:shadow-xl hover:-translate-y-2 transition-all duration-300 flex flex-col justify-between h-full relative">
             <div>
               <div className="flex items-center gap-3 mb-4">
-                <div className="w-10 h-10 rounded-xl bg-stone-100 flex items-center justify-center text-stone-600">
+                <div className="w-10 h-10 rounded-xl bg-stone-100 flex items-center justify-center text-stone-600 transition-transform duration-300 group-hover:scale-110">
                   <Utensils size={18} />
                 </div>
                 <h3 className="font-serif text-base font-bold text-stone-800">Gastronómico Básico</h3>
@@ -60,19 +74,19 @@ export default function UnitePage() {
                 ))}
               </ul>
             </div>
-            <a href={getWaLink("Plan Gastronómico Básico")} target="_blank" rel="noopener noreferrer" className="w-full py-3 bg-stone-100 text-stone-700 font-bold rounded-xl hover:bg-stone-200/70 transition-colors text-xs text-center block mt-auto">
+            <a href={getWaLink("Plan Gastronómico Básico")} target="_blank" rel="noopener noreferrer" className="w-full py-3 bg-stone-100 text-stone-700 font-bold rounded-xl hover:bg-stone-200/70 transition-all duration-200 hover:scale-[1.02] active:scale-[0.98] text-xs text-center block mt-auto">
               Consultar
             </a>
           </div>
 
           {/* PLAN 2: Gastro PRO (DESTACADO PREMIUM) */}
-          <div className="bg-white rounded-[32px] p-6 border-2 border-[#E1DBC9] shadow-md hover:shadow-lg transition-all flex flex-col justify-between h-full relative transform lg:-translate-y-1">
+          <div className="plan-card group bg-white rounded-[32px] p-6 border-2 border-[#E1DBC9] shadow-md hover:shadow-xl transition-all duration-300 flex flex-col justify-between h-full relative transform lg:-translate-y-1 hover:-translate-y-3">
             <div className="absolute -top-3 left-1/2 transform -translate-x-1/2 bg-[#2D4530] text-[#E1DBC9] text-[9px] font-black uppercase tracking-widest px-3 py-1 rounded-full whitespace-nowrap shadow-sm">
               🔥 El más elegido
             </div>
             <div>
               <div className="flex items-center gap-3 mb-4 mt-1">
-                <div className="w-10 h-10 rounded-xl bg-[#2D4530]/10 flex items-center justify-center text-[#2D4530]">
+                <div className="w-10 h-10 rounded-xl bg-[#2D4530]/10 flex items-center justify-center text-[#2D4530] transition-transform duration-300 group-hover:scale-110">
                   <Utensils size={18} />
                 </div>
                 <h3 className="font-serif text-base font-bold text-stone-800">Gastronómico Pro</h3>
@@ -96,19 +110,16 @@ export default function UnitePage() {
                 ))}
               </ul>
             </div>
-            <a href={getWaLink("Plan Gastronómico Pro")} target="_blank" rel="noopener noreferrer" className="w-full py-3 bg-[#2D4530] text-[#E1DBC9] font-bold rounded-xl hover:opacity-90 transition-all text-xs text-center block mt-auto shadow-sm">
+            <a href={getWaLink("Plan Gastronómico Pro")} target="_blank" rel="noopener noreferrer" className="w-full py-3 bg-[#2D4530] text-[#E1DBC9] font-bold rounded-xl hover:opacity-90 transition-all duration-200 hover:scale-[1.02] active:scale-[0.98] text-xs text-center block mt-auto shadow-sm">
               Consultar
             </a>
           </div>
 
-          {/* PLAN 3: Comercio & Turismo (DESTACADO RECOMENDADO) */}
-          <div className="bg-white rounded-[32px] p-6 border-2 border-[#E1DBC9] shadow-md hover:shadow-lg transition-all flex flex-col justify-between h-full relative transform lg:-translate-y-1">
-            <div className="absolute -top-3 left-1/2 transform -translate-x-1/2 bg-[#C4B9A8] text-stone-900 text-[9px] font-black uppercase tracking-widest px-3 py-1 rounded-full whitespace-nowrap shadow-sm">
-              ★ Recomendado
-            </div>
+          {/* PLAN 3: Comercio & Turismo */}
+          <div className="plan-card group bg-white rounded-[32px] p-6 border border-stone-200/70 shadow-sm hover:shadow-xl hover:-translate-y-2 transition-all duration-300 flex flex-col justify-between h-full relative">
             <div>
-              <div className="flex items-center gap-3 mb-4 mt-1">
-                <div className="w-10 h-10 rounded-xl bg-stone-100 flex items-center justify-center text-stone-700">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="w-10 h-10 rounded-xl bg-stone-100 flex items-center justify-center text-stone-700 transition-transform duration-300 group-hover:scale-110">
                   <Store size={18} />
                 </div>
                 <h3 className="font-serif text-base font-bold text-stone-800">Comercio & Turismo</h3>
@@ -128,16 +139,19 @@ export default function UnitePage() {
                 ))}
               </ul>
             </div>
-            <a href={getWaLink("Plan Comercio & Turismo")} target="_blank" rel="noopener noreferrer" className="w-full py-3 bg-[#2D4530] text-[#E1DBC9] font-bold rounded-xl hover:opacity-90 transition-all text-xs text-center block mt-auto shadow-sm">
+            <a href={getWaLink("Plan Comercio & Turismo")} target="_blank" rel="noopener noreferrer" className="w-full py-3 bg-stone-100 text-stone-700 font-bold rounded-xl hover:bg-stone-200/70 transition-all duration-200 hover:scale-[1.02] active:scale-[0.98] text-xs text-center block mt-auto">
               Consultar
             </a>
           </div>
 
-          {/* PLAN 4: Servicios */}
-          <div className="bg-white rounded-[32px] p-6 border border-stone-200/70 shadow-sm hover:shadow-md transition-all flex flex-col justify-between h-full relative">
+          {/* PLAN 4: Servicios (DESTACADO) */}
+          <div className="plan-card group bg-white rounded-[32px] p-6 border-2 border-[#E1DBC9] shadow-md hover:shadow-xl transition-all duration-300 flex flex-col justify-between h-full relative transform lg:-translate-y-1 hover:-translate-y-3">
+            <div className="absolute -top-3 left-1/2 transform -translate-x-1/2 bg-[#C4B9A8] text-stone-900 text-[9px] font-black uppercase tracking-widest px-3 py-1 rounded-full whitespace-nowrap shadow-sm">
+              ★ Recomendado
+            </div>
             <div>
-              <div className="flex items-center gap-3 mb-4">
-                <div className="w-10 h-10 rounded-xl bg-stone-100 flex items-center justify-center text-stone-600">
+              <div className="flex items-center gap-3 mb-4 mt-1">
+                <div className="w-10 h-10 rounded-xl bg-[#C4B9A8]/20 flex items-center justify-center text-stone-700 transition-transform duration-300 group-hover:scale-110">
                   <Wrench size={18} />
                 </div>
                 <h3 className="font-serif text-base font-bold text-stone-800">Servicios</h3>
@@ -157,16 +171,19 @@ export default function UnitePage() {
                 ))}
               </ul>
             </div>
-            <a href={getWaLink("Plan Servicios")} target="_blank" rel="noopener noreferrer" className="w-full py-3 bg-stone-100 text-stone-700 font-bold rounded-xl hover:bg-stone-200/70 transition-colors text-xs text-center block mt-auto">
+            <a href={getWaLink("Plan Servicios")} target="_blank" rel="noopener noreferrer" className="w-full py-3 bg-[#2D4530] text-[#E1DBC9] font-bold rounded-xl hover:opacity-90 transition-all duration-200 hover:scale-[1.02] active:scale-[0.98] text-xs text-center block mt-auto shadow-sm">
               Consultar
             </a>
           </div>
 
-          {/* PLAN 5: Profesionales & Salud */}
-          <div className="bg-white rounded-[32px] p-6 border border-stone-200/70 shadow-sm hover:shadow-md transition-all flex flex-col justify-between h-full relative">
+          {/* PLAN 5: Profesionales & Salud (DESTACADO) */}
+          <div className="plan-card group bg-white rounded-[32px] p-6 border-2 border-[#D4B896] shadow-md hover:shadow-xl transition-all duration-300 flex flex-col justify-between h-full relative transform lg:-translate-y-1 hover:-translate-y-3">
+            <div className="absolute -top-3 left-1/2 transform -translate-x-1/2 bg-[#D4B896] text-[#2D4530] text-[9px] font-black uppercase tracking-widest px-3 py-1 rounded-full whitespace-nowrap shadow-sm">
+              ✦ Alta demanda
+            </div>
             <div>
-              <div className="flex items-center gap-3 mb-4">
-                <div className="w-10 h-10 rounded-xl bg-stone-100 flex items-center justify-center text-stone-600">
+              <div className="flex items-center gap-3 mb-4 mt-1">
+                <div className="w-10 h-10 rounded-xl bg-[#D4B896]/20 flex items-center justify-center text-[#2D4530] transition-transform duration-300 group-hover:scale-110">
                   <HeartPulse size={18} />
                 </div>
                 <h3 className="font-serif text-base font-bold text-stone-800">Profesionales & Salud</h3>
@@ -186,7 +203,7 @@ export default function UnitePage() {
                 ))}
               </ul>
             </div>
-            <a href={getWaLink("Plan Profesionales & Salud")} target="_blank" rel="noopener noreferrer" className="w-full py-3 bg-stone-100 text-stone-700 font-bold rounded-xl hover:bg-stone-200/70 transition-colors text-xs text-center block mt-auto">
+            <a href={getWaLink("Plan Profesionales & Salud")} target="_blank" rel="noopener noreferrer" className="w-full py-3 bg-[#2D4530] text-[#E1DBC9] font-bold rounded-xl hover:opacity-90 transition-all duration-200 hover:scale-[1.02] active:scale-[0.98] text-xs text-center block mt-auto shadow-sm">
               Consultar
             </a>
           </div>
@@ -204,7 +221,7 @@ export default function UnitePage() {
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {/* Destacado 1 */}
-            <div className="bg-[#FDFCF9] border border-stone-100 rounded-2xl p-5 flex flex-col justify-between">
+            <div className="bg-[#FDFCF9] border border-stone-100 rounded-2xl p-5 flex flex-col justify-between transition-all duration-300 hover:shadow-lg hover:-translate-y-1">
               <div>
                 <div className="flex justify-between items-start gap-2 mb-2">
                   <h4 className="font-semibold text-sm text-stone-800 leading-tight">Premium Carrusel Principal</h4>
@@ -220,7 +237,7 @@ export default function UnitePage() {
             </div>
 
             {/* Destacado 2 */}
-            <div className="bg-[#FDFCF9] border border-stone-100 rounded-2xl p-5 flex flex-col justify-between">
+            <div className="bg-[#FDFCF9] border border-stone-100 rounded-2xl p-5 flex flex-col justify-between transition-all duration-300 hover:shadow-lg hover:-translate-y-1">
               <div>
                 <div className="flex justify-between items-start gap-2 mb-2">
                   <h4 className="font-semibold text-sm text-stone-800 leading-tight">Destacado de Rubro</h4>
