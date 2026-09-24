@@ -1,6 +1,6 @@
 "use client"
 
-import { Check, Sparkles, Utensils, Store, Wrench, ArrowLeft, HeartPulse, ShieldAlert } from "lucide-react"
+import { Check, Utensils, Store, Wrench, ArrowLeft, HeartPulse, ShieldAlert } from "lucide-react"
 import Link from "next/link"
 
 export default function UnitePage() {
@@ -31,56 +31,6 @@ export default function UnitePage() {
       </div>
 
       <div className="max-w-7xl mx-auto px-6 mt-12">
-        {/* Banner de Bienvenida / Club Fundadores */}
-        <div className="mb-12 bg-[#2D4530]/5 border border-[#2D4530]/10 rounded-[32px] p-6 md:p-10 flex flex-col md:flex-row items-start gap-6 shadow-sm">
-          <div className="w-12 h-12 rounded-2xl bg-[#2D4530]/10 flex items-center justify-center text-[#2D4530] flex-shrink-0 mt-0.5">
-            <Sparkles size={24} />
-          </div>
-          <div className="flex-1 min-w-0">
-            <span className="text-[10px] font-black uppercase tracking-widest text-[#2D4530] bg-[#2D4530]/10 px-2.5 py-1 rounded-full inline-block">
-              Beneficio Exclusivo de Lanzamiento
-            </span>
-            <h2 className="font-serif text-2xl text-stone-800 mt-2.5 mb-3 font-bold">Club Fundadores</h2>
-
-            <p className="text-stone-600 text-[13px] leading-relaxed">
-              Registrándote{" "}
-              <strong className="text-[#2D4530] font-bold">del 1 al 30 de junio</strong>{" "}
-              congelás tus{" "}
-              <strong className="text-[#2D4530] font-bold">primeros 2 meses al 100% bonificados (Gratis)</strong>.
-              Tu negocio va a estar activo, visible y captando clientes durante{" "}
-              <strong className="text-[#2D4530] font-bold">todo julio y agosto sin costo</strong>{" "}
-              y formando parte por esos dos meses de{" "}
-              <strong className="text-[#2D4530] font-bold tracking-wide">DESTACADOS</strong>.{" "}
-              Vos empezás a pagar tu plan{" "}
-              <strong className="text-[#2D4530] font-bold">recién en septiembre</strong>.
-            </p>
-
-            {/* Timeline visual */}
-            <div className="flex items-start gap-2 mt-5 flex-wrap sm:flex-nowrap">
-              <div className="flex flex-col items-center gap-1 flex-shrink-0">
-                <span className="text-[10px] font-black uppercase tracking-wider text-[#2D4530] bg-[#2D4530]/12 px-3 py-1 rounded-full">
-                  Junio
-                </span>
-                <span className="text-[10px] text-stone-400">Te registrás</span>
-              </div>
-              <div className="flex-1 h-px border-t-2 border-dashed border-[#2D4530]/20 mt-3 min-w-[20px]" />
-              <div className="flex flex-col items-center gap-1 flex-shrink-0">
-                <span className="text-[10px] font-black uppercase tracking-wider text-emerald-700 bg-emerald-50 border border-emerald-100 px-3 py-1 rounded-full">
-                  Jul · Ago
-                </span>
-                <span className="text-[10px] text-stone-400">100% gratis ✦ Destacado</span>
-              </div>
-              <div className="flex-1 h-px border-t-2 border-dashed border-[#2D4530]/20 mt-3 min-w-[20px]" />
-              <div className="flex flex-col items-center gap-1 flex-shrink-0">
-                <span className="text-[10px] font-black uppercase tracking-wider text-stone-500 bg-stone-100 px-3 py-1 rounded-full">
-                  Septiembre
-                </span>
-                <span className="text-[10px] text-stone-400">Recién pagás</span>
-              </div>
-            </div>
-          </div>
-        </div>
-
         {/* ═══════════════════════════════════════════════════════════════════
             GRID PRINCIPAL DE 5 PLANES COMERCIALES
            ═══════════════════════════════════════════════════════════════════ */}
@@ -183,14 +133,14 @@ export default function UnitePage() {
             </a>
           </div>
 
-          {/* PLAN 4: Servicios & Educación */}
+          {/* PLAN 4: Servicios */}
           <div className="bg-white rounded-[32px] p-6 border border-stone-200/70 shadow-sm hover:shadow-md transition-all flex flex-col justify-between h-full relative">
             <div>
               <div className="flex items-center gap-3 mb-4">
                 <div className="w-10 h-10 rounded-xl bg-stone-100 flex items-center justify-center text-stone-600">
                   <Wrench size={18} />
                 </div>
-                <h3 className="font-serif text-base font-bold text-stone-800">Servicios & Edu</h3>
+                <h3 className="font-serif text-base font-bold text-stone-800">Servicios</h3>
               </div>
               <p className="text-stone-500 text-[11px] leading-relaxed mb-4 min-h-[55px]">
                 Hacé que tu servicio esté disponible justo cuando los vecinos lo necesitan. La forma más rápida y prolija de generar confianza.
@@ -199,7 +149,7 @@ export default function UnitePage() {
                 <span className="text-sm font-bold text-[#2D4530] bg-[#2D4530]/8 px-3 py-1.5 rounded-full">Consultar precio</span>
               </div>
               <ul className="space-y-3 border-t border-stone-100 pt-4 mb-6">
-                {["Perfil en la guía de servicios y educación del Valle", "Detalle claro de especialidades, cursos o soluciones", "Zona de cobertura explícita (Domicilio o Espacio fijo)", "Botón de llamada rápido y WhatsApp para presupuestos"].map((item) => (
+                {["Perfil en la guía de servicios del Valle", "Detalle claro de especialidades y soluciones", "Zona de cobertura explícita (Domicilio o Espacio fijo)", "Botón de llamada rápido y WhatsApp para presupuestos"].map((item) => (
                   <li key={item} className="flex items-start gap-2 text-stone-600 text-[11px] leading-snug">
                     <Check size={13} className="text-[#2D4530] mt-0.5 flex-shrink-0" />
                     <span>{item}</span>
@@ -207,7 +157,7 @@ export default function UnitePage() {
                 ))}
               </ul>
             </div>
-            <a href={getWaLink("Plan Servicios & Educación")} target="_blank" rel="noopener noreferrer" className="w-full py-3 bg-stone-100 text-stone-700 font-bold rounded-xl hover:bg-stone-200/70 transition-colors text-xs text-center block mt-auto">
+            <a href={getWaLink("Plan Servicios")} target="_blank" rel="noopener noreferrer" className="w-full py-3 bg-stone-100 text-stone-700 font-bold rounded-xl hover:bg-stone-200/70 transition-colors text-xs text-center block mt-auto">
               Consultar
             </a>
           </div>
