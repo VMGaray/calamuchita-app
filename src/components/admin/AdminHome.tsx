@@ -5,6 +5,7 @@ import Link from "next/link"
 import { createClient } from "@/lib/supabase/client"
 import AnimateIn from "@/components/ui/AnimateIn"
 import AnimatedCounter from "@/components/ui/AnimatedCounter"
+import PwaStatsCard from "@/components/PwaStatsCard"
 import { CalendarDays, Newspaper, Smartphone, AlertCircle, BarChart2 } from "lucide-react"
 
 const sectionLabels: Record<string, string> = {
@@ -151,7 +152,7 @@ export default function AdminHome() {
               <Smartphone size={16} style={{ color: "#2D4530" }} />
             </div>
             <div>
-              <p className="text-xs uppercase tracking-wider mb-0.5" style={{ color: "rgba(45,69,48,0.55)" }}>Instalaciones PWA</p>
+              <p className="text-xs uppercase tracking-wider mb-0.5" style={{ color: "rgba(45,69,48,0.55)" }}>Instalaciones PWA (histórico)</p>
               <p className="text-2xl font-serif" style={{ color: "#2D4530" }}>
                 {loading ? "…" : <AnimatedCounter to={stats.pwaInstalls} />}
               </p>
@@ -186,6 +187,11 @@ export default function AdminHome() {
             </div>
           </Link>
         </AnimateIn>
+      </div>
+
+      {/* ── Uso real de la app instalada ── */}
+      <div className="mb-8">
+        <PwaStatsCard />
       </div>
 
       {/* ── Bloque inferior ── */}

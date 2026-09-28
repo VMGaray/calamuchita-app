@@ -15,6 +15,7 @@ import PageTransition from "@/components/ui/PageTransition"
 import ScrollToTop from "@/components/ui/ScrollToTop"
 import BackToTopButton from "@/components/ui/BackToTopButton"
 import InstallPrompt from "@/components/ui/InstallPrompt" // ✨ Importamos el cartel de instalación
+import PwaTracker from "@/components/PwaTracker"
 
 export const metadata: Metadata = {
   title: {
@@ -63,6 +64,9 @@ export default function RootLayout({
 
         {/* ✨ Inyectamos el cartel en la raíz para que vigile toda la navegación */}
         <InstallPrompt />
+
+        {/* Cuenta dispositivos que usan la app instalada (1 ping cada 12 h) */}
+        <PwaTracker />
       </body>
     </html>
   )
