@@ -136,6 +136,15 @@ const SYNONYMS: Record<string, string[]> = {
   regalo:         ["Regalería"],
   souvenirs:      ["Regalería"],
   bazar:          ["Regalería"],
+  globos:         ["Globología"],
+  globo:          ["Globología"],
+  globologia:     ["Globología"],
+  equitacion:     ["Escuela de Equitación"],
+  caballos:       ["Escuela de Equitación"],
+  "higiene y seguridad": ["Higiene y seguridad laboral"],
+  desarrollador:  ["Soluciones Digitales & AI"],
+  "inteligencia artificial": ["Soluciones Digitales & AI"],
+  ia:             ["Soluciones Digitales & AI"],
 }
 
 function findMatchingSubcategories(q: string): string[] {
@@ -236,8 +245,10 @@ export default async function BuscarPage({ searchParams }: Props) {
   if (prefix.length >= 6 && prefix !== q) {
     orParts.push(`name.ilike.%${prefix}%`)
   }
+  // subcategory es solo el primer rubro: también se busca en categories (todos los rubros)
   for (const s of matchingSubcats) {
     orParts.push(`subcategory.eq.${s}`)
+    orParts.push(`categories.cs.{"${s}"}`)
   }
 
   const { data: mainData } = await supabase

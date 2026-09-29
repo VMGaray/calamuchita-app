@@ -4,6 +4,7 @@ import { usePathname, useSearchParams } from "next/navigation"
 import { useLocalidad } from "@/lib/context/LocalidadContext"
 import { MapPin, ChevronRight } from "lucide-react"
 import { Suspense } from "react"
+import { findServiceGroup } from "@/lib/constants/categories"
 
 // ── Nombres de sección por ruta ──────────────────────────────────────────────
 const SECTION_LABELS: Record<string, string> = {
@@ -70,7 +71,8 @@ const SUBCAT_LABELS: Record<string, string> = {
   auxilio:       "Auxilio y Remolque",
   audiovisuales:     "Servicios audiovisuales",
   "higiene-seguridad": "Higiene y seguridad laboral",
-  "licenciado-hys":    "Licenciado en higiene y seguridad",
+  globologia:          "Globología",
+  "soluciones-digitales": "Soluciones Digitales & AI",
   bombas:              "Bombas y Motores eléctricos",
   refrigeracion:       "Refrigeración",
   "alquiler-autos":    "Alquiler de autos",
@@ -147,7 +149,9 @@ function ContextBarInner() {
 
   // Subcategoría: "categoria" para gastronomy, "cat" para directorio
   const catParam    = sp.get("categoria") || sp.get("cat")
-  const subcatLabel = catParam ? SUBCAT_LABELS[catParam] ?? null : null
+  const subcatLabel = (catParam ? SUBCAT_LABELS[catParam] : null)
+    ?? findServiceGroup(sp.get("grupo"))?.label
+    ?? null
 
   // Filtros rápidos activos
   const isAbierto  = sp.get("abierto")   === "true"

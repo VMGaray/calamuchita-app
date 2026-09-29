@@ -10,6 +10,8 @@ import {
 } from "lucide-react"
 import SectionModal from "@/components/public/SectionModal"
 import { sectionCategories, SectionKey } from "@/lib/sections"
+import { serviceGroupNavItems } from "@/lib/constants/categories"
+import { useActiveServiceGroups } from "@/lib/hooks/useActiveServiceGroups"
 
 type NavKey = SectionKey | "sports"
 
@@ -79,6 +81,11 @@ export default function StickyCategoryBar({ stickyOffset = 0 }: Props) {
     }
     setExpandedCat(prev => (prev === key ? null : key))
   }
+
+  // Servicios se despliega por grupos en lugar de los ~50 rubros sueltos
+  const activeServiceGroups = useActiveServiceGroups(expandedCat === "services")
+  const subItemsFor = (key: NavKey) =>
+    key === "services" ? serviceGroupNavItems(activeServiceGroups) : sectionCategories[key as SectionKey]
 
   const handleSubcategory = (href: string) => {
     router.push(href)
@@ -216,7 +223,7 @@ export default function StickyCategoryBar({ stickyOffset = 0 }: Props) {
                             style={{ overflow: "hidden" }}
                           >
                             <div className="grid grid-cols-2 gap-2 pt-1 pb-4">
-                              {sectionCategories[key as SectionKey].map(({ label: subLabel, href }) => (
+                              {subItemsFor(key).map(({ label: subLabel, href }) => (
                                 <button
                                   key={subLabel}
                                   onClick={() => handleSubcategory(href)}
