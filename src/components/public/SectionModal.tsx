@@ -6,10 +6,12 @@ import Link from "next/link"
 import { usePathname, useSearchParams } from "next/navigation"
 import { useLocalidad } from "@/lib/context/LocalidadContext"
 import { sectionCategories, SectionKey } from "@/lib/sections"
+import { serviceGroupNavItems } from "@/lib/constants/categories"
+import { useActiveServiceGroups } from "@/lib/hooks/useActiveServiceGroups"
 import { ShoppingBag, MapPin, Check } from "lucide-react"
 import {
   Utensils, Coffee, Beer, Bike, Clock, Package, Soup,
-  Wrench, Zap, Flame, Car, Building, Paintbrush, Hammer, KeyRound, Leaf, Waves, Home, Bug, Droplets, Sparkles, Shield, Truck, Mountain, HardHat, Scissors, Video, ShieldCheck, ClipboardList,
+  Wrench, Zap, Flame, Car, Building, Paintbrush, Hammer, KeyRound, Leaf, Waves, Home, Bug, Droplets, Sparkles, Shield, Truck, Mountain, HardHat, Scissors, Video, ShieldCheck, Balloon, Laptop,
   Stethoscope, Pill, Brain, Smile, Eye, PawPrint, AlertCircle, Ambulance, Hand, Scan,
   GraduationCap, BookOpen, Languages, Users, Music, Trophy,
   Hotel, Map, Tent, Activity, Compass, Plane,
@@ -29,8 +31,8 @@ const categoryIcons: Record<string, any> = {
   "Electricidad": Zap, "Energía Renovable": Sun, "Gasista": Flame, "Herrero": Hammer, "Paisajismo y Jardines": Leaf,
   "Limpieza": Sparkles, "Mecánica": Car, "Perforaciones": Droplets, "Piletero": Waves,
   "Pintor": Paintbrush, "Plomería": Wrench, "Zinguero": Home, "Profesionales": Briefcase, "Carteles tallados": Tag,
-  "Costurera/Modista": Scissors, "Escuela de Equitación": Activity, "Tapicería": Armchair, "Tatuajes": PenTool, "Traslados": Car, "Servicios audiovisuales": Video,
-  "Higiene y seguridad laboral": ShieldCheck, "Licenciado en higiene y seguridad": ClipboardList,
+  "Costurera/Modista": Scissors, "Tapicería": Armchair, "Tatuajes": PenTool, "Traslados": Car, "Servicios audiovisuales": Video,
+  "Higiene y seguridad laboral": ShieldCheck, "Globología": Balloon, "Soluciones Digitales & AI": Laptop,
   "Bombas y Motores eléctricos": Cog,
   "Refrigeración": Snowflake,
   "Papelería creativa": Palette, "Climatización": Wind, "Depilación": Sparkles, "Lavadero de autos": Droplets,
@@ -43,7 +45,7 @@ const categoryIcons: Record<string, any> = {
   "Pádel": Activity, "Vóley": Users, "Tenis": Activity,
   "Natación": Waves, "Ciclismo": Bike,
   "Trekking / Montaña": Mountain, "Yoga / Pilates": Sparkles, "Gimnasio": Dumbbell,
-  "Artes marciales": Shield, "Running": Timer,
+  "Artes marciales": Shield, "Running": Timer, "Escuela de Equitación": Activity,
   "Clínicas y Consultorios": Building, "Especialidades": Stethoscope, "Estética": Sparkles,
   "Hospitales y Dispensarios": AlertCircle, "Laboratorios": FlaskConical, "Masajes": Hand,
   "Psicología": Brain, "Psicomotricista": Footprints, "Radiología": Scan, "Terapias alternativas": Leaf, "Terapias complementarias": Flower2, "Traslado de pacientes": Ambulance,
@@ -66,6 +68,14 @@ const categoryIcons: Record<string, any> = {
 interface Props {
   section: SectionKey | null
   onClose: () => void
+}
+
+interface NavItem {
+  label: string
+  href: string
+  bg: string
+  color: string
+  icon?: React.ComponentType<{ size?: number; className?: string; style?: React.CSSProperties }>
 }
 
 function useActiveCategory(categories: { label: string; href: string }[]) {
@@ -114,7 +124,11 @@ function ActiveFiltersBar({ activeCategory, section }: { activeCategory: { label
 
 function SectionModalInner({ section, onClose }: Props) {
   const isVisible = section !== null && section !== "events"
-  const categories = isVisible ? sectionCategories[section!] : []
+  // Servicios se navega por grupos (pocos, con ícono) en lugar de los ~50 rubros sueltos
+  const activeGroups = useActiveServiceGroups(section === "services")
+  const categories: NavItem[] = !isVisible ? []
+    : section === "services" ? serviceGroupNavItems(activeGroups)
+    : sectionCategories[section!]
   const activeCategory = useActiveCategory(categories)
 
   useEffect(() => {
@@ -136,8 +150,8 @@ function SectionModalInner({ section, onClose }: Props) {
 
   const renderGrid = (cols: string) => (
     <div className={`grid ${cols} gap-2`}>
-      {categories.map(({ label, href, bg, color }, i) => {
-        const Icon = categoryIcons[label] || ShoppingBag
+      {categories.map(({ label, href, bg, color, icon }, i) => {
+        const Icon = icon || categoryIcons[label] || ShoppingBag
         const isActive = activeCategory?.href === href
 
         return (

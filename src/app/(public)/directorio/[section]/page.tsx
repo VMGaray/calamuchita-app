@@ -6,7 +6,7 @@ import { SectionKey } from "@/lib/sections"
 
 interface Props {
   params: Promise<{ section: string }>
-  searchParams: Promise<{ cat?: string; q?: string; pueblo?: string }>
+  searchParams: Promise<{ cat?: string; grupo?: string; q?: string; pueblo?: string }>
 }
 
 const sectionTitles: Record<string, string> = {

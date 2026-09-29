@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation"
 import { createClient } from "@/lib/supabase/client"
 import { BusinessSection, BusinessCategory } from "@/types/database"
 import { MASTER_CATEGORIES } from "@/lib/constants/categories"
+import RubrosSelector from "@/components/admin/RubrosSelector"
 import ImageUpload from "@/components/ui/ImageUpload"
 import PdfUpload from "@/components/ui/PdfUpload"
 import { isValidYoutubeUrl } from "@/lib/utils/youtube"
@@ -404,25 +405,12 @@ export default function AdminNegocioForm() {
               </label>
 
               {subcategoryOptions[form.section] && (
-                <div className="flex gap-2 flex-wrap mt-2 mb-3">
-                  {subcategoryOptions[form.section].map(opt => {
-                    const selected = form.categories.includes(opt)
-                    return (
-                      <button
-                        key={opt}
-                        type="button"
-                        onClick={() => toggleCategory(opt)}
-                        className={`py-1.5 px-3 rounded-xl text-xs font-medium border transition-colors ${
-                          selected
-                            ? "bg-primary-500 text-white border-primary-500"
-                            : "bg-white text-stone-600 border-stone-200 hover:border-primary-300"
-                        }`}
-                      >
-                        {opt}
-                      </button>
-                    )
-                  })}
-                </div>
+                <RubrosSelector
+                  options={subcategoryOptions[form.section]}
+                  selected={form.categories}
+                  onToggle={toggleCategory}
+                  grouped={form.section === "services"}
+                />
               )}
 
               {/* Selector de tipo de profesional */}

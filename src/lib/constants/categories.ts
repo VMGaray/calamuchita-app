@@ -6,8 +6,10 @@ import {
   Hotel, Map, Tent, Activity, Compass, Bike, Plane,
   Utensils, Coffee, Beer, Wine, ShoppingBag, Clock, Wheat, Pizza, Beef,
   Truck, Mountain, Printer, CreditCard, Briefcase, Gift,
-  Dumbbell, PersonStanding, Timer, Wind, Tag, Video, ShieldCheck, ClipboardList, Cog, Snowflake, Bone, Sofa, Target, FileText, Fence, Cake, Sun, PenTool, Brush, Frame, PartyPopper, Flower2, Footprints, PawPrint, Sprout
+  Dumbbell, PersonStanding, Timer, Wind, Tag, Video, ShieldCheck, Cog, Snowflake, Bone, Sofa, Target, FileText, Fence, Cake, Sun, PenTool, Brush, Frame, PartyPopper, Flower2, Footprints, PawPrint, Sprout,
+  Balloon, HousePlug, Trees, Laptop, LayoutGrid
 } from "lucide-react"
+import type { LucideIcon } from "lucide-react"
 
 export const MASTER_CATEGORIES = {
   gastronomy: {
@@ -51,15 +53,14 @@ export const MASTER_CATEGORIES = {
       { label: "Desinfecciones", icon: Bug, bg: "bg-lime-50", color: "text-lime-600" },
       { label: "Electricidad", icon: Zap, bg: "bg-yellow-50", color: "text-yellow-600" },
       { label: "Energía Renovable", icon: Sun, bg: "bg-slate-50", color: "text-slate-600" },
-      { label: "Escuela de Equitación", icon: PersonStanding, bg: "bg-gray-50", color: "text-gray-600" },
       { label: "Fletes", icon: Truck, bg: "bg-orange-50", color: "text-orange-700" },
+      { label: "Globología", icon: Balloon, bg: "bg-zinc-50", color: "text-zinc-600" },
       { label: "Gasista", icon: Flame, bg: "bg-orange-50", color: "text-orange-600" },
       { label: "Gestoría", icon: FileText, bg: "bg-slate-50", color: "text-slate-600" },
       { label: "Herrero", icon: Hammer, bg: "bg-zinc-50", color: "text-zinc-600" },
       { label: "Higiene y seguridad laboral", icon: ShieldCheck, bg: "bg-emerald-50", color: "text-emerald-600" },
       { label: "Impermeabilizaciones", icon: Waves, bg: "bg-teal-50", color: "text-teal-700" },
       { label: "Lavadero de autos", icon: Droplets, bg: "bg-blue-50", color: "text-blue-600" }, // <-- NUEVA
-      { label: "Licenciado en higiene y seguridad", icon: ClipboardList, bg: "bg-teal-50", color: "text-teal-700" },
       { label: "Limpieza", icon: Sparkles, bg: "bg-teal-50", color: "text-teal-600" },
       { label: "Máquinas de coser", icon: Cog, bg: "bg-slate-50", color: "text-slate-600" },
       { label: "Manicura", icon: Sparkles, bg: "bg-purple-50", color: "text-purple-600" },
@@ -75,6 +76,7 @@ export const MASTER_CATEGORIES = {
       { label: "Profesionales", icon: Briefcase, bg: "bg-violet-50", color: "text-violet-600" },
       { label: "Refrigeración", icon: Snowflake, bg: "bg-slate-50", color: "text-slate-400" },
       { label: "Servicios audiovisuales", icon: Video, bg: "bg-indigo-50", color: "text-indigo-600" },
+      { label: "Soluciones Digitales & AI", icon: Laptop, bg: "bg-slate-50", color: "text-slate-600" },
       { label: "Tapicería", icon: Armchair, bg: "bg-amber-50", color: "text-amber-700" },
       { label: "Tatuajes", icon: PenTool, bg: "bg-zinc-50", color: "text-zinc-600" },
       { label: "Traslados", icon: Car, bg: "bg-blue-50", color: "text-blue-600" },
@@ -157,6 +159,7 @@ export const MASTER_CATEGORIES = {
       { label: "Gimnasio", icon: Dumbbell, bg: "bg-red-50", color: "text-red-600" },
       { label: "Artes marciales", icon: Wind, bg: "bg-zinc-50", color: "text-zinc-600" },
       { label: "Running", icon: Timer, bg: "bg-amber-50", color: "text-amber-600" },
+      { label: "Escuela de Equitación", icon: PersonStanding, bg: "bg-gray-50", color: "text-gray-600" },
       { label: "Otro", icon: Sparkles, bg: "bg-stone-50", color: "text-stone-400" },
     ]
   },
@@ -170,4 +173,93 @@ export const MASTER_CATEGORIES = {
       { label: "Excursiones", icon: Map, bg: "bg-green-50", color: "text-green-600" },
     ]
   }
+}
+// ── Grupos de Servicios ──────────────────────────────────────────────────────
+// Segundo nivel sobre los rubros de Servicios: el vecino ve pocos grupos con
+// ícono y, al entrar, filtra por rubro. Los rubros se referencian por su label
+// EXACTO (el mismo que se guarda en businesses.categories). "Otro" queda
+// intencionalmente fuera de todo grupo.
+export interface ServiceGroup {
+  slug: string
+  label: string
+  icon: LucideIcon
+  rubros: string[]
+}
+
+export const SERVICE_GROUPS: ServiceGroup[] = [
+  { slug: "fiestas", label: "Cumpleaños y Fiestas", icon: PartyPopper, rubros: [
+    "Ambientación de eventos", "Animación Cumpleaños", "Globología", "Servicios audiovisuales", "Papelería creativa",
+  ] },
+  { slug: "construccion", label: "Construcción y obra", icon: HardHat, rubros: [
+    "Construcción", "Movimiento de suelos", "Venta de áridos", "Perforaciones", "Alambrados",
+    "Impermeabilizaciones", "Herrero", "Zinguero", "Pintor", "Decoración y Terminaciones de Interiores",
+  ] },
+  { slug: "instalaciones", label: "Instalaciones del hogar", icon: HousePlug, rubros: [
+    "Electricidad", "Gasista", "Plomería", "Climatización", "Refrigeración",
+    "Bombas y Motores eléctricos", "Energía Renovable",
+  ] },
+  { slug: "seguridad", label: "Seguridad", icon: ShieldCheck, rubros: [
+    "Alarmas-Seguridad", "Cerrajero", "Higiene y seguridad laboral",
+  ] },
+  { slug: "jardin-pileta-limpieza", label: "Jardín, pileta y limpieza", icon: Trees, rubros: [
+    "Paisajismo y Jardines", "Piletero", "Limpieza", "Desinfecciones",
+  ] },
+  { slug: "vehiculos", label: "Vehículos y traslados", icon: Car, rubros: [
+    "Mecánica", "Auxilio y Remolque", "Alquiler de autos", "Lavadero de autos", "Fletes", "Traslados",
+  ] },
+  { slug: "belleza", label: "Belleza y estética", icon: Sparkles, rubros: [
+    "Depilación", "Manicura", "Tatuajes",
+  ] },
+  { slug: "arreglos", label: "Arreglos y oficios", icon: Scissors, rubros: [
+    "Costurera/Modista", "Compostura de calzado", "Tapicería", "Máquinas de coser",
+  ] },
+  { slug: "tramites", label: "Trámites y asesoramiento", icon: FileText, rubros: [
+    "Gestoría", "Comisiones", "Coaching",
+  ] },
+  { slug: "arte", label: "Arte y artesanía", icon: Palette, rubros: [
+    "Artista plástica", "Carteles tallados",
+  ] },
+  { slug: "profesionales", label: "Profesionales", icon: Briefcase, rubros: [
+    "Profesionales", "Soluciones Digitales & AI",
+  ] },
+]
+
+/** Pseudo-grupo para negocios de Servicios cuyos rubros no caen en ningún grupo ("Otro", etc.). */
+export const OTROS_SERVICIOS_SLUG = "otros"
+
+/** Rubros efectivos de un negocio: categories, o subcategory como respaldo si categories está vacío. */
+export function businessRubros(b: { categories?: string[] | null; subcategory?: string | null }): string[] {
+  if (b.categories && b.categories.length > 0) return b.categories
+  return b.subcategory ? [b.subcategory] : []
+}
+
+/** Slugs de los grupos a los que pertenece un conjunto de rubros (un negocio puede estar en varios). */
+export function groupSlugsForRubros(rubros: string[]): string[] {
+  return SERVICE_GROUPS.filter(g => g.rubros.some(r => rubros.includes(r))).map(g => g.slug)
+}
+
+export function findServiceGroup(slug: string | undefined | null): ServiceGroup | undefined {
+  return slug ? SERVICE_GROUPS.find(g => g.slug === slug) : undefined
+}
+
+export function serviceGroupForRubro(rubro: string): ServiceGroup | undefined {
+  return SERVICE_GROUPS.find(g => g.rubros.includes(rubro))
+}
+
+/** Entradas de navegación de Servicios por grupo (modal de sección, barra sticky). */
+export function serviceGroupNavItems(activeSlugs: Set<string> | null) {
+  const visible = (slug: string) => !activeSlugs || activeSlugs.has(slug)
+  return [
+    ...SERVICE_GROUPS.filter(g => visible(g.slug)).map((g, i) => ({
+      label: g.label,
+      href: `/directorio/services?grupo=${g.slug}`,
+      icon: g.icon,
+      bg: i % 2 === 0 ? "bg-brand-slate/10" : "bg-brand-charcoal/10",
+      color: i % 2 === 0 ? "text-brand-slate" : "text-brand-charcoal",
+    })),
+    ...(activeSlugs?.has(OTROS_SERVICIOS_SLUG)
+      ? [{ label: "Otros servicios", href: `/directorio/services?grupo=${OTROS_SERVICIOS_SLUG}`, icon: Store, bg: "bg-brand-sand/50", color: "text-brand-charcoal" }]
+      : []),
+    { label: "Todos", href: "/directorio/services", icon: LayoutGrid, bg: "bg-brand-sand/50", color: "text-brand-charcoal" },
+  ]
 }
