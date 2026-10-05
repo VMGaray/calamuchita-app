@@ -83,6 +83,7 @@ const SUBCAT_LABELS: Record<string, string> = {
   clinicas:      "Clínicas y Consultorios",
   especialidades:"Especialidades",
   estetica:      "Estética",
+  farmacias:     "Farmacias",
   hospitales:    "Hospitales",
   laboratorios:  "Laboratorios",
   masajes:       "Masajes",

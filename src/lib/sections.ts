@@ -72,6 +72,7 @@ export const sectionCategories = {
     { label: "Clínicas y Consultorios", desc: "Atención médica general", href: "/directorio/health?cat=clinicas", bg: "bg-brand-pine/10", color: "text-brand-pine" },
     { label: "Especialidades", desc: "Médicos especializados", href: "/directorio/health?cat=especialidades", bg: "bg-brand-slate/10", color: "text-brand-slate" },
     { label: "Estética", desc: "Tratamientos estéticos y de belleza", href: "/directorio/health?cat=estetica", bg: "bg-brand-charcoal/10", color: "text-brand-charcoal" },
+    { label: "Farmacias", desc: "Medicamentos, perfumería y cuidado personal", href: "/directorio/health?cat=farmacias", bg: "bg-brand-slate/10", color: "text-brand-slate" },
     { label: "Hospitales y Dispensarios", desc: "Guardias y urgencias", href: "/directorio/health?cat=hospitales", bg: "bg-brand-earth/10", color: "text-brand-earth" },
     { label: "Laboratorios", desc: "Análisis clínicos y diagnóstico", href: "/directorio/health?cat=laboratorios", bg: "bg-brand-slate/10", color: "text-brand-slate" },
     { label: "Masajes", desc: "Masajes terapéuticos y relajantes", href: "/directorio/health?cat=masajes", bg: "bg-brand-pine/10", color: "text-brand-pine" },

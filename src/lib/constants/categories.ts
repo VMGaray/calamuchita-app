@@ -1,7 +1,7 @@
 import {
   Wrench, Zap, Flame, Car, Building, Paintbrush, Hammer, KeyRound, Leaf, Waves, Home, Bug, Sparkles, Droplets, Shield, Scissors, Soup,
   Store, Shirt, Gem, HardHat, Baby, Smartphone, Armchair, Dog, HeartPulse, Package,
-  Brain, AlertCircle, FlaskConical, Stethoscope, Ambulance, Hand, Scan,
+  Brain, AlertCircle, FlaskConical, Stethoscope, Ambulance, Hand, Scan, Pill,
   GraduationCap, BookOpen, Languages, Users, Music, Trophy, Palette,
   Hotel, Map, Tent, Activity, Compass, Bike, Plane,
   Utensils, Coffee, Beer, Wine, ShoppingBag, Clock, Wheat, Pizza, Beef,
@@ -118,6 +118,7 @@ export const MASTER_CATEGORIES = {
       { label: "Clínicas y Consultorios", icon: Building, bg: "bg-blue-50", color: "text-blue-600" },
       { label: "Especialidades", icon: Stethoscope, bg: "bg-purple-50", color: "text-purple-600" },
       { label: "Estética", icon: Sparkles, bg: "bg-stone-50", color: "text-stone-600" },
+      { label: "Farmacias", icon: Pill, bg: "bg-zinc-50", color: "text-zinc-600" },
       { label: "Hospitales y Dispensarios", icon: AlertCircle, bg: "bg-red-50", color: "text-red-600" },
       { label: "Laboratorios", icon: FlaskConical, bg: "bg-cyan-50", color: "text-cyan-600" },
       { label: "Masajes", icon: Hand, bg: "bg-rose-50", color: "text-rose-600" },
