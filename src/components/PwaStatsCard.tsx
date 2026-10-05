@@ -33,9 +33,8 @@ export default function PwaStatsCard() {
   if (!stats) return <p className="text-sm text-stone-400">Cargando…</p>;
 
   const items = [
-    { label: 'Dispositivos con la app', value: stats.total, strong: true },
+    { label: 'Dispositivos detectados desde el 28/09', value: stats.total, strong: true },
     { label: 'Activos últimos 7 días', value: stats.active_7d },
-    { label: 'Activos últimos 30 días', value: stats.active_30d },
     { label: 'Nuevos esta semana', value: stats.new_7d },
     { label: 'iPhone', value: stats.ios },
     { label: 'Android (web)', value: stats.android },
@@ -46,6 +45,18 @@ export default function PwaStatsCard() {
   return (
     <section className="rounded-2xl border border-stone-200 bg-white p-6">
       <h2 className="mb-4 text-base font-medium text-stone-700">Uso real de la app</h2>
+      <div
+        className="mb-3 rounded-xl border p-5"
+        style={{ background: 'rgba(45,69,48,0.07)', borderColor: 'rgba(45,69,48,0.2)' }}
+      >
+        <p className="mb-1 text-xs uppercase tracking-wider" style={{ color: 'rgba(45,69,48,0.65)' }}>
+          Personas que usan la app
+        </p>
+        <p className="font-serif text-5xl tabular-nums" style={{ color: '#2D4530' }}>
+          <AnimatedCounter to={Number(stats.active_30d) || 0} />
+        </p>
+        <p className="mt-1 text-xs text-stone-500">Activos últimos 30 días</p>
+      </div>
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
         {items.map((it) => (
           <div

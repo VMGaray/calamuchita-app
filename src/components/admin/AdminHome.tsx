@@ -127,7 +127,7 @@ export default function AdminHome() {
 
         <AnimateIn direction="up" delay={0.1}>
           <div className="bg-white rounded-2xl border border-stone-200 p-5">
-            <p className="text-xs text-stone-400 uppercase tracking-wider mb-2">Usuarios</p>
+            <p className="text-xs text-stone-400 uppercase tracking-wider mb-2">Usuarios registrados</p>
             <p className="text-3xl font-serif text-stone-800">
               {loading ? "…" : <AnimatedCounter to={stats.users} />}
             </p>
@@ -152,10 +152,11 @@ export default function AdminHome() {
               <Smartphone size={16} style={{ color: "#2D4530" }} />
             </div>
             <div>
-              <p className="text-xs uppercase tracking-wider mb-0.5" style={{ color: "rgba(45,69,48,0.55)" }}>Instalaciones PWA (histórico)</p>
+              <p className="text-xs uppercase tracking-wider mb-0.5" style={{ color: "rgba(45,69,48,0.55)" }}>Instalaciones desde el navegador (total histórico)</p>
               <p className="text-2xl font-serif" style={{ color: "#2D4530" }}>
                 {loading ? "…" : <AnimatedCounter to={stats.pwaInstalls} />}
               </p>
+              <p className="text-[11px] text-stone-400 mt-0.5">No cuenta iPhone ni Play Store. No descuenta desinstalaciones.</p>
             </div>
           </div>
         </AnimateIn>

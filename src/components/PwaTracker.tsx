@@ -22,7 +22,9 @@ function detectPlatform(): Platform | null {
 
   if (!isStandalone) return null; // navegador común: no se cuenta
 
-  if (/iPhone|iPad|iPod/.test(ua)) return 'ios';
+  // iPadOS 13+ se presenta como Mac: se distingue por la pantalla táctil
+  const isIPadOS = /Macintosh/.test(ua) && navigator.maxTouchPoints > 1;
+  if (/iPhone|iPad|iPod/.test(ua) || isIPadOS) return 'ios';
   if (/Android/.test(ua)) return 'android';
   return 'desktop';
 }
