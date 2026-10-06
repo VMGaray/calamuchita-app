@@ -547,6 +547,14 @@ export default function InfoUtilPage({ initialCategoria, initialPueblo }: Props)
   }
 
   const categoria = searchParams.get("categoria") ?? initialCategoria ?? "todos"
+
+  // Una vista por cada apertura de la página o cambio de categoría (guardias incluidas).
+  // Se cuenta en info_views — ver supabase/migrations/02_info_views.sql.
+  useEffect(() => {
+    if (!CATEGORIAS.some(c => c.key === categoria)) return
+    createClient().rpc("increment_info_view", { p_key: categoria }).then()
+  }, [categoria])
+
   const visibleLocalidades = showAll ? LOCALIDADES : MAIN_LOCALIDADES
 
   const allServices = contacts

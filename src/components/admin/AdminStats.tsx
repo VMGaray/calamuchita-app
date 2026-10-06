@@ -54,6 +54,7 @@ function Skeleton() {
 
 export default function AdminStats() {
   const [businesses, setBusinesses] = useState<BusinessStat[]>([])
+  const [infoViews, setInfoViews] = useState(0)
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
@@ -67,7 +68,9 @@ export default function AdminStats() {
       // Los contactos (WhatsApp, teléfono, reserva) se registran acá, no en
       // businesses.total_leads — esa columna quedó sin uso real.
       supabase.from("business_leads").select("business_id"),
-    ]).then(([{ data: bizData }, { data: leadsData }]) => {
+      // Info Útil no son negocios: sus vistas (páginas y guardias) van a info_views.
+      supabase.from("info_views").select("total_views"),
+    ]).then(([{ data: bizData }, { data: leadsData }, { data: infoData }]) => {
       const leadsByBusiness = new Map<string, number>()
       for (const lead of leadsData || []) {
         leadsByBusiness.set(lead.business_id, (leadsByBusiness.get(lead.business_id) ?? 0) + 1)
@@ -79,6 +82,7 @@ export default function AdminStats() {
           total_leads: leadsByBusiness.get(b.id) ?? 0,
         }))
       )
+      setInfoViews((infoData || []).reduce((s, r) => s + (r.total_views ?? 0), 0))
       setLoading(false)
     })
   }, [])
@@ -96,14 +100,16 @@ export default function AdminStats() {
   const bySection = Object.entries(SECTION_LABELS)
     .map(([key, label]) => {
       const group = businesses.filter(b => b.section === key)
+      const extraViews = key === "info" ? infoViews : 0
       return {
         label,
-        views: group.reduce((s, b) => s + b.total_views, 0),
+        views: group.reduce((s, b) => s + b.total_views, 0) + extraViews,
         leads: group.reduce((s, b) => s + b.total_leads, 0),
         count: group.length,
+        extraViews,
       }
     })
-    .filter(s => s.count > 0)
+    .filter(s => s.count > 0 || s.extraViews > 0)
     .sort((a, b) => b.views - a.views)
 
   function exportCSV() {
