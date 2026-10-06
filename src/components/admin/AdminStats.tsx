@@ -61,6 +61,14 @@ const PERIODS: { key: Period; label: string; days: number | null }[] = [
   { key: "all", label: "Todo",            days: null },
 ]
 
+// view_events empezó a registrar vistas este día (03_view_events.sql).
+// Los contactos tienen histórico completo; las vistas, no.
+const VIEWS_SINCE = new Date("2026-10-06T00:00:00-03:00")
+
+function fmtDayMonth(d: Date) {
+  return d.toLocaleDateString("es-AR", { day: "numeric", month: "numeric", timeZone: "America/Argentina/Buenos_Aires" })
+}
+
 interface BusinessBase {
   id: string
   name: string
@@ -83,6 +91,8 @@ export default function AdminStats() {
   const [bizBase, setBizBase] = useState<BusinessBase[]>([])
   const [infoCounter, setInfoCounter] = useState(0)
   const [activity, setActivity] = useState<ActivityRow[]>([])
+  // Fecha desde la que el período queda cubierto por view_events, si todavía no lo está.
+  const [viewsCompleteFrom, setViewsCompleteFrom] = useState<Date | null>(null)
   const [loadingBase, setLoadingBase] = useState(true)
   const [loadingActivity, setLoadingActivity] = useState(true)
 
@@ -111,6 +121,8 @@ export default function AdminStats() {
       .then(({ data, error }) => {
         if (error) console.warn("[AdminStats] admin_activity falló:", error.message)
         setActivity((data as ActivityRow[] | null) ?? [])
+        const completeFrom = days ? new Date(VIEWS_SINCE.getTime() + days * 86_400_000) : null
+        setViewsCompleteFrom(completeFrom && Date.now() < completeFrom.getTime() ? completeFrom : null)
         setLoadingActivity(false)
       })
   }, [period])
@@ -212,6 +224,11 @@ export default function AdminStats() {
           <p className="text-stone-500 text-sm">
             {periodLabel} · todos los negocios, activos o no
           </p>
+          {viewsCompleteFrom && (
+            <p className="text-xs mt-1" style={{ color: "#C9A44B" }}>
+              Las vistas se miden desde el {fmtDayMonth(VIEWS_SINCE)}
+            </p>
+          )}
         </div>
         <button
           onClick={exportCSV}
@@ -305,9 +322,15 @@ export default function AdminStats() {
           </div>
           <p className="text-[10px] text-stone-400 uppercase tracking-wider mb-1">Conversión</p>
           <p className="text-3xl font-serif" style={{ color: "#A3B18A" }}>
-            <AnimatedCounter to={Math.round(conversionPct)} duration={1.5} suffix="%" />
+            {viewsCompleteFrom
+              ? "—"
+              : <AnimatedCounter to={Math.round(conversionPct)} duration={1.5} suffix="%" />}
           </p>
-          <p className="text-[10px] text-stone-400 mt-1">leads / vistas</p>
+          <p className="text-[10px] text-stone-400 mt-1">
+            {viewsCompleteFrom
+              ? `Disponible desde el ${fmtDayMonth(viewsCompleteFrom)}`
+              : "leads / vistas"}
+          </p>
         </motion.div>
       </div>
 
