@@ -20,6 +20,7 @@ interface BusinessStat {
   id: string
   name: string
   section: string
+  status: string
   total_views: number
   total_leads: number
 }
@@ -52,50 +53,113 @@ function Skeleton() {
   )
 }
 
-export default function AdminStats() {
-  const [businesses, setBusinesses] = useState<BusinessStat[]>([])
-  const [infoViews, setInfoViews] = useState(0)
-  const [loading, setLoading] = useState(true)
+type Period = "7d" | "30d" | "all"
 
+const PERIODS: { key: Period; label: string; days: number | null }[] = [
+  { key: "7d",  label: "Últimos 7 días",  days: 7    },
+  { key: "30d", label: "Últimos 30 días", days: 30   },
+  { key: "all", label: "Todo",            days: null },
+]
+
+interface BusinessBase {
+  id: string
+  name: string
+  section: string
+  status: string
+  total_views: number | null
+}
+
+// Fila de admin_activity(): una por negocio o por clave de Info Útil.
+// business_id e info_key nulos = eventos de negocios borrados.
+interface ActivityRow {
+  business_id: string | null
+  info_key: string | null
+  views: number
+  contacts: number
+}
+
+export default function AdminStats() {
+  const [period, setPeriod] = useState<Period>("30d")
+  const [bizBase, setBizBase] = useState<BusinessBase[]>([])
+  const [infoCounter, setInfoCounter] = useState(0)
+  const [activity, setActivity] = useState<ActivityRow[]>([])
+  const [loadingBase, setLoadingBase] = useState(true)
+  const [loadingActivity, setLoadingActivity] = useState(true)
+
+  // Todos los negocios, activos o no: los totales no dependen de las bajas.
   useEffect(() => {
     const supabase = createClient()
     Promise.all([
-      supabase
-        .from("businesses")
-        .select("id, name, section, total_views")
-        .eq("status", "active")
-        .order("total_views", { ascending: false }),
-      // Los contactos (WhatsApp, teléfono, reserva) se registran acá, no en
-      // businesses.total_leads — esa columna quedó sin uso real.
-      supabase.from("business_leads").select("business_id"),
-      // Info Útil no son negocios: sus vistas (páginas y guardias) van a info_views.
+      supabase.from("businesses").select("id, name, section, status, total_views"),
+      // Info Útil no son negocios: sus vistas acumuladas van a info_views.
       supabase.from("info_views").select("total_views"),
-    ]).then(([{ data: bizData }, { data: leadsData }, { data: infoData }]) => {
-      const leadsByBusiness = new Map<string, number>()
-      for (const lead of leadsData || []) {
-        leadsByBusiness.set(lead.business_id, (leadsByBusiness.get(lead.business_id) ?? 0) + 1)
-      }
-      setBusinesses(
-        (bizData || []).map(b => ({
-          ...b,
-          total_views: b.total_views ?? 0,
-          total_leads: leadsByBusiness.get(b.id) ?? 0,
-        }))
-      )
-      setInfoViews((infoData || []).reduce((s, r) => s + (r.total_views ?? 0), 0))
-      setLoading(false)
+    ]).then(([{ data: bizData }, { data: infoData }]) => {
+      setBizBase(bizData || [])
+      setInfoCounter((infoData || []).reduce((s, r) => s + (r.total_views ?? 0), 0))
+      setLoadingBase(false)
     })
   }, [])
 
-  if (loading) return <Skeleton />
+  // Vistas y contactos del período, desde view_events (ver supabase/migrations/03_view_events.sql).
+  // En "Todo" también se usa para los contactos: view_events tiene el histórico
+  // completo de business_leads.
+  useEffect(() => {
+    const days = PERIODS.find(p => p.key === period)?.days ?? null
+    const since = days ? new Date(Date.now() - days * 86_400_000).toISOString() : "1970-01-01T00:00:00Z"
+    createClient()
+      .rpc("admin_activity", { p_since: since })
+      .then(({ data, error }) => {
+        if (error) console.warn("[AdminStats] admin_activity falló:", error.message)
+        setActivity((data as ActivityRow[] | null) ?? [])
+        setLoadingActivity(false)
+      })
+  }, [period])
+
+  if (loadingBase) return <Skeleton />
 
   // ── Computed ─────────────────────────────────────────────────────
-  const totalViews    = businesses.reduce((s, b) => s + b.total_views, 0)
-  const totalLeads    = businesses.reduce((s, b) => s + b.total_leads, 0)
+  const viewsByBusiness = new Map<string, number>()
+  const leadsByBusiness = new Map<string, number>()
+  let infoPeriodViews = 0
+  let orphanViews = 0
+  let orphanLeads = 0
+  for (const row of activity) {
+    const views = Number(row.views) || 0
+    const contacts = Number(row.contacts) || 0
+    if (row.business_id) {
+      viewsByBusiness.set(row.business_id, views)
+      leadsByBusiness.set(row.business_id, contacts)
+    } else if (row.info_key) {
+      infoPeriodViews += views
+    } else {
+      orphanViews += views
+      orphanLeads += contacts
+    }
+  }
+
+  // En "Todo" las vistas salen de los contadores acumulados (incluyen la
+  // historia previa a view_events); en los períodos, de los eventos.
+  const isAll = period === "all"
+  const businesses: BusinessStat[] = bizBase
+    .map(b => ({
+      id: b.id,
+      name: b.name,
+      section: b.section,
+      status: b.status,
+      total_views: isAll ? (b.total_views ?? 0) : (viewsByBusiness.get(b.id) ?? 0),
+      total_leads: leadsByBusiness.get(b.id) ?? 0,
+    }))
+    .sort((a, b) => b.total_views - a.total_views || b.total_leads - a.total_leads)
+  const infoViews = isAll ? infoCounter : infoPeriodViews
+
+  const totalViews    = businesses.reduce((s, b) => s + b.total_views, 0) + (isAll ? 0 : orphanViews)
+  const totalLeads    = businesses.reduce((s, b) => s + b.total_leads, 0) + orphanLeads
   const conversionPct = totalViews > 0 ? Math.round((totalLeads / totalViews) * 1000) / 10 : 0
-  const topBusiness   = businesses[0] ?? null
-  const top10         = businesses.slice(0, 10)
+  const ranked        = businesses.filter(b => b.total_views + b.total_leads > 0)
+  const topBusiness   = ranked[0] ?? null
+  const top10         = ranked.slice(0, 10)
   const maxActivity   = top10[0] ? top10[0].total_views + top10[0].total_leads : 1
+  const periodLabel   = PERIODS.find(p => p.key === period)!.label
 
   const bySection = Object.entries(SECTION_LABELS)
     .map(([key, label]) => {
@@ -105,16 +169,15 @@ export default function AdminStats() {
         label,
         views: group.reduce((s, b) => s + b.total_views, 0) + extraViews,
         leads: group.reduce((s, b) => s + b.total_leads, 0),
-        count: group.length,
-        extraViews,
       }
     })
-    .filter(s => s.count > 0 || s.extraViews > 0)
+    .filter(s => s.views > 0 || s.leads > 0)
     .sort((a, b) => b.views - a.views)
 
   function exportCSV() {
     const rows = [
-      ["Negocio", "Sección", "Vistas", "Contactos WhatsApp", "Conversión (%)"],
+      [`Período: ${periodLabel}`],
+      ["Negocio", "Sección", "Estado", "Vistas", "Contactos", "Conversión (%)"],
       ...businesses.map(b => {
         const conv = b.total_views > 0
           ? ((b.total_leads / b.total_views) * 100).toFixed(1)
@@ -122,6 +185,7 @@ export default function AdminStats() {
         return [
           b.name,
           SECTION_LABELS[b.section] ?? b.section,
+          b.status,
           b.total_views,
           b.total_leads,
           conv,
@@ -133,7 +197,7 @@ export default function AdminStats() {
     const url = URL.createObjectURL(blob)
     const a = document.createElement("a")
     a.href = url
-    a.download = `metricas-calamuchita-${new Date().toISOString().slice(0, 10)}.csv`
+    a.download = `metricas-calamuchita-${period}-${new Date().toISOString().slice(0, 10)}.csv`
     a.click()
     URL.revokeObjectURL(url)
   }
@@ -145,7 +209,9 @@ export default function AdminStats() {
       <div className="flex items-start justify-between gap-4">
         <div>
           <h1 className="text-2xl text-stone-800 mb-1">Estadísticas</h1>
-          <p className="text-stone-500 text-sm">Actividad acumulada de todos los negocios activos</p>
+          <p className="text-stone-500 text-sm">
+            {periodLabel} · todos los negocios, activos o no
+          </p>
         </div>
         <button
           onClick={exportCSV}
@@ -155,6 +221,30 @@ export default function AdminStats() {
           <Download size={15} />
           Exportar CSV
         </button>
+      </div>
+
+      {/* ── Selector de período ── */}
+      <div className="flex flex-wrap items-center gap-2">
+        {PERIODS.map(p => {
+          const active = p.key === period
+          return (
+            <button
+              key={p.key}
+              onClick={() => {
+                if (p.key === period) return
+                setLoadingActivity(true)
+                setPeriod(p.key)
+              }}
+              className="px-4 py-1.5 rounded-full text-xs font-semibold border transition-all active:scale-95"
+              style={active
+                ? { background: "#2D4530", color: "#E1DBC9", borderColor: "#2D4530" }
+                : { background: "#fff", color: "#57534e", borderColor: "#e7e5e4" }}
+            >
+              {p.label}
+            </button>
+          )
+        })}
+        {loadingActivity && <span className="text-xs text-stone-400">Cargando…</span>}
       </div>
 
       {/* ── KPIs ── */}
@@ -180,7 +270,7 @@ export default function AdminStats() {
           <div className="w-9 h-9 rounded-xl flex items-center justify-center mb-3" style={{ background: "rgba(37,211,102,0.1)" }}>
             <MessageCircle size={16} style={{ color: "#128C7E" }} />
           </div>
-          <p className="text-[10px] text-stone-400 uppercase tracking-wider mb-1">Contactos WA</p>
+          <p className="text-[10px] text-stone-400 uppercase tracking-wider mb-1">Contactos</p>
           <p className="text-3xl font-serif" style={{ color: "#128C7E" }}>
             <AnimatedCounter to={totalLeads} duration={1.5} />
           </p>
