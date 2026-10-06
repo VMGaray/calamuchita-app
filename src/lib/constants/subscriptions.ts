@@ -55,8 +55,9 @@ export const AUTO_EXPIRING_STATUSES: ReadonlySet<SubscriptionStatus> = new Set<S
 // Si se cambia allá, cambiar también acá.
 export const SUBSCRIPTION_GRACE_DAYS = 7
 
-// Ventana del filtro "Por vencer": fin de período dentro de los próximos N días (o ya pasado).
-export const EXPIRING_SOON_DAYS = 10
+// Ventana de "Por vencer" (filtro y color ámbar): fin de período entre hoy y los próximos
+// N días. Las ya vencidas tienen su propio filtro ("Vencidas").
+export const EXPIRING_SOON_DAYS = 7
 
 export const CYCLE_LABEL: Record<BillingCycle, string> = {
   monthly: "Mensual",

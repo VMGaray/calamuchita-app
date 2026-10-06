@@ -166,7 +166,7 @@ export function isRenewable(storedStatus: string, periodEnd: string | null | und
   return (AUTO_EXPIRING_STATUSES as ReadonlySet<string>).has(storedStatus) && toDateKey(periodEnd) !== null
 }
 
-// "Por vencer": renovable con fin <= hoy + N días (incluye las ya vencidas).
+// "Por vencer": renovable con fin entre hoy y hoy + N días (no incluye las ya vencidas).
 export function isExpiringSoon(
   storedStatus: string,
   periodEnd: string | null | undefined,
@@ -176,7 +176,7 @@ export function isExpiringSoon(
   if (!isRenewable(storedStatus, periodEnd)) return false
   const end = toDateKey(periodEnd)
   const limit = addDaysISO(today, days)
-  return end !== null && limit !== null && end <= limit
+  return end !== null && limit !== null && end >= today && end <= limit
 }
 
 export function formatARS(amount: number): string {

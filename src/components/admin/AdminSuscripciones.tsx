@@ -7,11 +7,11 @@ import {
   Subscription, SubscriptionStatus, BillingCycle, BusinessSection, BusinessCategory, BusinessStatus,
 } from "@/types/database"
 import {
-  AUTO_EXPIRING_STATUSES, CYCLE_LABEL, SECTION_LABEL, STATUS_FIELDS, STATUS_FILTER_LABEL, STATUS_LABEL,
+  AUTO_EXPIRING_STATUSES, CYCLE_LABEL, EXPIRING_SOON_DAYS, SECTION_LABEL, STATUS_FIELDS, STATUS_FILTER_LABEL, STATUS_LABEL,
   STATUS_STYLE, SUBSCRIPTION_GRACE_DAYS, SUBSCRIPTION_STATUSES, VISIBLE_STATUSES,
 } from "@/lib/constants/subscriptions"
 import {
-  bulkBlockReason, chunk, computeRenewedEnd, daysUntil, formatARS, formatDate, isExpiringSoon, isPastGrace,
+  bulkBlockReason, chunk, computeRenewedEnd, formatARS, formatDate, isExpiringSoon, isPastGrace,
   isRenewable, isTrialDateExpired, normalizeSubscriptionStatus, renewalBase, saveLeavesExpired, toDateKey,
   todayInArgentina, toISODate,
 } from "@/lib/utils/subscriptions"
@@ -34,7 +34,7 @@ interface BusinessOption {
   category: BusinessCategory | null
 }
 
-type StatusFilter = SubscriptionStatus | "all" | "trial_expired" | "expiring"
+type StatusFilter = SubscriptionStatus | "all" | "trial_expired" | "expiring" | "overdue"
 
 // Botones de renovación de cada fila. Va resaltado el que coincide con el ciclo de cobro.
 const RENEW_OPTIONS: { months: 1 | 12; cycle: BillingCycle; label: string }[] = [
@@ -44,8 +44,54 @@ const RENEW_OPTIONS: { months: 1 | 12; cycle: BillingCycle; label: string }[] = 
 
 // ─── helpers ─────────────────────────────────────────────────────────────────
 
-// Estados que pueden vencer o tener aviso de "vence pronto".
-const WITH_DUE_DATE = new Set<SubscriptionStatus>(["trial", "active", "discount", "complimentary"])
+// ─── Urgencia del vencimiento (solo visual) ──────────────────────────────────
+
+type Urgency = "overdue" | "soon" | "ok"
+
+// Orden por defecto: vencidas, después las que vencen pronto, al final las que están al día.
+const URGENCY_RANK: Record<Urgency, number> = { overdue: 0, soon: 1, ok: 2 }
+
+const URGENCY_STYLE: Record<Urgency, string> = {
+  overdue: "bg-red-50 text-red-800 border-red-200",
+  soon:    "bg-amber-50 text-amber-700 border-amber-200",
+  ok:      "bg-stone-50 text-stone-500 border-stone-200",
+}
+
+interface DueInfo {
+  endKey: string | null
+  // null = la fecha no aplica (sin vencimiento, gratis, suspendida…)
+  days: number | null
+  urgency: Urgency
+}
+
+// Días entre dos fechas "YYYY-MM-DD", en UTC para que la zona del navegador no corra un día.
+function diffDays(from: string, to: string): number {
+  const ms = (k: string) => Date.UTC(Number(k.slice(0, 4)), Number(k.slice(5, 7)) - 1, Number(k.slice(8, 10)))
+  return Math.round((ms(to) - ms(from)) / 86_400_000)
+}
+
+// Solo las que vencen (renovables, o ya vencidas) tienen urgencia; el resto queda "al día".
+function dueInfo(sub: SubRow, today: string): DueInfo {
+  const endKey = toDateKey(sub.current_period_end)
+  if (!endKey || !(isRenewable(sub.status, endKey) || sub.eff === "expired")) {
+    return { endKey, days: null, urgency: "ok" }
+  }
+  const days = diffDays(today, endKey)
+  return { endKey, days, urgency: days < 0 ? "overdue" : days <= EXPIRING_SOON_DAYS ? "soon" : "ok" }
+}
+
+// "07/10", con año solo si no es el actual.
+function formatDayMonth(key: string, today: string): string {
+  const base = `${key.slice(8, 10)}/${key.slice(5, 7)}`
+  return key.slice(0, 4) === today.slice(0, 4) ? base : `${base}/${key.slice(0, 4)}`
+}
+
+function relativeDays(days: number): string {
+  if (days === 0) return "hoy"
+  const n = Math.abs(days)
+  const unit = n === 1 ? "día" : "días"
+  return days > 0 ? `en ${n} ${unit}` : `hace ${n} ${unit}`
+}
 
 // .in("id", [...]) con muchos uuid puede pasarse del largo de URL permitido.
 const BATCH_SIZE = 50
@@ -649,6 +695,8 @@ export default function AdminSuscripciones() {
       if (!isTrialDateExpired(s.eff, s.current_period_end)) return false
     } else if (filter === "expiring") {
       if (!isExpiringSoon(s.status, s.current_period_end, today)) return false
+    } else if (filter === "overdue") {
+      if (dueInfo(s, today).urgency !== "overdue") return false
     } else if (filter !== "all" && s.eff !== filter) {
       return false
     }
@@ -656,10 +704,15 @@ export default function AdminSuscripciones() {
     if (query && !s.businesses?.name?.toLowerCase().includes(query)) return false
     return true
   })
-  // "Por vencer": las que hay que renovar primero, arriba (fin de período ascendente).
-  if (filter === "expiring") {
-    filtered.sort((a, b) => (toDateKey(a.current_period_end) ?? "").localeCompare(toDateKey(b.current_period_end) ?? ""))
-  }
+  // Vencidas primero (la más vieja arriba), después las que vencen pronto y al final las
+  // que están al día; dentro de cada grupo, por fin de período ascendente (sin fecha al final).
+  filtered.sort((a, b) => {
+    const da = dueInfo(a, today)
+    const db = dueInfo(b, today)
+    if (da.urgency !== db.urgency) return URGENCY_RANK[da.urgency] - URGENCY_RANK[db.urgency]
+    if (!da.endKey || !db.endKey) return da.endKey ? -1 : db.endKey ? 1 : 0
+    return da.endKey.localeCompare(db.endKey)
+  })
 
   // Contadores y tarjeta de ingreso: sobre todas las suscripciones, sin filtros.
   const counts = SUBSCRIPTION_STATUSES.reduce(
@@ -668,6 +721,7 @@ export default function AdminSuscripciones() {
   )
   const trialExpiredCount = subs.filter(s => isTrialDateExpired(s.eff, s.current_period_end)).length
   const expiringCount = subs.filter(s => isExpiringSoon(s.status, s.current_period_end, today)).length
+  const overdueCount = subs.filter(s => dueInfo(s, today).urgency === "overdue").length
   const monthlyRevenue = subs
     .filter(s => s.eff === "active" || s.eff === "discount")
     .reduce((sum, s) => sum + Number(s.monthly_price ?? 0), 0)
@@ -892,6 +946,16 @@ export default function AdminSuscripciones() {
           </button>
         ))}
         <button
+          onClick={() => changeFilter("overdue")}
+          className={`px-3 py-1.5 rounded-xl text-xs border transition-colors ${
+            filter === "overdue"
+              ? "bg-[#2D4530] text-white border-[#2D4530]"
+              : "bg-red-50 text-red-800 border-red-200 hover:border-red-300"
+          }`}
+        >
+          Vencidas ({overdueCount})
+        </button>
+        <button
           onClick={() => changeFilter("expiring")}
           className={`px-3 py-1.5 rounded-xl text-xs border transition-colors ${
             filter === "expiring"
@@ -994,9 +1058,7 @@ export default function AdminSuscripciones() {
           </div>
 
           {filtered.map((sub, i) => {
-            const days = daysUntil(sub.current_period_end)
-            const dueSoon = WITH_DUE_DATE.has(sub.eff) && days !== null && days >= 0 && days <= 3
-            const trialDateExpired = isTrialDateExpired(sub.eff, sub.current_period_end)
+            const due = dueInfo(sub, today)
             const hiddenByBusiness = VISIBLE_STATUSES.has(sub.eff) && sub.businesses?.status === "suspended"
             const showsReason = STATUS_FIELDS[sub.eff].reason && !!sub.reason
             return (
@@ -1012,6 +1074,7 @@ export default function AdminSuscripciones() {
                   className="accent-[#2D4530] shrink-0"
                 />
                 <div className="flex-1 min-w-0">
+                  {/* Línea 1: negocio, estado y vencimiento */}
                   <div className="flex items-center gap-2 flex-wrap">
                     <p className="text-sm font-medium text-stone-800 truncate">
                       {sub.businesses?.name ?? "—"}
@@ -1019,14 +1082,9 @@ export default function AdminSuscripciones() {
                     <span className={`text-[10px] font-medium px-2 py-0.5 rounded-full ${STATUS_STYLE[sub.eff]}`}>
                       {STATUS_LABEL[sub.eff]}
                     </span>
-                    {STATUS_FIELDS[sub.eff].cycle && (
-                      <span className="text-[10px] text-stone-400 px-2 py-0.5 rounded-full bg-stone-50 border border-stone-100">
-                        {CYCLE_LABEL[sub.billing_cycle]}
-                      </span>
-                    )}
-                    {trialDateExpired && (
-                      <span className="text-[10px] font-medium px-2 py-0.5 rounded-full bg-amber-50 text-amber-700 border border-amber-200">
-                        Fecha vencida
+                    {due.urgency === "overdue" && sub.eff !== "expired" && (
+                      <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-red-800 text-white">
+                        Vencida
                       </span>
                     )}
                     {hiddenByBusiness && (
@@ -1034,12 +1092,19 @@ export default function AdminSuscripciones() {
                         Oculto: negocio suspendido
                       </span>
                     )}
-                    {dueSoon && (
-                      <span className="text-[10px] font-medium px-2 py-0.5 rounded-full bg-yellow-50 text-yellow-700">
-                        ⚠️ Vence pronto
-                      </span>
-                    )}
+                    <span className={`sm:ml-auto text-xs px-2 py-0.5 rounded-lg border whitespace-nowrap ${URGENCY_STYLE[due.urgency]}`}>
+                      {due.endKey ? (
+                        <>
+                          {due.days !== null && due.days < 0 ? "Venció" : "Vence"}{" "}
+                          <span className="font-bold">{formatDayMonth(due.endKey, today)}</span>
+                          {due.days !== null && <> · {relativeDays(due.days)}</>}
+                        </>
+                      ) : (
+                        "Sin vencimiento"
+                      )}
+                    </span>
                   </div>
+                  {/* Línea 2: precio, plan, alta y notas */}
                   <div className="flex items-center gap-3 mt-0.5 flex-wrap">
                     {Number(sub.price) > 0 && (
                       <span className="text-xs text-stone-500 font-medium">
@@ -1047,11 +1112,11 @@ export default function AdminSuscripciones() {
                         {sub.billing_cycle === "yearly" && " / año"}
                       </span>
                     )}
+                    {STATUS_FIELDS[sub.eff].cycle && (
+                      <span className="text-xs text-stone-400">{CYCLE_LABEL[sub.billing_cycle]}</span>
+                    )}
                     <span className="text-xs text-stone-400">
                       Alta: {formatDate(sub.current_period_start, "numeric")}
-                    </span>
-                    <span className="text-xs text-stone-400">
-                      {sub.current_period_end ? `Vence: ${formatDate(sub.current_period_end)}` : "Sin vencimiento"}
                     </span>
                     {showsReason && (
                       <span className="text-xs text-stone-500 truncate max-w-[200px]">Motivo: {sub.reason}</span>
