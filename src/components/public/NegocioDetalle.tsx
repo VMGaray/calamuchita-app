@@ -198,7 +198,10 @@ export default function NegocioDetalle({ business, promotions = [] }: Props) {
 
   const photos: string[] =
     Array.isArray(business.business_photos) && business.business_photos.length > 0
-      ? business.business_photos.map((p: { url: string }) => p.url)
+      ? [...business.business_photos]
+          .sort((a: { sort_order: number | null }, b: { sort_order: number | null }) =>
+            (a.sort_order ?? Number.MAX_SAFE_INTEGER) - (b.sort_order ?? Number.MAX_SAFE_INTEGER))
+          .map((p: { url: string }) => p.url)
       : business.cover_url ? [business.cover_url] : []
 
   const coverUrl     = photos[0] || null

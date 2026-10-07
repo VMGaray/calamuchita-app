@@ -418,7 +418,7 @@ export default function MiCartaSimple() {
               </button>
             </div>
           ) : (
-            <PdfUpload onChange={handlePdfChange} />
+            <PdfUpload onChange={handlePdfChange} pathPrefix={businessId} />
           )}
         </div>
       )}
@@ -433,6 +433,7 @@ export default function MiCartaSimple() {
                 value={url}
                 onChange={u => handleFotoChange(i, u)}
                 folder="menu-fotos"
+                pathPrefix={businessId}
                 label={`Foto ${i + 1}`}
               />
             ))}

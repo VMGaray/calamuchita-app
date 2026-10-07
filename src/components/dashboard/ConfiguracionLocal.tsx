@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react"
 import { createClient } from "@/lib/supabase/client"
 import ImageUpload from "@/components/ui/ImageUpload"
+import GaleriaFotos from "@/components/ui/GaleriaFotos"
 import HorariosEditor, { HorarioDay, mergeHorariosFromDB, expandHorariosForSave } from "@/components/ui/HorariosEditor"
 import dynamic from "next/dynamic"
 import { LatLng, PUEBLOS } from "@/lib/geocoding"
@@ -46,7 +47,6 @@ export default function ConfiguracionLocal() {
   const [error, setError] = useState<string | null>(null)
   const [success, setSuccess] = useState(false)
   const [businessId, setBusinessId] = useState<string | null>(null)
-  const [photos, setPhotos] = useState<string[]>([])
   const [horarios, setHorarios] = useState<HorarioDay[]>([])
   const [coords, setCoords] = useState<LatLng | null>(null)
 
@@ -79,13 +79,12 @@ export default function ConfiguracionLocal() {
 
       const { data: business } = await supabase
         .from("businesses")
-        .select("*, business_photos(*)")
+        .select("*")
         .eq("owner_id", user.id)
         .single()
 
       if (business) {
         setBusinessId(business.id)
-        setPhotos(business.business_photos?.map((p: { url: string }) => p.url) || [])
         const { street, pueblo } = splitAddress(business.address, business.pueblo)
         setForm({
           name: business.name || "",
@@ -148,24 +147,6 @@ export default function ConfiguracionLocal() {
         ? prev.categories.filter(c => c !== cat)
         : [...prev.categories, cat]
     }))
-  }
-
-  const handleAddPhoto = async (url: string | null) => {
-    if (!url || !businessId) return
-    const supabase = createClient()
-    await supabase.from("business_photos").insert({
-      business_id: businessId,
-      url,
-      sort_order: photos.length,
-    })
-    setPhotos(prev => [...prev, url])
-  }
-
-  const handleRemovePhoto = async (url: string) => {
-    if (!businessId) return
-    const supabase = createClient()
-    await supabase.from("business_photos").delete().eq("business_id", businessId).eq("url", url)
-    setPhotos(prev => prev.filter(p => p !== url))
   }
 
   const generateUniqueSlug = async (baseSlug: string, supabase: any): Promise<string> => {
@@ -474,49 +455,37 @@ export default function ConfiguracionLocal() {
 
         {/* Fotos */}
         <div className="bg-white rounded-2xl border border-stone-200 p-6 space-y-4">
-          <h2 className="text-sm font-medium text-stone-700">Fotos</h2>
+          <h2 className="text-sm font-medium text-stone-700">Logo y portada</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <ImageUpload
               value={form.logo_url}
               onChange={(url) => handleChange("logo_url", url)}
               folder="logos"
               label="Logo"
+              pathPrefix={businessId}
+              maxWidth={800}
             />
             <ImageUpload
               value={form.cover_url}
               onChange={(url) => handleChange("cover_url", url)}
               folder="covers"
               label="Foto de portada"
+              pathPrefix={businessId}
             />
           </div>
-
-          {/* Fotos adicionales */}
-          <div>
-            <p className="text-sm font-medium text-stone-700 mb-3">Fotos adicionales</p>
-            <div className="grid grid-cols-3 gap-3 mb-3">
-              {photos.map((url, i) => (
-                <div key={i} className="relative group rounded-xl overflow-hidden border border-stone-200 aspect-square">
-                  <img src={url} alt="" className="w-full h-full object-cover" />
-                  <button
-                    onClick={() => handleRemovePhoto(url)}
-                    className="absolute top-2 right-2 w-6 h-6 bg-red-500 text-white rounded-full text-xs opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center"
-                  >
-                    ×
-                  </button>
-                </div>
-              ))}
-              {photos.length < 8 && (
-                <ImageUpload
-                  value={null}
-                  onChange={handleAddPhoto}
-                  folder="gallery"
-                  label=""
-                />
-              )}
-            </div>
-            <p className="text-xs text-stone-400">{photos.length}/8 fotos</p>
-          </div>
+          <p className="text-xs text-stone-400">El logo y la portada se guardan con el botón &quot;Guardar cambios&quot;.</p>
         </div>
+
+        {/* Galería */}
+        {businessId && (
+          <div className="bg-white rounded-2xl border border-stone-200 p-6">
+            <h2 className="text-sm font-medium text-stone-700 mb-1">Galería del local</h2>
+            <p className="text-xs text-stone-400 mb-4">
+              Hasta 8 fotos: salón, fachada, platos, lo que quieras mostrar. Se ven en tu perfil como carrusel.
+            </p>
+            <GaleriaFotos businessId={businessId} />
+          </div>
+        )}
 
         {/* Horarios */}
         <div className="bg-white rounded-2xl border border-stone-200 p-6">

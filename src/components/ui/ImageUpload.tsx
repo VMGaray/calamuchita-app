@@ -4,6 +4,7 @@ import { useState, useRef } from "react"
 import { createClient } from "@/lib/supabase/client"
 import { Upload, X, ImageIcon, Loader2 } from "lucide-react"
 import Image from "next/image"
+import { MAX_INPUT_BYTES, MAX_UPLOAD_BYTES, resizeImage, storagePath, storagePathFromPublicUrl } from "@/lib/images"
 
 interface Props {
   value: string | null
@@ -11,6 +12,10 @@ interface Props {
   bucket?: string
   folder?: string
   label?: string
+  /** Primer segmento de la ruta en Storage (el id del negocio en el panel del comercio) */
+  pathPrefix?: string | null
+  /** Ancho máximo al redimensionar en el navegador */
+  maxWidth?: number
 }
 
 export default function ImageUpload({
@@ -19,6 +24,8 @@ export default function ImageUpload({
   bucket = "businesses",
   folder = "covers",
   label = "Subir imagen",
+  pathPrefix,
+  maxWidth = 1600,
 }: Props) {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -29,8 +36,8 @@ export default function ImageUpload({
     const file = e.target.files?.[0]
     if (!file) return
 
-    if (file.size > 5 * 1024 * 1024) {
-      setError("La imagen no puede superar 5 MB")
+    if (file.size > MAX_INPUT_BYTES) {
+      setError("La imagen es demasiado pesada (máx. 25 MB)")
       return
     }
 
@@ -39,13 +46,18 @@ export default function ImageUpload({
 
     try {
       const supabase = createClient()
-      const ext = (file.name.split(".").pop() ?? "jpg").toLowerCase()
-      const fileName = `${folder}/${Date.now()}.${ext}`
+      // Redimensionar y comprimir en el navegador antes de subir
+      const { blob, ext } = await resizeImage(file, maxWidth)
+      if (blob.size > MAX_UPLOAD_BYTES) {
+        setError("La imagen sigue siendo muy pesada después de comprimirla. Probá con otra.")
+        return
+      }
+      const fileName = storagePath(folder, ext, pathPrefix)
 
       // 2. Upload con desestructuración completa — data puede ser null si falla
       const { data: uploadData, error: uploadError } = await supabase.storage
         .from(bucket)
-        .upload(fileName, file, { upsert: true, cacheControl: "31536000" })
+        .upload(fileName, blob, { upsert: false, cacheControl: "31536000", contentType: blob.type })
 
       // 3. Guardia doble: chequear tanto uploadError como uploadData nulo
       if (uploadError || !uploadData) {
@@ -82,8 +94,7 @@ export default function ImageUpload({
     try {
       const supabase = createClient()
       // Extraer el path relativo al bucket desde la URL pública
-      const bucketPrefix = `/storage/v1/object/public/${bucket}/`
-      const relativePath = value.split(bucketPrefix)[1]
+      const relativePath = storagePathFromPublicUrl(value, bucket)
       if (relativePath) {
         await supabase.storage.from(bucket).remove([relativePath])
       }
@@ -145,7 +156,7 @@ export default function ImageUpload({
               <p className="text-sm text-stone-500 mb-1">
                 Hacé click para subir
               </p>
-              <p className="text-xs text-stone-400">PNG, JPG o WEBP · máx. 5 MB</p>
+              <p className="text-xs text-stone-400">PNG, JPG o WEBP · se optimiza al subir</p>
             </div>
           )}
         </div>

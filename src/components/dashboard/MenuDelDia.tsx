@@ -275,6 +275,7 @@ export default function MenuDelDia() {
                 value={item.image_url}
                 onChange={(url) => updateItem(index, "image_url", url)}
                 folder="menu-items"
+                pathPrefix={businessId}
                 label=""
               />
             </div>

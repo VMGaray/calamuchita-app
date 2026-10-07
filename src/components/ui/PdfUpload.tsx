@@ -6,9 +6,11 @@ import { FileText } from "lucide-react"
 
 interface Props {
   onChange: (url: string | null) => void
+  /** Primer segmento de la ruta en Storage (el id del negocio en el panel del comercio) */
+  pathPrefix?: string | null
 }
 
-export default function PdfUpload({ onChange }: Props) {
+export default function PdfUpload({ onChange, pathPrefix }: Props) {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const inputRef = useRef<HTMLInputElement>(null)
@@ -31,7 +33,7 @@ export default function PdfUpload({ onChange }: Props) {
     setError(null)
 
     const supabase = createClient()
-    const fileName = `menus/${Date.now()}.pdf`
+    const fileName = pathPrefix ? `${pathPrefix}/menus/${Date.now()}.pdf` : `menus/${Date.now()}.pdf`
 
     const { error: uploadError } = await supabase.storage
       .from("businesses")

@@ -8,6 +8,7 @@ import { MASTER_CATEGORIES } from "@/lib/constants/categories"
 import RubrosSelector from "@/components/admin/RubrosSelector"
 import ImageUpload from "@/components/ui/ImageUpload"
 import PdfUpload from "@/components/ui/PdfUpload"
+import GaleriaFotos from "@/components/ui/GaleriaFotos"
 import { isValidYoutubeUrl } from "@/lib/utils/youtube"
 import { normalizeUrl } from "@/lib/normalizeUrl"
 import HorariosEditor, { HorarioDay, expandHorariosForSave, mergeHorariosFromDB, defaultHorarios } from "@/components/ui/HorariosEditor"
@@ -112,7 +113,6 @@ export default function AdminNegocioEdit({ id }: Props) {
   const [error, setError] = useState<string | null>(null)
   const [success, setSuccess] = useState(false)
   const [horarios, setHorarios] = useState<HorarioDay[]>(defaultHorarios)
-  const [galleryPhotos, setGalleryPhotos] = useState<(string | null)[]>([null, null, null])
   const [branches, setBranches] = useState<Array<{ address: string; pueblo: string }>>([])
   const [professionalType, setProfessionalType] = useState("")
   const [coordsInput, setCoordsInput] = useState("")
@@ -216,16 +216,6 @@ export default function AdminNegocioEdit({ id }: Props) {
 
       if (horariosData) setHorarios(mergeHorariosFromDB(horariosData))
 
-      const { data: photosData } = await supabase
-        .from("business_photos")
-        .select("url")
-        .eq("business_id", id)
-
-      if (photosData) {
-        const urls = photosData.map((p: any) => p.url as string)
-        setGalleryPhotos([urls[0] || null, urls[1] || null, urls[2] || null])
-      }
-
       setLoading(false)
     }
     fetch()
@@ -308,13 +298,7 @@ export default function AdminNegocioEdit({ id }: Props) {
     // Guardar sucursales (requiere columna `branches jsonb default '[]'` en businesses)
     await supabase.from("businesses").update({ branches }).eq("id", id)
 
-    const validPhotos = galleryPhotos.filter(Boolean) as string[]
-    await supabase.from("business_photos").delete().eq("business_id", id)
-    if (validPhotos.length > 0) {
-      await supabase.from("business_photos").insert(
-        validPhotos.map(url => ({ business_id: id, url }))
-      )
-    }
+    // La galería (business_photos) se guarda al instante desde <GaleriaFotos>
 
     setSaving(false)
     setSuccess(true)
@@ -662,21 +646,9 @@ export default function AdminNegocioEdit({ id }: Props) {
             <ImageUpload value={form.cover_url} onChange={(url) => handleChange("cover_url", url)} folder="covers" label="Foto de portada" />
           </div>
           <div>
-            <p className="text-sm font-medium text-stone-700 mb-1">Fotos adicionales <span className="text-stone-400 font-normal">(carrusel en el detalle — hasta 3)</span></p>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-3">
-              {[0, 1, 2].map(i => (
-                <ImageUpload
-                  key={i}
-                  value={galleryPhotos[i]}
-                  onChange={url => {
-                    const next = [...galleryPhotos]
-                    next[i] = url
-                    setGalleryPhotos(next)
-                  }}
-                  folder="gallery"
-                  label={`Foto ${i + 1}`}
-                />
-              ))}
+            <p className="text-sm font-medium text-stone-700 mb-1">Galería <span className="text-stone-400 font-normal">(carrusel en el detalle — hasta 8, se guarda al instante)</span></p>
+            <div className="mt-3">
+              <GaleriaFotos businessId={id} />
             </div>
           </div>
           <div>

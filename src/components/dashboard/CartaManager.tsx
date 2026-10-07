@@ -615,7 +615,7 @@ export default function CartaManager() {
               </button>
             </div>
           ) : (
-            <PdfUpload onChange={handlePdfChange} />
+            <PdfUpload onChange={handlePdfChange} pathPrefix={businessId} />
           )}
         </div>
       )}
