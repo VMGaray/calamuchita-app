@@ -61,6 +61,7 @@ export interface Business {
   offers_delivery: boolean
   offers_takeaway: boolean
   offers_dine_in: boolean
+  dietary_options: string[]
   status: BusinessStatus
   group_name: string | null
   group_id: string | null
@@ -107,6 +108,7 @@ export interface MenuItem {
   image_url: string | null
   is_available: boolean
   sort_order: number
+  dietary_tags: string[]
   created_at: string
 }
 

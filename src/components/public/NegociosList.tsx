@@ -8,6 +8,7 @@ import { createClient } from "@/lib/supabase/client"
 import Link from "next/link"
 import Image from "next/image"
 import { ChevronLeft, ChevronRight, Star } from "lucide-react"
+import { isDietaryKey } from "@/lib/constants/dietary"
 
 type BusinessHour = {
   day_of_week: number
@@ -35,7 +36,7 @@ interface Business {
 }
 
 interface Props {
-  params: { categoria?: string; abierto?: string; delivery?: string; takeaway?: string; q?: string }
+  params: { categoria?: string; abierto?: string; delivery?: string; takeaway?: string; q?: string; dieta?: string }
 }
 
 const PAGE_SIZE = 12
@@ -116,6 +117,8 @@ export default function NegociosList({ params }: Props) {
       if (params.delivery === "true") query = query.eq("offers_delivery", true)
       if (params.takeaway === "true") query = query.eq("offers_takeaway", true)
       if (params.q) query = query.ilike("name", `%${params.q}%`)
+      const dieta = (params.dieta || "").split(",").filter(isDietaryKey)
+      if (dieta.length > 0) query = query.contains("dietary_options", dieta)
 
       const { data } = await query
         .order("is_premium", { ascending: false })
@@ -134,7 +137,7 @@ export default function NegociosList({ params }: Props) {
     }
 
     fetchBusinesses()
-  }, [params.categoria, params.abierto, params.delivery, params.takeaway, params.q])
+  }, [params.categoria, params.abierto, params.delivery, params.takeaway, params.q, params.dieta])
 
   useEffect(() => {
     if (isFirstRender.current) {

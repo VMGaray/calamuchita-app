@@ -10,6 +10,8 @@ import {
 } from "lucide-react"
 import Image from "next/image"
 import CartaInteractiva from "@/components/public/CartaInteractiva"
+import { DietaryBadges } from "@/components/ui/DietaryTags"
+import { DIETARY_DISCLAIMER, dietaryOptionsFor } from "@/lib/constants/dietary"
 import { createClient } from "@/lib/supabase/client"
 import { normalizeArgPhone } from "@/lib/phone"
 import { normalizeUrl } from "@/lib/normalizeUrl"
@@ -457,6 +459,14 @@ export default function NegocioDetalle({ business, promotions = [] }: Props) {
               {business.offers_dine_in  && <div className="flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-semibold" style={{ background: "rgba(45,69,48,0.07)", color: "#2D4530" }}><UtensilsCrossed size={13} /> Salón</div>}
               {business.offers_delivery && <div className="flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-semibold" style={{ background: "rgba(45,69,48,0.07)", color: "#2D4530" }}><Truck size={13} /> Delivery</div>}
               {business.offers_takeaway && <div className="flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-semibold" style={{ background: "rgba(45,69,48,0.07)", color: "#2D4530" }}><ShoppingBag size={13} /> Take away</div>}
+            </div>
+          )}
+
+          {/* ── Opciones alimentarias declaradas por el local ── */}
+          {dietaryOptionsFor(business.dietary_options).length > 0 && (
+            <div className="bg-white/50 rounded-2xl p-4">
+              <DietaryBadges keys={business.dietary_options} />
+              <p className="text-[11px] mt-2" style={{ color: "rgba(45,69,48,0.45)" }}>{DIETARY_DISCLAIMER}</p>
             </div>
           )}
 

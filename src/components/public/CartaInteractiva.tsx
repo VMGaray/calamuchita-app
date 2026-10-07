@@ -5,6 +5,8 @@ import Image from "next/image"
 import { motion, AnimatePresence } from "framer-motion"
 import { Plus, Minus, ShoppingBag } from "lucide-react"
 import CarritoDrawer from "./CarritoDrawer"
+import { DietaryBadges } from "@/components/ui/DietaryTags"
+import { DIETARY_DISCLAIMER } from "@/lib/constants/dietary"
 
 interface MenuItem {
   id: string
@@ -14,11 +16,15 @@ interface MenuItem {
   image_url: string | null
   is_available: boolean
   category_id: string | null
+  sort_order?: number | null
+  dietary_tags?: string[] | null
 }
 
 interface MenuCategory {
   id: string
   name: string
+  is_active?: boolean | null
+  sort_order?: number | null
   menu_items: MenuItem[]
 }
 
@@ -66,8 +72,17 @@ export default function CartaInteractiva({ categories, business }: Props) {
   const totalItems = cart.reduce((sum, i) => sum + i.quantity, 0)
   const totalPrice = cart.reduce((sum, i) => sum + i.price * i.quantity, 0)
 
-  const activeCategories = categories.filter(
-    cat => cat.menu_items?.some(item => item.is_available)
+  const bySortOrder = (a: { sort_order?: number | null }, b: { sort_order?: number | null }) =>
+    (a.sort_order ?? Number.MAX_SAFE_INTEGER) - (b.sort_order ?? Number.MAX_SAFE_INTEGER)
+
+  // El público ya recibe solo lo visible por RLS; este filtro cubre al dueño y al admin
+  // cuando miran su propio perfil (antes veían las categorías "Ocultas")
+  const activeCategories = categories
+    .filter(cat => cat.is_active !== false && cat.menu_items?.some(item => item.is_available))
+    .sort(bySortOrder)
+
+  const hasDietaryTags = activeCategories.some(cat =>
+    cat.menu_items.some(item => item.is_available && (item.dietary_tags?.length ?? 0) > 0)
   )
 
   if (activeCategories.length === 0) return null
@@ -101,6 +116,7 @@ export default function CartaInteractiva({ categories, business }: Props) {
               <div className="space-y-3">
                 {cat.menu_items
                   .filter(item => item.is_available)
+                  .sort(bySortOrder)
                   .map(item => {
                     const qty = getQty(item.id)
                     return (
@@ -126,6 +142,9 @@ export default function CartaInteractiva({ categories, business }: Props) {
                             <p className="text-xs mt-0.5 leading-relaxed" style={{ color: "rgba(45,69,48,0.5)" }}>
                               {item.description}
                             </p>
+                          )}
+                          {(item.dietary_tags?.length ?? 0) > 0 && (
+                            <div className="mt-1.5"><DietaryBadges keys={item.dietary_tags} size="xs" /></div>
                           )}
                           <p className="text-sm font-semibold mt-1" style={{ color: "#5E4B3B" }}>
                             ${item.price.toLocaleString("es-AR")}
@@ -182,6 +201,12 @@ export default function CartaInteractiva({ categories, business }: Props) {
             </div>
           ))}
         </div>
+
+        {hasDietaryTags && (
+          <p className="text-[11px] mt-6" style={{ color: "rgba(45,69,48,0.45)" }}>
+            Etiquetas alimentarias: {DIETARY_DISCLAIMER.toLowerCase()}.
+          </p>
+        )}
       </div>
 
       {/* Botón flotante en mobile */}

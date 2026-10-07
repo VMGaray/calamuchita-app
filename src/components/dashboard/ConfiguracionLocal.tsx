@@ -4,6 +4,8 @@ import { useState, useEffect } from "react"
 import { createClient } from "@/lib/supabase/client"
 import ImageUpload from "@/components/ui/ImageUpload"
 import GaleriaFotos from "@/components/ui/GaleriaFotos"
+import { DietarySelector } from "@/components/ui/DietaryTags"
+import { DIETARY_DISCLAIMER } from "@/lib/constants/dietary"
 import HorariosEditor, { HorarioDay, mergeHorariosFromDB, expandHorariosForSave } from "@/components/ui/HorariosEditor"
 import dynamic from "next/dynamic"
 import { LatLng, PUEBLOS } from "@/lib/geocoding"
@@ -69,6 +71,7 @@ export default function ConfiguracionLocal() {
     cover_url: null as string | null,
     pet_friendly: false,
     payment_methods: [] as string[],
+    dietary_options: [] as string[],
   })
 
   useEffect(() => {
@@ -105,6 +108,7 @@ export default function ConfiguracionLocal() {
           cover_url: business.cover_url || null,
           pet_friendly: business.pet_friendly || false,
           payment_methods: business.payment_methods || [],
+          dietary_options: business.dietary_options || [],
         })
 
         const { data: horariosData } = await supabase
@@ -199,6 +203,7 @@ export default function ConfiguracionLocal() {
       cover_url: form.cover_url,
       pet_friendly: form.pet_friendly,
       payment_methods: form.payment_methods,
+      dietary_options: form.dietary_options,
       owner_id: user.id,
     }
 
@@ -396,6 +401,18 @@ export default function ConfiguracionLocal() {
               </label>
             ))}
           </div>
+        </div>
+
+        {/* Opciones alimentarias */}
+        <div className="bg-white rounded-2xl border border-stone-200 p-6">
+          <h2 className="text-sm font-medium text-stone-700 mb-1">Opciones alimentarias</h2>
+          <p className="text-xs text-stone-400 mb-4">
+            Marcá lo que ofrecés. Se muestra en tu perfil con la aclaración &quot;{DIETARY_DISCLAIMER}&quot; y sirve para que te encuentren con los filtros de Gastronomía.
+          </p>
+          <DietarySelector
+            value={form.dietary_options}
+            onChange={next => handleChange("dietary_options", next)}
+          />
         </div>
 
         {/* Pet friendly y formas de pago */}

@@ -10,6 +10,7 @@ interface Props {
     delivery?: string
     takeaway?: string
     q?: string
+    dieta?: string
   }>
 }
 

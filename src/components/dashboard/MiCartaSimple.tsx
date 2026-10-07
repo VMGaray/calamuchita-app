@@ -7,6 +7,7 @@ import { SkeletonCarta } from "@/components/ui/Skeleton"
 import PdfUpload from "@/components/ui/PdfUpload"
 import ImageUpload from "@/components/ui/ImageUpload"
 import { useBusinessDashboard } from "@/lib/context/BusinessDashboardContext"
+import { DietaryBadges, DietarySelector } from "@/components/ui/DietaryTags"
 
 type Mode = "manual" | "pdf" | "fotos" | null
 
@@ -15,6 +16,7 @@ interface MenuItem {
   name: string
   description: string | null
   price: number
+  dietary_tags: string[] | null
 }
 
 const MAX_FOTOS = 5
@@ -30,9 +32,9 @@ export default function MiCartaSimple() {
   const [categoryId, setCategoryId] = useState<string | null>(null)
   const [items, setItems] = useState<MenuItem[]>([])
   const [addingItem, setAddingItem] = useState(false)
-  const [newItem, setNewItem] = useState({ name: "", description: "", price: "" })
+  const [newItem, setNewItem] = useState({ name: "", description: "", price: "", tags: [] as string[] })
   const [editingId, setEditingId] = useState<string | null>(null)
-  const [editForm, setEditForm] = useState({ name: "", description: "", price: "" })
+  const [editForm, setEditForm] = useState({ name: "", description: "", price: "", tags: [] as string[] })
 
   // PDF
   const [pdfUrl, setPdfUrl] = useState<string | null>(null)
@@ -64,7 +66,7 @@ export default function MiCartaSimple() {
 
       const { data: categories } = await supabase
         .from("menu_categories")
-        .select("id, menu_items(id, name, description, price)")
+        .select("id, menu_items(id, name, description, price, dietary_tags)")
         .eq("business_id", business.id)
         .limit(1)
 
@@ -140,15 +142,16 @@ export default function MiCartaSimple() {
         name: newItem.name.trim(),
         description: newItem.description.trim() || null,
         price: parseFloat(newItem.price),
+        dietary_tags: newItem.tags,
         is_available: true,
         sort_order: items.length,
       })
-      .select("id, name, description, price")
+      .select("id, name, description, price, dietary_tags")
       .single()
 
     if (!error && data) {
       setItems(prev => [...prev, data as MenuItem])
-      setNewItem({ name: "", description: "", price: "" })
+      setNewItem({ name: "", description: "", price: "", tags: [] })
       setAddingItem(false)
     }
   }
@@ -162,9 +165,10 @@ export default function MiCartaSimple() {
         name: editForm.name.trim(),
         description: editForm.description.trim() || null,
         price: parseFloat(editForm.price),
+        dietary_tags: editForm.tags,
       })
       .eq("id", itemId)
-      .select("id, name, description, price")
+      .select("id, name, description, price, dietary_tags")
       .single()
 
     if (!error && data) {
@@ -298,6 +302,11 @@ export default function MiCartaSimple() {
                         placeholder="Descripción (opcional)"
                         className="w-full px-3 py-2 rounded-lg border border-stone-200 text-sm outline-none focus:border-stone-400"
                       />
+                      <DietarySelector
+                        size="sm"
+                        value={editForm.tags}
+                        onChange={tags => setEditForm(f => ({ ...f, tags }))}
+                      />
                       <div className="flex gap-2">
                         <input
                           type="number"
@@ -326,12 +335,15 @@ export default function MiCartaSimple() {
                       <div className="flex-1 min-w-0">
                         <p className="text-sm font-medium text-stone-700">{item.name}</p>
                         {item.description && <p className="text-xs text-stone-400 mt-0.5 truncate">{item.description}</p>}
+                        {(item.dietary_tags?.length ?? 0) > 0 && (
+                          <div className="mt-1"><DietaryBadges keys={item.dietary_tags} size="xs" /></div>
+                        )}
                       </div>
                       <p className="text-sm font-semibold shrink-0" style={{ color: "#2D4530" }}>
                         ${item.price.toLocaleString("es-AR")}
                       </p>
                       <button
-                        onClick={() => { setEditingId(item.id); setEditForm({ name: item.name, description: item.description || "", price: item.price.toString() }) }}
+                        onClick={() => { setEditingId(item.id); setEditForm({ name: item.name, description: item.description || "", price: item.price.toString(), tags: item.dietary_tags ?? [] }) }}
                         className="w-7 h-7 rounded-lg flex items-center justify-center text-stone-300 hover:text-stone-600 hover:bg-stone-100 transition-colors shrink-0"
                       >
                         <Edit2 size={13} />
@@ -367,6 +379,11 @@ export default function MiCartaSimple() {
                   placeholder="Descripción (opcional)"
                   className="w-full px-3 py-2.5 rounded-xl border border-stone-200 text-sm outline-none focus:border-stone-400"
                 />
+                <DietarySelector
+                  size="sm"
+                  value={newItem.tags}
+                  onChange={tags => setNewItem(f => ({ ...f, tags }))}
+                />
                 <div className="flex gap-2">
                   <div className="relative">
                     <span className="absolute left-3 top-1/2 -translate-y-1/2 text-stone-400 text-sm">$</span>
@@ -386,7 +403,7 @@ export default function MiCartaSimple() {
                     Agregar
                   </button>
                   <button
-                    onClick={() => { setAddingItem(false); setNewItem({ name: "", description: "", price: "" }) }}
+                    onClick={() => { setAddingItem(false); setNewItem({ name: "", description: "", price: "", tags: [] }) }}
                     className="px-3 py-2.5 rounded-xl text-sm text-stone-500 hover:bg-stone-100"
                   >
                     <X size={16} />

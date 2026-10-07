@@ -2,6 +2,7 @@
 
 import { useRouter, useSearchParams } from "next/navigation"
 import { motion } from "framer-motion"
+import { DIETARY_OPTIONS, isDietaryKey } from "@/lib/constants/dietary"
 
 const categories = [
   { key: "", label: "Todos" },
@@ -27,7 +28,7 @@ const pillInactive = {
 }
 
 interface Props {
-  params: { categoria?: string; abierto?: string; delivery?: string; takeaway?: string; q?: string }
+  params: { categoria?: string; abierto?: string; delivery?: string; takeaway?: string; q?: string; dieta?: string }
 }
 
 export default function NegociosFilters({ params }: Props) {
@@ -39,6 +40,15 @@ export default function NegociosFilters({ params }: Props) {
     if (value) current.set(key, value)
     else current.delete(key)
     router.push(`/negocios?${current.toString()}`)
+  }
+
+  // ?dieta=sin_tacc,vegano — se pueden combinar (el local tiene que declarar todas)
+  const selectedDiet = (params.dieta || "").split(",").filter(isDietaryKey)
+  const toggleDiet = (key: string) => {
+    const next = selectedDiet.includes(key as typeof selectedDiet[number])
+      ? selectedDiet.filter(k => k !== key)
+      : [...selectedDiet, key]
+    updateFilter("dieta", next.join(","))
   }
 
  return (
@@ -118,6 +128,40 @@ export default function NegociosFilters({ params }: Props) {
           Take Away
         </motion.button>
       </div>
+
+      {/* ── OPCIONES ALIMENTARIAS ── */}
+      <div
+        className="flex gap-2 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+        style={{
+          paddingBottom: "2px",
+          WebkitMaskImage: "linear-gradient(to right, black 85%, transparent 100%)",
+          maskImage: "linear-gradient(to right, black 85%, transparent 100%)",
+        }}
+      >
+        {DIETARY_OPTIONS.map(({ key, short, icon: Icon }) => {
+          const isActive = selectedDiet.includes(key)
+          return (
+            <motion.button
+              key={key}
+              onClick={() => toggleDiet(key)}
+              aria-pressed={isActive}
+              className="flex-shrink-0 flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-medium whitespace-nowrap"
+              style={isActive ? pillActive : pillInactive}
+              whileHover={{ y: -2 }}
+              whileTap={{ y: 0 }}
+              transition={{ type: "spring", stiffness: 400, damping: 22 }}
+            >
+              <Icon size={13} />
+              {short}
+            </motion.button>
+          )
+        })}
+      </div>
+      {selectedDiet.length > 0 && (
+        <p className="text-[11px]" style={{ color: "rgba(225,219,201,0.6)" }}>
+          Según lo que declara cada local.
+        </p>
+      )}
     </div>
   )
 }

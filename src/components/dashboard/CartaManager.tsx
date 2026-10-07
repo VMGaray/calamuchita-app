@@ -7,6 +7,7 @@ import { Plus, Trash2, ChevronDown, ChevronUp, GripVertical, Edit2, Check, X, Bo
 import { SkeletonCarta } from "@/components/ui/Skeleton"
 import PdfUpload from "@/components/ui/PdfUpload"
 import { normalizeUrl } from "@/lib/normalizeUrl"
+import { DietaryBadges, DietarySelector } from "@/components/ui/DietaryTags"
 
 type Mode = "manual" | "pdf" | "link" | null
 
@@ -19,6 +20,7 @@ interface MenuItem {
   sort_order: number
   image_url: string | null
   category_id: string
+  dietary_tags: string[] | null
 }
 
 interface MenuCategory {
@@ -39,10 +41,10 @@ export default function CartaManager() {
   const [addingCat, setAddingCat] = useState(false)
 
   const [addingItemTo, setAddingItemTo] = useState<string | null>(null)
-  const [newItem, setNewItem] = useState({ name: "", description: "", price: "" })
+  const [newItem, setNewItem] = useState({ name: "", description: "", price: "", tags: [] as string[] })
 
   const [editingItem, setEditingItem] = useState<string | null>(null)
-  const [editForm, setEditForm] = useState({ name: "", description: "", price: "" })
+  const [editForm, setEditForm] = useState({ name: "", description: "", price: "", tags: [] as string[] })
 
   // Modo de carga
   const [mode, setMode] = useState<Mode>(null)
@@ -186,6 +188,7 @@ export default function CartaManager() {
         name: newItem.name.trim(),
         description: newItem.description.trim() || null,
         price: parseFloat(newItem.price),
+        dietary_tags: newItem.tags,
         is_available: true,
         sort_order: cat?.menu_items?.length || 0,
       })
@@ -198,7 +201,7 @@ export default function CartaManager() {
           ? { ...c, menu_items: [...(c.menu_items || []), data] }
           : c
       ))
-      setNewItem({ name: "", description: "", price: "" })
+      setNewItem({ name: "", description: "", price: "", tags: [] })
       setAddingItemTo(null)
     }
   }
@@ -235,6 +238,7 @@ export default function CartaManager() {
         name: editForm.name.trim(),
         description: editForm.description.trim() || null,
         price: parseFloat(editForm.price),
+        dietary_tags: editForm.tags,
       })
       .eq("id", itemId)
       .select()
@@ -453,6 +457,11 @@ export default function CartaManager() {
                                       placeholder="Descripción (opcional)"
                                       className="w-full px-3 py-2 rounded-lg border border-stone-200 text-sm outline-none focus:border-stone-400"
                                     />
+                                    <DietarySelector
+                                      size="sm"
+                                      value={editForm.tags}
+                                      onChange={tags => setEditForm(f => ({ ...f, tags }))}
+                                    />
                                     <div className="flex gap-2">
                                       <input
                                         type="number"
@@ -487,6 +496,9 @@ export default function CartaManager() {
                                       {item.description && (
                                         <p className="text-xs text-stone-400 mt-0.5 truncate">{item.description}</p>
                                       )}
+                                      {(item.dietary_tags?.length ?? 0) > 0 && (
+                                        <div className="mt-1"><DietaryBadges keys={item.dietary_tags} size="xs" /></div>
+                                      )}
                                     </div>
                                     <p className="text-sm font-semibold flex-shrink-0" style={{ color: "#2D4530" }}>
                                       ${item.price.toLocaleString("es-AR")}
@@ -510,6 +522,7 @@ export default function CartaManager() {
                                           name: item.name,
                                           description: item.description || "",
                                           price: item.price.toString(),
+                                          tags: item.dietary_tags ?? [],
                                         })
                                       }}
                                       className="w-7 h-7 rounded-lg flex items-center justify-center text-stone-300 hover:text-stone-600 hover:bg-stone-100 transition-colors flex-shrink-0"
@@ -555,6 +568,11 @@ export default function CartaManager() {
                                 placeholder="Descripción (opcional)"
                                 className="w-full px-3 py-2.5 rounded-xl border border-stone-200 text-sm outline-none focus:border-stone-400"
                               />
+                              <DietarySelector
+                                size="sm"
+                                value={newItem.tags}
+                                onChange={tags => setNewItem(f => ({ ...f, tags }))}
+                              />
                               <div className="flex gap-2">
                                 <div className="relative">
                                   <span className="absolute left-3 top-1/2 -translate-y-1/2 text-stone-400 text-sm">$</span>
@@ -574,7 +592,7 @@ export default function CartaManager() {
                                   Agregar
                                 </button>
                                 <button
-                                  onClick={() => { setAddingItemTo(null); setNewItem({ name: "", description: "", price: "" }) }}
+                                  onClick={() => { setAddingItemTo(null); setNewItem({ name: "", description: "", price: "", tags: [] }) }}
                                   className="px-3 py-2.5 rounded-xl text-sm text-stone-500 hover:bg-stone-100"
                                 >
                                   <X size={16} />
