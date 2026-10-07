@@ -35,9 +35,10 @@ export default function CarritoDrawer({
   open, onClose, cart, onAdd, onRemove, business, onOrderSuccess
 }: Props) {
   const [step, setStep] = useState<Step>("cart")
-  // Delivery solo si el local lo ofrece; si no, retiro en el local (igual que valida crear_pedido)
+  // Solo los tipos que ofrece el local (crear_pedido rechaza el resto). Si no ofrece ninguno,
+  // CartaInteractiva no muestra el carrito, así que este componente no se usa.
   const [orderType, setOrderType] = useState<"delivery" | "takeaway">(
-    business.offers_delivery && !business.offers_takeaway ? "delivery" : "takeaway"
+    business.offers_takeaway ? "takeaway" : "delivery"
   )
   const [form, setForm] = useState({ name: "", phone: "", address: "", notes: "" })
   const [loading, setLoading] = useState(false)

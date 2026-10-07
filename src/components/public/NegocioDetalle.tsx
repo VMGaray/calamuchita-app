@@ -487,11 +487,13 @@ export default function NegocioDetalle({ business, promotions = [] }: Props) {
                   <Calendar size={16} /> Reservar
                 </button>
               )}
+              {(business.offers_delivery || business.offers_takeaway) && (
               <button onClick={handleHacerPedido} disabled={!hasMenu && !waNumber}
                 className="flex-1 min-w-[110px] flex items-center justify-center gap-2 py-4 rounded-2xl font-bold text-sm shadow-sm transition-all active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed"
                 style={{ background: "#2D4530", color: "#E1DBC9" }}>
                 <ShoppingBag size={16} /> Hacer Pedido
               </button>
+              )}
             </div>
           )}
 

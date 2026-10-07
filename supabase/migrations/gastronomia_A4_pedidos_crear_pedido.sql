@@ -1,12 +1,14 @@
 -- Gastronomía · GRUPO A (correr ANTES del merge) · 4 de 4
 -- Pedidos sin cuenta: customer_id opcional + función crear_pedido().
 --
+-- Se puede volver a correr entera sin problema (todo es idempotente / CREATE OR REPLACE).
 -- No rompe la versión actual: el carrito de producción sigue insertando directo en
 -- orders/order_items con un usuario logueado (esas políticas se quitan recién en el grupo B).
 --
 -- Qué hace crear_pedido (SECURITY DEFINER, search_path vacío, todo calificado con public.):
 --   · valida que el negocio sea gastronómico, esté activo y visible (business_is_public)
---   · delivery solo si el local ofrece delivery; take away siempre
+--   · cada tipo solo si el local lo ofrece (offers_delivery / offers_takeaway);
+--     un local sin ninguno de los dos no recibe pedidos
 --   · nombre, teléfono (6 a 20 dígitos), dirección (obligatoria en delivery), nota: largos acotados
 --   · productos: 1 a 50 distintos, cantidad 1 a 20; tienen que ser del negocio, estar disponibles
 --     y en una categoría visible. Nombre y PRECIO salen de menu_items (no del navegador)
@@ -57,7 +59,7 @@ DECLARE
   v_order_id      uuid;
 BEGIN
   -- Negocio
-  SELECT b.id, b.offers_delivery
+  SELECT b.id, b.offers_delivery, b.offers_takeaway
     INTO v_business
     FROM public.businesses b
    WHERE b.id = p_business_id
@@ -73,8 +75,14 @@ BEGIN
     RAISE EXCEPTION 'Tipo de pedido inválido.';
   END IF;
   v_type := p_type::public.order_type;
+  IF NOT coalesce(v_business.offers_delivery, false) AND NOT coalesce(v_business.offers_takeaway, false) THEN
+    RAISE EXCEPTION 'Este local no está recibiendo pedidos por la app.';
+  END IF;
   IF v_type = 'delivery' AND NOT coalesce(v_business.offers_delivery, false) THEN
     RAISE EXCEPTION 'Este local no hace delivery.';
+  END IF;
+  IF v_type = 'takeaway' AND NOT coalesce(v_business.offers_takeaway, false) THEN
+    RAISE EXCEPTION 'Este local no tiene retiro en el local (take away).';
   END IF;
 
   -- Datos del cliente

@@ -71,6 +71,8 @@ export default function CartaInteractiva({ categories, business, tableService }:
   }
 
   const getQty = (id: string) => cart.find(i => i.id === id)?.quantity || 0
+  // Sin delivery ni take away: se muestra solo la carta (sin +/−, carrito ni botón de pedir)
+  const takesOrders = business.offers_delivery || business.offers_takeaway
   const totalItems = cart.reduce((sum, i) => sum + i.quantity, 0)
   const totalPrice = cart.reduce((sum, i) => sum + i.price * i.quantity, 0)
 
@@ -99,7 +101,7 @@ export default function CartaInteractiva({ categories, business, tableService }:
               <p className="text-xs mt-0.5" style={{ color: "rgba(45,69,48,0.55)" }}>{tableService}</p>
             )}
           </div>
-          {totalItems > 0 && (
+          {takesOrders && totalItems > 0 && (
             <motion.button
               onClick={() => setDrawerOpen(true)}
               className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium"
@@ -159,6 +161,7 @@ export default function CartaInteractiva({ categories, business, tableService }:
                         </div>
 
                         {/* Controles +/- */}
+                        {takesOrders && (
                         <div className="flex items-center gap-2 flex-shrink-0">
                           <AnimatePresence>
                             {qty > 0 && (
@@ -201,6 +204,7 @@ export default function CartaInteractiva({ categories, business, tableService }:
                             <Plus size={14} />
                           </motion.button>
                         </div>
+                        )}
                       </div>
                     )
                   })}
@@ -218,7 +222,7 @@ export default function CartaInteractiva({ categories, business, tableService }:
 
       {/* Botón flotante en mobile */}
       <AnimatePresence>
-        {totalItems > 0 && (
+        {takesOrders && totalItems > 0 && (
           <motion.button
             initial={{ y: 100, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
@@ -242,6 +246,7 @@ export default function CartaInteractiva({ categories, business, tableService }:
         )}
       </AnimatePresence>
 
+      {takesOrders && (
       <CarritoDrawer
         open={drawerOpen}
         onClose={() => setDrawerOpen(false)}
@@ -254,6 +259,7 @@ export default function CartaInteractiva({ categories, business, tableService }:
           setDrawerOpen(false)
         }}
       />
+      )}
     </>
   )
 }
