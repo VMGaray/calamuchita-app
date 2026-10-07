@@ -1,4 +1,4 @@
--- Gastronomía · GRUPO A (correr ANTES del merge) · 1 de 4
+-- Gastronomía · GRUPO A (correr ANTES del merge) · 1 de 5
 -- Tope de 8 fotos por negocio en business_photos.
 --
 -- Solo agrega un trigger: no cambia políticas ni datos. La versión actual del panel

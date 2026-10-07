@@ -158,12 +158,14 @@ export interface OrderItem {
 export interface Reservation {
   id: string
   business_id: string
-  customer_id: string
+  customer_id: string | null    // null = reserva sin cuenta (crear_reserva)
   date: string
   time: string
   party_size: number
   status: ReservationStatus
   notes: string | null
+  customer_name: string | null
+  customer_phone: string | null
   created_at: string
 }
 

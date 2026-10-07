@@ -1,4 +1,4 @@
--- Gastronomía · GRUPO A (correr ANTES del merge) · 2 de 4
+-- Gastronomía · GRUPO A (correr ANTES del merge) · 2 de 5
 -- Opciones alimentarias del local y de cada plato.
 --
 -- Solo agrega columnas con default '{}': la versión actual del sitio las ignora.

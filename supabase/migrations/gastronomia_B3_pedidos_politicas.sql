@@ -1,4 +1,4 @@
--- Gastronomía · GRUPO B (correr DESPUÉS del merge a main) · 3 de 3
+-- Gastronomía · GRUPO B (correr DESPUÉS del merge a main) · 3 de 5
 -- Pedidos: crear_pedido() pasa a ser el único camino para crear pedidos,
 -- se limpian las políticas duplicadas y se suma el admin en order_items.
 --

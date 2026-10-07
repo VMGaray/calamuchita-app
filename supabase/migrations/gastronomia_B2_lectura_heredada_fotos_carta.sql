@@ -1,4 +1,4 @@
--- Gastronomía · GRUPO B (correr DESPUÉS del merge a main) · 2 de 3
+-- Gastronomía · GRUPO B (correr DESPUÉS del merge a main) · 2 de 5
 -- Lectura pública "heredada": fotos y carta solo se ven si el negocio se ve.
 --
 -- Hoy business_photos se lee con USING (true), y menu_categories / menu_items solo miran

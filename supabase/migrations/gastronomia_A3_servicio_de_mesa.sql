@@ -1,4 +1,4 @@
--- Gastronomía · GRUPO A (correr ANTES del merge) · 3 de 4
+-- Gastronomía · GRUPO A (correr ANTES del merge) · 3 de 5
 -- Servicio de mesa en la carta.
 --
 --   charges_table_service  null  = el local no lo informó (en la carta no se muestra nada)

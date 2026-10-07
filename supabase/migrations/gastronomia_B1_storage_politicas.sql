@@ -1,4 +1,4 @@
--- Gastronomía · GRUPO B (correr DESPUÉS del merge a main) · 1 de 3
+-- Gastronomía · GRUPO B (correr DESPUÉS del merge a main) · 1 de 5
 -- Storage: cada dueño maneja solo los archivos de su negocio; el admin, todos.
 --
 -- CÓMO SE NOMBRAN LOS ARCHIVOS

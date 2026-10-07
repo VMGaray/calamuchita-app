@@ -1,4 +1,4 @@
--- Gastronomía · GRUPO A (correr ANTES del merge) · 4 de 4
+-- Gastronomía · GRUPO A (correr ANTES del merge) · 4 de 5
 -- Pedidos sin cuenta: customer_id opcional + función crear_pedido().
 --
 -- Se puede volver a correr entera sin problema (todo es idempotente / CREATE OR REPLACE).
