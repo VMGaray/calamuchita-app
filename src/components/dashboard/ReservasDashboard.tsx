@@ -6,6 +6,7 @@ import { motion, AnimatePresence } from "framer-motion"
 import { CalendarDays, Clock, Users, CheckCircle, XCircle, RefreshCw } from "lucide-react"
 import { SkeletonList } from "@/components/ui/Skeleton"
 import { useBusinessDashboard } from "@/lib/context/BusinessDashboardContext"
+import { hoyAR, sumarDias } from "@/lib/utils/fechas"
 
 interface Reservation {
   id: string
@@ -110,7 +111,7 @@ export default function ReservasDashboard() {
     setUpdatingStatus(null)
   }
 
-  const today = new Date().toISOString().split("T")[0]
+  const today = hoyAR()
 
   const filteredReservations = reservations.filter(r => {
     if (filter === "upcoming") return r.date >= today && r.status !== "cancelled"
@@ -126,7 +127,7 @@ export default function ReservasDashboard() {
   const formatDate = (dateStr: string) => {
     const date = new Date(dateStr + "T00:00:00")
     const isToday = dateStr === today
-    const isTomorrow = dateStr === new Date(Date.now() + 86400000).toISOString().split("T")[0]
+    const isTomorrow = dateStr === sumarDias(today, 1)
     if (isToday) return "Hoy"
     if (isTomorrow) return "Mañana"
     return `${DAYS[date.getDay()]} ${date.getDate()} ${MONTHS[date.getMonth()]}`

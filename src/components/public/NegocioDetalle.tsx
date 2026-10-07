@@ -17,6 +17,7 @@ import { createClient } from "@/lib/supabase/client"
 import { normalizeArgPhone } from "@/lib/phone"
 import { normalizeUrl } from "@/lib/normalizeUrl"
 import { extractYoutubeId } from "@/lib/utils/youtube"
+import { hoyAR } from "@/lib/utils/fechas"
 import PromoCoupon, {
   promoFontVariables,
   sectionToCategoria,
@@ -146,7 +147,7 @@ export default function NegocioDetalle({ business, promotions = [] }: Props) {
   const hasMenu             = hasInteractiveCarta || hasPdfCarta || hasLinkCarta || hasFotosCarta
   const tableService        = tableServiceLabel(business.charges_table_service, business.table_service_fee)
   const todayMenu = business.daily_menus?.find((m: any) => {
-    const today = new Date().toISOString().split("T")[0]
+    const today = hoyAR()
     return m.date === today && m.is_published
   })
 
@@ -816,7 +817,7 @@ export default function NegocioDetalle({ business, promotions = [] }: Props) {
                   <div className="grid grid-cols-2 gap-3">
                     <div>
                       <label className="block text-sm font-medium text-stone-700 mb-1"><Calendar size={12} className="inline mr-1" />Fecha *</label>
-                      <input type="date" value={reservaForm.date} min={new Date().toISOString().split("T")[0]} onChange={e => setReservaForm(p => ({ ...p, date: e.target.value }))} className="w-full px-4 py-2.5 rounded-xl border border-stone-200 text-stone-800 text-sm outline-none focus:ring-2 focus:ring-[#2D4530]/20" />
+                      <input type="date" value={reservaForm.date} min={hoyAR()} onChange={e => setReservaForm(p => ({ ...p, date: e.target.value }))} className="w-full px-4 py-2.5 rounded-xl border border-stone-200 text-stone-800 text-sm outline-none focus:ring-2 focus:ring-[#2D4530]/20" />
                     </div>
                     <div>
                       <label className="block text-sm font-medium text-stone-700 mb-1"><Clock size={12} className="inline mr-1" />Hora *</label>

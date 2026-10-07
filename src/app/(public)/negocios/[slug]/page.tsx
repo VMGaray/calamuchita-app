@@ -3,6 +3,7 @@ import { Suspense } from "react"
 import NegocioDetalle from "@/components/public/NegocioDetalle"
 import { createClient } from "@/lib/supabase/server"
 import { notFound, redirect } from "next/navigation"
+import { hoyAR } from "@/lib/utils/fechas"
 
 interface Props {
   params: Promise<{ slug: string }>
@@ -21,7 +22,7 @@ function buildPromoLabel(promo: { discount_label?: string | null; discount_perce
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params
   const supabase = await createClient()
-  const today = new Date().toISOString().split("T")[0]
+  const today = hoyAR()
 
   const { data: business } = await supabase
     .from("businesses")
@@ -71,7 +72,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 export default async function NegocioDetallePage({ params, searchParams }: Props) {
   const { slug } = await params
   const supabase = await createClient()
-  const today = new Date().toISOString().split("T")[0]
+  const today = hoyAR()
 
   const { data: business } = await supabase
     .from("businesses")

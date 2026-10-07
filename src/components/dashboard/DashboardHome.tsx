@@ -6,6 +6,7 @@ import { motion } from "framer-motion"
 import { ShoppingBag, CalendarDays, UtensilsCrossed, TrendingUp, Clock, BookOpen, Settings } from "lucide-react"
 import Link from "next/link"
 import { useBusinessDashboard } from "@/lib/context/BusinessDashboardContext"
+import { hoyAR, inicioDelDiaAR } from "@/lib/utils/fechas"
 
 interface Stats {
   ordersToday: number
@@ -82,7 +83,7 @@ export default function DashboardHome() {
       setBusinessName(business.name)
       setIsOpen(business.is_open)
 
-      const today = new Date().toISOString().split("T")[0]
+      const today = hoyAR()
 
       if (!isRestaurante) {
         const { data: menu } = await supabase
@@ -98,8 +99,8 @@ export default function DashboardHome() {
       }
 
       const startOfMonth = new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString()
-      // Medianoche local: con la fecha UTC ("today"), desde las 21 h los pedidos del día desaparecían
-      const startOfToday = new Date(new Date().setHours(0, 0, 0, 0)).toISOString()
+      // Medianoche en Argentina: con la fecha UTC, desde las 21 h los pedidos del día desaparecían
+      const startOfToday = inicioDelDiaAR()
 
       const { data: ordersToday } = await supabase
         .from("orders")
