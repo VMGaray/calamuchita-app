@@ -35,17 +35,22 @@ export default function CarritoDrawer({
   open, onClose, cart, onAdd, onRemove, business, onOrderSuccess
 }: Props) {
   const [step, setStep] = useState<Step>("cart")
+  // Delivery solo si el local lo ofrece; si no, retiro en el local (igual que valida crear_pedido)
   const [orderType, setOrderType] = useState<"delivery" | "takeaway">(
-    business.offers_takeaway ? "takeaway" : "delivery"
+    business.offers_delivery && !business.offers_takeaway ? "delivery" : "takeaway"
   )
   const [form, setForm] = useState({ name: "", phone: "", address: "", notes: "" })
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState("")
+  // Link de WhatsApp con el resumen del pedido ya registrado (para el botón de la pantalla final)
+  const [waLink, setWaLink] = useState<string | null>(null)
 
   // Cierra y resetea el estado interno para que la próxima apertura empiece limpia
   const handleClose = () => {
+    if (step === "success") onOrderSuccess()   // recién acá se vacía el carrito
     setStep("cart")
     setError("")
+    setWaLink(null)
     onClose()
   }
 
@@ -65,38 +70,27 @@ export default function CarritoDrawer({
     setLoading(true)
 
     try {
-      const supabase = createClient()
-      const { data: { user } } = await supabase.auth.getUser()
+      // Un solo camino para crear pedidos (con o sin cuenta): la función valida el negocio,
+      // los productos y toma los precios de la base. Ver gastronomia_A4_pedidos_crear_pedido.sql
+      const { data, error: rpcError } = await createClient().rpc("crear_pedido", {
+        p_business_id: business.id,
+        p_type: orderType,
+        p_items: cart.map(i => ({ id: i.id, qty: i.quantity })),
+        p_customer_name: form.name.trim(),
+        p_customer_phone: form.phone.trim(),
+        p_delivery_address: orderType === "delivery" ? form.address.trim() : null,
+        p_notes: form.notes.trim() || null,
+      })
 
-      const { data: order, error: orderError } = await supabase
-        .from("orders")
-        .insert({
-          business_id: business.id,
-          customer_id: user!.id,
-          type: orderType,
-          status: "pending",
-          total,
-          notes: form.notes || null,
-          customer_name: form.name,
-          customer_phone: form.phone,
-          delivery_address: orderType === "delivery" ? form.address : null,
-        })
-        .select()
-        .single()
+      if (rpcError) {
+        // P0001 = mensajes pensados para el vecino (RAISE EXCEPTION de crear_pedido)
+        setError(rpcError.code === "P0001" ? rpcError.message : "Hubo un error al procesar el pedido. Intentá de nuevo.")
+        return
+      }
 
-      if (orderError) throw orderError
-
-      await supabase.from("order_items").insert(
-        cart.map(item => ({
-          order_id: order.id,
-          item_name: item.name,
-          item_price: item.price,
-          quantity: item.quantity,
-        }))
-      )
-
+      const serverTotal = Number((data as { total: number } | null)?.total ?? total)
       const itemsText = cart
-        .map(i => `• ${i.quantity}x ${i.name} — $${(i.price * i.quantity).toLocaleString("es-AR")}`)
+        .map(i => `• ${i.quantity}x ${i.name}`)
         .join("\n")
 
       const msg = [
@@ -111,23 +105,19 @@ export default function CarritoDrawer({
         `*Productos:*`,
         itemsText,
         ``,
-        `💰 *Total: $${total.toLocaleString("es-AR")}*`,
+        `💰 *Total: $${serverTotal.toLocaleString("es-AR")}*`,
         form.notes ? `\n📝 *Nota:* ${form.notes}` : "",
       ].filter(Boolean).join("\n")
 
       if (business.whatsapp) {
-        const phone = normalizeArgPhone(business.whatsapp)
-        window.open(
-          `https://wa.me/${phone}?text=${encodeURIComponent(msg)}`,
-          "_blank"
-        )
+        const link = `https://wa.me/${normalizeArgPhone(business.whatsapp)}?text=${encodeURIComponent(msg)}`
+        setWaLink(link)
+        // Puede bloquearlo el navegador (Safari) por abrirse después de esperar a la base:
+        // por eso la pantalla final también tiene el botón
+        window.open(link, "_blank")
       }
 
       setStep("success")
-      setTimeout(() => {
-        onOrderSuccess()   // limpia carrito y cierra drawer desde CartaInteractiva
-        // handleClose resetea el step internamente al cerrar
-      }, 3000)
 
     } catch (e) {
       setError("Hubo un error al procesar el pedido. Intentá de nuevo.")
@@ -358,9 +348,29 @@ export default function CarritoDrawer({
                   </motion.div>
                   <h3 className="font-serif text-2xl" style={{ color: "#2D4530" }}>¡Pedido enviado!</h3>
                   <p className="text-sm leading-relaxed" style={{ color: "rgba(45,69,48,0.6)" }}>
-                    Tu pedido fue registrado y se abrió WhatsApp para confirmarlo con el local.
-                    Pronto te van a contactar.
+                    {waLink
+                      ? "El local ya lo recibió. Mandales también el resumen por WhatsApp para confirmarlo."
+                      : "El local ya lo recibió. Pronto te van a contactar al teléfono que dejaste."}
                   </p>
+                  {waLink && (
+                    <a
+                      href={waLink}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="w-full py-3.5 rounded-xl text-sm font-medium text-center"
+                      style={{ background: "#25D366", color: "white" }}
+                    >
+                      Enviar por WhatsApp
+                    </a>
+                  )}
+                  <button
+                    type="button"
+                    onClick={handleClose}
+                    className="text-sm underline underline-offset-2"
+                    style={{ color: "rgba(45,69,48,0.6)" }}
+                  >
+                    Cerrar
+                  </button>
                 </div>
               )}
             </div>

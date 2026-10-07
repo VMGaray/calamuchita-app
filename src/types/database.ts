@@ -134,13 +134,16 @@ export interface DailyMenuItem {
 export interface Order {
   id: string
   business_id: string
-  customer_id: string
+  customer_id: string | null    // null = pedido sin cuenta (crear_pedido)
   type: OrderType
   status: OrderStatus
   scheduled_time: string | null
   estimated_time: number | null
   notes: string | null
   total: number
+  customer_name: string | null
+  customer_phone: string | null
+  delivery_address: string | null
   created_at: string
 }
 
