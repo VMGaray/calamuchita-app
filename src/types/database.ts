@@ -62,6 +62,8 @@ export interface Business {
   offers_takeaway: boolean
   offers_dine_in: boolean
   dietary_options: string[]
+  charges_table_service: boolean | null
+  table_service_fee: number | null
   status: BusinessStatus
   group_name: string | null
   group_id: string | null

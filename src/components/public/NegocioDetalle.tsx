@@ -12,6 +12,7 @@ import Image from "next/image"
 import CartaInteractiva from "@/components/public/CartaInteractiva"
 import { DietaryBadges } from "@/components/ui/DietaryTags"
 import { DIETARY_DISCLAIMER, dietaryOptionsFor } from "@/lib/constants/dietary"
+import { tableServiceLabel } from "@/lib/utils/tableService"
 import { createClient } from "@/lib/supabase/client"
 import { normalizeArgPhone } from "@/lib/phone"
 import { normalizeUrl } from "@/lib/normalizeUrl"
@@ -143,6 +144,7 @@ export default function NegocioDetalle({ business, promotions = [] }: Props) {
   const hasLinkCarta        = !hasInteractiveCarta && !hasPdfCarta && !!menuLinkUrl
   const hasFotosCarta       = !hasInteractiveCarta && !hasPdfCarta && !hasLinkCarta && (business.menu_photos_urls?.length ?? 0) > 0
   const hasMenu             = hasInteractiveCarta || hasPdfCarta || hasLinkCarta || hasFotosCarta
+  const tableService        = tableServiceLabel(business.charges_table_service, business.table_service_fee)
   const todayMenu = business.daily_menus?.find((m: any) => {
     const today = new Date().toISOString().split("T")[0]
     return m.date === today && m.is_published
@@ -588,7 +590,7 @@ export default function NegocioDetalle({ business, promotions = [] }: Props) {
           {/* Carta interactiva */}
           {hasInteractiveCarta && (
             <div ref={cartaRef}>
-              <CartaInteractiva categories={business.menu_categories} business={business} />
+              <CartaInteractiva categories={business.menu_categories} business={business} tableService={tableService} />
             </div>
           )}
 
@@ -661,6 +663,11 @@ export default function NegocioDetalle({ business, promotions = [] }: Props) {
                 ))}
               </div>
             </div>
+          )}
+
+          {/* Servicio de mesa para las cartas en PDF, link o fotos (la interactiva lo muestra adentro) */}
+          {tableService && hasMenu && !hasInteractiveCarta && (
+            <p className="text-xs text-center -mt-2" style={{ color: "rgba(45,69,48,0.6)" }}>{tableService}</p>
           )}
 
         </div>

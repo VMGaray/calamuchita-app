@@ -44,9 +44,11 @@ interface Props {
     offers_delivery: boolean
     offers_takeaway: boolean
   }
+  /** "Servicio de mesa: $X por persona" / "Sin cargo de servicio de mesa" (null si el local no lo informó) */
+  tableService?: string | null
 }
 
-export default function CartaInteractiva({ categories, business }: Props) {
+export default function CartaInteractiva({ categories, business, tableService }: Props) {
   const [cart, setCart] = useState<CartItem[]>([])
   const [drawerOpen, setDrawerOpen] = useState(false)
 
@@ -91,7 +93,12 @@ export default function CartaInteractiva({ categories, business }: Props) {
     <>
       <div className="bg-white rounded-2xl p-4 md:p-6" style={{ border: "1px solid rgba(45,69,48,0.1)" }}>
         <div className="flex items-center justify-between mb-6">
-          <h2 className="font-serif text-xl" style={{ color: "#2D4530" }}>Carta</h2>
+          <div>
+            <h2 className="font-serif text-xl" style={{ color: "#2D4530" }}>Carta</h2>
+            {tableService && (
+              <p className="text-xs mt-0.5" style={{ color: "rgba(45,69,48,0.55)" }}>{tableService}</p>
+            )}
+          </div>
           {totalItems > 0 && (
             <motion.button
               onClick={() => setDrawerOpen(true)}
