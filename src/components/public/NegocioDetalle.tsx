@@ -191,9 +191,9 @@ export default function NegocioDetalle({ business, promotions = [] }: Props) {
 
   const mapsLink =
     business.latitude && business.longitude
-      ? `https://www.google.com/maps/search/?api=1&query=${business.latitude},${business.longitude}`
+      ? `https://www.google.com/maps/dir/?api=1&destination=${business.latitude},${business.longitude}`
       : typeof business.address === "string" && business.address.trim()
-      ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${business.name}, ${business.address}`)}`
+      ? `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(`${business.name}, ${business.address}`)}`
       : null
 
   const photos: string[] =

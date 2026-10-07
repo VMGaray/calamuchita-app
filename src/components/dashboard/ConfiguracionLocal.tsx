@@ -4,6 +4,27 @@ import { useState, useEffect } from "react"
 import { createClient } from "@/lib/supabase/client"
 import ImageUpload from "@/components/ui/ImageUpload"
 import HorariosEditor, { HorarioDay, mergeHorariosFromDB, expandHorariosForSave } from "@/components/ui/HorariosEditor"
+import dynamic from "next/dynamic"
+import { LatLng, PUEBLOS } from "@/lib/geocoding"
+
+// El mapa (mapbox-gl) pesa: se carga solo en el navegador y aparte del resto del formulario
+const UbicacionPicker = dynamic(() => import("@/components/dashboard/UbicacionPicker"), {
+  ssr: false,
+  loading: () => <div className="h-64 rounded-xl bg-stone-100 animate-pulse" />,
+})
+
+/** Separa la calle del pueblo en `address` ("calle, pueblo"), priorizando la columna `pueblo`. */
+function splitAddress(address: string | null, pueblo: string | null): { street: string; pueblo: string } {
+  const full = address?.trim() || ""
+  if (pueblo) {
+    const suffix = `, ${pueblo}`
+    const street = full.toLowerCase().endsWith(suffix.toLowerCase()) ? full.slice(0, -suffix.length) : full
+    return { street: street.trim(), pueblo }
+  }
+  const lastComma = full.lastIndexOf(",")
+  if (lastComma === -1) return { street: full, pueblo: "" }
+  return { street: full.slice(0, lastComma).trim(), pueblo: full.slice(lastComma + 1).trim() }
+}
 
 const categoryOptions = [
   { value: "restaurant", label: "Restaurante" },
@@ -19,66 +40,6 @@ const categoryOptions = [
   { value: "other", label: "Otro" },
 ]
 
-const pueblos = [
-  "Villa General Belgrano",
-  "Los Reartes",
-  "Santa Rosa de Calamuchita",
-  "La Cumbrecita",
-  "Yacanto",
-  "Amboy",
-  "Villa Ciudad de América",
-  "Embalse",
-  "Villa del Dique",
-]
-
-function isShortMapsUrl(input: string): boolean {
-  return /maps\.app\.goo\.gl|goo\.gl\/maps/i.test(input)
-}
-
-function parseManualCoords(input: string): { lat: number; lng: number } | null {
-  const trimmed = input.trim()
-  if (!trimmed) return null
-
-  // @lat,lng — URLs completas de Google Maps (/maps/@lat,lng o /place/.../@lat,lng)
-  const atMatch = trimmed.match(/@(-?\d+\.\d+),(-?\d+\.\d+)/)
-  if (atMatch) {
-    const lat = parseFloat(atMatch[1]), lng = parseFloat(atMatch[2])
-    if (!isNaN(lat) && !isNaN(lng)) return { lat, lng }
-  }
-
-  // ?q=lat,lng o ?q=lat%2Clng
-  const qMatch = trimmed.match(/[?&]q=(-?\d+\.\d+)[,%2C]+(-?\d+\.\d+)/i)
-  if (qMatch) {
-    const lat = parseFloat(qMatch[1]), lng = parseFloat(qMatch[2])
-    if (!isNaN(lat) && !isNaN(lng)) return { lat, lng }
-  }
-
-  // ll=lat,lng
-  const llMatch = trimmed.match(/[?&]ll=(-?\d+\.\d+),(-?\d+\.\d+)/)
-  if (llMatch) {
-    const lat = parseFloat(llMatch[1]), lng = parseFloat(llMatch[2])
-    if (!isNaN(lat) && !isNaN(lng)) return { lat, lng }
-  }
-
-  // /search/lat,lng o /search/lat,+lng
-  const searchMatch = trimmed.match(/\/search\/(-?\d+\.\d+)[,+\s]+(-?\d+\.\d+)/)
-  if (searchMatch) {
-    const lat = parseFloat(searchMatch[1]), lng = parseFloat(searchMatch[2])
-    if (!isNaN(lat) && !isNaN(lng)) return { lat, lng }
-  }
-
-  // Coordenadas sueltas: "-31.9809, -64.5594" o "-31.9809 -64.5594"
-  const parts = trimmed.split(/[,\s]+/).filter(Boolean)
-  if (parts.length >= 2) {
-    const lat = parseFloat(parts[0]), lng = parseFloat(parts[1])
-    if (!isNaN(lat) && !isNaN(lng) && Math.abs(lat) <= 90 && Math.abs(lng) <= 180) {
-      return { lat, lng }
-    }
-  }
-
-  return null
-}
-
 export default function ConfiguracionLocal() {
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
@@ -87,7 +48,7 @@ export default function ConfiguracionLocal() {
   const [businessId, setBusinessId] = useState<string | null>(null)
   const [photos, setPhotos] = useState<string[]>([])
   const [horarios, setHorarios] = useState<HorarioDay[]>([])
-  const [coordsInput, setCoordsInput] = useState("")
+  const [coords, setCoords] = useState<LatLng | null>(null)
 
   const [form, setForm] = useState({
     name: "",
@@ -125,13 +86,14 @@ export default function ConfiguracionLocal() {
       if (business) {
         setBusinessId(business.id)
         setPhotos(business.business_photos?.map((p: { url: string }) => p.url) || [])
+        const { street, pueblo } = splitAddress(business.address, business.pueblo)
         setForm({
           name: business.name || "",
           slug: business.slug || "",
           description: business.description || "",
           categories: business.categories || [],
-          address: business.address?.split(",")[0]?.trim() || "",
-          pueblo: business.address?.split(",")[1]?.trim() || "",
+          address: street,
+          pueblo,
           phone: business.phone || "",
           whatsapp: business.whatsapp || "",
           instagram: business.instagram || "",
@@ -154,8 +116,8 @@ export default function ConfiguracionLocal() {
 
         if (horariosData) setHorarios(mergeHorariosFromDB(horariosData))
 
-        if (business.latitude && business.longitude) {
-          setCoordsInput(`${business.latitude}, ${business.longitude}`)
+        if (business.latitude != null && business.longitude != null) {
+          setCoords({ lat: business.latitude, lng: business.longitude })
         }
       }
       setLoading(false)
@@ -231,7 +193,6 @@ export default function ConfiguracionLocal() {
     if (!user) return
 
     const uniqueSlug = businessId ? form.slug : await generateUniqueSlug(form.slug, supabase)
-    const manualCoords = parseManualCoords(coordsInput)
     const data = {
       name: form.name,
       slug: uniqueSlug,
@@ -241,8 +202,10 @@ export default function ConfiguracionLocal() {
       category: form.categories[0] || "other",
       categories: form.categories,
       address: form.pueblo ? `${form.address}, ${form.pueblo}` : form.address || null,
-      latitude: manualCoords?.lat ?? null,
-      longitude: manualCoords?.lng ?? null,
+      pueblo: form.pueblo || null,
+      // Solo queda en null si el comercio tocó "Quitar ubicación" o nunca la cargó
+      latitude: coords?.lat ?? null,
+      longitude: coords?.lng ?? null,
       phone: form.phone || null,
       whatsapp: form.whatsapp || null,
       instagram: form.instagram || null,
@@ -403,7 +366,9 @@ export default function ConfiguracionLocal() {
               className="w-full px-4 py-2.5 rounded-xl border border-stone-200 text-stone-800 text-sm outline-none focus:ring-2 focus:ring-primary-300 bg-white"
             >
               <option value="">Seleccioná un pueblo</option>
-              {pueblos.map(p => <option key={p} value={p}>{p}</option>)}
+              {/* Si el admin cargó un pueblo fuera de la lista, se conserva como opción */}
+              {(form.pueblo && !PUEBLOS.includes(form.pueblo) ? [form.pueblo, ...PUEBLOS] : PUEBLOS)
+                .map(p => <option key={p} value={p}>{p}</option>)}
             </select>
           </div>
           <div>
@@ -417,42 +382,15 @@ export default function ConfiguracionLocal() {
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-stone-700 mb-1">
-              Coordenadas{" "}
-              <span className="text-stone-400 font-normal">(opcional)</span>
-            </label>
-            <input
-              type="text"
-              value={coordsInput}
-              onChange={e => setCoordsInput(e.target.value)}
-              placeholder="-31.9809, -64.5594  o pegá el link de Google Maps"
-              className={`w-full px-4 py-2.5 rounded-xl border text-stone-800 text-sm outline-none focus:ring-2 ${
-                coordsInput && !parseManualCoords(coordsInput)
-                  ? "border-red-300 focus:ring-red-200"
-                  : coordsInput && parseManualCoords(coordsInput)
-                  ? "border-green-300 focus:ring-green-200"
-                  : "border-stone-200 focus:ring-primary-300"
-              }`}
-            />
-            {coordsInput && parseManualCoords(coordsInput) && (
-              <p className="text-xs text-green-600 mt-1">
-                ✓ lat {parseManualCoords(coordsInput)!.lat.toFixed(6)}, lng {parseManualCoords(coordsInput)!.lng.toFixed(6)}
-              </p>
-            )}
-            {coordsInput && !parseManualCoords(coordsInput) && (
-              isShortMapsUrl(coordsInput) ? (
-                <p className="text-xs text-amber-600 mt-1">
-                  Este es un link corto de Google Maps. Abrilo en el navegador, copiá el link de la barra de dirección y pegalo acá.
-                </p>
-              ) : (
-                <p className="text-xs text-red-500 mt-1">
-                  Formato no reconocido. Pegá las coordenadas (-31.9809, -64.5594) o el link completo de Google Maps.
-                </p>
-              )
-            )}
-            <p className="text-xs text-stone-400 mt-1">
-              Podés pegar las coordenadas (-31.98, -64.55) o el link de Google Maps desde el navegador.
+            <label className="block text-sm font-medium text-stone-700 mb-1">Ubicación en el mapa</label>
+            <p className="text-xs text-stone-400 mb-3">
+              Se usa en el mapa del Valle y en el botón &quot;Llegar&quot; de tu perfil.
             </p>
+            <UbicacionPicker
+              value={coords}
+              onChange={setCoords}
+              address={[form.address, form.pueblo].filter(Boolean).join(", ")}
+            />
           </div>
         </div>
 
