@@ -80,7 +80,8 @@ export default function AdminSidebar() {
             <MapPin size={13} className="text-white" />
           </Link>
 
-          {links.map(({ href, label, icon: Icon }) => {
+          {/* En desktop Configuración va en el pie del sidebar; en mobile, al final de la barra */}
+          {[...links, { href: "/admin/configuracion", label: "Configuración", icon: Settings }].map(({ href, label, icon: Icon }) => {
             const active = isActive(href)
             return (
               <Link

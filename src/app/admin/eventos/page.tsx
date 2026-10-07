@@ -109,11 +109,11 @@ export default function AdminEventosPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#FDFCF9] py-12 px-6">
+    <div className="min-h-screen bg-[#FDFCF9] py-4 px-0 md:py-12 md:px-6">
       <div className="max-w-3xl mx-auto space-y-10">
 
         {/* ── Formulario ── */}
-        <form onSubmit={handleSubmit} className="space-y-4 bg-white p-8 rounded-[32px] border border-stone-200 shadow-sm">
+        <form onSubmit={handleSubmit} className="space-y-4 bg-white p-5 md:p-8 rounded-[32px] border border-stone-200 shadow-sm">
           <div className="flex items-center justify-between">
             <h2 className="font-serif text-2xl text-[#2D4530]">
               {editingId ? "Editar evento" : "Nuevo evento"}

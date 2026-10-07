@@ -300,7 +300,7 @@ export default function AdminNegocios() {
 
       {/* Filtros por localidad y categoría */}
       <div className="flex items-center gap-3 mb-6 flex-wrap">
-        <div className="flex flex-col gap-1">
+        <div className="flex flex-col gap-1 w-full sm:w-auto">
           <label className="text-xs text-stone-400">Localidad</label>
           <select
             value={puebloFilter}
@@ -313,7 +313,7 @@ export default function AdminNegocios() {
             ))}
           </select>
         </div>
-        <div className="flex flex-col gap-1">
+        <div className="flex flex-col gap-1 w-full sm:w-auto">
           <label className="text-xs text-stone-400">Categoría</label>
           <select
             value={categoryFilter}
@@ -371,7 +371,7 @@ export default function AdminNegocios() {
           {filtered.map((business, i) => (
             <div
               key={business.id}
-              className={`flex items-center gap-3 px-4 sm:px-6 py-4 ${i !== filtered.length - 1 ? "border-b border-stone-100" : ""}`}
+              className={`flex flex-wrap sm:flex-nowrap items-center gap-x-3 gap-y-2 px-4 sm:px-6 py-4 ${i !== filtered.length - 1 ? "border-b border-stone-100" : ""}`}
             >
               {/* Logo */}
               <div className="w-12 h-12 rounded-xl bg-stone-100 overflow-hidden flex-shrink-0">
@@ -384,8 +384,8 @@ export default function AdminNegocios() {
                 )}
               </div>
 
-              {/* Info */}
-              <div className="flex-1 min-w-0">
+              {/* Info — en mobile ocupa todo el ancho junto al logo y el resto baja */}
+              <div className="flex-1 min-w-[calc(100%-4.5rem)] sm:min-w-0">
                 <div className="flex items-center gap-2">
                   <p className="text-sm font-medium text-stone-800 truncate">{business.name}</p>
                   {business.is_premium && (
@@ -424,6 +424,7 @@ export default function AdminNegocios() {
                 </div>
               </div>
 
+              <div className="flex items-center gap-3 shrink-0 ml-auto">
               {/* Status */}
               <button
                 onClick={() => handleToggleStatus(business.id, business.status)}
@@ -464,6 +465,7 @@ export default function AdminNegocios() {
                 >
                   <Trash2 size={15} />
                 </button>
+              </div>
               </div>
             </div>
           ))}

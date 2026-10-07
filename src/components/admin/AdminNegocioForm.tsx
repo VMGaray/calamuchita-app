@@ -514,7 +514,7 @@ export default function AdminNegocioForm() {
                 className="w-full px-4 py-2.5 rounded-xl border border-stone-200 text-stone-800 text-sm outline-none focus:ring-2 focus:ring-primary-300" />
             </div>
           </div>
-          <div className="grid grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             <div>
               <label className="block text-sm font-medium text-stone-700 mb-1">Instagram</label>
               <input type="text" value={form.instagram} onChange={e => handleChange("instagram", e.target.value)}

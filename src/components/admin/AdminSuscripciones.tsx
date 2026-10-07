@@ -1064,7 +1064,7 @@ export default function AdminSuscripciones() {
             return (
               <div
                 key={sub.id}
-                className={`flex items-center gap-3 px-5 py-3.5 ${i !== filtered.length - 1 ? "border-b border-stone-100" : ""}`}
+                className={`flex flex-wrap sm:flex-nowrap items-center gap-x-3 gap-y-2 px-4 sm:px-5 py-3.5 ${i !== filtered.length - 1 ? "border-b border-stone-100" : ""}`}
               >
                 <input
                   type="checkbox"
@@ -1073,7 +1073,8 @@ export default function AdminSuscripciones() {
                   aria-label={`Seleccionar ${sub.businesses?.name ?? "suscripción"}`}
                   className="accent-[#2D4530] shrink-0"
                 />
-                <div className="flex-1 min-w-0">
+                {/* En mobile ocupa todo el ancho y las acciones bajan a otra línea */}
+                <div className="flex-1 min-w-[calc(100%-2rem)] sm:min-w-0">
                   {/* Línea 1: negocio, estado y vencimiento */}
                   <div className="flex items-center gap-2 flex-wrap">
                     <p className="text-sm font-medium text-stone-800 truncate">
@@ -1127,6 +1128,7 @@ export default function AdminSuscripciones() {
                   </div>
                 </div>
 
+                <div className="flex items-center gap-1 shrink-0 ml-auto">
                 {isRenewable(sub.status, sub.current_period_end) && (
                   <div className="flex items-center gap-1 shrink-0">
                     {RENEW_OPTIONS.map(opt => (
@@ -1158,6 +1160,7 @@ export default function AdminSuscripciones() {
                 >
                   <Trash2 size={13} />
                 </button>
+                </div>
               </div>
             )
           })}

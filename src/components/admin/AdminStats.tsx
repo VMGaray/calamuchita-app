@@ -441,7 +441,7 @@ export default function AdminStats() {
             <BarChart
               data={bySection}
               layout="vertical"
-              margin={{ top: 0, right: 20, bottom: 0, left: 90 }}
+              margin={{ top: 0, right: 20, bottom: 0, left: 0 }}
               barCategoryGap="30%"
               barGap={4}
             >
