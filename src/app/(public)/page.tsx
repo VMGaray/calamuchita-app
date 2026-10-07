@@ -7,6 +7,7 @@ import LocalidadSelectorWidget from "@/components/public/LocalidadSelectorWidget
 import { createClient } from "@/lib/supabase/server"
 import type { Novedad } from "@/types/database"
 import { sectionToCategoria, buildPromoDiscount, formatValidUntil, type Promo } from "@/lib/promos"
+import { businessProfileUrl } from "@/lib/utils/business"
 
 const NOVEDADES_LIMIT = 5
 
@@ -57,7 +58,7 @@ function mapPromotionToPromo(promo: Promotion): Promo | null {
     descuento_label,
     descripcion: promo.description,
     validez: formatValidUntil(promo.valid_until),
-    link: `/negocios/${biz.slug}`,
+    link: businessProfileUrl(biz.section, biz.slug),
   }
 }
 

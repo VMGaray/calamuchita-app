@@ -3,6 +3,7 @@ import { Suspense } from "react"
 import DirectorioDetalle from "@/components/public/DirectorioDetalle"
 import { createClient } from "@/lib/supabase/server"
 import { notFound, redirect } from "next/navigation"
+import { businessProfileUrl } from "@/lib/utils/business"
 
 interface Props {
   params: Promise<{ section: string; slug: string }>
@@ -89,8 +90,9 @@ export default async function DirectorioDetallePage({ params }: Props) {
   // para mostrar el breadcrumb/back correcto. Si un negocio fue
   // recategorizado, redirigimos a la URL canónica en vez de romper
   // links viejos compartidos con la sección anterior.
+  // Gastronomía va a /negocios/<slug> (los links /directorio/gastronomy/... ya los redirige next.config).
   if (business.section !== section) {
-    redirect(`/directorio/${business.section}/${slug}`)
+    redirect(businessProfileUrl(business.section, slug))
   }
 
   const { data: promotionsData } = await supabase

@@ -2,10 +2,11 @@ import type { Metadata } from "next"
 import { Suspense } from "react"
 import NegocioDetalle from "@/components/public/NegocioDetalle"
 import { createClient } from "@/lib/supabase/server"
-import { notFound } from "next/navigation"
+import { notFound, redirect } from "next/navigation"
 
 interface Props {
   params: Promise<{ slug: string }>
+  searchParams: Promise<{ from?: string }>
 }
 
 const DEFAULT_IMAGE = "/valle.jpg"
@@ -67,7 +68,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   }
 }
 
-export default async function NegocioDetallePage({ params }: Props) {
+export default async function NegocioDetallePage({ params, searchParams }: Props) {
   const { slug } = await params
   const supabase = await createClient()
   const today = new Date().toISOString().split("T")[0]
@@ -92,6 +93,15 @@ export default async function NegocioDetallePage({ params }: Props) {
     .single()
 
   if (!business) notFound()
+
+  // Este perfil es el gastronómico. Un negocio de otra sección (por ejemplo desde el mapa
+  // o una promo del inicio) se redirige en el servidor, antes de renderizar: así la vista
+  // se registra una sola vez y en el perfil correcto.
+  if (business.section !== "gastronomy") {
+    const { from } = await searchParams
+    const qs = from ? `?from=${encodeURIComponent(from)}` : ""
+    redirect(`/directorio/${business.section}/${slug}${qs}`)
+  }
 
   const { data: promotionsData } = await supabase
     .from("promotions")

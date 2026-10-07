@@ -9,6 +9,7 @@ import { createClient } from "@/lib/supabase/client"
 import { MapPin, Info, ArrowLeft } from "lucide-react"
 import Link from "next/link"
 import Image from "next/image"
+import { businessProfileUrl } from "@/lib/utils/business"
 
 const MAPBOX_TOKEN = process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN
 
@@ -193,7 +194,7 @@ export default function GeneralMapPage() {
             className="z-50"
           >
             <Link 
-              href={`/negocios/${selectedBusiness.slug}`}
+              href={businessProfileUrl(selectedBusiness.section, selectedBusiness.slug)}
               className="flex items-center gap-3 p-1 min-w-[180px] group"
             >
               {selectedBusiness.logo_url && (

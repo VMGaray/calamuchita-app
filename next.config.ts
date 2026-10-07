@@ -58,6 +58,10 @@ const nextConfig: NextConfig = {
     return [
       { source: "/login", destination: "/gastronomicos", permanent: false },
       { source: "/registro", destination: "/gastronomicos", permanent: false },
+      // Gastronomía tiene un solo perfil público (/negocios/<slug>, con carta y pedidos).
+      // Los links viejos del directorio se redirigen antes de renderizar (308; la query se conserva).
+      { source: "/directorio/gastronomy", destination: "/negocios", permanent: true },
+      { source: "/directorio/gastronomy/:slug", destination: "/negocios/:slug", permanent: true },
     ]
   },
 }
