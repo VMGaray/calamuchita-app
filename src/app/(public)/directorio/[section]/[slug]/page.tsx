@@ -92,7 +92,9 @@ export default async function DirectorioDetallePage({ params }: Props) {
   // recategorizado, redirigimos a la URL canónica en vez de romper
   // links viejos compartidos con la sección anterior.
   // Gastronomía va a /negocios/<slug> (los links /directorio/gastronomy/... ya los redirige next.config).
-  if (business.section !== section) {
+  // Las secciones extra (extra_sections) también son válidas: así el "volver" lleva a la sección desde la que se entró.
+  const enSeccionExtra = business.section !== "gastronomy" && (business.extra_sections ?? []).includes(section)
+  if (business.section !== section && !enSeccionExtra) {
     redirect(businessProfileUrl(business.section, slug))
   }
 

@@ -6,6 +6,7 @@ import { createClient } from "@/lib/supabase/client"
 import { BusinessSection, BusinessCategory } from "@/types/database"
 import { MASTER_CATEGORIES } from "@/lib/constants/categories"
 import RubrosSelector from "@/components/admin/RubrosSelector"
+import SeccionesExtra, { limpiarSeccionesExtra, rubroPrincipal, rubrosDeSeccion } from "@/components/admin/SeccionesExtra"
 import ImageUpload from "@/components/ui/ImageUpload"
 import PdfUpload from "@/components/ui/PdfUpload"
 import { isValidYoutubeUrl } from "@/lib/utils/youtube"
@@ -146,6 +147,7 @@ export default function AdminNegocioForm() {
     slug: "",
     description: "",
     section: "services" as BusinessSection,
+    extra_sections: [] as BusinessSection[],
     categories: [] as string[],
     address: "",
     pueblo: "",
@@ -216,6 +218,11 @@ export default function AdminNegocioForm() {
     }))
   }
 
+  const inSection = (s: BusinessSection) =>
+    form.section === s || limpiarSeccionesExtra(form.section, form.extra_sections).includes(s)
+  const isGastronomy = form.section === "gastronomy"
+  const isHealth = inSection("health")
+
   const handleSubmit = async () => {
     if (!form.name || !form.section) {
       setError("El nombre y la sección son obligatorios")
@@ -235,7 +242,8 @@ export default function AdminNegocioForm() {
     const manualCoords = parseManualCoords(coordsInput)
     const coords = manualCoords ?? (fullAddress ? await geocodeAddress(fullAddress) : null)
 
-    const hasProfesionales = form.categories.includes("Profesionales")
+    const extraSections = limpiarSeccionesExtra(form.section, form.extra_sections)
+    const hasProfesionales = inSection("services") && form.categories.includes("Profesionales")
     const finalCategories = hasProfesionales && professionalType
       ? [...new Set([...form.categories, professionalType])]
       : form.categories
@@ -245,10 +253,13 @@ export default function AdminNegocioForm() {
       slug: uniqueSlug,
       description: form.description || null,
       section: form.section,
+      extra_sections: extraSections,
       type: form.section === "gastronomy" ? "gastronomy" : "directory",
-      category: form.section === "gastronomy" ? (finalCategories[0] as BusinessCategory) || "other" : null,
+      category: form.section === "gastronomy"
+        ? (finalCategories.find(c => gastronomyCategories.some(g => g.value === c)) as BusinessCategory) || "other"
+        : null,
       categories: finalCategories,
-      subcategory: form.section === "gastronomy" ? null : (finalCategories[0] || null),
+      subcategory: form.section === "gastronomy" ? null : rubroPrincipal(form.section, finalCategories),
       address: fullAddress || null,
       pueblo: form.pueblo || null,
       latitude: coords?.lat ?? null,
@@ -271,11 +282,11 @@ export default function AdminNegocioForm() {
       cover_url: form.cover_url,
       menu_pdf_url: form.menu_pdf_url,
       video_url: form.video_url || null,
-      doctor_name: form.section === "health" ? form.doctor_name || null : null,
-      medical_specialties: form.section === "health" ? form.medical_specialties : [],
-      health_coverages: form.section === "health" ? form.health_coverages : [],
-      has_24h_guard: form.section === "health" ? form.has_24h_guard : false,
-      appointment_system: form.section === "health" ? form.appointment_system || null : null,
+      doctor_name: isHealth ? form.doctor_name || null : null,
+      medical_specialties: isHealth ? form.medical_specialties : [],
+      health_coverages: isHealth ? form.health_coverages : [],
+      has_24h_guard: isHealth ? form.has_24h_guard : false,
+      appointment_system: isHealth ? form.appointment_system || null : null,
       group_name: form.group_name || null,
       group_id: form.group_id || null,
     })
@@ -343,8 +354,6 @@ export default function AdminNegocioForm() {
     router.push("/admin/negocios")
   }
 
-  const isGastronomy = form.section === "gastronomy"
-  const isHealth = form.section === "health"
   const isServicesOrCommerce = ["services", "commerce", "health", "tourism", "education", "sports", "events", "info"].includes(form.section)
 
   return (
@@ -410,30 +419,8 @@ export default function AdminNegocioForm() {
                   selected={form.categories}
                   onToggle={toggleCategory}
                   grouped={form.section === "services"}
+                  legacyIgnore={form.extra_sections.flatMap(rubrosDeSeccion)}
                 />
-              )}
-
-              {/* Selector de tipo de profesional */}
-              {form.section === "services" && form.categories.includes("Profesionales") && (
-                <div className="mt-3 p-4 bg-violet-50 rounded-xl border border-violet-100">
-                  <label className="block text-xs font-semibold text-violet-700 mb-2">Tipo de profesional</label>
-                  <div className="flex gap-2 flex-wrap">
-                    {PROFESIONALES_OPTIONS.map(opt => (
-                      <button
-                        key={opt}
-                        type="button"
-                        onClick={() => setProfessionalType(prev => prev === opt ? "" : opt)}
-                        className={`py-1.5 px-3 rounded-xl text-xs font-medium border transition-colors ${
-                          professionalType === opt
-                            ? "bg-violet-600 text-white border-violet-600"
-                            : "bg-white text-stone-600 border-stone-200 hover:border-violet-300"
-                        }`}
-                      >
-                        {opt}
-                      </button>
-                    ))}
-                  </div>
-                </div>
               )}
 
               <input
@@ -468,6 +455,36 @@ export default function AdminNegocioForm() {
                   ))}
                 </div>
               )}
+            </div>
+          )}
+
+          <SeccionesExtra
+            principal={form.section}
+            extra={form.extra_sections}
+            categories={form.categories}
+            onChange={(extra_sections, categories) => setForm(prev => ({ ...prev, extra_sections, categories }))}
+          />
+
+          {/* Selector de tipo de profesional */}
+          {inSection("services") && form.categories.includes("Profesionales") && (
+            <div className="mt-3 p-4 bg-violet-50 rounded-xl border border-violet-100">
+              <label className="block text-xs font-semibold text-violet-700 mb-2">Tipo de profesional</label>
+              <div className="flex gap-2 flex-wrap">
+                {PROFESIONALES_OPTIONS.map(opt => (
+                  <button
+                    key={opt}
+                    type="button"
+                    onClick={() => setProfessionalType(prev => prev === opt ? "" : opt)}
+                    className={`py-1.5 px-3 rounded-xl text-xs font-medium border transition-colors ${
+                      professionalType === opt
+                        ? "bg-violet-600 text-white border-violet-600"
+                        : "bg-white text-stone-600 border-stone-200 hover:border-violet-300"
+                    }`}
+                  >
+                    {opt}
+                  </button>
+                ))}
+              </div>
             </div>
           )}
         </div>
