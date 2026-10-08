@@ -390,7 +390,7 @@ export default function NegocioDetalle({ business, promotions = [] }: Props) {
               <p className="text-[10px] font-black uppercase tracking-[0.22em] mb-2" style={{ color: "rgba(45,69,48,0.42)" }}>
                 Sobre nosotros
               </p>
-              <p className="text-sm leading-relaxed" style={{ color: "rgba(45,69,48,0.72)" }}>
+              <p className="text-sm leading-relaxed whitespace-pre-line" style={{ color: "rgba(45,69,48,0.72)" }}>
                 {business.description}
               </p>
             </div>

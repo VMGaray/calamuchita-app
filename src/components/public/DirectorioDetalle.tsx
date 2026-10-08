@@ -393,7 +393,7 @@ export default function DirectorioDetalle({ business, section, promotions = [] }
             {business.description && (
               <div className={`${cardClass} min-h-[200px]`}>
                 <p className="text-xs font-semibold uppercase tracking-wider text-stone-400 mb-2">Sobre nosotros</p>
-                <p className="text-sm text-stone-600 leading-relaxed">{business.description}</p>
+                <p className="text-sm text-stone-600 leading-relaxed whitespace-pre-line">{business.description}</p>
               </div>
             )}
 
