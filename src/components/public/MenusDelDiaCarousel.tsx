@@ -6,6 +6,7 @@ import { ChevronLeft, ChevronRight, UtensilsCrossed } from "lucide-react"
 import Link from "next/link"
 import { createClient } from "@/lib/supabase/client"
 import { useLocalidad } from "@/lib/context/LocalidadContext"
+import { hoyAR } from "@/lib/utils/fechas"
 
 // Tipo que refleja exactamente lo que devuelve Supabase
 interface MenuDelDiaRow {
@@ -83,7 +84,7 @@ export default function MenusDelDiaCarousel() {
   useEffect(() => {
     async function fetchMenus() {
       const supabase = createClient()
-      const today = new Date().toISOString().split("T")[0]
+      const today = hoyAR()
 
       const { data, error } = await supabase
         .from("daily_menus")

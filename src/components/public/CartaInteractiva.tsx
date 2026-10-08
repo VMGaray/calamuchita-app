@@ -5,6 +5,8 @@ import Image from "next/image"
 import { motion, AnimatePresence } from "framer-motion"
 import { Plus, Minus, ShoppingBag } from "lucide-react"
 import CarritoDrawer from "./CarritoDrawer"
+import { DietaryBadges } from "@/components/ui/DietaryTags"
+import { DIETARY_DISCLAIMER } from "@/lib/constants/dietary"
 
 interface MenuItem {
   id: string
@@ -14,11 +16,15 @@ interface MenuItem {
   image_url: string | null
   is_available: boolean
   category_id: string | null
+  sort_order?: number | null
+  dietary_tags?: string[] | null
 }
 
 interface MenuCategory {
   id: string
   name: string
+  is_active?: boolean | null
+  sort_order?: number | null
   menu_items: MenuItem[]
 }
 
@@ -38,9 +44,11 @@ interface Props {
     offers_delivery: boolean
     offers_takeaway: boolean
   }
+  /** "Servicio de mesa: $X por persona" / "Sin cargo de servicio de mesa" (null si el local no lo informó) */
+  tableService?: string | null
 }
 
-export default function CartaInteractiva({ categories, business }: Props) {
+export default function CartaInteractiva({ categories, business, tableService }: Props) {
   const [cart, setCart] = useState<CartItem[]>([])
   const [drawerOpen, setDrawerOpen] = useState(false)
 
@@ -63,11 +71,22 @@ export default function CartaInteractiva({ categories, business }: Props) {
   }
 
   const getQty = (id: string) => cart.find(i => i.id === id)?.quantity || 0
+  // Sin delivery ni take away: se muestra solo la carta (sin +/−, carrito ni botón de pedir)
+  const takesOrders = business.offers_delivery || business.offers_takeaway
   const totalItems = cart.reduce((sum, i) => sum + i.quantity, 0)
   const totalPrice = cart.reduce((sum, i) => sum + i.price * i.quantity, 0)
 
-  const activeCategories = categories.filter(
-    cat => cat.menu_items?.some(item => item.is_available)
+  const bySortOrder = (a: { sort_order?: number | null }, b: { sort_order?: number | null }) =>
+    (a.sort_order ?? Number.MAX_SAFE_INTEGER) - (b.sort_order ?? Number.MAX_SAFE_INTEGER)
+
+  // El público ya recibe solo lo visible por RLS; este filtro cubre al dueño y al admin
+  // cuando miran su propio perfil (antes veían las categorías "Ocultas")
+  const activeCategories = categories
+    .filter(cat => cat.is_active !== false && cat.menu_items?.some(item => item.is_available))
+    .sort(bySortOrder)
+
+  const hasDietaryTags = activeCategories.some(cat =>
+    cat.menu_items.some(item => item.is_available && (item.dietary_tags?.length ?? 0) > 0)
   )
 
   if (activeCategories.length === 0) return null
@@ -76,8 +95,13 @@ export default function CartaInteractiva({ categories, business }: Props) {
     <>
       <div className="bg-white rounded-2xl p-4 md:p-6" style={{ border: "1px solid rgba(45,69,48,0.1)" }}>
         <div className="flex items-center justify-between mb-6">
-          <h2 className="font-serif text-xl" style={{ color: "#2D4530" }}>Carta</h2>
-          {totalItems > 0 && (
+          <div>
+            <h2 className="font-serif text-xl" style={{ color: "#2D4530" }}>Carta</h2>
+            {tableService && (
+              <p className="text-xs mt-0.5" style={{ color: "rgba(45,69,48,0.55)" }}>{tableService}</p>
+            )}
+          </div>
+          {takesOrders && totalItems > 0 && (
             <motion.button
               onClick={() => setDrawerOpen(true)}
               className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium"
@@ -101,6 +125,7 @@ export default function CartaInteractiva({ categories, business }: Props) {
               <div className="space-y-3">
                 {cat.menu_items
                   .filter(item => item.is_available)
+                  .sort(bySortOrder)
                   .map(item => {
                     const qty = getQty(item.id)
                     return (
@@ -127,12 +152,16 @@ export default function CartaInteractiva({ categories, business }: Props) {
                               {item.description}
                             </p>
                           )}
+                          {(item.dietary_tags?.length ?? 0) > 0 && (
+                            <div className="mt-1.5"><DietaryBadges keys={item.dietary_tags} size="xs" /></div>
+                          )}
                           <p className="text-sm font-semibold mt-1" style={{ color: "#5E4B3B" }}>
                             ${item.price.toLocaleString("es-AR")}
                           </p>
                         </div>
 
                         {/* Controles +/- */}
+                        {takesOrders && (
                         <div className="flex items-center gap-2 flex-shrink-0">
                           <AnimatePresence>
                             {qty > 0 && (
@@ -175,6 +204,7 @@ export default function CartaInteractiva({ categories, business }: Props) {
                             <Plus size={14} />
                           </motion.button>
                         </div>
+                        )}
                       </div>
                     )
                   })}
@@ -182,11 +212,17 @@ export default function CartaInteractiva({ categories, business }: Props) {
             </div>
           ))}
         </div>
+
+        {hasDietaryTags && (
+          <p className="text-[11px] mt-6" style={{ color: "rgba(45,69,48,0.45)" }}>
+            Etiquetas alimentarias: {DIETARY_DISCLAIMER.toLowerCase()}.
+          </p>
+        )}
       </div>
 
       {/* Botón flotante en mobile */}
       <AnimatePresence>
-        {totalItems > 0 && (
+        {takesOrders && totalItems > 0 && (
           <motion.button
             initial={{ y: 100, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
@@ -210,6 +246,7 @@ export default function CartaInteractiva({ categories, business }: Props) {
         )}
       </AnimatePresence>
 
+      {takesOrders && (
       <CarritoDrawer
         open={drawerOpen}
         onClose={() => setDrawerOpen(false)}
@@ -222,6 +259,7 @@ export default function CartaInteractiva({ categories, business }: Props) {
           setDrawerOpen(false)
         }}
       />
+      )}
     </>
   )
 }

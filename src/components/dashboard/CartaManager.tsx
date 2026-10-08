@@ -7,6 +7,8 @@ import { Plus, Trash2, ChevronDown, ChevronUp, GripVertical, Edit2, Check, X, Bo
 import { SkeletonCarta } from "@/components/ui/Skeleton"
 import PdfUpload from "@/components/ui/PdfUpload"
 import { normalizeUrl } from "@/lib/normalizeUrl"
+import { DietaryBadges, DietarySelector } from "@/components/ui/DietaryTags"
+import { tableServiceLabel } from "@/lib/utils/tableService"
 
 type Mode = "manual" | "pdf" | "link" | null
 
@@ -19,6 +21,7 @@ interface MenuItem {
   sort_order: number
   image_url: string | null
   category_id: string
+  dietary_tags: string[] | null
 }
 
 interface MenuCategory {
@@ -39,16 +42,23 @@ export default function CartaManager() {
   const [addingCat, setAddingCat] = useState(false)
 
   const [addingItemTo, setAddingItemTo] = useState<string | null>(null)
-  const [newItem, setNewItem] = useState({ name: "", description: "", price: "" })
+  const [newItem, setNewItem] = useState({ name: "", description: "", price: "", tags: [] as string[] })
 
   const [editingItem, setEditingItem] = useState<string | null>(null)
-  const [editForm, setEditForm] = useState({ name: "", description: "", price: "" })
+  const [editForm, setEditForm] = useState({ name: "", description: "", price: "", tags: [] as string[] })
 
   // Modo de carga
   const [mode, setMode] = useState<Mode>(null)
   const [choosingMode, setChoosingMode] = useState(false)
   const [pdfUrl, setPdfUrl] = useState<string | null>(null)
   const [linkValue, setLinkValue] = useState("")
+
+  // Servicio de mesa (null = el local todavía no lo informó)
+  const [chargesService, setChargesService] = useState<boolean | null>(null)
+  const [serviceFee, setServiceFee] = useState("")
+  const [savedService, setSavedService] = useState<{ charges: boolean | null; fee: number | null }>({ charges: null, fee: null })
+  const [savingService, setSavingService] = useState(false)
+  const [serviceMsg, setServiceMsg] = useState<{ type: "ok" | "error"; text: string } | null>(null)
 
   useEffect(() => {
     fetchData()
@@ -61,7 +71,7 @@ export default function CartaManager() {
 
     const { data: business } = await supabase
       .from("businesses")
-      .select("id, menu_pdf_url, menu_link")
+      .select("id, menu_pdf_url, menu_link, charges_table_service, table_service_fee")
       .eq("owner_id", user.id)
       .single()
 
@@ -70,6 +80,9 @@ export default function CartaManager() {
     setBusinessId(business.id)
     setPdfUrl(business.menu_pdf_url)
     setLinkValue(business.menu_link || "")
+    setChargesService(business.charges_table_service)
+    setServiceFee(business.table_service_fee != null ? String(business.table_service_fee) : "")
+    setSavedService({ charges: business.charges_table_service, fee: business.table_service_fee })
 
     const { data } = await supabase
       .from("menu_categories")
@@ -131,6 +144,31 @@ export default function CartaManager() {
     await createClient().from("businesses").update({ menu_link: normalized }).eq("id", businessId)
   }
 
+  // SERVICIO DE MESA
+
+  const handleSaveService = async () => {
+    if (!businessId || chargesService === null) return
+    const fee = chargesService ? parseFloat(serviceFee) : null
+    if (chargesService && (!fee || fee <= 0)) {
+      setServiceMsg({ type: "error", text: "Ingresá el monto por persona" })
+      return
+    }
+    setSavingService(true)
+    setServiceMsg(null)
+    const { error } = await createClient()
+      .from("businesses")
+      .update({ charges_table_service: chargesService, table_service_fee: fee })
+      .eq("id", businessId)
+    setSavingService(false)
+    if (error) {
+      setServiceMsg({ type: "error", text: "No se pudo guardar. Intentá de nuevo." })
+      return
+    }
+    setSavedService({ charges: chargesService, fee })
+    setServiceMsg({ type: "ok", text: "Guardado" })
+    setTimeout(() => setServiceMsg(null), 2500)
+  }
+
   // CATEGORÍAS
 
   const handleAddCategory = async () => {
@@ -186,6 +224,7 @@ export default function CartaManager() {
         name: newItem.name.trim(),
         description: newItem.description.trim() || null,
         price: parseFloat(newItem.price),
+        dietary_tags: newItem.tags,
         is_available: true,
         sort_order: cat?.menu_items?.length || 0,
       })
@@ -198,7 +237,7 @@ export default function CartaManager() {
           ? { ...c, menu_items: [...(c.menu_items || []), data] }
           : c
       ))
-      setNewItem({ name: "", description: "", price: "" })
+      setNewItem({ name: "", description: "", price: "", tags: [] })
       setAddingItemTo(null)
     }
   }
@@ -235,6 +274,7 @@ export default function CartaManager() {
         name: editForm.name.trim(),
         description: editForm.description.trim() || null,
         price: parseFloat(editForm.price),
+        dietary_tags: editForm.tags,
       })
       .eq("id", itemId)
       .select()
@@ -301,6 +341,59 @@ export default function CartaManager() {
         <div className="flex items-center gap-2 mb-6 px-4 py-2.5 rounded-xl bg-green-50 border border-green-200 w-fit">
           <Check size={14} className="text-green-600" />
           <span className="text-xs font-medium text-green-700">Modo activo: {modeLabel[mode]}</span>
+        </div>
+      )}
+
+      {/* Servicio de mesa: se muestra en la carta pública, cualquiera sea el modo de carga */}
+      {!showPicker && (
+        <div className="bg-white rounded-2xl border border-stone-200 p-5 mb-6">
+          <p className="text-sm font-medium text-stone-700 mb-3">¿Cobrás servicio de mesa?</p>
+          <div className="flex flex-wrap items-center gap-2">
+            {[{ value: true, label: "Sí" }, { value: false, label: "No" }].map(opt => (
+              <button
+                key={opt.label}
+                type="button"
+                onClick={() => setChargesService(opt.value)}
+                aria-pressed={chargesService === opt.value}
+                className={`px-4 py-2 rounded-xl text-sm font-medium border transition-colors ${
+                  chargesService === opt.value
+                    ? "bg-[#2D4530] text-white border-[#2D4530]"
+                    : "bg-white text-stone-600 border-stone-200 hover:border-stone-300"
+                }`}
+              >
+                {opt.label}
+              </button>
+            ))}
+            {chargesService && (
+              <div className="relative">
+                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-stone-400 text-sm">$</span>
+                <input
+                  type="number"
+                  min="0"
+                  inputMode="decimal"
+                  value={serviceFee}
+                  onChange={e => setServiceFee(e.target.value)}
+                  placeholder="Por persona"
+                  className="w-36 pl-7 pr-3 py-2 rounded-xl border border-stone-200 text-sm outline-none focus:border-stone-400"
+                />
+              </div>
+            )}
+            <button
+              type="button"
+              onClick={handleSaveService}
+              disabled={chargesService === null || savingService}
+              className="px-4 py-2 rounded-xl text-sm font-medium disabled:opacity-40"
+              style={{ background: "#2D4530", color: "white" }}
+            >
+              {savingService ? "Guardando..." : "Guardar"}
+            </button>
+          </div>
+          <p className={`text-xs mt-2 ${serviceMsg?.type === "error" ? "text-red-500" : serviceMsg ? "text-green-600" : "text-stone-400"}`}>
+            {serviceMsg?.text
+              ?? (savedService.charges === null
+                ? "Todavía no lo informaste: en tu carta no se muestra nada."
+                : `En tu carta se ve: "${tableServiceLabel(savedService.charges, savedService.fee)}"`)}
+          </p>
         </div>
       )}
 
@@ -453,6 +546,11 @@ export default function CartaManager() {
                                       placeholder="Descripción (opcional)"
                                       className="w-full px-3 py-2 rounded-lg border border-stone-200 text-sm outline-none focus:border-stone-400"
                                     />
+                                    <DietarySelector
+                                      size="sm"
+                                      value={editForm.tags}
+                                      onChange={tags => setEditForm(f => ({ ...f, tags }))}
+                                    />
                                     <div className="flex gap-2">
                                       <input
                                         type="number"
@@ -487,6 +585,9 @@ export default function CartaManager() {
                                       {item.description && (
                                         <p className="text-xs text-stone-400 mt-0.5 truncate">{item.description}</p>
                                       )}
+                                      {(item.dietary_tags?.length ?? 0) > 0 && (
+                                        <div className="mt-1"><DietaryBadges keys={item.dietary_tags} size="xs" /></div>
+                                      )}
                                     </div>
                                     <p className="text-sm font-semibold flex-shrink-0" style={{ color: "#2D4530" }}>
                                       ${item.price.toLocaleString("es-AR")}
@@ -510,6 +611,7 @@ export default function CartaManager() {
                                           name: item.name,
                                           description: item.description || "",
                                           price: item.price.toString(),
+                                          tags: item.dietary_tags ?? [],
                                         })
                                       }}
                                       className="w-7 h-7 rounded-lg flex items-center justify-center text-stone-300 hover:text-stone-600 hover:bg-stone-100 transition-colors flex-shrink-0"
@@ -555,6 +657,11 @@ export default function CartaManager() {
                                 placeholder="Descripción (opcional)"
                                 className="w-full px-3 py-2.5 rounded-xl border border-stone-200 text-sm outline-none focus:border-stone-400"
                               />
+                              <DietarySelector
+                                size="sm"
+                                value={newItem.tags}
+                                onChange={tags => setNewItem(f => ({ ...f, tags }))}
+                              />
                               <div className="flex gap-2">
                                 <div className="relative">
                                   <span className="absolute left-3 top-1/2 -translate-y-1/2 text-stone-400 text-sm">$</span>
@@ -574,7 +681,7 @@ export default function CartaManager() {
                                   Agregar
                                 </button>
                                 <button
-                                  onClick={() => { setAddingItemTo(null); setNewItem({ name: "", description: "", price: "" }) }}
+                                  onClick={() => { setAddingItemTo(null); setNewItem({ name: "", description: "", price: "", tags: [] }) }}
                                   className="px-3 py-2.5 rounded-xl text-sm text-stone-500 hover:bg-stone-100"
                                 >
                                   <X size={16} />
@@ -615,7 +722,7 @@ export default function CartaManager() {
               </button>
             </div>
           ) : (
-            <PdfUpload onChange={handlePdfChange} />
+            <PdfUpload onChange={handlePdfChange} pathPrefix={businessId} />
           )}
         </div>
       )}

@@ -4,6 +4,7 @@ import { useState, useEffect } from "react"
 import { createClient } from "@/lib/supabase/client"
 import { Plus, Trash2, Eye, EyeOff } from "lucide-react"
 import ImageUpload from "@/components/ui/ImageUpload"
+import { hoyAR, sumarDias } from "@/lib/utils/fechas"
 
 interface DailyMenuItem {
   id?: string
@@ -25,7 +26,7 @@ export default function MenuDelDia() {
   const [error, setError] = useState<string | null>(null)
   const [success, setSuccess] = useState<string | null>(null)
 
-  const today = new Date().toISOString().split("T")[0]
+  const today = hoyAR()
   const todayLabel = new Date().toLocaleDateString("es-AR", {
     weekday: "long", day: "numeric", month: "long"
   })
@@ -67,9 +68,7 @@ export default function MenuDelDia() {
       }
 
       // Menú de ayer para precargar
-      const yesterday = new Date()
-      yesterday.setDate(yesterday.getDate() - 1)
-      const yesterdayStr = yesterday.toISOString().split("T")[0]
+      const yesterdayStr = sumarDias(hoyAR(), -1)
 
       const { data: yesterdayMenu } = await supabase
         .from("daily_menus")
@@ -275,6 +274,7 @@ export default function MenuDelDia() {
                 value={item.image_url}
                 onChange={(url) => updateItem(index, "image_url", url)}
                 folder="menu-items"
+                pathPrefix={businessId}
                 label=""
               />
             </div>

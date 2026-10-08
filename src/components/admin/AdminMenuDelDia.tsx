@@ -4,6 +4,7 @@ import { useState, useEffect } from "react"
 import { createClient } from "@/lib/supabase/client"
 import { Plus, Trash2, Eye, EyeOff, ArrowLeft } from "lucide-react"
 import { useRouter } from "next/navigation"
+import { hoyAR, sumarDias } from "@/lib/utils/fechas"
 
 interface DailyMenuItem {
   id?: string
@@ -29,7 +30,7 @@ export default function AdminMenuDelDia({ businessId }: Props) {
   const [error, setError] = useState<string | null>(null)
   const [success, setSuccess] = useState<string | null>(null)
 
-  const today = new Date().toISOString().split("T")[0]
+  const today = hoyAR()
   const todayLabel = new Date().toLocaleDateString("es-AR", {
     weekday: "long", day: "numeric", month: "long"
   })
@@ -65,13 +66,11 @@ export default function AdminMenuDelDia({ businessId }: Props) {
         })))
       }
 
-      const yesterday = new Date()
-      yesterday.setDate(yesterday.getDate() - 1)
       const { data: yesterdayMenu } = await supabase
         .from("daily_menus")
         .select("*, daily_menu_items(*)")
         .eq("business_id", businessId)
-        .eq("date", yesterday.toISOString().split("T")[0])
+        .eq("date", sumarDias(hoyAR(), -1))
         .single()
 
       if (yesterdayMenu) {

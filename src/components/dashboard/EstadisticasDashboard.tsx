@@ -74,12 +74,13 @@ export default function EstadisticasDashboard() {
           .gte("created_at", startOfMonth)
           .neq("status", "cancelled"),
 
+        // Se filtra en el cliente: 'cancelled' no es un estado de reserva y comparar
+        // contra un valor inexistente del enum hace fallar la consulta (el total quedaba en 0)
         supabase
           .from("reservations")
-          .select("id", { count: "exact", head: true })
+          .select("status")
           .eq("business_id", biz.id)
-          .gte("created_at", startOfMonth)
-          .neq("status", "cancelled"),
+          .gte("created_at", startOfMonth),
 
         supabase
           .from("business_leads")
@@ -95,7 +96,7 @@ export default function EstadisticasDashboard() {
         totalViews: biz.total_views ?? 0,
         ordersMonth: orders.length,
         revenueMonth: orders.reduce((sum, o) => sum + (o.total ?? 0), 0),
-        reservasMonth: reservasRes.count ?? 0,
+        reservasMonth: (reservasRes.data ?? []).filter(r => !["rejected", "cancelled", "no_show"].includes(r.status)).length,
         leadsWhatsapp: leads.filter(l => l.type === "whatsapp").length,
         leadsPhone: leads.filter(l => l.type === "phone").length,
         leadsReserva: leads.filter(l => l.type === "reserva").length,

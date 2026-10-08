@@ -3,18 +3,25 @@
 import { useState, useEffect, useCallback } from "react"
 import { createClient } from "@/lib/supabase/client"
 import { motion, AnimatePresence } from "framer-motion"
-import { CalendarDays, Clock, Users, CheckCircle, XCircle, RefreshCw } from "lucide-react"
+import { CalendarDays, Clock, Users, CheckCircle, XCircle, RefreshCw, UserX } from "lucide-react"
 import { SkeletonList } from "@/components/ui/Skeleton"
 import { useBusinessDashboard } from "@/lib/context/BusinessDashboardContext"
+import { normalizeArgPhone } from "@/lib/phone"
+import { hoyAR, sumarDias } from "@/lib/utils/fechas"
 
 interface Reservation {
   id: string
   date: string
   time: string
   party_size: number
-  status: "pending" | "confirmed" | "cancelled"
+  // Enum reservation_status de la base
+  status: "pending" | "confirmed" | "rejected" | "completed" | "no_show"
   notes: string | null
   created_at: string
+  // Reservas hechas con crear_reserva (con o sin cuenta)
+  customer_name: string | null
+  customer_phone: string | null
+  // Reservas viejas con cuenta: datos del perfil (si la RLS de profiles lo permite)
   profiles: {
     full_name: string | null
     phone: string | null
@@ -32,12 +39,44 @@ const STATUS_CONFIG = {
     color: "bg-green-100 text-green-700",
     icon: CheckCircle,
   },
-  cancelled: {
-    label: "Cancelada",
+  rejected: {
+    label: "Rechazada",
     color: "bg-red-100 text-red-500",
     icon: XCircle,
   },
+  completed: {
+    label: "Completada",
+    color: "bg-stone-100 text-stone-500",
+    icon: CheckCircle,
+  },
+  no_show: {
+    label: "No se presentó",
+    color: "bg-stone-100 text-stone-500",
+    icon: UserX,
+  },
 }
+
+type ReservationStatus = Reservation["status"]
+
+// Acciones posibles desde cada estado
+const STATUS_ACTIONS: Record<ReservationStatus, { to: ReservationStatus; label: string; tone: "primary" | "secondary" | "danger" }[]> = {
+  pending: [
+    { to: "confirmed", label: "Confirmar", tone: "primary" },
+    { to: "rejected", label: "Rechazar", tone: "danger" },
+  ],
+  confirmed: [
+    { to: "completed", label: "Completada", tone: "primary" },
+    { to: "no_show", label: "No se presentó", tone: "secondary" },
+  ],
+  rejected: [],
+  completed: [],
+  no_show: [],
+}
+
+const ACTIVE_STATUSES: ReservationStatus[] = ["pending", "confirmed"]
+
+const customerName = (r: Reservation) => r.customer_name || r.profiles?.full_name || "Cliente"
+const customerPhone = (r: Reservation) => r.customer_phone || r.profiles?.phone || null
 
 const DAYS = ["Dom", "Lun", "Mar", "Mié", "Jue", "Vie", "Sáb"]
 const MONTHS = ["ene", "feb", "mar", "abr", "may", "jun", "jul", "ago", "sep", "oct", "nov", "dic"]
@@ -50,6 +89,7 @@ export default function ReservasDashboard() {
   const [filter, setFilter] = useState<string>("upcoming")
   const [expandedRes, setExpandedRes] = useState<string | null>(null)
   const [updatingStatus, setUpdatingStatus] = useState<string | null>(null)
+  const [updateError, setUpdateError] = useState<{ resId: string; text: string } | null>(null)
 
   const fetchReservations = useCallback(async (bizId: string) => {
     const supabase = createClient()
@@ -65,8 +105,11 @@ export default function ReservasDashboard() {
   useEffect(() => {
     if (!isRestaurante) { setLoading(false); return }
 
+    const supabase = createClient()
+    let channel: ReturnType<typeof supabase.channel> | null = null
+    let cancelled = false
+
     const init = async () => {
-      const supabase = createClient()
       const { data: { user } } = await supabase.auth.getUser()
       if (!user) return
 
@@ -81,9 +124,10 @@ export default function ReservasDashboard() {
       setBusinessId(business.id)
       await fetchReservations(business.id)
       setLoading(false)
+      if (cancelled) return
 
-      const channel = supabase
-        .channel("reservations-channel")
+      channel = supabase
+        .channel(`reservations-${business.id}`)
         .on("postgres_changes", {
           event: "*",
           schema: "public",
@@ -91,31 +135,40 @@ export default function ReservasDashboard() {
           filter: `business_id=eq.${business.id}`,
         }, () => fetchReservations(business.id))
         .subscribe()
-
-      return () => { supabase.removeChannel(channel) }
     }
     init()
+
+    // El cleanup tiene que devolverse desde el efecto (antes cada visita sumaba un canal)
+    return () => {
+      cancelled = true
+      if (channel) supabase.removeChannel(channel)
+    }
   }, [fetchReservations, isRestaurante])
 
-  const handleUpdateStatus = async (resId: string, newStatus: string) => {
-    setUpdatingStatus(resId)
-    const supabase = createClient()
-    await supabase
+  const handleUpdateStatus = async (res: Reservation, newStatus: ReservationStatus) => {
+    if (newStatus === "rejected" && !confirm(`¿Rechazás la reserva de ${customerName(res)}?`)) return
+    setUpdatingStatus(res.id)
+    setUpdateError(null)
+    // .select() para detectar si la base no actualizó nada (RLS devuelve 0 filas sin error)
+    const { data, error } = await createClient()
       .from("reservations")
       .update({ status: newStatus })
-      .eq("id", resId)
-    setReservations(prev =>
-      prev.map(r => r.id === resId ? { ...r, status: newStatus as Reservation["status"] } : r)
-    )
+      .eq("id", res.id)
+      .select("id")
+    if (error || !data?.length) {
+      setUpdateError({ resId: res.id, text: "No se pudo cambiar el estado. Actualizá e intentá de nuevo." })
+    } else {
+      setReservations(prev => prev.map(r => r.id === res.id ? { ...r, status: newStatus } : r))
+    }
     setUpdatingStatus(null)
   }
 
-  const today = new Date().toISOString().split("T")[0]
+  const today = hoyAR()
 
   const filteredReservations = reservations.filter(r => {
-    if (filter === "upcoming") return r.date >= today && r.status !== "cancelled"
+    if (filter === "upcoming") return r.date >= today && ACTIVE_STATUSES.includes(r.status)
     if (filter === "today") return r.date === today
-    if (filter === "past") return r.date < today || r.status === "cancelled"
+    if (filter === "past") return r.date < today || !ACTIVE_STATUSES.includes(r.status)
     return true
   })
 
@@ -126,7 +179,7 @@ export default function ReservasDashboard() {
   const formatDate = (dateStr: string) => {
     const date = new Date(dateStr + "T00:00:00")
     const isToday = dateStr === today
-    const isTomorrow = dateStr === new Date(Date.now() + 86400000).toISOString().split("T")[0]
+    const isTomorrow = dateStr === sumarDias(today, 1)
     if (isToday) return "Hoy"
     if (isTomorrow) return "Mañana"
     return `${DAYS[date.getDay()]} ${date.getDate()} ${MONTHS[date.getMonth()]}`
@@ -171,7 +224,7 @@ export default function ReservasDashboard() {
         {[
           { key: "upcoming", label: "Próximas" },
           { key: "today", label: "Hoy" },
-          { key: "past", label: "Pasadas" },
+          { key: "past", label: "Historial" },
           { key: "all", label: "Todas" },
         ].map(f => (
           <button
@@ -200,7 +253,8 @@ export default function ReservasDashboard() {
         <div className="space-y-3">
           <AnimatePresence>
             {filteredReservations.map(res => {
-              const config = STATUS_CONFIG[res.status]
+              const config = STATUS_CONFIG[res.status] ?? STATUS_CONFIG.pending
+              const phone = customerPhone(res)
               const StatusIcon = config.icon
               const isExpanded = expandedRes === res.id
               const isPast = res.date < today
@@ -237,7 +291,7 @@ export default function ReservasDashboard() {
 
                     <div className="flex-1 min-w-0">
                       <p className="text-sm font-semibold text-stone-800 truncate">
-                        {res.profiles?.full_name || "Cliente"}
+                        {customerName(res)}
                       </p>
                       <div className="flex items-center gap-3 mt-0.5">
                         <span className="flex items-center gap-1 text-xs text-stone-400">
@@ -284,13 +338,13 @@ export default function ReservasDashboard() {
                                 {res.party_size} {res.party_size === 1 ? "persona" : "personas"}
                               </span>
                             </div>
-                            {res.profiles?.phone && (
+                            {phone && (
                               <a
-                                href={`tel:${res.profiles.phone}`}
+                                href={`tel:${phone}`}
                                 className="flex flex-col gap-0.5 p-3 rounded-xl bg-stone-50 hover:bg-stone-100 transition-colors col-span-2"
                               >
                                 <span className="text-xs text-stone-400">Teléfono</span>
-                                <span className="text-sm font-medium text-stone-700">{res.profiles.phone}</span>
+                                <span className="text-sm font-medium text-stone-700">{phone}</span>
                               </a>
                             )}
                           </div>
@@ -302,44 +356,39 @@ export default function ReservasDashboard() {
                             </div>
                           )}
 
-                          {res.status === "pending" && !isPast && (
-                            <div className="flex gap-2">
-                              <button
-                                onClick={() => handleUpdateStatus(res.id, "confirmed")}
-                                disabled={updatingStatus === res.id}
-                                className="flex-1 py-2.5 rounded-xl text-sm font-medium transition-all disabled:opacity-50"
-                                style={{ background: "#2D4530", color: "white" }}
-                              >
-                                {updatingStatus === res.id ? "..." : "Confirmar"}
-                              </button>
-                              <button
-                                onClick={() => handleUpdateStatus(res.id, "cancelled")}
-                                disabled={updatingStatus === res.id}
-                                className="flex-1 py-2.5 rounded-xl text-sm font-medium transition-all disabled:opacity-50"
-                                style={{ background: "rgba(239,68,68,0.1)", color: "#ef4444", border: "1px solid rgba(239,68,68,0.2)" }}
-                              >
-                                Cancelar
-                              </button>
+                          {STATUS_ACTIONS[res.status].length > 0 && (
+                            <div className="flex flex-wrap gap-2">
+                              {STATUS_ACTIONS[res.status].map(action => (
+                                <button
+                                  key={action.to}
+                                  onClick={() => handleUpdateStatus(res, action.to)}
+                                  disabled={updatingStatus === res.id}
+                                  className="flex-1 min-w-[110px] py-2.5 rounded-xl text-sm font-medium transition-all disabled:opacity-50"
+                                  style={
+                                    action.tone === "danger"
+                                      ? { background: "rgba(239,68,68,0.1)", color: "#ef4444", border: "1px solid rgba(239,68,68,0.2)" }
+                                      : action.tone === "secondary"
+                                      ? { background: "white", color: "#2D4530", border: "1px solid #2D4530" }
+                                      : { background: "#2D4530", color: "white" }
+                                  }
+                                >
+                                  {updatingStatus === res.id ? "..." : action.label}
+                                </button>
+                              ))}
                             </div>
                           )}
-
-                          {res.status === "confirmed" && !isPast && (
-                            <button
-                              onClick={() => handleUpdateStatus(res.id, "cancelled")}
-                              disabled={updatingStatus === res.id}
-                              className="w-full py-2.5 rounded-xl text-sm font-medium transition-all disabled:opacity-50"
-                              style={{ background: "rgba(239,68,68,0.1)", color: "#ef4444", border: "1px solid rgba(239,68,68,0.2)" }}
-                            >
-                              Cancelar reserva
-                            </button>
+                          {updateError?.resId === res.id && (
+                            <p className="text-xs text-red-500">{updateError.text}</p>
                           )}
 
-                          {res.profiles?.phone && (
+                          {phone && (
                             <a
-                              href={`https://wa.me/${res.profiles.phone.replace(/\D/g, "")}?text=${encodeURIComponent(
+                              href={`https://wa.me/${normalizeArgPhone(phone)}?text=${encodeURIComponent(
                                 res.status === "confirmed"
-                                  ? `Hola ${res.profiles.full_name}, tu reserva para el ${formatDate(res.date)} a las ${formatTime(res.time)} está confirmada! Te esperamos 🙌`
-                                  : `Hola ${res.profiles.full_name}, te contactamos por tu reserva del ${formatDate(res.date)}.`
+                                  ? `Hola ${customerName(res)}, tu reserva para el ${formatDate(res.date)} a las ${formatTime(res.time)} está confirmada! Te esperamos 🙌`
+                                  : res.status === "rejected"
+                                  ? `Hola ${customerName(res)}, lamentablemente no podemos tomar tu reserva del ${formatDate(res.date)} a las ${formatTime(res.time)}.`
+                                  : `Hola ${customerName(res)}, te contactamos por tu reserva del ${formatDate(res.date)}.`
                               )}`}
                               target="_blank"
                               rel="noopener noreferrer"

@@ -3,6 +3,8 @@ import { Suspense } from "react"
 import DirectorioDetalle from "@/components/public/DirectorioDetalle"
 import { createClient } from "@/lib/supabase/server"
 import { notFound, redirect } from "next/navigation"
+import { businessProfileUrl } from "@/lib/utils/business"
+import { hoyAR } from "@/lib/utils/fechas"
 
 interface Props {
   params: Promise<{ section: string; slug: string }>
@@ -20,7 +22,7 @@ function buildPromoLabel(promo: { discount_label?: string | null; discount_perce
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params
   const supabase = await createClient()
-  const today = new Date().toISOString().split("T")[0]
+  const today = hoyAR()
 
   const { data: business } = await supabase
     .from("businesses")
@@ -70,7 +72,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 export default async function DirectorioDetallePage({ params }: Props) {
   const { slug, section } = await params
   const supabase = await createClient()
-  const today = new Date().toISOString().split("T")[0]
+  const today = hoyAR()
 
   const { data: business } = await supabase
     .from("businesses")
@@ -89,8 +91,9 @@ export default async function DirectorioDetallePage({ params }: Props) {
   // para mostrar el breadcrumb/back correcto. Si un negocio fue
   // recategorizado, redirigimos a la URL canónica en vez de romper
   // links viejos compartidos con la sección anterior.
+  // Gastronomía va a /negocios/<slug> (los links /directorio/gastronomy/... ya los redirige next.config).
   if (business.section !== section) {
-    redirect(`/directorio/${business.section}/${slug}`)
+    redirect(businessProfileUrl(business.section, slug))
   }
 
   const { data: promotionsData } = await supabase

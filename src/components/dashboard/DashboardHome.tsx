@@ -6,6 +6,7 @@ import { motion } from "framer-motion"
 import { ShoppingBag, CalendarDays, UtensilsCrossed, TrendingUp, Clock, BookOpen, Settings } from "lucide-react"
 import Link from "next/link"
 import { useBusinessDashboard } from "@/lib/context/BusinessDashboardContext"
+import { hoyAR, inicioDelDiaAR } from "@/lib/utils/fechas"
 
 interface Stats {
   ordersToday: number
@@ -24,6 +25,15 @@ interface RecentOrder {
   total: number
   status: string
   created_at: string
+}
+
+// Enum order_status de la base ('completed' = Entregado)
+const ORDER_STATUS_LABELS: Record<string, string> = {
+  pending: "Pendiente",
+  confirmed: "Confirmado",
+  ready: "Listo",
+  completed: "Entregado",
+  cancelled: "Cancelado",
 }
 
 export default function DashboardHome() {
@@ -73,7 +83,7 @@ export default function DashboardHome() {
       setBusinessName(business.name)
       setIsOpen(business.is_open)
 
-      const today = new Date().toISOString().split("T")[0]
+      const today = hoyAR()
 
       if (!isRestaurante) {
         const { data: menu } = await supabase
@@ -89,12 +99,14 @@ export default function DashboardHome() {
       }
 
       const startOfMonth = new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString()
+      // Medianoche en Argentina: con la fecha UTC, desde las 21 h los pedidos del día desaparecían
+      const startOfToday = inicioDelDiaAR()
 
       const { data: ordersToday } = await supabase
         .from("orders")
         .select("id, customer_name, type, total, status, created_at")
         .eq("business_id", business.id)
-        .gte("created_at", today)
+        .gte("created_at", startOfToday)
         .order("created_at", { ascending: false })
 
       const { count: monthCount } = await supabase
@@ -102,6 +114,7 @@ export default function DashboardHome() {
         .select("*", { count: "exact", head: true })
         .eq("business_id", business.id)
         .gte("created_at", startOfMonth)
+        .neq("status", "cancelled")
 
       const { data: reservationsToday } = await supabase
         .from("reservations")
@@ -117,16 +130,17 @@ export default function DashboardHome() {
         .single()
 
       const todayOrders = ordersToday || []
+      const todayValidOrders = todayOrders.filter(o => o.status !== "cancelled")
       const todayReservations = reservationsToday || []
 
       setStats({
-        ordersToday: todayOrders.length,
+        ordersToday: todayValidOrders.length,
         ordersPending: todayOrders.filter(o => o.status === "pending").length,
         reservationsToday: todayReservations.length,
         reservationsPending: todayReservations.filter(r => r.status === "pending").length,
         menuPublished: menu?.is_published || false,
         totalOrdersMonth: monthCount || 0,
-        revenueToday: todayOrders.reduce((sum, o) => sum + (o.total || 0), 0),
+        revenueToday: todayValidOrders.reduce((sum, o) => sum + (o.total || 0), 0),
       })
 
       setRecentOrders(todayOrders.slice(0, 4) as RecentOrder[])
@@ -392,7 +406,7 @@ export default function DashboardHome() {
                   <p className="text-sm font-semibold" style={{ color: "#2D4530" }}>
                     ${order.total.toLocaleString("es-AR")}
                   </p>
-                  <p className="text-xs text-stone-400 mt-0.5 capitalize">{order.status}</p>
+                  <p className="text-xs text-stone-400 mt-0.5">{ORDER_STATUS_LABELS[order.status] ?? order.status}</p>
                 </div>
               </div>
             ))}

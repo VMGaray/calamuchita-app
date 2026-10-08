@@ -17,7 +17,8 @@ interface OrderItem {
 interface Order {
   id: string
   type: "delivery" | "takeaway"
-  status: "pending" | "confirmed" | "ready" | "delivered" | "cancelled"
+  // Enum order_status de la base: 'completed' es "Entregado"
+  status: "pending" | "confirmed" | "ready" | "completed" | "cancelled"
   total: number
   notes: string | null
   customer_name: string | null
@@ -43,7 +44,7 @@ const STATUS_CONFIG = {
     color: "bg-green-100 text-green-700",
     icon: CheckCircle,
   },
-  delivered: {
+  completed: {
     label: "Entregado",
     color: "bg-stone-100 text-stone-500",
     icon: CheckCircle,
@@ -55,18 +56,22 @@ const STATUS_CONFIG = {
   },
 }
 
-const STATUS_FLOW: Record<string, string[]> = {
-  pending: ["confirmed", "cancelled"],
-  confirmed: ["ready", "cancelled"],
-  ready: ["delivered"],
-  delivered: [],
+// Desde cualquier estado activo se puede avanzar un paso, marcar Entregado o Cancelar
+const ACTIVE_STATUSES: Order["status"][] = ["pending", "confirmed", "ready"]
+const DONE_STATUSES: Order["status"][] = ["completed", "cancelled"]
+
+const STATUS_FLOW: Record<Order["status"], Order["status"][]> = {
+  pending: ["confirmed", "completed", "cancelled"],
+  confirmed: ["ready", "completed", "cancelled"],
+  ready: ["completed", "cancelled"],
+  completed: [],
   cancelled: [],
 }
 
 const STATUS_LABELS: Record<string, string> = {
   confirmed: "Confirmar",
   ready: "Marcar listo",
-  delivered: "Marcar entregado",
+  completed: "Entregado",
   cancelled: "Cancelar",
 }
 
@@ -78,6 +83,7 @@ export default function PedidosDashboard() {
   const [filter, setFilter] = useState<string>("active")
   const [expandedOrder, setExpandedOrder] = useState<string | null>(null)
   const [updatingStatus, setUpdatingStatus] = useState<string | null>(null)
+  const [updateError, setUpdateError] = useState<{ orderId: string; text: string } | null>(null)
 
   const fetchOrders = useCallback(async (bizId: string) => {
     const supabase = createClient()
@@ -92,8 +98,11 @@ export default function PedidosDashboard() {
   useEffect(() => {
     if (!isRestaurante) { setLoading(false); return }
 
+    const supabase = createClient()
+    let channel: ReturnType<typeof supabase.channel> | null = null
+    let cancelled = false
+
     const init = async () => {
-      const supabase = createClient()
       const { data: { user } } = await supabase.auth.getUser()
       if (!user) return
 
@@ -108,9 +117,10 @@ export default function PedidosDashboard() {
       setBusinessId(business.id)
       await fetchOrders(business.id)
       setLoading(false)
+      if (cancelled) return
 
-      const channel = supabase
-        .channel("orders-channel")
+      channel = supabase
+        .channel(`orders-${business.id}`)
         .on("postgres_changes", {
           event: "*",
           schema: "public",
@@ -120,28 +130,37 @@ export default function PedidosDashboard() {
           fetchOrders(business.id)
         })
         .subscribe()
-
-      return () => { supabase.removeChannel(channel) }
     }
     init()
+
+    // Antes el cleanup se devolvía desde init() y nunca se ejecutaba: cada visita sumaba un canal
+    return () => {
+      cancelled = true
+      if (channel) supabase.removeChannel(channel)
+    }
   }, [fetchOrders, isRestaurante])
 
-  const handleUpdateStatus = async (orderId: string, newStatus: string) => {
-    setUpdatingStatus(orderId)
-    const supabase = createClient()
-    await supabase
+  const handleUpdateStatus = async (order: Order, newStatus: Order["status"]) => {
+    if (newStatus === "cancelled" && !confirm(`¿Cancelás el pedido de ${order.customer_name || "este cliente"}?`)) return
+    setUpdatingStatus(order.id)
+    setUpdateError(null)
+    // .select() para detectar si la base no actualizó nada (RLS devuelve 0 filas sin error)
+    const { data, error } = await createClient()
       .from("orders")
       .update({ status: newStatus })
-      .eq("id", orderId)
-    setOrders(prev =>
-      prev.map(o => o.id === orderId ? { ...o, status: newStatus as Order["status"] } : o)
-    )
+      .eq("id", order.id)
+      .select("id")
+    if (error || !data?.length) {
+      setUpdateError({ orderId: order.id, text: "No se pudo cambiar el estado. Actualizá e intentá de nuevo." })
+    } else {
+      setOrders(prev => prev.map(o => o.id === order.id ? { ...o, status: newStatus } : o))
+    }
     setUpdatingStatus(null)
   }
 
   const filteredOrders = orders.filter(o => {
-    if (filter === "active") return ["pending", "confirmed", "ready"].includes(o.status)
-    if (filter === "done") return ["delivered", "cancelled"].includes(o.status)
+    if (filter === "active") return ACTIVE_STATUSES.includes(o.status)
+    if (filter === "done") return DONE_STATUSES.includes(o.status)
     return true
   })
 
@@ -193,7 +212,7 @@ export default function PedidosDashboard() {
       <div className="flex gap-2 mb-6">
         {[
           { key: "active", label: "Activos" },
-          { key: "done", label: "Finalizados" },
+          { key: "done", label: "Historial" },
           { key: "all", label: "Todos" },
         ].map(f => (
           <button
@@ -215,14 +234,14 @@ export default function PedidosDashboard() {
         <div className="bg-white rounded-2xl border border-stone-200 p-12 text-center">
           <ShoppingBag size={40} className="mx-auto text-stone-300 mb-3" />
           <p className="text-stone-500 text-sm">
-            {filter === "active" ? "No hay pedidos activos" : "No hay pedidos"}
+            {filter === "active" ? "No hay pedidos activos" : filter === "done" ? "Todavía no hay pedidos en el historial" : "No hay pedidos"}
           </p>
         </div>
       ) : (
         <div className="space-y-3">
           <AnimatePresence>
             {filteredOrders.map(order => {
-              const config = STATUS_CONFIG[order.status]
+              const config = STATUS_CONFIG[order.status] ?? STATUS_CONFIG.pending
               const StatusIcon = config.icon
               const nextStatuses = STATUS_FLOW[order.status]
               const isExpanded = expandedOrder === order.id
@@ -340,16 +359,18 @@ export default function PedidosDashboard() {
                           )}
 
                           {nextStatuses.length > 0 && (
-                            <div className="flex gap-2 pt-1">
+                            <div className="flex flex-wrap gap-2 pt-1">
                               {nextStatuses.map(nextStatus => (
                                 <button
                                   key={nextStatus}
-                                  onClick={() => handleUpdateStatus(order.id, nextStatus)}
+                                  onClick={() => handleUpdateStatus(order, nextStatus)}
                                   disabled={updatingStatus === order.id}
-                                  className="flex-1 py-2.5 rounded-xl text-sm font-medium transition-all disabled:opacity-50"
+                                  className="flex-1 min-w-[96px] py-2.5 rounded-xl text-sm font-medium transition-all disabled:opacity-50"
                                   style={
                                     nextStatus === "cancelled"
                                       ? { background: "rgba(239,68,68,0.1)", color: "#ef4444", border: "1px solid rgba(239,68,68,0.2)" }
+                                      : nextStatus === "completed"
+                                      ? { background: "white", color: "#2D4530", border: "1px solid #2D4530" }
                                       : { background: "#2D4530", color: "white" }
                                   }
                                 >
@@ -357,6 +378,9 @@ export default function PedidosDashboard() {
                                 </button>
                               ))}
                             </div>
+                          )}
+                          {updateError?.orderId === order.id && (
+                            <p className="text-xs text-red-500">{updateError.text}</p>
                           )}
 
                           {order.customer_phone && (

@@ -6,14 +6,18 @@ import { motion, AnimatePresence } from "framer-motion"
 import {
   Phone, AtSign, MapPin, Clock, Truck, ShoppingBag,
   UtensilsCrossed, ArrowLeft, Calendar, Globe,
-  Navigation, ChevronLeft, ChevronRight, X, Users,
+  Navigation, ChevronLeft, ChevronRight, X, Users, CheckCircle,
 } from "lucide-react"
 import Image from "next/image"
 import CartaInteractiva from "@/components/public/CartaInteractiva"
+import { DietaryBadges } from "@/components/ui/DietaryTags"
+import { DIETARY_DISCLAIMER, dietaryOptionsFor } from "@/lib/constants/dietary"
+import { tableServiceLabel } from "@/lib/utils/tableService"
 import { createClient } from "@/lib/supabase/client"
 import { normalizeArgPhone } from "@/lib/phone"
 import { normalizeUrl } from "@/lib/normalizeUrl"
 import { extractYoutubeId } from "@/lib/utils/youtube"
+import { hoyAR } from "@/lib/utils/fechas"
 import PromoCoupon, {
   promoFontVariables,
   sectionToCategoria,
@@ -94,6 +98,9 @@ export default function NegocioDetalle({ business, promotions = [] }: Props) {
   const [lightboxTouchX, setLightboxTouchX] = useState<number | null>(null)
   const [showReserva,    setShowReserva]    = useState(false)
   const [reservaForm,    setReservaForm]    = useState<ReservaForm>(EMPTY_FORM)
+  const [reservaEstado,  setReservaEstado]  = useState<"form" | "enviando" | "ok">("form")
+  const [reservaError,   setReservaError]   = useState<string | null>(null)
+  const [reservaWaLink,  setReservaWaLink]  = useState<string | null>(null)
   const [isDesktop,      setIsDesktop]      = useState(false)
 
   // Detección de breakpoint por JS (no solo CSS) para no montar en el DOM
@@ -141,8 +148,9 @@ export default function NegocioDetalle({ business, promotions = [] }: Props) {
   const hasLinkCarta        = !hasInteractiveCarta && !hasPdfCarta && !!menuLinkUrl
   const hasFotosCarta       = !hasInteractiveCarta && !hasPdfCarta && !hasLinkCarta && (business.menu_photos_urls?.length ?? 0) > 0
   const hasMenu             = hasInteractiveCarta || hasPdfCarta || hasLinkCarta || hasFotosCarta
+  const tableService        = tableServiceLabel(business.charges_table_service, business.table_service_fee)
   const todayMenu = business.daily_menus?.find((m: any) => {
-    const today = new Date().toISOString().split("T")[0]
+    const today = hoyAR()
     return m.date === today && m.is_published
   })
 
@@ -166,21 +174,51 @@ export default function NegocioDetalle({ business, promotions = [] }: Props) {
     }
   }
 
-  const handleEnviarReserva = () => {
+  const cerrarReserva = () => {
+    setShowReserva(false)
+    if (reservaEstado === "ok") {
+      setReservaEstado("form")
+      setReservaWaLink(null)
+      setReservaForm(prev => ({ ...prev, date: "", time: "", notes: "" }))
+    }
+    setReservaError(null)
+  }
+
+  const handleEnviarReserva = async () => {
     recordLead("reserva")
     try { localStorage.setItem(GUEST_KEY, JSON.stringify({ name: reservaForm.name, phone: reservaForm.phone })) } catch (e) { console.error(e) }
-    const fullPhone  = normalizeArgPhone((business.whatsapp || business.phone) || "")
-    const numPeople  = parseInt(reservaForm.people, 10)
-    const labelPeople = isNaN(numPeople) ? "más de 10" : numPeople === 1 ? "1 persona" : `${numPeople} personas`
-    const msg = encodeURIComponent(
-      `🌿 ¡Hola *${business.name}*! 👋\nVengo desde *Calamuchita App* para realizar una solicitud:\n\n` +
-      `📌 *DETALLES DE LA RESERVA:*\n👤 *Cliente:* ${reservaForm.name.trim()}\n📞 *Teléfono:* ${reservaForm.phone.trim()}\n` +
-      `📅 *Fecha:* ${reservaForm.date}\n🕐 *Hora:* ${reservaForm.time} hs\n👥 *Comensales:* ${labelPeople}\n\n` +
-      `📝 *Notas adicionales:*\n${reservaForm.notes.trim() || "Ninguna"}\n\n¡Muchas gracias!`
-    )
-    window.open(`https://wa.me/${fullPhone}?text=${msg}`, "_blank")
-    setShowReserva(false)
-    setReservaForm(prev => ({ ...prev, date: "", time: "", notes: "" }))
+    setReservaEstado("enviando")
+    setReservaError(null)
+
+    // La reserva queda en el panel del local (con o sin cuenta). Ver gastronomia_A5_reservas_crear_reserva.sql
+    const numPeople = parseInt(reservaForm.people, 10)
+    const { error } = await createClient().rpc("crear_reserva", {
+      p_business_id: business.id,
+      p_date: reservaForm.date,
+      p_time: reservaForm.time,
+      p_party_size: numPeople,
+      p_customer_name: reservaForm.name.trim(),
+      p_customer_phone: reservaForm.phone.trim(),
+      p_notes: reservaForm.notes.trim() || null,
+    })
+    if (error) {
+      setReservaEstado("form")
+      // P0001 = mensajes pensados para el vecino (RAISE EXCEPTION de crear_reserva)
+      setReservaError(error.code === "P0001" ? error.message : "No se pudo enviar la reserva. Intentá de nuevo.")
+      return
+    }
+
+    if (waNumber) {
+      const labelPeople = numPeople === 1 ? "1 persona" : `${numPeople} personas`
+      const msg = encodeURIComponent(
+        `🌿 ¡Hola *${business.name}*! 👋\nVengo desde *Calamuchita App* para realizar una solicitud:\n\n` +
+        `📌 *DETALLES DE LA RESERVA:*\n👤 *Cliente:* ${reservaForm.name.trim()}\n📞 *Teléfono:* ${reservaForm.phone.trim()}\n` +
+        `📅 *Fecha:* ${reservaForm.date}\n🕐 *Hora:* ${reservaForm.time} hs\n👥 *Comensales:* ${labelPeople}\n\n` +
+        `📝 *Notas adicionales:*\n${reservaForm.notes.trim() || "Ninguna"}\n\n¡Muchas gracias!`
+      )
+      setReservaWaLink(`https://wa.me/${waNumber}?text=${msg}`)
+    }
+    setReservaEstado("ok")
   }
 
   const reservaValid =
@@ -191,14 +229,17 @@ export default function NegocioDetalle({ business, promotions = [] }: Props) {
 
   const mapsLink =
     business.latitude && business.longitude
-      ? `https://www.google.com/maps/search/?api=1&query=${business.latitude},${business.longitude}`
+      ? `https://www.google.com/maps/dir/?api=1&destination=${business.latitude},${business.longitude}`
       : typeof business.address === "string" && business.address.trim()
-      ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${business.name}, ${business.address}`)}`
+      ? `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(`${business.name}, ${business.address}`)}`
       : null
 
   const photos: string[] =
     Array.isArray(business.business_photos) && business.business_photos.length > 0
-      ? business.business_photos.map((p: { url: string }) => p.url)
+      ? [...business.business_photos]
+          .sort((a: { sort_order: number | null }, b: { sort_order: number | null }) =>
+            (a.sort_order ?? Number.MAX_SAFE_INTEGER) - (b.sort_order ?? Number.MAX_SAFE_INTEGER))
+          .map((p: { url: string }) => p.url)
       : business.cover_url ? [business.cover_url] : []
 
   const coverUrl     = photos[0] || null
@@ -349,7 +390,7 @@ export default function NegocioDetalle({ business, promotions = [] }: Props) {
               <p className="text-[10px] font-black uppercase tracking-[0.22em] mb-2" style={{ color: "rgba(45,69,48,0.42)" }}>
                 Sobre nosotros
               </p>
-              <p className="text-sm leading-relaxed" style={{ color: "rgba(45,69,48,0.72)" }}>
+              <p className="text-sm leading-relaxed whitespace-pre-line" style={{ color: "rgba(45,69,48,0.72)" }}>
                 {business.description}
               </p>
             </div>
@@ -457,6 +498,14 @@ export default function NegocioDetalle({ business, promotions = [] }: Props) {
             </div>
           )}
 
+          {/* ── Opciones alimentarias declaradas por el local ── */}
+          {dietaryOptionsFor(business.dietary_options).length > 0 && (
+            <div className="bg-white/50 rounded-2xl p-4">
+              <DietaryBadges keys={business.dietary_options} />
+              <p className="text-[11px] mt-2" style={{ color: "rgba(45,69,48,0.45)" }}>{DIETARY_DISCLAIMER}</p>
+            </div>
+          )}
+
           {/* ── Botones gastronómicos ── */}
           {business.section === "gastronomy" && (
             <div className="flex flex-wrap gap-3">
@@ -465,18 +514,20 @@ export default function NegocioDetalle({ business, promotions = [] }: Props) {
                 style={{ background: "#2D4530", color: "#E1DBC9" }}>
                 <UtensilsCrossed size={16} /> Ver Carta
               </button>
-              {business.has_table_service && (
-                <button onClick={() => setShowReserva(true)} disabled={!waNumber}
+              {business.accepts_reservations && (
+                <button onClick={() => setShowReserva(true)}
                   className="flex-1 min-w-[110px] flex items-center justify-center gap-2 py-4 rounded-2xl font-bold text-sm shadow-sm transition-all active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed"
                   style={{ background: "#2D4530", color: "#E1DBC9" }}>
                   <Calendar size={16} /> Reservar
                 </button>
               )}
+              {(business.offers_delivery || business.offers_takeaway) && (
               <button onClick={handleHacerPedido} disabled={!hasMenu && !waNumber}
                 className="flex-1 min-w-[110px] flex items-center justify-center gap-2 py-4 rounded-2xl font-bold text-sm shadow-sm transition-all active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed"
                 style={{ background: "#2D4530", color: "#E1DBC9" }}>
                 <ShoppingBag size={16} /> Hacer Pedido
               </button>
+              )}
             </div>
           )}
 
@@ -575,7 +626,7 @@ export default function NegocioDetalle({ business, promotions = [] }: Props) {
           {/* Carta interactiva */}
           {hasInteractiveCarta && (
             <div ref={cartaRef}>
-              <CartaInteractiva categories={business.menu_categories} business={business} />
+              <CartaInteractiva categories={business.menu_categories} business={business} tableService={tableService} />
             </div>
           )}
 
@@ -648,6 +699,11 @@ export default function NegocioDetalle({ business, promotions = [] }: Props) {
                 ))}
               </div>
             </div>
+          )}
+
+          {/* Servicio de mesa para las cartas en PDF, link o fotos (la interactiva lo muestra adentro) */}
+          {tableService && hasMenu && !hasInteractiveCarta && (
+            <p className="text-xs text-center -mt-2" style={{ color: "rgba(45,69,48,0.6)" }}>{tableService}</p>
           )}
 
         </div>
@@ -772,14 +828,32 @@ export default function NegocioDetalle({ business, promotions = [] }: Props) {
       <AnimatePresence>
         {showReserva && (
           <>
-            <motion.div className="fixed inset-0 bg-black/40 z-[200]" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setShowReserva(false)} />
+            <motion.div className="fixed inset-0 bg-black/40 z-[200]" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={cerrarReserva} />
             <motion.div className="fixed inset-x-4 bottom-4 top-4 z-[210] max-w-md mx-auto overflow-y-auto"
               initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }}>
               <div className="bg-white rounded-3xl overflow-hidden shadow-2xl">
                 <div className="px-6 py-4 flex items-center justify-between" style={{ background: "#2D4530" }}>
                   <h2 className="font-bold text-lg" style={{ color: "#E1DBC9" }}>Reservar mesa</h2>
-                  <button onClick={() => setShowReserva(false)} className="text-stone-300 hover:text-white"><X size={22} /></button>
+                  <button onClick={cerrarReserva} className="text-stone-300 hover:text-white"><X size={22} /></button>
                 </div>
+                {reservaEstado === "ok" ? (
+                  <div className="p-6 space-y-4 text-center">
+                    <CheckCircle size={48} className="mx-auto" style={{ color: "#2D4530" }} />
+                    <p className="font-bold text-lg" style={{ color: "#2D4530" }}>¡Pedido de reserva enviado!</p>
+                    <p className="text-sm text-stone-500">
+                      El local lo recibió y te va a confirmar al teléfono que dejaste.
+                      {reservaWaLink && " Si querés, mandales también el detalle por WhatsApp."}
+                    </p>
+                    {reservaWaLink && (
+                      <a href={reservaWaLink} target="_blank" rel="noopener noreferrer"
+                        className="w-full py-3 rounded-xl text-sm font-bold flex items-center justify-center gap-2 text-white"
+                        style={{ background: "#25D366" }}>
+                        <WaIcon size={16} /> Enviar por WhatsApp
+                      </a>
+                    )}
+                    <button onClick={cerrarReserva} className="text-sm underline underline-offset-2 text-stone-500">Cerrar</button>
+                  </div>
+                ) : (
                 <div className="p-6 space-y-4">
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <div>
@@ -794,7 +868,7 @@ export default function NegocioDetalle({ business, promotions = [] }: Props) {
                   <div className="grid grid-cols-2 gap-3">
                     <div>
                       <label className="block text-sm font-medium text-stone-700 mb-1"><Calendar size={12} className="inline mr-1" />Fecha *</label>
-                      <input type="date" value={reservaForm.date} min={new Date().toISOString().split("T")[0]} onChange={e => setReservaForm(p => ({ ...p, date: e.target.value }))} className="w-full px-4 py-2.5 rounded-xl border border-stone-200 text-stone-800 text-sm outline-none focus:ring-2 focus:ring-[#2D4530]/20" />
+                      <input type="date" value={reservaForm.date} min={hoyAR()} onChange={e => setReservaForm(p => ({ ...p, date: e.target.value }))} className="w-full px-4 py-2.5 rounded-xl border border-stone-200 text-stone-800 text-sm outline-none focus:ring-2 focus:ring-[#2D4530]/20" />
                     </div>
                     <div>
                       <label className="block text-sm font-medium text-stone-700 mb-1"><Clock size={12} className="inline mr-1" />Hora *</label>
@@ -804,20 +878,24 @@ export default function NegocioDetalle({ business, promotions = [] }: Props) {
                   <div>
                     <label className="block text-sm font-medium text-stone-700 mb-1"><Users size={12} className="inline mr-1" />Personas *</label>
                     <select value={reservaForm.people} onChange={e => setReservaForm(p => ({ ...p, people: e.target.value }))} className="w-full px-4 py-2.5 rounded-xl border border-stone-200 text-stone-800 text-sm outline-none bg-white">
-                      {[1,2,3,4,5,6,7,8,9,10].map(n => <option key={n} value={n}>{n} {n === 1 ? "persona" : "personas"}</option>)}
-                      <option value="más de 10">Más de 10</option>
+                      {Array.from({ length: 20 }, (_, i) => i + 1).map(n => <option key={n} value={n}>{n} {n === 1 ? "persona" : "personas"}</option>)}
                     </select>
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-stone-700 mb-1">Aclaraciones <span className="text-stone-400 font-normal">(opcional)</span></label>
                     <textarea value={reservaForm.notes} onChange={e => setReservaForm(p => ({ ...p, notes: e.target.value }))} placeholder="Ej: ventana, celíaco, silla para bebé..." rows={2} className="w-full px-4 py-2.5 rounded-xl border border-stone-200 text-stone-800 text-sm outline-none resize-none" />
                   </div>
-                  <button onClick={handleEnviarReserva} disabled={!reservaValid}
+                  <p className="text-xs text-stone-400">Para grupos de más de 20 personas, contalo en las aclaraciones.</p>
+                  {reservaError && (
+                    <p className="text-xs px-3 py-2 rounded-lg bg-red-50 text-red-600">{reservaError}</p>
+                  )}
+                  <button onClick={handleEnviarReserva} disabled={!reservaValid || reservaEstado === "enviando"}
                     className="w-full py-3 rounded-xl text-sm font-bold transition-all disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center gap-2 text-white active:scale-95"
-                    style={{ background: "#25D366" }}>
-                    <WaIcon size={16} /> Enviar reserva por WhatsApp
+                    style={{ background: "#2D4530" }}>
+                    <Calendar size={16} /> {reservaEstado === "enviando" ? "Enviando..." : "Enviar reserva"}
                   </button>
                 </div>
+                )}
               </div>
             </motion.div>
           </>

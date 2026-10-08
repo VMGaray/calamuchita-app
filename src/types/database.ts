@@ -61,6 +61,9 @@ export interface Business {
   offers_delivery: boolean
   offers_takeaway: boolean
   offers_dine_in: boolean
+  dietary_options: string[]
+  charges_table_service: boolean | null
+  table_service_fee: number | null
   status: BusinessStatus
   group_name: string | null
   group_id: string | null
@@ -107,6 +110,7 @@ export interface MenuItem {
   image_url: string | null
   is_available: boolean
   sort_order: number
+  dietary_tags: string[]
   created_at: string
 }
 
@@ -130,13 +134,16 @@ export interface DailyMenuItem {
 export interface Order {
   id: string
   business_id: string
-  customer_id: string
+  customer_id: string | null    // null = pedido sin cuenta (crear_pedido)
   type: OrderType
   status: OrderStatus
   scheduled_time: string | null
   estimated_time: number | null
   notes: string | null
   total: number
+  customer_name: string | null
+  customer_phone: string | null
+  delivery_address: string | null
   created_at: string
 }
 
@@ -151,12 +158,14 @@ export interface OrderItem {
 export interface Reservation {
   id: string
   business_id: string
-  customer_id: string
+  customer_id: string | null    // null = reserva sin cuenta (crear_reserva)
   date: string
   time: string
   party_size: number
   status: ReservationStatus
   notes: string | null
+  customer_name: string | null
+  customer_phone: string | null
   created_at: string
 }
 

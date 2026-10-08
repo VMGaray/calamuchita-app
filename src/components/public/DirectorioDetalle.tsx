@@ -15,6 +15,7 @@ import { normalizeUrl } from "@/lib/normalizeUrl"
 import { extractYoutubeId } from "@/lib/utils/youtube"
 import AnimateIn from "@/components/ui/AnimateIn"
 import BackButton from "@/components/ui/BackButton"
+import { businessProfileUrl } from "@/lib/utils/business"
 
 function WaIcon({ size = 14 }: { size?: number }) {
   return (
@@ -392,7 +393,7 @@ export default function DirectorioDetalle({ business, section, promotions = [] }
             {business.description && (
               <div className={`${cardClass} min-h-[200px]`}>
                 <p className="text-xs font-semibold uppercase tracking-wider text-stone-400 mb-2">Sobre nosotros</p>
-                <p className="text-sm text-stone-600 leading-relaxed">{business.description}</p>
+                <p className="text-sm text-stone-600 leading-relaxed whitespace-pre-line">{business.description}</p>
               </div>
             )}
 
@@ -506,7 +507,7 @@ export default function DirectorioDetalle({ business, section, promotions = [] }
                 {groupMembers.map((member) => (
                   <a
                     key={member.id}
-                    href={`/directorio/${member.section}/${member.slug}`}
+                    href={businessProfileUrl(member.section, member.slug)}
                     className="rounded-2xl border border-stone-100 p-3 flex flex-col items-center text-center gap-2 hover:shadow-sm transition-shadow"
                     style={{ background: "#FAFAF9" }}
                   >

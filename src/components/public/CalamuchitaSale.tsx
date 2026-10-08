@@ -5,6 +5,7 @@ import { motion } from "framer-motion"
 import { Share2, ArrowRight, Tag, Calendar, ChevronLeft, ChevronRight } from "lucide-react"
 import Link from "next/link"
 import AnimateIn from "@/components/ui/AnimateIn"
+import { businessProfileUrl } from "@/lib/utils/business"
 
 type PromoBusiness = {
   id: string
@@ -117,7 +118,7 @@ function TicketCard({
           </button>
           {biz && (
             <Link
-              href={`/negocios/${biz.slug}`}
+              href={businessProfileUrl(biz.section, biz.slug)}
               className="flex items-center gap-1 text-xs font-semibold transition-opacity hover:opacity-70"
               style={{ color: "#B85C38" }}
             >
@@ -165,7 +166,7 @@ export default function CalamuchitaSale({
   const handleShare = async (promo: Promotion) => {
     const biz = promo.businesses
     if (!biz) return
-    const url = `${window.location.origin}/negocios/${biz.slug}`
+    const url = `${window.location.origin}${businessProfileUrl(biz.section, biz.slug)}`
     const label =
       promo.discount_label ||
       (promo.discount_percentage ? `${promo.discount_percentage}% OFF` : "una oferta especial")

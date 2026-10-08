@@ -7,6 +7,8 @@ import LocalidadSelectorWidget from "@/components/public/LocalidadSelectorWidget
 import { createClient } from "@/lib/supabase/server"
 import type { Novedad } from "@/types/database"
 import { sectionToCategoria, buildPromoDiscount, formatValidUntil, type Promo } from "@/lib/promos"
+import { businessProfileUrl } from "@/lib/utils/business"
+import { hoyAR } from "@/lib/utils/fechas"
 
 const NOVEDADES_LIMIT = 5
 
@@ -57,7 +59,7 @@ function mapPromotionToPromo(promo: Promotion): Promo | null {
     descuento_label,
     descripcion: promo.description,
     validez: formatValidUntil(promo.valid_until),
-    link: `/negocios/${biz.slug}`,
+    link: businessProfileUrl(biz.section, biz.slug),
   }
 }
 
@@ -73,7 +75,7 @@ export type EditorialPost = {
 
 export default async function HomePage() {
   const supabase = await createClient()
-  const today = new Date().toISOString().split("T")[0]
+  const today = hoyAR()
 
   const [
     { data: featuredData },
