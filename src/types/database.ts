@@ -37,6 +37,7 @@ export interface Business {
   slug: string
   description: string | null
   section: BusinessSection
+  extra_sections: BusinessSection[]  // otras secciones donde también aparece listado
   type: BusinessType
   category: BusinessCategory | null
   categories: string[]          // ← nuevo

@@ -16,7 +16,7 @@ function fetchActiveGroupSlugs(): Promise<Set<string>> {
         .from("businesses")
         .select("categories, subcategory")
         .eq("status", "active")
-        .eq("section", "services")
+        .or("section.eq.services,extra_sections.cs.{services}")
       const slugs = new Set<string>()
       for (const b of data ?? []) {
         const groups = groupSlugsForRubros(businessRubros(b))

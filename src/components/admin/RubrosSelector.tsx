@@ -8,6 +8,8 @@ interface Props {
   onToggle: (rubro: string) => void
   /** Agrupa los chips bajo los grupos de Servicios */
   grouped?: boolean
+  /** Rubros que no cuentan como "fuera de la lista" (p. ej. los de otras secciones del negocio) */
+  legacyIgnore?: string[]
 }
 
 function Chip({ label, selected, onClick }: { label: string; selected: boolean; onClick: () => void }) {
@@ -28,10 +30,10 @@ function Chip({ label, selected, onClick }: { label: string; selected: boolean; 
 
 // Chips de rubros con multiselección. En Servicios se muestran agrupados;
 // un rubro puede elegirse junto a otros del mismo grupo o de grupos distintos.
-export default function RubrosSelector({ options, selected, onToggle, grouped = false }: Props) {
+export default function RubrosSelector({ options, selected, onToggle, grouped = false, legacyIgnore = [] }: Props) {
   // Rubros asignados que ya no están en la lista (p. ej. un rubro dado de baja):
   // se muestran marcados para que no se pierdan en silencio al guardar.
-  const legacy = selected.filter(s => !options.includes(s))
+  const legacy = selected.filter(s => !options.includes(s) && !legacyIgnore.includes(s))
 
   const legacyBlock = legacy.length > 0 && (
     <div className="mt-3">

@@ -273,7 +273,7 @@ export default async function BuscarPage({ searchParams }: Props) {
       .from("businesses")
       .select("id, name, slug, section, subcategory, address, logo_url, cover_url, description, is_open, phone, whatsapp, business_hours(day_of_week, opens_at, closes_at, is_closed)")
       .eq("status", "active")
-      .eq("section", "health")
+      .or("section.eq.health,extra_sections.cs.{health}")
       .overlaps("medical_specialties", targetGroups)
 
     for (const biz of specialtyData ?? []) {

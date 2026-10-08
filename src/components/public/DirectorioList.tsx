@@ -296,7 +296,9 @@ export default function DirectorioList({ section, filters }: Props) {
         .from("businesses")
         .select("id, name, slug, subcategory, categories, address, pueblo, phone, whatsapp, instagram, logo_url, cover_url, description, is_premium, is_featured_rubro, medical_specialties")
         .eq("status", "active")
-        .eq("section", section)
+        // Sección principal o una de las secciones donde también aparece.
+        // section viene de la URL: solo letras, para no alterar el filtro or().
+        .or(/^[a-z]+$/.test(section) ? `section.eq.${section},extra_sections.cs.{${section}}` : "id.is.null")
 
       if (serverCatLabel) {
         query = query.or(`subcategory.ilike.%${serverCatLabel}%,categories.cs.{"${serverCatLabel}"}`)

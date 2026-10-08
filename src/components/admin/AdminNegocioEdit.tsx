@@ -6,6 +6,7 @@ import { createClient } from "@/lib/supabase/client"
 import { BusinessSection, BusinessCategory } from "@/types/database"
 import { MASTER_CATEGORIES } from "@/lib/constants/categories"
 import RubrosSelector from "@/components/admin/RubrosSelector"
+import SeccionesExtra, { limpiarSeccionesExtra, rubroPrincipal, rubrosDeSeccion } from "@/components/admin/SeccionesExtra"
 import ImageUpload from "@/components/ui/ImageUpload"
 import PdfUpload from "@/components/ui/PdfUpload"
 import GaleriaFotos from "@/components/ui/GaleriaFotos"
@@ -123,6 +124,7 @@ export default function AdminNegocioEdit({ id }: Props) {
     slug: "",
     description: "",
     section: "services" as BusinessSection,
+    extra_sections: [] as BusinessSection[],
     subcategory: "",
     address: "",
     pueblo: "",
@@ -167,6 +169,7 @@ export default function AdminNegocioEdit({ id }: Props) {
           slug: business.slug || "",
           description: business.description || "",
           section: business.section || "services",
+          extra_sections: business.extra_sections || [],
           subcategory: business.subcategory || "",
           address: addressParts[0]?.trim() || "",
           pueblo: business.pueblo || addressParts[1]?.trim() || "",
@@ -231,6 +234,9 @@ export default function AdminNegocioEdit({ id }: Props) {
     )
   }
 
+  const inSection = (s: BusinessSection) =>
+    form.section === s || limpiarSeccionesExtra(form.section, form.extra_sections).includes(s)
+
   const handleSave = async () => {
     if (!form.name) { setError("El nombre es obligatorio"); return }
     setSaving(true)
@@ -242,7 +248,7 @@ export default function AdminNegocioEdit({ id }: Props) {
     const manualCoords = parseManualCoords(coordsInput)
     const coords = manualCoords ?? (fullAddress ? await geocodeAddress(fullAddress) : null)
 
-    const hasProfesionales = form.section === "services" && selectedCategories.includes("Profesionales")
+    const hasProfesionales = inSection("services") && selectedCategories.includes("Profesionales")
     const updatedCategories = hasProfesionales && professionalType
       ? [...new Set([...selectedCategories, professionalType])]
       : selectedCategories.filter(Boolean)
@@ -254,8 +260,11 @@ export default function AdminNegocioEdit({ id }: Props) {
         slug: form.slug,
         description: form.description || null,
         section: form.section,
-        category: form.section === "gastronomy" ? (updatedCategories[0] as BusinessCategory) || "other" : null,
-        subcategory: form.section === "gastronomy" ? null : (updatedCategories[0] || null),
+        extra_sections: limpiarSeccionesExtra(form.section, form.extra_sections),
+        category: form.section === "gastronomy"
+          ? (updatedCategories.find(c => gastronomyCategories.some(g => g.value === c)) as BusinessCategory) || "other"
+          : null,
+        subcategory: form.section === "gastronomy" ? null : rubroPrincipal(form.section, updatedCategories),
         categories: updatedCategories,
         address: fullAddress || null,
         pueblo: form.pueblo || null,
@@ -279,8 +288,8 @@ export default function AdminNegocioEdit({ id }: Props) {
         payment_methods: form.payment_methods,
         is_premium: form.is_premium,
         is_featured_rubro: form.is_featured_rubro,
-        has_24h_guard: form.section === "health" ? form.has_24h_guard : false,
-        appointment_system: form.section === "health" ? form.appointment_system || null : null,
+        has_24h_guard: inSection("health") ? form.has_24h_guard : false,
+        appointment_system: inSection("health") ? form.appointment_system || null : null,
         group_name: form.group_name || null,
         group_id: form.group_id || null,
       })
@@ -413,28 +422,8 @@ export default function AdminNegocioEdit({ id }: Props) {
         selected={selectedCategories}
         onToggle={toggleCategory}
         grouped={form.section === "services"}
+        legacyIgnore={form.extra_sections.flatMap(rubrosDeSeccion)}
       />
-    )}
-    {form.section === "services" && selectedCategories.includes("Profesionales") && (
-      <div className="mt-3 p-4 bg-violet-50 rounded-xl border border-violet-100">
-        <label className="block text-xs font-semibold text-violet-700 mb-2">Tipo de profesional</label>
-        <div className="flex gap-2 flex-wrap">
-          {PROFESIONALES_OPTIONS.map(opt => (
-            <button
-              key={opt}
-              type="button"
-              onClick={() => setProfessionalType(prev => prev === opt ? "" : opt)}
-              className={`py-1.5 px-3 rounded-xl text-xs font-medium border transition-colors ${
-                professionalType === opt
-                  ? "bg-violet-600 text-white border-violet-600"
-                  : "bg-white text-stone-600 border-stone-200 hover:border-violet-300"
-              }`}
-            >
-              {opt}
-            </button>
-          ))}
-        </div>
-      </div>
     )}
     <input
       type="text"
@@ -469,6 +458,38 @@ export default function AdminNegocioEdit({ id }: Props) {
     )}
   </div>
 )}
+
+          <SeccionesExtra
+            principal={form.section}
+            extra={form.extra_sections}
+            categories={selectedCategories}
+            onChange={(extra_sections, categories) => {
+              setForm(prev => ({ ...prev, extra_sections }))
+              setSelectedCategories(categories)
+            }}
+          />
+
+          {inSection("services") && selectedCategories.includes("Profesionales") && (
+            <div className="mt-3 p-4 bg-violet-50 rounded-xl border border-violet-100">
+              <label className="block text-xs font-semibold text-violet-700 mb-2">Tipo de profesional</label>
+              <div className="flex gap-2 flex-wrap">
+                {PROFESIONALES_OPTIONS.map(opt => (
+                  <button
+                    key={opt}
+                    type="button"
+                    onClick={() => setProfessionalType(prev => prev === opt ? "" : opt)}
+                    className={`py-1.5 px-3 rounded-xl text-xs font-medium border transition-colors ${
+                      professionalType === opt
+                        ? "bg-violet-600 text-white border-violet-600"
+                        : "bg-white text-stone-600 border-stone-200 hover:border-violet-300"
+                    }`}
+                  >
+                    {opt}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Info básica */}
@@ -823,7 +844,7 @@ export default function AdminNegocioEdit({ id }: Props) {
         </div>
 
         {/* Salud — guardia y turnos */}
-        {form.section === "health" && (
+        {inSection("health") && (
           <div className="bg-white rounded-2xl border border-stone-200 p-6 space-y-4">
             <h2 className="text-sm font-medium text-stone-700">Guardia y turnos</h2>
             <label className="flex items-center gap-3 cursor-pointer">
