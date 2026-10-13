@@ -107,11 +107,13 @@ const SUBCAT_LABELS: Record<string, string> = {
   excursiones:   "Excursiones",
   // commerce
   "aberturas-aluminio": "Aberturas de aluminio",
+  "elementos-seguridad": "Elementos de seguridad",
   "fabrica-espumantes": "Fábrica de Espumantes",
   forrajeria:    "Forrajería",
   hogar:         "Hogar",
   imprenta:      "Imprenta",
   indumentaria:  "Indumentaria",
+  matafuegos:    "Matafuegos",
   mascotas:      "Mascotas",
   ninos:         "Niños",
   "pagos-agencias": "Pagos y Agencias",
