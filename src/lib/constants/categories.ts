@@ -7,7 +7,7 @@ import {
   Utensils, Coffee, Beer, Wine, ShoppingBag, Clock, Wheat, Pizza, Beef,
   Truck, Mountain, Printer, CreditCard, Briefcase, Gift,
   Dumbbell, PersonStanding, Timer, Wind, Tag, Video, ShieldCheck, Cog, Snowflake, Bone, Sofa, Target, FileText, Fence, Cake, Sun, PenTool, Brush, Frame, PartyPopper, Flower2, Footprints, PawPrint, Sprout,
-  Balloon, HousePlug, Trees, Laptop, LayoutGrid
+  Balloon, HousePlug, Trees, Laptop, LayoutGrid, FireExtinguisher
 } from "lucide-react"
 import type { LucideIcon } from "lucide-react"
 
@@ -90,12 +90,14 @@ export const MASTER_CATEGORIES = {
       { label: "Aberturas de aluminio", icon: Frame, bg: "bg-slate-50", color: "text-slate-600" },
       { label: "Accesorios", icon: Gem, bg: "bg-pink-50", color: "text-pink-600" },
       { label: "Cuero Argentino", icon: Briefcase, bg: "bg-stone-50", color: "text-stone-600" }, // <-- Ubicado según la C
+      { label: "Elementos de seguridad", icon: HardHat, bg: "bg-stone-50", color: "text-stone-600" },
       { label: "Fábrica de Espumantes", icon: Wine, bg: "bg-rose-50", color: "text-rose-700" },
       { label: "Forrajería", icon: Package, bg: "bg-amber-50", color: "text-amber-700" },
       { label: "Hogar", icon: Armchair, bg: "bg-orange-50", color: "text-orange-700" },
       { label: "Imprenta", icon: Printer, bg: "bg-slate-50", color: "text-slate-600" },
       { label: "Indumentaria", icon: Shirt, bg: "bg-pink-50", color: "text-pink-600" },
       { label: "Inmobiliarias", icon: Building, bg: "bg-blue-50", color: "text-blue-600" },
+      { label: "Matafuegos", icon: FireExtinguisher, bg: "bg-stone-50", color: "text-stone-600" },
       { label: "Mascotas", icon: Dog, bg: "bg-amber-50", color: "text-amber-600" },
       { label: "Niños", icon: Baby, bg: "bg-indigo-50", color: "text-indigo-600" },
       { label: "Pagos y Agencias", icon: CreditCard, bg: "bg-stone-50", color: "text-stone-600" },
