@@ -13,6 +13,9 @@ import { isValidYoutubeUrl } from "@/lib/utils/youtube"
 import { normalizeUrl } from "@/lib/normalizeUrl"
 import HorariosEditor, { HorarioDay, expandHorariosForSave, defaultHorarios } from "@/components/ui/HorariosEditor"
 
+// Fotos de galería que se cargan en el alta (después se editan con GaleriaFotos, tope 8)
+const FOTOS_ALTA = 5
+
 const sections: { value: BusinessSection; label: string }[] = [
   { value: "gastronomy", label: "Gastronomía" },
   { value: "services",   label: "Servicios" },
@@ -137,7 +140,7 @@ export default function AdminNegocioForm() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [horarios, setHorarios] = useState<HorarioDay[]>(defaultHorarios)
-  const [galleryPhotos, setGalleryPhotos] = useState<(string | null)[]>([null, null, null])
+  const [galleryPhotos, setGalleryPhotos] = useState<(string | null)[]>(Array(FOTOS_ALTA).fill(null))
   const [branches, setBranches] = useState<Array<{ address: string; pueblo: string }>>([])
   const [professionalType, setProfessionalType] = useState("")
   const [coordsInput, setCoordsInput] = useState("")
@@ -831,9 +834,9 @@ export default function AdminNegocioForm() {
               folder="covers" label="Foto de portada" />
           </div>
           <div>
-            <p className="text-sm font-medium text-stone-700 mb-1">Fotos adicionales <span className="text-stone-400 font-normal">(carrusel en el detalle — hasta 3)</span></p>
+            <p className="text-sm font-medium text-stone-700 mb-1">Fotos adicionales <span className="text-stone-400 font-normal">(carrusel en el detalle — hasta {FOTOS_ALTA})</span></p>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-3">
-              {[0, 1, 2].map(i => (
+              {Array.from({ length: FOTOS_ALTA }, (_, i) => (
                 <ImageUpload
                   key={i}
                   value={galleryPhotos[i]}
