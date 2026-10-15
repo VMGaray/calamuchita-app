@@ -5,6 +5,7 @@ import { createClient } from "@/lib/supabase/server"
 import { notFound, redirect } from "next/navigation"
 import { businessProfileUrl } from "@/lib/utils/business"
 import { hoyAR } from "@/lib/utils/fechas"
+import { promoHeadline, PROMO_VALUE_COLUMNS } from "@/lib/promos"
 
 interface Props {
   params: Promise<{ section: string; slug: string }>
@@ -12,12 +13,6 @@ interface Props {
 
 const DEFAULT_IMAGE = "/valle.jpg"
 
-function buildPromoLabel(promo: { discount_label?: string | null; discount_percentage?: number | null } | null) {
-  if (!promo) return null
-  if (promo.discount_label) return promo.discount_label
-  if (promo.discount_percentage) return `${promo.discount_percentage}% OFF`
-  return null
-}
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params
@@ -28,7 +23,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     .from("businesses")
     .select(`
       name, description, cover_url,
-      promotions (discount_label, discount_percentage, valid_until, is_active)
+      promotions (${PROMO_VALUE_COLUMNS}, valid_until, is_active)
     `)
     .eq("slug", slug)
     .eq("status", "active")
@@ -43,7 +38,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
   const promos: any[] = (business as any).promotions ?? []
   const activePromo = promos.find((p) => p.is_active && p.valid_until >= today) ?? null
-  const promoLabel = buildPromoLabel(activePromo)
+  const promoLabel = promoHeadline(activePromo)
 
   const title = promoLabel
     ? `¡${promoLabel} en ${business.name}! — Calamuchita App`
@@ -100,7 +95,7 @@ export default async function DirectorioDetallePage({ params }: Props) {
 
   const { data: promotionsData } = await supabase
     .from("promotions")
-    .select("id, title, description, discount_percentage, discount_label, valid_until")
+    .select(`id, title, description, ${PROMO_VALUE_COLUMNS}, valid_until`)
     .eq("business_id", business.id)
     .eq("is_active", true)
     .gte("valid_until", today)

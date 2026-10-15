@@ -6,7 +6,7 @@ import CtaBusiness from "@/components/public/CtaBusiness"
 import LocalidadSelectorWidget from "@/components/public/LocalidadSelectorWidget"
 import { createClient } from "@/lib/supabase/server"
 import type { Novedad } from "@/types/database"
-import { sectionToCategoria, buildPromoDiscount, formatValidUntil, type Promo } from "@/lib/promos"
+import { sectionToCategoria, buildPromoDiscount, formatValidUntil, PROMO_VALUE_COLUMNS, type Promo, type PromoValueFields } from "@/lib/promos"
 import { businessProfileUrl } from "@/lib/utils/business"
 import { hoyAR } from "@/lib/utils/fechas"
 
@@ -30,12 +30,10 @@ type PromoBusiness = {
   logo_url: string | null
 }
 
-type Promotion = {
+type Promotion = PromoValueFields & {
   id: string
   title: string
   description: string | null
-  discount_percentage: number | null
-  discount_label: string | null
   valid_until: string | null
   businesses: PromoBusiness | null
 }
@@ -45,10 +43,7 @@ function mapPromotionToPromo(promo: Promotion): Promo | null {
   const biz = promo.businesses
   if (!biz) return null // sin negocio asociado no hay a dónde llevar el "Ver promo"
 
-  const { descuento_valor, descuento_label } = buildPromoDiscount(
-    promo.discount_percentage,
-    promo.discount_label
-  )
+  const { descuento_valor, descuento_label } = buildPromoDiscount(promo)
 
   return {
     id: promo.id,
@@ -97,8 +92,7 @@ export default async function HomePage() {
         id,
         title,
         description,
-        discount_percentage,
-        discount_label,
+        ${PROMO_VALUE_COLUMNS},
         valid_until,
         businesses(id, name, slug, section, logo_url)
       `)

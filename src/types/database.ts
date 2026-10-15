@@ -20,6 +20,7 @@ export type SubscriptionStatus = 'trial' | 'active' | 'discount' | 'complimentar
 // de Postgres, pero la UI nunca los ofrece (ver normalizeSubscriptionStatus).
 export type SubscriptionStatusDb = SubscriptionStatus | 'overdue' | 'cancelled'
 export type BillingCycle = 'monthly' | 'yearly'
+export type DiscountKind = 'percentage' | 'price' | 'text'
 
 export interface Profile {
   id: string
@@ -77,7 +78,9 @@ export interface Promotion {
   business_id: string
   title: string
   description: string | null
+  discount_kind: DiscountKind | null   // null = promo anterior al tipo (se muestra con la lógica vieja)
   discount_percentage: number | null
+  discount_price: number | null
   discount_label: string | null
   valid_until: string
   is_active: boolean

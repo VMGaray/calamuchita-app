@@ -87,20 +87,61 @@ export interface Promo {
 // lógica de "número grande / etiqueta chica" ni el formato de fecha.
 // ─────────────────────────────────────────────────────────────
 
+export type DiscountKind = "percentage" | "price" | "text"
+
+/** Columnas del valor destacado, para los .select() de `promotions`. */
+export const PROMO_VALUE_COLUMNS = "discount_kind, discount_percentage, discount_price, discount_label"
+
+/** Campos del valor destacado tal como vienen de la tabla `promotions`. */
+export interface PromoValueFields {
+  /** null = promo cargada antes de que existiera el tipo: se muestra con la lógica vieja. */
+  discount_kind?: DiscountKind | null
+  discount_percentage: number | null
+  discount_price?: number | null
+  discount_label: string | null
+}
+
+export function formatPromoPrice(price: number): string {
+  return `$${Number(price).toLocaleString("es-AR")}`
+}
+
 /**
- * A partir de discount_percentage/discount_label de la tabla `promotions`,
- * arma el valor grande del cupón y, si corresponde, la etiqueta chica.
- * Si hay porcentaje, discount_label queda como etiqueta secundaria (ej "Cervezas").
- * Si no hay porcentaje, discount_label pasa a ser el valor grande (ej "2x1", "Envío gratis").
+ * Arma el valor grande del cupón y, si corresponde, la etiqueta chica.
+ *   percentage → "20%"     + discount_label como aclaración ("en cervezas")
+ *   price      → "$12.500" + discount_label como aclaración
+ *   text       → discount_label ("2x1", "Regalo")
+ *   null (promos viejas) → porcentaje con la etiqueta como aclaración, o la etiqueta sola.
  */
 export function buildPromoDiscount(
-  discount_percentage: number | null,
-  discount_label: string | null
+  promo: PromoValueFields
 ): { descuento_valor: string | null; descuento_label: string | null } {
-  const percentageLabel = discount_percentage ? `${discount_percentage}%` : null
-  return {
-    descuento_valor: percentageLabel ?? discount_label ?? null,
-    descuento_label: percentageLabel && discount_label ? discount_label : null,
+  const label = promo.discount_label?.trim() || null
+  switch (promo.discount_kind) {
+    case "percentage":
+      return { descuento_valor: promo.discount_percentage ? `${promo.discount_percentage}%` : null, descuento_label: label }
+    case "price":
+      return { descuento_valor: promo.discount_price ? formatPromoPrice(promo.discount_price) : null, descuento_label: label }
+    case "text":
+      return { descuento_valor: label, descuento_label: null }
+    default: {
+      const percentageLabel = promo.discount_percentage ? `${promo.discount_percentage}%` : null
+      return {
+        descuento_valor: percentageLabel ?? label,
+        descuento_label: percentageLabel && label ? label : null,
+      }
+    }
+  }
+}
+
+/** Valor en una sola línea, para badges y títulos de página: "20% OFF", "$12.500", "2x1". */
+export function promoHeadline(promo: PromoValueFields | null): string | null {
+  if (!promo) return null
+  const label = promo.discount_label?.trim() || null
+  switch (promo.discount_kind) {
+    case "percentage": return promo.discount_percentage ? `${promo.discount_percentage}% OFF` : null
+    case "price":      return promo.discount_price ? formatPromoPrice(promo.discount_price) : null
+    case "text":       return label
+    default:           return label ?? (promo.discount_percentage ? `${promo.discount_percentage}% OFF` : null)
   }
 }
 

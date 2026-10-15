@@ -16,6 +16,7 @@ import { extractYoutubeId } from "@/lib/utils/youtube"
 import AnimateIn from "@/components/ui/AnimateIn"
 import BackButton from "@/components/ui/BackButton"
 import { businessProfileUrl } from "@/lib/utils/business"
+import { promoHeadline, type PromoValueFields } from "@/lib/promos"
 
 function WaIcon({ size = 14 }: { size?: number }) {
   return (
@@ -53,9 +54,8 @@ function FeatureBadge({ icon, label }: { icon: React.ReactNode; label: string })
   )
 }
 
-interface Promotion {
-  id: string; title: string; description: string | null
-  discount_percentage: number | null; discount_label: string | null; valid_until: string | null
+interface Promotion extends PromoValueFields {
+  id: string; title: string; description: string | null; valid_until: string | null
 }
 
 interface Props { business: any; section: string; promotions?: Promotion[] }
@@ -539,7 +539,7 @@ export default function DirectorioDetalle({ business, section, promotions = [] }
           <AnimateIn>
             <div className="flex flex-col gap-3">
               {promotions.map(promo => {
-                const badge = promo.discount_label || (promo.discount_percentage ? `${promo.discount_percentage}% OFF` : "PROMO EXCLUSIVA")
+                const badge = promoHeadline(promo) ?? "PROMO EXCLUSIVA"
                 const validDate = promo.valid_until
                   ? new Date(promo.valid_until + "T12:00:00").toLocaleDateString("es-AR", { day: "numeric", month: "long", year: "numeric" })
                   : null

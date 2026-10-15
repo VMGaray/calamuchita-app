@@ -24,6 +24,7 @@ import PromoCoupon, {
   buildPromoDiscount,
   formatValidUntil,
   type Promo,
+  type PromoValueFields,
 } from "@/components/public/PromoCoupon"
 
 const DAY = ["Domingo", "Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado"]
@@ -80,9 +81,8 @@ function calcIsOpenNow(hours: any[]): boolean {
   return todayShifts.some((h: any) => hhmm >= h.opens_at.slice(0, 5) && hhmm < h.closes_at.slice(0, 5))
 }
 
-interface Promotion {
-  id: string; title: string; description: string | null
-  discount_percentage: number | null; discount_label: string | null; valid_until: string | null
+interface Promotion extends PromoValueFields {
+  id: string; title: string; description: string | null; valid_until: string | null
 }
 
 interface Props { business: any; promotions?: Promotion[] }
@@ -468,10 +468,7 @@ export default function NegocioDetalle({ business, promotions = [] }: Props) {
           {promotions.length > 0 && (
             <div className={`${promoFontVariables} flex flex-col gap-4`}>
               {promotions.map(promo => {
-                const { descuento_valor, descuento_label } = buildPromoDiscount(
-                  promo.discount_percentage,
-                  promo.discount_label
-                )
+                const { descuento_valor, descuento_label } = buildPromoDiscount(promo)
                 const promoCoupon: Promo = {
                   id: promo.id,
                   comercio: business.name,
