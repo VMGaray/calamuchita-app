@@ -75,6 +75,7 @@ const SUBCAT_LABELS: Record<string, string> = {
   "soluciones-digitales": "Soluciones Digitales & AI",
   bombas:              "Bombas y Motores eléctricos",
   refrigeracion:       "Refrigeración",
+  "reparacion-celulares": "Reparación de Celulares",
   "alquiler-autos":    "Alquiler de autos",
   compostura:          "Compostura de calzado",
   "papeleria-creativa": "Papelería creativa",

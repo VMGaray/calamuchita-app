@@ -5,7 +5,7 @@ export default function manifest() {
     id: "/",
     name: "Calamuchita App",
     short_name: "Calamuchita App",
-    description: "Todo el Valle de Calamuchita en un solo lugar. Gastronomía, servicios, turismo y más.",
+    description: "Todo el Valle de Calamuchita en un mismo lugar. Gastronomía, servicios, turismo y más.",
     start_url: "/?utm_source=pwa&utm_medium=homescreen&utm_campaign=launch",
     scope: "/",
     display: "standalone",

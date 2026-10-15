@@ -34,7 +34,7 @@ const categoryIcons: Record<string, any> = {
   "Costurera/Modista": Scissors, "Tapicería": Armchair, "Tatuajes": PenTool, "Traslados": Car, "Servicios audiovisuales": Video,
   "Higiene y seguridad laboral": ShieldCheck, "Globología": Balloon, "Soluciones Digitales & AI": Laptop,
   "Bombas y Motores eléctricos": Cog,
-  "Refrigeración": Snowflake,
+  "Refrigeración": Snowflake, "Reparación de Celulares": Smartphone,
   "Papelería creativa": Palette, "Climatización": Wind, "Depilación": Sparkles, "Lavadero de autos": Droplets,
   "Máquinas de coser": Cog,
   "Comisiones": CreditCard,
