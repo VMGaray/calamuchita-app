@@ -87,6 +87,15 @@ export interface Promotion {
   created_at: string
 }
 
+export interface PromotionFlyer {
+  id: string
+  promotion_id: string
+  business_id: string
+  url: string
+  sort_order: number
+  created_at: string
+}
+
 export interface BusinessHours {
   id: string
   business_id: string

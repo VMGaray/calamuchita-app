@@ -2,9 +2,10 @@
 
 import { useEffect, useState } from "react"
 import { createClient } from "@/lib/supabase/client"
-import { Tag, Building2, Calendar, ToggleLeft, ToggleRight, Plus, Pencil, Trash2, X } from "lucide-react"
+import { Tag, Building2, Calendar, ToggleLeft, ToggleRight, Plus, Pencil, Trash2, X, Images } from "lucide-react"
 import PromoForm, { EMPTY_PROMO_FORM, promoFormFromRow, promoPayload, type PromoFormValues } from "@/components/admin/PromoForm"
 import { promoHeadline } from "@/lib/promos"
+import { removeFlyerFiles } from "@/lib/promoFlyers"
 import { hoyAR } from "@/lib/utils/fechas"
 import type { Promotion } from "@/types/database"
 
@@ -12,6 +13,7 @@ interface Business { id: string; name: string; section: string }
 
 interface PromoRow extends Promotion {
   businesses: { name: string; slug: string; section: string } | null
+  promotion_flyers: { url: string }[]
 }
 
 function formatDate(date: string) {
@@ -26,15 +28,17 @@ function isExpired(valid_until: string) {
 
 function PromoModal({
   initial,
-  isNew,
+  promotionId,
   businesses,
   onSave,
+  onDone,
   onClose,
 }: {
   initial: PromoFormValues
-  isNew: boolean
+  promotionId: string | null
   businesses: Business[]
-  onSave: (f: PromoFormValues) => Promise<void>
+  onSave: (f: PromoFormValues) => Promise<string>
+  onDone: () => void
   onClose: () => void
 }) {
   return (
@@ -42,13 +46,20 @@ function PromoModal({
       <div className="bg-white rounded-2xl shadow-2xl w-full max-w-lg overflow-hidden">
         <div className="flex items-center justify-between px-6 py-4 border-b border-stone-100">
           <h2 className="font-semibold text-stone-800">
-            {isNew ? "Nueva promoción" : "Editar promoción"}
+            {promotionId ? "Editar promoción" : "Nueva promoción"}
           </h2>
           <button onClick={onClose} className="w-8 h-8 flex items-center justify-center rounded-xl hover:bg-stone-100 text-stone-400">
             <X size={16} />
           </button>
         </div>
-        <PromoForm initial={initial} isNew={isNew} businesses={businesses} onSave={onSave} onCancel={onClose} />
+        <PromoForm
+          initial={initial}
+          promotionId={promotionId}
+          businesses={businesses}
+          onSave={onSave}
+          onDone={onDone}
+          onCancel={onClose}
+        />
       </div>
     </div>
   )
@@ -64,7 +75,7 @@ export default function AdminPromociones() {
   const fetchAll = async () => {
     const supabase = createClient()
     const [{ data: promoData }, { data: bizData }] = await Promise.all([
-      supabase.from("promotions").select("*, businesses(name, slug, section)").order("created_at", { ascending: false }),
+      supabase.from("promotions").select("*, businesses(name, slug, section), promotion_flyers(url)").order("created_at", { ascending: false }),
       supabase.from("businesses").select("id, name, section").eq("status", "active").order("name"),
     ])
     setPromos((promoData as PromoRow[]) || [])
@@ -80,31 +91,36 @@ export default function AdminPromociones() {
     setPromos(prev => prev.map(p => p.id === id ? { ...p, is_active: !current } : p))
   }
 
-  const handleDelete = async (id: string) => {
-    if (!confirm("¿Eliminar esta promoción?")) return
+  const handleDelete = async (promo: PromoRow) => {
+    const flyerCount = promo.promotion_flyers.length
+    if (!confirm(flyerCount
+      ? `¿Eliminar esta promoción y sus ${flyerCount} flyer${flyerCount === 1 ? "" : "s"}?`
+      : "¿Eliminar esta promoción?")) return
     const supabase = createClient()
-    await supabase.from("promotions").delete().eq("id", id)
-    setPromos(prev => prev.filter(p => p.id !== id))
+    const { error } = await supabase.from("promotions").delete().eq("id", promo.id)
+    if (error) { alert("No se pudo eliminar la promoción"); return }
+    // Las filas de flyers se borran en cascada; los archivos de Storage, acá
+    await removeFlyerFiles(supabase, promo.promotion_flyers.map(f => f.url))
+    setPromos(prev => prev.filter(p => p.id !== promo.id))
   }
 
   const openNew = () => setModal({ open: true, editing: null })
   const openEdit = (p: PromoRow) => setModal({ open: true, editing: p })
-  const closeModal = () => setModal({ open: false, editing: null })
+  // Al cerrar se refresca igual: los flyers de una promo existente se guardan al subirlos
+  const closeModal = () => { setModal({ open: false, editing: null }); fetchAll() }
 
-  const handleSave = async (form: PromoFormValues) => {
+  const handleSave = async (form: PromoFormValues): Promise<string> => {
     const supabase = createClient()
     const payload = promoPayload(form)
 
     if (modal.editing) {
       const { error } = await supabase.from("promotions").update(payload).eq("id", modal.editing.id)
       if (error) throw error
-    } else {
-      const { error } = await supabase.from("promotions").insert(payload)
-      if (error) throw error
+      return modal.editing.id
     }
-
-    await fetchAll()
-    closeModal()
+    const { data, error } = await supabase.from("promotions").insert(payload).select("id").single()
+    if (error || !data) throw error ?? new Error("No se pudo crear la promoción")
+    return data.id as string
   }
 
   const modalInitial: PromoFormValues = modal.editing ? promoFormFromRow(modal.editing) : EMPTY_PROMO_FORM
@@ -124,9 +140,10 @@ export default function AdminPromociones() {
       {modal.open && (
         <PromoModal
           initial={modalInitial}
-          isNew={!modal.editing}
+          promotionId={modal.editing?.id ?? null}
           businesses={businesses}
           onSave={handleSave}
+          onDone={closeModal}
           onClose={closeModal}
         />
       )}
@@ -210,6 +227,12 @@ export default function AdminPromociones() {
                         {promo.businesses.name}
                       </span>
                     )}
+                    {promo.promotion_flyers.length > 0 && (
+                      <span className="flex items-center gap-1 text-xs text-stone-400">
+                        <Images size={11} />
+                        {promo.promotion_flyers.length} flyer{promo.promotion_flyers.length === 1 ? "" : "s"}
+                      </span>
+                    )}
                     <span className={`flex items-center gap-1 text-xs ${expired ? "text-red-400" : "text-stone-400"}`}>
                       <Calendar size={11} />
                       {expired ? "Venció" : "Válido hasta"} {formatDate(promo.valid_until)}
@@ -247,7 +270,7 @@ export default function AdminPromociones() {
                     <Pencil size={14} />
                   </button>
                   <button
-                    onClick={() => handleDelete(promo.id)}
+                    onClick={() => handleDelete(promo)}
                     className="w-8 h-8 flex items-center justify-center rounded-xl hover:bg-red-50 text-stone-400 hover:text-red-500 transition-colors"
                     title="Eliminar"
                   >
