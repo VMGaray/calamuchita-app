@@ -2,7 +2,7 @@
 
 Directorio digital y plataforma gastronómica para el Valle de Calamuchita, Córdoba, Argentina.
 
-Conecta a turistas y residentes con los comercios, servicios y restaurantes de las 16 localidades del valle. Los negocios gastronómicos pueden gestionar su carta, menú del día, reservas y pedidos desde un dashboard propio. Los administradores tienen control total sobre la plataforma.
+Conecta a turistas y residentes con los comercios, servicios y restaurantes de las localidades del valle. Los negocios gastronómicos gestionan su carta, menú del día, pedidos y reservas desde un dashboard propio; los clientes piden y reservan **sin necesidad de crear cuenta**. Los administradores tienen control total sobre la plataforma.
 
 ---
 
@@ -10,19 +10,22 @@ Conecta a turistas y residentes con los comercios, servicios y restaurantes de l
 
 | Tecnología | Uso |
 |---|---|
-| Next.js (App Router) | Framework principal, SSR, rutas |
+| Next.js 16 (App Router) | Framework principal, SSR, rutas |
 | React 19 | UI |
 | TypeScript 5 | Tipado estático |
 | Tailwind CSS 4 | Estilos (con `@theme` CSS variables) |
-| Supabase | PostgreSQL, autenticación, storage |
+| Supabase | PostgreSQL, autenticación, storage, realtime |
+| Resend | Emails transaccionales (alta, aprobación y rechazo de negocios) |
 | Framer Motion | Animaciones |
 | Lucide React | Iconografía |
-| Mapbox GL / react-map-gl | Mapa interactivo de comercios |
+| Mapbox GL / react-map-gl | Mapa interactivo y selector de ubicación |
 | qrcode.react | Generación de QR en canvas |
 | Recharts | Gráficos de estadísticas |
 | Swiper | Carruseles (menú del día, galería) |
 | Lenis | Smooth scrolling |
 | next-pwa (`@ducanh2912`) | Progressive Web App (service worker, manifest) |
+
+> El build de producción usa webpack (`next build --webpack`) porque next-pwa todavía no soporta Turbopack.
 
 ---
 
@@ -31,52 +34,87 @@ Conecta a turistas y residentes con los comercios, servicios y restaurantes de l
 ### Sitio Público
 
 - **Hero con búsqueda global** — filtra negocios por nombre o categoría
-- **JoyasDelValle** — marquee infinito RAF-based de negocios destacados con navegación manual
-- **Directorio por secciones** — 8 secciones con subcategorías: Gastronomía, Servicios, Salud, Educación, Turismo, Comercios, Eventos, Info útil
-- **Menús del día** — carrusel de menús diarios publicados por los restaurantes
-- **Teléfonos Útiles** — contactos de emergencia (Bomberos, Policía, Salud, Cooperativa) para las 16 localidades
-- **Detalle de negocio** — carta interactiva, menú del día, reserva por WhatsApp, horarios, servicios, mapa
-- **Profesionales en clínicas** — los profesionales de salud cargados dentro de una clínica también aparecen en la vista de su especialidad (Psicología, Terapias, Especialidades, etc.)
-- **Barra sticky de categorías** — grid 2×4 en mobile, barra horizontal en desktop
-- **Sistema de leads** — botón WhatsApp sticky en mobile que registra contactos
+- **JoyasDelValle** — marquee infinito de negocios destacados con navegación manual
+- **Directorio por secciones** — Gastronomía, Servicios, Comercios, Salud, Educación, Turismo, Deportes, Eventos, Info útil. Los negocios pueden figurar además en secciones extra (`extra_sections`)
+- **Grupos de rubros en Servicios** — grupos → rubros, definidos en código (`SERVICE_GROUPS` en `src/lib/constants/categories.ts`)
+- **Gastronomía** (`/negocios`) — filtros por categoría, abierto ahora, delivery, take away, búsqueda y opciones alimentarias (sin TACC, vegano, etc.)
+- **Perfil de negocio** — gastronómicos en `/negocios/[slug]`; el resto en `/directorio/[section]/[slug]` (la URL vieja de gastronomía redirige). Carta interactiva, menú del día, galería, horarios, servicios, mapa, promoción vigente
+- **Pedidos sin cuenta** — carrito con delivery / take away (solo los que el local ofrece), creados vía RPC `crear_pedido`
+- **Reservas sin cuenta** — botón *Reservar* en locales que aceptan reservas, creadas vía RPC `crear_reserva`
+- **Carta pública** — etiquetas alimentarias por plato y aviso de servicio de mesa (con o sin cargo)
+- **Menú del día** (`/menu-del-dia`) — carrusel de menús diarios publicados por los restaurantes (fechas en hora de Argentina)
+- **Destacados** (`/destacados`) — negocios premium
+- **Novedades** (`/novedades`) — avisos de corto plazo con vencimiento y localidad
+- **Identidad Calamuchitana** (`/identidad-calamuchitana/[id]`) — notas editoriales (entrevistas, efemérides, tips, noticias)
+- **Info Útil** (`/info-util`) — servicios por localidad, farmacias y veterinarias de guardia, transporte, contactos de emergencia
+- **Profesionales en clínicas** — los profesionales de salud cargados dentro de una clínica también aparecen en la vista de su especialidad
+- **Sistema de leads** — botones de WhatsApp / teléfono / reserva que registran contactos
 - **SEO dinámico** — `generateMetadata` por negocio con Open Graph y Twitter Cards
-- **Agenda de eventos** — listado filtrable por localidad con detalle y galería de fotos
-- **Mapa interactivo** — comercios geolocalizados sobre Mapbox con popup de detalle
-- **Página de planes** (`/unite`) — landing para negocios con tres planes y banner "Club Fundadores"
-- **Política de privacidad** (`/politica-de-privacidad`) — página estática con política de privacidad del sitio
-- **Eliminar cuenta** (`/eliminar-cuenta`) — formulario para que usuarios soliciten la baja de su cuenta
+- **Agenda de eventos** — listado filtrable por localidad con detalle y galería
+- **Mapa interactivo** — comercios geolocalizados sobre Mapbox
+- **Página de planes** (`/unite`) — landing para negocios con planes y banner "Club Fundadores"
+- **Política de privacidad** y **Eliminar cuenta** — páginas requeridas por Google Play
 
-### Auth — Gastronómicos
+### Auth
 
-- Ruta `/gastronomicos` con dos formularios en una misma página: **login** y **registro**
-- El registro es exclusivo para negocios (`role: "business"`), crea una fila en `pending_registrations` y queda pendiente de aprobación admin
-- Una vez aprobado, el gastronómico puede acceder al dashboard
-- `/registro` redirige a `/gastronomicos` (flujo unificado)
-- El admin accede por `/login` (footer del sitio público)
+- Ruta `/gastronomicos` con **login** y **registro** en la misma página (también es donde inicia sesión el admin)
+- El registro es exclusivo para negocios (`role: "business"`), crea una fila en `pending_registrations` (con la categoría elegida) y notifica al admin por email
+- Al aprobar o rechazar, el negocio recibe un email (`/api/send-email`, Resend)
+- Recuperación de contraseña en `/reset-password`; los links de email pasan por `/auth/callback`
 
 ### Dashboard — Rol `business`
 
-- **Inicio** — métricas del día (pedidos, reservas, menú), toggle abierto/cerrado, pedidos recientes
-- **Menú del día** — publicar, editar, usar menú del día anterior como base
-- **Carta** — categorías y platos con nombre, descripción, precio, disponibilidad y foto
-- **Pedidos** — delivery y take away con estados (nuevo → confirmado → listo → entregado), realtime via Supabase
-- **Reservas** — confirmación/rechazo, vista por fecha, realtime
-- **Estadísticas** — vistas al perfil, contactos generados, pedidos y facturación del mes
-- **Mi local** — datos, descripción, logo, fotos, horarios de atención (con 2° turno), coordenadas (soporta link de Google Maps o decimal), servicios, formas de pago, carta PDF
-- **Estado pendiente** — si la cuenta está pendiente de aprobación, se muestra `DashboardPending` con botón de contacto por WhatsApp y actualización en tiempo real cuando el admin aprueba
+Hay dos variantes según la categoría del negocio (`isRestaurante` en `src/lib/utils/business.ts`):
+
+**Restaurantes** (Inicio, Menú del día, Carta, Pedidos, Reservas, Estadísticas, Mi local)
+
+- **Inicio** — métricas del día, toggle abierto/cerrado, pedidos recientes
+- **Menú del día** — publicar, editar, usar el del día anterior como base
+- **Carta** — categorías y platos con precio, disponibilidad, foto y etiquetas alimentarias; configuración de servicio de mesa
+- **Pedidos** — estados Pendiente → Confirmado → Listo → Entregado / Cancelado; pestañas Activos, Historial y Todos; realtime
+- **Reservas** — Confirmar / Rechazar y luego Completada / No se presentó; pestañas Próximas, Hoy, Historial y Todas; realtime
+- **Estadísticas** — vistas y contactos por período
+
+**Viandas y otros** (Inicio, Menú del día, Mi carta, Mi local) — carta simplificada con PDF, link o fotos de la carta
+
+**Mi local** (ambas) — datos, logo, portada, galería de hasta 8 fotos (con orden y redimensionado), horarios con 2° turno, ubicación con mapa y geocodificación, pueblo, servicios, formas de pago, opciones alimentarias
+
+**Estado pendiente** — si la cuenta no fue aprobada se muestra `DashboardPending`, que se actualiza en tiempo real cuando el admin aprueba
 
 ### Panel Admin — Rol `admin`
 
-- **Dashboard** — métricas globales: negocios, usuarios, vistas, contactos WhatsApp, eventos
-- **Negocios** — CRUD completo, filtro por sección, toggle estado, analytics por fila
-- **Solicitudes** — listado de gastronómicos pendientes de aprobación con acciones aprobar/rechazar
-- **Eventos** — crear, listar y editar eventos con galería de imágenes múltiples
-- **Promociones** — listado con badge de descuento, estado y toggle
-- **Suscripciones** — CRUD por negocio: estado (trial/activa/vencida/cancelada), precio, ciclo (mensual/anual), fechas, notas. Resumen con contadores y filtro rápido
-- **Marketing App** — generador de QR para la home, descarga PNG y calcomanía A5
-- **Vista gastronómico** — preview del panel de negocio para mostrarle a clientes cómo se ve el dashboard
-- **Info Útil** — 4 pestañas: Contactos útiles, Localidades, Servicios, Transporte
-- **QR por negocio** — en cada ficha de edición, QR del perfil público con descarga e impresión A5
+- **Dashboard** — métricas globales: negocios, usuarios, vistas, contactos, instalaciones de la app
+- **Negocios** — alta (hasta 5 fotos de galería), edición, filtro por sección, toggle de estado, QR del perfil con descarga e impresión A5, edición del menú del día de cada negocio
+- **Solicitudes** — gastronómicos pendientes de aprobación (badge con contador)
+- **Eventos** — crear, listar y editar con galería de imágenes
+- **Identidad Calamuchitana** — notas editoriales (`editorial_posts`)
+- **Novedades** — avisos con fecha de vencimiento y localidad
+- **Estadísticas** — vistas y contactos por período (7 días / 30 días / todo), ranking top 10 y desglose por sección (RPC `admin_activity`)
+- **Promociones** — descuentos por negocio con vencimiento
+- **Suscripciones** — 7 estados (ver abajo), renovar +1 mes / +1 año, filtros Por vencer y Vencidas, orden por urgencia
+- **Marketing** — QR de la home, descarga PNG y calcomanía A5
+- **Info Útil** — pestañas Servicios (por localidad), Transporte, Guardias (fotos del cuadro de turnos de farmacias y veterinarias) y Localidades
+- **Vista gastronómico** — preview del panel de negocio para mostrar a clientes
+- **Configuración** — datos del sitio, contacto y redes (`site_config`)
+
+---
+
+## Suscripciones y visibilidad
+
+| Estado | Visible al público | Vence solo |
+|---|---|---|
+| `trial` | Sí | No |
+| `active` | Sí | Sí |
+| `discount` | Sí | Sí |
+| `complimentary` (Bonificado) | Sí | Sí |
+| `free` (Gratis, sin fecha de fin) | Sí | No |
+| `expired` | No | — |
+| `suspended` | No | — |
+
+- El vencimiento se **calcula al leer** (estado efectivo): `current_period_end` + 7 días de gracia. No se guarda.
+- Estados heredados: `overdue` → `expired`, `cancelled` → `suspended`.
+- La visibilidad la decide la base con `public.business_is_public()` y una política RLS **restrictiva** sobre `businesses` (admin y dueño siempre ven su negocio). Las constantes de `src/lib/constants/subscriptions.ts` son solo un espejo para rotular en el panel.
+- Fotos y carta "heredan" la visibilidad del negocio (migración B2).
 
 ---
 
@@ -106,19 +144,20 @@ Variables CSS (Tailwind 4 `@theme`):
 
 | Rol | Acceso |
 |---|---|
-| `customer` | Sitio público completo |
+| `customer` | Sitio público completo (no hace falta cuenta para pedir ni reservar) |
 | `business` | Sitio público + `/dashboard` |
 | `admin` | Sitio público + `/dashboard` + `/admin` |
 
-El rol `business` se guarda en `user.user_metadata.role`. El rol `admin` se guarda en la tabla `profiles`.
+El rol `business` se guarda en `user.user_metadata.role`. El rol `admin` se guarda en la tabla `profiles` (en SQL se consulta con `public.is_admin()`).
 
 ---
 
 ## Protección de Rutas
 
-- **Middleware** (`middleware.ts`) — redirige `/dashboard` y `/admin` si no hay sesión activa
-- **Layout `/dashboard`** — verifica `user_metadata.role === "business"` o `profiles.role === "admin"`. Si el negocio no está aprobado aún, muestra `DashboardPending`
-- **Layout `/admin`** — verifica `profiles.role === "admin"`, redirige si no
+- **Middleware** (`middleware.ts`) — redirige `/dashboard` y `/admin` a `/gastronomicos` si no hay sesión
+- **Layout `/dashboard`** — verifica `user_metadata.role === "business"` o `profiles.role === "admin"`. Si el negocio no está aprobado, muestra `DashboardPending`
+- **Layout `/admin`** — verifica `profiles.role === "admin"`
+- **RLS en Supabase** — la seguridad real vive en las políticas: pedidos y reservas solo se crean por RPC y solo los leen el dueño y el admin; el dueño solo puede cambiar el `status`
 
 ---
 
@@ -127,63 +166,59 @@ El rol `business` se guarda en `user.user_metadata.role`. El rol `admin` se guar
 ```
 src/
 ├── app/
-│   ├── (auth)/                  # Login
-│   │   └── login/
-│   ├── (public)/                # Sitio público
-│   │   ├── page.tsx             # Home
-│   │   ├── buscar/              # Búsqueda global
-│   │   └── directorio/[section]/[slug]/
-│   ├── gastronomicos/           # Auth de gastronómicos (login + registro + aprobación)
-│   ├── eventos/                 # Agenda pública
-│   │   ├── page.tsx
-│   │   └── [id]/page.tsx
-│   ├── unite/                   # Landing de planes para negocios
-│   ├── mapa/                    # Mapa interactivo (Mapbox)
-│   ├── dashboard/               # Panel de negocio (requiere rol business/admin)
-│   │   ├── page.tsx             # Inicio — métricas del día
+│   ├── (auth)/reset-password/
+│   ├── (public)/                    # Sitio público
+│   │   ├── page.tsx                 # Home
+│   │   ├── buscar/
+│   │   ├── negocios/[slug]/         # Gastronomía + perfil gastronómico
+│   │   ├── directorio/[section]/[slug]/
 │   │   ├── menu-del-dia/
-│   │   ├── carta/
-│   │   ├── pedidos/
-│   │   ├── reservas/
-│   │   ├── estadisticas/
-│   │   └── configuracion/       # Mi local
-│   └── admin/                   # Panel admin
-│       ├── page.tsx             # Dashboard global
-│       ├── negocios/[id]/
-│       ├── solicitudes/         # Aprobación de gastronómicos
-│       ├── eventos/
-│       ├── promociones/
-│       ├── suscripciones/
-│       ├── marketing/
-│       ├── info-util/
-│       └── gastronomicos/       # Vista previa del dashboard para admin
+│   │   ├── destacados/
+│   │   ├── novedades/[id]/
+│   │   ├── identidad-calamuchitana/[id]/
+│   │   └── info-util/
+│   ├── api/send-email/              # Emails vía Resend
+│   ├── auth/callback/               # Intercambio de código de Supabase Auth
+│   ├── gastronomicos/               # Login + registro
+│   ├── eventos/[id]/
+│   ├── mapa/
+│   ├── unite/
+│   ├── politica-de-privacidad/
+│   ├── eliminar-cuenta/
+│   ├── ~offline/                    # Fallback offline de la PWA
+│   ├── dashboard/                   # Panel de negocio
+│   │   ├── menu-del-dia/  carta/  mi-carta/  pedidos/
+│   │   ├── reservas/  estadisticas/  configuracion/
+│   └── admin/                       # Panel admin
+│       ├── negocios/ (nuevo, [id], [id]/menu-del-dia)
+│       ├── solicitudes/  eventos/  identidad-calamuchitana/  novedades/
+│       ├── stats/  promociones/  suscripciones/  marketing/
+│       ├── info-util/  gastronomicos/  configuracion/
 │
 ├── components/
-│   ├── public/                  # DirectorioList, DirectorioDetalle, etc.
-│   ├── shared/                  # Header, Footer
-│   ├── dashboard/               # DashboardHome, CartaManager, PedidosDashboard,
-│   │                            #   ReservasDashboard, EstadisticasDashboard,
-│   │                            #   MenuDelDia, ConfiguracionLocal, Sidebar,
-│   │                            #   DashboardPending
-│   ├── admin/                   # AdminHome, AdminNegocios, AdminNegocioForm,
-│   │                            #   AdminNegocioEdit, AdminSolicitudes,
-│   │                            #   AdminSuscripciones, AdminPromociones,
-│   │                            #   AdminInfoUtil, AdminSidebar, QRMarketing
+│   ├── public/      # NegocioDetalle, DirectorioDetalle, CartaInteractiva, CarritoDrawer, …
+│   ├── dashboard/   # DashboardHome, CartaManager, MiCartaSimple, PedidosDashboard,
+│   │                #   ReservasDashboard, ConfiguracionLocal, UbicacionPicker, …
+│   ├── admin/       # AdminNegocios, AdminSuscripciones, AdminStats, AdminInfoUtil, …
+│   ├── auth/        # RegisterForm, LoginForm, ResetPasswordForm
+│   ├── shared/      # Header, Footer
 │   ├── events/
-│   └── ui/                      # ImageUpload, PdfUpload, HorariosEditor,
-│                                #   AnimateIn, Card3D, Skeleton, etc.
+│   └── ui/          # ImageUpload, GaleriaFotos, HorariosEditor, DietaryTags, …
 │
 ├── lib/
-│   ├── supabase/                # Clientes browser y server (@supabase/ssr)
+│   ├── supabase/    # Clientes browser y server (@supabase/ssr)
+│   ├── constants/   # categories (rubros y SERVICE_GROUPS), subscriptions, dietary,
+│   │                #   gastronomyCategories, telefonos, localidadImages
+│   ├── context/     # LocalidadContext, BusinessDashboardContext
 │   ├── hooks/
-│   ├── context/
-│   │   └── LocalidadContext.tsx
-│   ├── constants/
-│   │   ├── telefonos.ts
-│   │   └── categories.ts
-│   └── sections.ts              # Secciones + subcategorías + rutas del directorio
+│   ├── utils/       # business, subscriptions, fechas (hora AR), tableService, …
+│   ├── email.ts  geocoding.ts  pwa.ts  sections.ts  …
 │
-└── middleware.ts                 # Protección de rutas /dashboard y /admin
+└── types/database.ts
+
+supabase/migrations/   # Migraciones numeradas y de la rama de gastronomía
+*.sql (raíz)           # Migraciones anteriores (novedades, promociones, suscripciones, grupos)
+scripts/               # create-reviewer-user.mjs (usuario revisor de Google Play)
 ```
 
 ---
@@ -193,335 +228,129 @@ src/
 ```
 /                                   Home
 /buscar?q=                          Búsqueda global
-/directorio/[section]               Directorio por sección
-/directorio/[section]/[slug]        Detalle de negocio
-/directorio/health?cat=psicologia   Filtro por especialidad (salud)
-/eventos                            Agenda del Valle
-/eventos/[id]                       Detalle de evento
+/negocios                           Gastronomía (filtros: categoria, abierto, delivery, takeaway, dieta, q)
+/negocios/[slug]                    Perfil de negocio gastronómico
+/directorio/[section]               Directorio por sección (?cat= para rubro)
+/directorio/[section]/[slug]        Perfil de negocio no gastronómico
+/menu-del-dia                       Menús del día
+/destacados                         Negocios destacados
+/novedades  ·  /novedades/[id]      Novedades
+/identidad-calamuchitana/[id]       Nota editorial
+/info-util?categoria=&pueblo=       Info Útil
+/eventos  ·  /eventos/[id]          Agenda del Valle
 /mapa                               Mapa interactivo
-/gastronomicos                      Login + registro para gastronómicos
-/unite                              Landing de planes para negocios
+/unite                              Planes para negocios
+/gastronomicos                      Login + registro
+/reset-password                     Nueva contraseña
 /dashboard                          Inicio del panel de negocio
 /dashboard/menu-del-dia             Menú del día
-/dashboard/carta                    Gestión de carta
+/dashboard/carta                    Carta (restaurantes)
+/dashboard/mi-carta                 Carta simplificada (viandas y otros)
 /dashboard/pedidos                  Pedidos en tiempo real
 /dashboard/reservas                 Reservas
-/dashboard/estadisticas             Estadísticas del negocio
-/dashboard/configuracion            Mi local (perfil, horarios, fotos, coordenadas)
+/dashboard/estadisticas             Estadísticas
+/dashboard/configuracion            Mi local
 /admin                              Panel administrador
-/admin/negocios                     Listado y gestión de negocios
-/admin/negocios/[id]                Edición de negocio + QR
-/admin/solicitudes                  Solicitudes de registro pendientes
-/admin/eventos                      Gestión de eventos
-/admin/promociones                  Gestión de promociones
-/admin/suscripciones                Gestión de suscripciones
+/admin/negocios[/nuevo|/[id]]       Gestión de negocios
+/admin/negocios/[id]/menu-del-dia   Menú del día de un negocio
+/admin/solicitudes                  Solicitudes de registro
+/admin/eventos                      Eventos
+/admin/identidad-calamuchitana      Notas editoriales
+/admin/novedades                    Novedades
+/admin/stats                        Estadísticas globales
+/admin/promociones                  Promociones
+/admin/suscripciones                Suscripciones
 /admin/marketing                    QR general + calcomanías
-/admin/info-util                    Contactos, localidades, servicios, transporte
-/admin/gastronomicos                Vista previa del dashboard (demo para clientes)
+/admin/info-util                    Servicios, transporte, guardias, localidades
+/admin/gastronomicos                Vista previa del dashboard
+/admin/configuracion                Configuración del sitio
 /politica-de-privacidad             Política de privacidad
 /eliminar-cuenta                    Solicitud de baja de cuenta
 ```
 
 ---
 
-## Base de Datos — Tablas Principales
+## Base de Datos
 
-### `businesses`
-Negocio o comercio del directorio.
+Los tipos de referencia están en `src/types/database.ts`. Tablas principales:
 
-Campos clave: `id`, `name`, `slug`, `section`, `subcategory`, `categories`, `status` (`pending`/`active`/`inactive`), `owner_id`, `is_premium`, `total_views`, `total_leads`, `latitude`, `longitude`, `professionals` (JSONB), `medical_specialties`, `health_coverages`, `has_24h_guard`, `payment_methods`, `pet_friendly`, `logo_url`, `cover_url`, `menu_pdf_url`.
+| Tabla | Contenido |
+|---|---|
+| `businesses` | Negocios. Campos clave: `slug`, `section`, `extra_sections`, `category`, `categories`, `subcategory`, `status`, `owner_id`, `is_premium`, `pueblo`, coordenadas, `offers_delivery`/`offers_takeaway`/`offers_dine_in`, `accepts_reservations`, `dietary_options`, `charges_table_service`/`table_service_fee`, `menu_pdf_url`/`menu_link`/`menu_photos_urls`, `total_views` |
+| `profiles` | Rol del usuario (`customer` / `business` / `admin`) |
+| `pending_registrations` | Solicitudes de alta de gastronómicos (con `category`) |
+| `subscriptions` | Una por negocio: estado, precio, ciclo, período, notas, motivo |
+| `business_hours` | Horarios (hasta 2 turnos por día) |
+| `business_photos` | Galería (tope de 8 por trigger) |
+| `menu_categories` / `menu_items` | Carta permanente (`dietary_tags` por plato) |
+| `daily_menus` / `daily_menu_items` | Menú del día |
+| `orders` / `order_items` | Pedidos; `customer_id` opcional. Solo se crean con `crear_pedido` |
+| `reservations` | Reservas; `customer_id` opcional, `customer_name`/`customer_phone`. Solo se crean con `crear_reserva` |
+| `promotions` | Promociones por negocio |
+| `business_leads` | Contactos (WhatsApp, teléfono, reserva) |
+| `events` | Agenda |
+| `novedades` | Avisos de corto plazo |
+| `editorial_posts` | Identidad Calamuchitana |
+| `localities`, `useful_contacts`, `transport_companies`, `guardia_photos` | Info Útil |
+| `site_config` | Configuración del sitio (admin) |
+| `info_views`, `view_events` | Analytics de Info Útil y eventos con fecha |
+| `pwa_devices` | Dispositivos que abren la app instalada |
 
-### `profiles`
-Tabla con rol del usuario (para detectar admins).
+### Funciones (RPC) usadas desde la app
 
-```sql
-CREATE TABLE profiles (
-  id uuid REFERENCES auth.users(id) ON DELETE CASCADE PRIMARY KEY,
-  role text NOT NULL DEFAULT 'customer',
-  created_at timestamptz DEFAULT now()
-);
-```
+| Función | Uso |
+|---|---|
+| `crear_pedido` | Crea pedido + items validando negocio, tipo, productos y precios (salen de `menu_items`). Tope de 3 por teléfono/negocio/hora |
+| `crear_reserva` | Crea reserva: hasta 90 días, 1–30 personas, hora de Argentina. Tope de 3 por teléfono/local/hora |
+| `increment_view` | Suma una vista al negocio |
+| `increment_info_view` | Suma una vista a una categoría de Info Útil |
+| `admin_activity` | Vistas y contactos por período para el panel admin |
+| `track_pwa_device` / `pwa_stats` | Registro y conteo de instalaciones |
 
-### `pending_registrations`
-Solicitudes de registro de gastronómicos pendientes de aprobación.
+### Migraciones
 
-```sql
-CREATE TABLE pending_registrations (
-  id uuid DEFAULT gen_random_uuid() PRIMARY KEY,
-  user_id uuid REFERENCES auth.users(id) ON DELETE CASCADE,
-  email text NOT NULL,
-  full_name text,
-  business_name text,
-  approval_status text NOT NULL DEFAULT 'pending'
-    CHECK (approval_status IN ('pending','approved','rejected')),
-  created_at timestamptz DEFAULT now()
-);
-```
+Se corren a mano en Supabase → SQL Editor. Cada archivo explica en su encabezado qué hace y sus requisitos.
 
-### `business_hours`
-Horarios de atención (hasta 2 turnos por día).
-
-```sql
-CREATE TABLE business_hours (
-  id uuid DEFAULT gen_random_uuid() PRIMARY KEY,
-  business_id uuid REFERENCES businesses(id) ON DELETE CASCADE,
-  day_of_week integer NOT NULL,  -- 0=Dom ... 6=Sáb
-  opens_at time NOT NULL,
-  closes_at time NOT NULL,
-  is_closed boolean NOT NULL DEFAULT false
-);
-```
-
-### `business_photos`
-Galería de fotos del negocio.
-
-```sql
-CREATE TABLE business_photos (
-  id uuid DEFAULT gen_random_uuid() PRIMARY KEY,
-  business_id uuid REFERENCES businesses(id) ON DELETE CASCADE,
-  url text NOT NULL,
-  sort_order integer DEFAULT 0
-);
-```
-
-### `business_leads`
-Registro de contactos generados (WhatsApp, teléfono, reserva).
-
-```sql
-CREATE TABLE business_leads (
-  id uuid DEFAULT gen_random_uuid() PRIMARY KEY,
-  business_id uuid REFERENCES businesses(id) ON DELETE CASCADE,
-  type text NOT NULL CHECK (type IN ('whatsapp','phone','reserva')),
-  created_at timestamptz DEFAULT now()
-);
-```
-
-### `orders` / `order_items`
-Pedidos (delivery y take away).
-
-```sql
-CREATE TABLE orders (
-  id uuid DEFAULT gen_random_uuid() PRIMARY KEY,
-  business_id uuid REFERENCES businesses(id) ON DELETE CASCADE,
-  type text NOT NULL CHECK (type IN ('delivery','takeaway')),
-  status text NOT NULL DEFAULT 'pending'
-    CHECK (status IN ('pending','confirmed','ready','delivered','cancelled')),
-  total numeric NOT NULL DEFAULT 0,
-  customer_name text,
-  customer_phone text,
-  delivery_address text,
-  notes text,
-  created_at timestamptz DEFAULT now()
-);
-
-CREATE TABLE order_items (
-  id uuid DEFAULT gen_random_uuid() PRIMARY KEY,
-  order_id uuid REFERENCES orders(id) ON DELETE CASCADE,
-  item_name text NOT NULL,
-  item_price numeric NOT NULL,
-  quantity integer NOT NULL DEFAULT 1
-);
-```
-
-### `reservations`
-Reservas de mesa.
-
-```sql
-CREATE TABLE reservations (
-  id uuid DEFAULT gen_random_uuid() PRIMARY KEY,
-  business_id uuid REFERENCES businesses(id) ON DELETE CASCADE,
-  user_id uuid REFERENCES auth.users(id),
-  date date NOT NULL,
-  time time NOT NULL,
-  party_size integer NOT NULL,
-  status text NOT NULL DEFAULT 'pending'
-    CHECK (status IN ('pending','confirmed','cancelled')),
-  notes text,
-  created_at timestamptz DEFAULT now()
-);
-```
-
-### `daily_menus` / `daily_menu_items`
-Menú del día.
-
-```sql
-CREATE TABLE daily_menus (
-  id uuid DEFAULT gen_random_uuid() PRIMARY KEY,
-  business_id uuid REFERENCES businesses(id) ON DELETE CASCADE,
-  date date NOT NULL,
-  is_published boolean NOT NULL DEFAULT false,
-  UNIQUE (business_id, date)
-);
-
-CREATE TABLE daily_menu_items (
-  id uuid DEFAULT gen_random_uuid() PRIMARY KEY,
-  daily_menu_id uuid REFERENCES daily_menus(id) ON DELETE CASCADE,
-  name text NOT NULL,
-  description text,
-  price numeric NOT NULL,
-  includes_drink boolean NOT NULL DEFAULT false,
-  image_url text,
-  sort_order integer DEFAULT 0
-);
-```
-
-### `menu_categories` / `menu_items`
-Carta permanente del negocio.
-
-```sql
-CREATE TABLE menu_categories (
-  id uuid DEFAULT gen_random_uuid() PRIMARY KEY,
-  business_id uuid REFERENCES businesses(id) ON DELETE CASCADE,
-  name text NOT NULL,
-  sort_order integer DEFAULT 0,
-  is_active boolean NOT NULL DEFAULT true
-);
-
-CREATE TABLE menu_items (
-  id uuid DEFAULT gen_random_uuid() PRIMARY KEY,
-  business_id uuid REFERENCES businesses(id) ON DELETE CASCADE,
-  category_id uuid REFERENCES menu_categories(id) ON DELETE CASCADE,
-  name text NOT NULL,
-  description text,
-  price numeric NOT NULL,
-  is_available boolean NOT NULL DEFAULT true,
-  sort_order integer DEFAULT 0,
-  image_url text
-);
-```
-
-### `subscriptions`
-
-```sql
-CREATE TABLE subscriptions (
-  id uuid DEFAULT gen_random_uuid() PRIMARY KEY,
-  business_id uuid REFERENCES businesses(id) ON DELETE CASCADE NOT NULL,
-  status text NOT NULL DEFAULT 'trial' CHECK (status IN ('trial','active','overdue','cancelled')),
-  price numeric NOT NULL DEFAULT 0,
-  billing_cycle text NOT NULL DEFAULT 'monthly' CHECK (billing_cycle IN ('monthly','yearly')),
-  current_period_start date NOT NULL,
-  current_period_end date NOT NULL,
-  notes text,
-  created_at timestamptz DEFAULT now()
-);
-```
-
-### `events`
-
-```sql
-CREATE TABLE events (
-  id uuid DEFAULT gen_random_uuid() PRIMARY KEY,
-  title text NOT NULL,
-  description text,
-  localidad text,
-  date_description text,
-  category text DEFAULT 'festival',
-  image_url jsonb DEFAULT '[]',
-  created_at timestamptz DEFAULT now()
-);
-```
-
-### Tablas Info Útil
-
-```sql
-CREATE TABLE localities (
-  id uuid DEFAULT gen_random_uuid() PRIMARY KEY,
-  name text NOT NULL,
-  slug text NOT NULL UNIQUE,
-  sort_order integer NOT NULL DEFAULT 0
-);
-
-CREATE TABLE useful_contacts (
-  id uuid DEFAULT gen_random_uuid() PRIMARY KEY,
-  title text NOT NULL,
-  description text,
-  phone text,
-  address text,
-  schedule text,
-  category text NOT NULL DEFAULT 'other',
-  sort_order integer NOT NULL DEFAULT 0,
-  is_active boolean NOT NULL DEFAULT true
-);
-
-CREATE TABLE utility_services (
-  id uuid DEFAULT gen_random_uuid() PRIMARY KEY,
-  locality_id uuid REFERENCES localities(id) ON DELETE CASCADE,
-  name text NOT NULL,
-  category text NOT NULL,
-  phone text,
-  address text,
-  description text,
-  is_active boolean NOT NULL DEFAULT true,
-  sort_order integer NOT NULL DEFAULT 0
-);
-
-CREATE TABLE transport_schedules (
-  id uuid DEFAULT gen_random_uuid() PRIMARY KEY,
-  company text NOT NULL,
-  origin_id uuid REFERENCES localities(id),
-  destination_id uuid REFERENCES localities(id),
-  departure_time text NOT NULL,
-  arrival_time text,
-  days text[] NOT NULL DEFAULT '{}',
-  notes text,
-  is_active boolean NOT NULL DEFAULT true
-);
-```
+- `supabase/migrations/01..03` — dispositivos PWA, vistas de Info Útil y `view_events`
+- `supabase/migrations/gastronomia_A*` — **antes** del merge de `feat/gastronomia`: tope de fotos, opciones alimentarias, servicio de mesa, `crear_pedido`, `crear_reserva`
+- `supabase/migrations/gastronomia_B*` — **después** del merge a `main`: Storage por negocio, lectura heredada de fotos/carta, políticas de pedidos y reservas
+- Raíz: `suscripciones_funciones_estado.sql` → `suscripciones_politica_visibilidad.sql` (en ese orden), `grupos_servicios_migracion.sql`, novedades, promociones y columnas sueltas
 
 ---
 
 ## Analytics
 
-| Métrica | Dónde | Cómo |
-|---|---|---|
-| Vistas al perfil | Detalle de negocio | RPC `increment_view` al montar |
-| Contactos (WhatsApp, teléfono, reserva) | Botones de contacto público | Insert en `business_leads` (ver tabla más abajo) |
+| Métrica | Cómo |
+|---|---|
+| Vistas al perfil | RPC `increment_view` → `businesses.total_views` |
+| Contactos (WhatsApp, teléfono, reserva) | Insert en `business_leads` |
+| Vistas de Info Útil | RPC `increment_info_view` → `info_views` |
+| Actividad por período | Triggers que copian lo anterior en `view_events` (desde el 6/10/2026) |
+| Instalaciones de la app | `track_pwa_device` → `pwa_devices` |
 
-```sql
-ALTER TABLE businesses ADD COLUMN IF NOT EXISTS total_views integer NOT NULL DEFAULT 0;
-
-CREATE OR REPLACE FUNCTION increment_view(business_id uuid)
-RETURNS void LANGUAGE sql SECURITY DEFINER AS $$
-  UPDATE businesses SET total_views = total_views + 1 WHERE id = business_id;
-$$;
-
--- Policy necesaria para que el insert público a business_leads funcione
--- (sin esto el insert falla en silencio y ningún contacto queda registrado):
-CREATE POLICY "Cualquiera puede registrar un lead"
-  ON business_leads FOR INSERT
-  TO anon, authenticated
-  WITH CHECK (true);
-```
-
-`businesses.total_leads` existió como columna pero quedó sin uso real (solo la
-incrementaba un componente que nunca se renderizaba) — el panel admin y el
-dashboard del negocio calculan los contactos contando filas de `business_leads`.
+`businesses.total_leads` quedó sin uso: los contactos se cuentan sobre `business_leads`.
 
 ---
 
-## Storage Buckets (Supabase)
+## Storage (Supabase)
 
 | Bucket | Uso |
 |---|---|
-| `logos` | Logos de negocios |
-| `covers` | Fotos de portada |
-| `gallery` | Fotos adicionales del negocio |
-| `menu-items` | Fotos de platos de la carta |
-| `professionals` | Fotos de profesionales de salud |
-| `event-images` | Imágenes de eventos |
+| `businesses` | Logos, portadas, galería, PDF y fotos de la carta, fotos de platos. Desde el panel del comercio: `<business_id>/<carpeta>/<archivo>` |
+| `event-images` | Eventos, novedades e Identidad Calamuchitana (solo admin) |
 
-Todos públicos (lectura pública, escritura autenticada).
+Lectura pública. Escritura: el admin todo; el dueño solo dentro de la carpeta de su negocio (migración B1).
 
 ---
 
 ## PWA
 
-La app está configurada como Progressive Web App con `@ducanh2912/next-pwa`.
+Configurada con `@ducanh2912/next-pwa`.
 
-- `public/manifest.json` — nombre, colores, íconos
-- `public/icons/` — íconos en múltiples tamaños incluyendo `icon-512-maskable.png` (para Android adaptive icons)
-- El service worker se genera automáticamente en build de producción
-- `assetlinks.json` en `/public/.well-known/` habilita TWA (Trusted Web Activity) en Android con el SHA-256 del certificado de firma de Google Play
+- `src/app/manifest.ts` — nombre, colores, íconos
+- `public/icons/` — íconos en varios tamaños, incluido `icon-512-maskable.png`
+- El service worker se genera en el build de producción; `/~offline` es la página sin conexión
+- `public/.well-known/assetlinks.json` habilita TWA (Trusted Web Activity) para la app de Google Play
 
 ---
 
@@ -531,15 +360,19 @@ La app está configurada como Progressive Web App con `@ducanh2912/next-pwa`.
 NEXT_PUBLIC_SUPABASE_URL=
 NEXT_PUBLIC_SUPABASE_ANON_KEY=
 NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN=
+NEXT_PUBLIC_SITE_URL=
+RESEND_API_KEY=
 ```
 
 ---
 
 ## Localidades
 
-16 localidades del Valle de Calamuchita:
+Las localidades se administran desde **Admin → Info Útil → Localidades** (tabla `localities`). Entre ellas:
 
-Villa General Belgrano · Santa Rosa de Calamuchita · La Cumbrecita · Los Reartes · Embalse · Amboy · Villa del Dique · Villa Rumipal · Potrero de Garay · Villa Yacanto · Villa Alpina · Villa Berna · Villa Ciudad Parque · Villa Quillinzo · La Cruz · Intiyaco
+Villa General Belgrano · Santa Rosa de Calamuchita · La Cumbrecita · Los Reartes · Embalse · Amboy · Villa del Dique · Villa Rumipal · Potrero de Garay · Villa Yacanto · Villa Ciudad de América · Villa Alpina · Villa Berna · Villa Ciudad Parque · Villa Quillinzo · La Cruz · Intiyaco
+
+Las fotos de cada localidad se mapean en `src/lib/constants/localidadImages.ts`.
 
 ---
 
@@ -547,8 +380,7 @@ Villa General Belgrano · Santa Rosa de Calamuchita · La Cumbrecita · Los Rear
 
 ```bash
 npm install
-cp .env.example .env.local
-# Completar variables de entorno
+# Crear .env.local con las variables de arriba
 npm run dev
 ```
 
@@ -558,7 +390,7 @@ npm run dev
 
 ```bash
 npm run dev      # Desarrollo local (http://localhost:3000)
-npm run build    # Build de producción
+npm run build    # Build de producción (webpack)
 npm run start    # Servidor de producción
 npm run lint     # Lint del código
 ```
@@ -569,8 +401,8 @@ npm run lint     # Lint del código
 
 | Funcionalidad | Estado |
 |---|---|
-| Suscripciones — vista en dashboard del negocio | Admin gestiona suscripciones; falta vista `/dashboard` para que el negocio vea su propio estado |
+| Suscripciones — vista en el dashboard del negocio | El admin las gestiona; el negocio todavía no ve su propio estado |
 | Paginación del directorio | Sin implementar |
-| Selector de localidad en formulario de eventos | El campo usa texto libre; sin selector de `localities` |
+| Selector de localidad en el formulario de eventos | Usa texto libre |
 | WebGLBackground | Componente creado, sin integrar |
-| Push notifications para pedidos | Sin implementar |
+| Push notifications para pedidos y reservas | Sin implementar |
