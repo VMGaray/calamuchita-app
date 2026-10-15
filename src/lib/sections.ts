@@ -58,6 +58,7 @@ export const sectionCategories = {
     { label: "Plomería", desc: "Instalaciones y reparaciones", href: "/directorio/services?cat=plomeria", bg: "bg-brand-slate/10", color: "text-brand-slate" },
     { label: "Profesionales", desc: "Contadores, abogados, arquitectos y más", href: "/directorio/services?cat=profesionales", bg: "bg-violet-100", color: "text-violet-700" },
     { label: "Refrigeración", desc: "Aire acondicionado y cámaras frías", href: "/directorio/services?cat=refrigeracion", bg: "bg-brand-slate/10", color: "text-brand-slate" },
+    { label: "Reparación de Celulares", desc: "Arreglo de pantallas, baterías y equipos", href: "/directorio/services?cat=reparacion-celulares", bg: "bg-brand-slate/10", color: "text-brand-slate" },
     { label: "Servicios audiovisuales", desc: "Fotografía, video y producción", href: "/directorio/services?cat=audiovisuales", bg: "bg-brand-slate/10", color: "text-brand-slate" },
     { label: "Soluciones Digitales & AI", desc: "Desarrollo, automatización e inteligencia artificial", href: "/directorio/services?cat=soluciones-digitales", bg: "bg-brand-slate/10", color: "text-brand-slate" },
     { label: "Tapicería", desc: "Tapizado y restauración de muebles", href: "/directorio/services?cat=tapiceria", bg: "bg-brand-earth/10", color: "text-brand-earth" },

@@ -75,6 +75,7 @@ export const MASTER_CATEGORIES = {
       { label: "Plomería", icon: Wrench, bg: "bg-blue-50", color: "text-blue-600" },
       { label: "Profesionales", icon: Briefcase, bg: "bg-violet-50", color: "text-violet-600" },
       { label: "Refrigeración", icon: Snowflake, bg: "bg-slate-50", color: "text-slate-400" },
+      { label: "Reparación de Celulares", icon: Smartphone, bg: "bg-stone-50", color: "text-stone-600" },
       { label: "Servicios audiovisuales", icon: Video, bg: "bg-indigo-50", color: "text-indigo-600" },
       { label: "Soluciones Digitales & AI", icon: Laptop, bg: "bg-slate-50", color: "text-slate-600" },
       { label: "Tapicería", icon: Armchair, bg: "bg-amber-50", color: "text-amber-700" },
@@ -214,7 +215,7 @@ export const SERVICE_GROUPS: ServiceGroup[] = [
     "Depilación", "Manicura", "Tatuajes",
   ] },
   { slug: "arreglos", label: "Arreglos y oficios", icon: Scissors, rubros: [
-    "Costurera/Modista", "Compostura de calzado", "Tapicería", "Máquinas de coser",
+    "Costurera/Modista", "Compostura de calzado", "Tapicería", "Máquinas de coser", "Reparación de Celulares",
   ] },
   { slug: "tramites", label: "Trámites y asesoramiento", icon: FileText, rubros: [
     "Gestoría", "Comisiones", "Coaching",
