@@ -55,7 +55,7 @@ function HeroSectionInner() {
           <InteractiveText text="Todo el valle," />
         </motion.div>
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.3, delay: 0.6 }}>
-          <InteractiveText text="en un solo lugar" />
+          <InteractiveText text="en un mismo lugar" />
         </motion.div>
       </h1>
 

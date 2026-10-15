@@ -22,7 +22,7 @@ export const metadata: Metadata = {
     template: "%s | Calamuchita App",
     default: "Calamuchita App",
   },
-  description: "Todo el Valle de Calamuchita en un solo lugar. Gastronomía, servicios, salud, turismo y más en Córdoba, Argentina.",
+  description: "Todo el Valle de Calamuchita en un mismo lugar. Gastronomía, servicios, salud, turismo y más en Córdoba, Argentina.",
   manifest: "/manifest", // ✨ Vinculación clave para que Next.js asocie tu manifest.ts
   openGraph: {
     siteName: "Calamuchita App",
