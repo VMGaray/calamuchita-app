@@ -2,6 +2,7 @@
 
 import { useState } from "react"
 import Image from "next/image"
+import { Images } from "lucide-react"
 import PromoCoupon, {
   fontDisplay,
   fontBody,
@@ -12,45 +13,45 @@ import PromoCoupon, {
   CATEGORY_COLORS,
   normalizeCategoria,
   getInitials,
-  type Promo,
+  groupHeadline,
+  type PromoGroup,
 } from "@/components/public/PromoCoupon"
 
 // ─────────────────────────────────────────────────────────────
 // Layout master-detail para desktop (lg+): columna izquierda con la lista
-// compacta de promos (una fila por promo, acento del color de su categoría),
-// columna derecha con el detalle de la promo seleccionada. El detalle
-// reutiliza <PromoCoupon> tal cual — el mismo componente que ya se usa en
-// el perfil de negocio — para no duplicar su estilo.
+// compacta de negocios con promos (una fila por negocio, acento del color de
+// su categoría), columna derecha con el detalle del negocio seleccionado. El
+// detalle reutiliza <PromoCoupon> tal cual — el mismo componente que se usa
+// en el perfil de negocio — para no duplicar su estilo.
 //
 // Mobile/tablet angosto siguen viendo el stack acordeón (PromoAccordionCard);
 // ver el toggle lg:hidden / hidden lg:block en PromosExclusivas.tsx.
 // ─────────────────────────────────────────────────────────────
 
 export interface PromoMasterDetailProps {
-  promos: Promo[]
-  onShare?: (promo: Promo) => void
+  groups: PromoGroup[]
 }
 
-export default function PromoMasterDetail({ promos, onShare }: PromoMasterDetailProps) {
-  // Estado interno: qué promo está seleccionada en la lista. Default: la primera.
-  const [selectedId, setSelectedId] = useState<string | null>(promos[0]?.id ?? null)
+export default function PromoMasterDetail({ groups }: PromoMasterDetailProps) {
+  // Estado interno: qué negocio está seleccionado en la lista. Default: el primero.
+  const [selectedId, setSelectedId] = useState<string | null>(groups[0]?.businessId ?? null)
 
-  const selected = promos.find((promo) => promo.id === selectedId) ?? promos[0]
+  const selected = groups.find((g) => g.businessId === selectedId) ?? groups[0]
 
   return (
     <div className="grid grid-cols-[360px_1fr] items-start gap-6">
       <ul className="flex max-h-180 flex-col gap-2 overflow-y-auto pr-1">
-        {promos.map((promo) => {
-          const categoria = normalizeCategoria(promo.categoria)
+        {groups.map((group) => {
+          const categoria = normalizeCategoria(group.categoria)
           const color = CATEGORY_COLORS[categoria]
-          const isSelected = promo.id === selected?.id
-          const bigLabel = promo.descuento_valor ?? promo.descuento_label ?? "Oferta especial"
+          const isSelected = group.businessId === selected?.businessId
+          const { primary } = groupHeadline(group)
 
           return (
-            <li key={promo.id}>
+            <li key={group.businessId}>
               <button
                 type="button"
-                onClick={() => setSelectedId(promo.id)}
+                onClick={() => setSelectedId(group.businessId)}
                 aria-current={isSelected}
                 className="flex w-full items-center gap-3 rounded-2xl border px-3 py-2.5 text-left transition-colors"
                 style={{
@@ -70,10 +71,10 @@ export default function PromoMasterDetail({ promos, onShare }: PromoMasterDetail
                   className="flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-[11px]"
                   style={{ background: SECTION_BG }}
                 >
-                  {promo.logo_url ? (
+                  {group.logo_url ? (
                     <div className="relative h-full w-full p-1">
                       <Image
-                        src={promo.logo_url}
+                        src={group.logo_url}
                         alt=""
                         fill
                         sizes="40px"
@@ -86,7 +87,7 @@ export default function PromoMasterDetail({ promos, onShare }: PromoMasterDetail
                       className="text-xs font-bold"
                       style={{ ...fontDisplay, color: color.a }}
                     >
-                      {getInitials(promo.comercio)}
+                      {getInitials(group.comercio)}
                     </span>
                   )}
                 </div>
@@ -96,22 +97,27 @@ export default function PromoMasterDetail({ promos, onShare }: PromoMasterDetail
                     className="truncate text-[14px] font-bold"
                     style={{ ...fontDisplay, color: TEXT_MAIN }}
                   >
-                    {promo.comercio}
+                    {group.comercio}
                   </p>
                   <p
-                    className="truncate text-[12px] font-semibold"
+                    className="flex items-center gap-1.5 truncate text-[12px] font-semibold"
                     style={{ ...fontBody, color: color.a }}
                   >
                     {color.label}
+                    {group.flyers.length > 0 && (
+                      <span className="inline-flex items-center gap-0.5" style={{ color: TEXT_MUTED }}>
+                        · <Images size={11} aria-hidden="true" /> {group.flyers.length}
+                      </span>
+                    )}
                   </p>
                 </div>
 
                 <span
-                  title={bigLabel}
+                  title={primary}
                   className="max-w-25 shrink-0 truncate text-right text-[13px] font-bold"
                   style={{ ...fontBody, color: TEXT_MUTED }}
                 >
-                  {bigLabel}
+                  {primary}
                 </span>
               </button>
             </li>
@@ -120,7 +126,7 @@ export default function PromoMasterDetail({ promos, onShare }: PromoMasterDetail
       </ul>
 
       <div className="lg:sticky lg:top-24">
-        {selected && <PromoCoupon promo={selected} onShare={onShare} />}
+        {selected && <PromoCoupon key={selected.businessId} group={selected} />}
       </div>
     </div>
   )

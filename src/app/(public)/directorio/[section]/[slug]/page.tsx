@@ -5,7 +5,7 @@ import { createClient } from "@/lib/supabase/server"
 import { notFound, redirect } from "next/navigation"
 import { businessProfileUrl } from "@/lib/utils/business"
 import { hoyAR } from "@/lib/utils/fechas"
-import { promoHeadline, PROMO_VALUE_COLUMNS } from "@/lib/promos"
+import { promoHeadline, buildPromoGroup, PROMO_VALUE_COLUMNS, PROMO_FLYERS_EMBED, type PromotionRow } from "@/lib/promos"
 
 interface Props {
   params: Promise<{ section: string; slug: string }>
@@ -95,16 +95,25 @@ export default async function DirectorioDetallePage({ params }: Props) {
 
   const { data: promotionsData } = await supabase
     .from("promotions")
-    .select(`id, title, description, ${PROMO_VALUE_COLUMNS}, valid_until`)
+    .select(`id, title, description, ${PROMO_VALUE_COLUMNS}, valid_until, ${PROMO_FLYERS_EMBED}`)
     .eq("business_id", business.id)
     .eq("is_active", true)
     .gte("valid_until", today)
-    .order("created_at", { ascending: false })
-    .limit(3)
+    .order("valid_until", { ascending: true })
+
+  // Todas las promos vigentes en un solo bloque (el perfil muestra 3 y "Ver todas")
+  const promoRows = (promotionsData as PromotionRow[] | null) ?? []
+  const promoGroup = promoRows.length
+    ? buildPromoGroup(
+        { id: business.id, name: business.name, section: business.section, logo_url: business.logo_url ?? null },
+        promoRows,
+        null
+      )
+    : null
 
   return (
     <Suspense>
-      <DirectorioDetalle business={business} section={section} promotions={promotionsData ?? []} />
+      <DirectorioDetalle business={business} section={section} promoGroup={promoGroup} />
     </Suspense>
   )
 }
