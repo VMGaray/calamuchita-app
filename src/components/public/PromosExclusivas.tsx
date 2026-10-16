@@ -13,15 +13,12 @@ import {
   TEXT_MUTED,
   BORDER,
   GREEN_ACCENT,
-  type Promo,
+  type PromoGroup,
 } from "@/components/public/PromoCoupon"
 
-export type { Promo }
-
 export interface PromosExclusivasProps {
-  promos: Promo[]
-  /** Si no se pasa, cada PromoCoupon usa Web Share API con fallback a portapapeles. */
-  onShare?: (promo: Promo) => void
+  /** Un grupo por negocio, con todas sus promos vigentes. */
+  groups: PromoGroup[]
   eyebrow?: string
   title?: React.ReactNode
   subtitle?: string
@@ -29,17 +26,16 @@ export interface PromosExclusivasProps {
 }
 
 export default function PromosExclusivas({
-  promos,
-  onShare,
+  groups,
   eyebrow = "No te pierdas las",
   title,
   subtitle = "Descuentos y beneficios pensados para vos, directo de los comercios del Valle de Calamuchita.",
   className = "",
 }: PromosExclusivasProps) {
-  // Estado interno: qué cupón del stack está abierto (uno solo a la vez).
+  // Estado interno: qué negocio del stack está abierto (uno solo a la vez).
   const [openId, setOpenId] = useState<string | null>(null)
 
-  if (!promos || promos.length === 0) return null
+  if (!groups || groups.length === 0) return null
 
   return (
     <section className={`${promoFontVariables} ${className}`}>
@@ -72,21 +68,20 @@ export default function PromosExclusivas({
 
       {/* Mobile / tablet angosto: stack apilado tipo acordeón. */}
       <ul className="flex w-full flex-col lg:hidden">
-        {promos.map((promo, i) => (
+        {groups.map((group, i) => (
           <PromoAccordionCard
-            key={promo.id}
-            promo={promo}
+            key={group.businessId}
+            group={group}
             index={i}
-            isOpen={openId === promo.id}
-            onToggle={() => setOpenId((current) => (current === promo.id ? null : promo.id))}
-            onShare={onShare}
+            isOpen={openId === group.businessId}
+            onToggle={() => setOpenId((current) => (current === group.businessId ? null : group.businessId))}
           />
         ))}
       </ul>
 
       {/* Desktop (lg+): master-detail — lista compacta + detalle a la derecha. */}
       <div className="hidden lg:block">
-        <PromoMasterDetail promos={promos} onShare={onShare} />
+        <PromoMasterDetail groups={groups} />
       </div>
     </section>
   )
