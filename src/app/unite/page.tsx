@@ -4,7 +4,7 @@ import { Check, Utensils, Store, Wrench, ArrowLeft, HeartPulse, ShieldAlert } fr
 import Link from "next/link"
 
 export default function UnitePage() {
-  const WHATSAPP_NUMBER = "541145311047"
+  const WHATSAPP_NUMBER = "5493546547950"
 
   // Mensajes pre-armados para WhatsApp según el plan seleccionado
   const getWaLink = (planName: string) => {
