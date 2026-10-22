@@ -30,7 +30,7 @@ const DEFAULTS: Config = {
   url: "https://calamuchita.app",
   localidad_default: "Villa General Belgrano",
   email: "",
-  whatsapp: "1145311047",
+  whatsapp: "3546547950",
   telefono: "",
   direccion: "Valle de Calamuchita, Córdoba, Argentina",
   instagram: "",

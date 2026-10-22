@@ -30,7 +30,7 @@ export default function DashboardPending({ userName, userEmail, userId }: Props)
   const waMsg = encodeURIComponent(
     `Hola! Me registré en Calamuchita App como gastronómico y mi cuenta lleva más de 24hs pendiente de aprobación.\n\nNombre: ${userName || "—"}\nEmail: ${userEmail || "—"}`
   )
-  const waLink = `https://wa.me/541145311047?text=${waMsg}`
+  const waLink = `https://wa.me/5493546547950?text=${waMsg}`
 
   return (
     <main className="min-h-screen bg-stone-50 flex items-center justify-center p-4">

@@ -5,6 +5,7 @@ import Link from "next/link"
 import { useRef, useState } from "react"
 import { ChevronLeft, ChevronRight, FileText } from "lucide-react"
 import type { EditorialPost } from "@/app/(public)/page"
+import { stripRichText } from "@/lib/richText"
 
 // Colores de badge para fondo blanco — contraste legible sobre tarjeta clara
 const TYPE_BADGE: Record<string, { bg: string; color: string; dot: string }> = {
@@ -173,7 +174,7 @@ export default function PulsoDelValle({ posts }: Props) {
                 {/* Descripción — gris oscuro legible */}
                 {post.description && (
                   <p className="text-xs text-stone-600 font-medium leading-relaxed line-clamp-2 mt-1">
-                    {post.description}
+                    {stripRichText(post.description)}
                   </p>
                 )}
 
