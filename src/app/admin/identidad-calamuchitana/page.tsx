@@ -1,14 +1,15 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef } from "react"
 import Link from "next/link"
 import Image from "next/image"
 import { AnimatePresence, motion } from "framer-motion"
 import { createClient } from "@/lib/supabase/client"
 import ImageUpload from "@/components/ui/ImageUpload"
+import { htmlToRichText, stripRichText } from "@/lib/richText"
 import {
   ArrowLeft, Plus, X, Pencil, Trash2, Newspaper,
-  Loader2, ImageIcon, CalendarDays,
+  Loader2, ImageIcon, CalendarDays, Bold,
 } from "lucide-react"
 
 // ── Tipos ─────────────────────────────────────────────────────────────────────
@@ -71,6 +72,7 @@ export default function IdentidadCalamuchitanaPage() {
   const [showForm, setShowForm] = useState(false)
   const [editing, setEditing] = useState<EditorialPost | null>(null)
   const [form, setForm] = useState<FormState>(EMPTY_FORM)
+  const descRef = useRef<HTMLTextAreaElement>(null)
 
   // ── Fetch ──────────────────────────────────────────────────────────────────
 
@@ -115,6 +117,32 @@ export default function IdentidadCalamuchitanaPage() {
 
   const set = <K extends keyof FormState>(key: K) =>
     (val: FormState[K]) => setForm(f => ({ ...f, [key]: val }))
+
+  // Reemplaza la selección del textarea y deja el cursor/selección en su lugar
+  const replaceDescSelection = (build: (selected: string) => string, selectInner = false) => {
+    const ta = descRef.current
+    if (!ta) return
+    const { selectionStart: start, selectionEnd: end, value } = ta
+    const selected = value.slice(start, end)
+    const insert = build(selected)
+    setForm(f => ({ ...f, description: value.slice(0, start) + insert + value.slice(end) }))
+    requestAnimationFrame(() => {
+      ta.focus()
+      if (selectInner) ta.setSelectionRange(start + 2, start + 2 + selected.length)
+      else ta.setSelectionRange(start + insert.length, start + insert.length)
+    })
+  }
+
+  // Al pegar desde Word / Google Docs conserva párrafos y negritas
+  const handleDescPaste = (e: React.ClipboardEvent<HTMLTextAreaElement>) => {
+    const html = e.clipboardData.getData("text/html")
+    if (!html) return
+    e.preventDefault()
+    const text = htmlToRichText(html)
+    replaceDescSelection(() => text)
+  }
+
+  const toggleBold = () => replaceDescSelection(sel => `**${sel}**`, true)
 
   // ── Save ───────────────────────────────────────────────────────────────────
 
@@ -279,7 +307,7 @@ export default function IdentidadCalamuchitanaPage() {
                   </p>
                   {post.description && (
                     <p className="text-xs text-stone-400 leading-relaxed line-clamp-2">
-                      {post.description}
+                      {stripRichText(post.description)}
                     </p>
                   )}
                   {post.expires_at && (
@@ -423,16 +451,31 @@ export default function IdentidadCalamuchitanaPage() {
 
                   {/* Descripción */}
                   <div>
-                    <label className="block text-[10px] font-black uppercase tracking-[0.18em] text-stone-400 mb-2">
-                      Descripción
-                    </label>
+                    <div className="flex items-end justify-between mb-2">
+                      <label className="block text-[10px] font-black uppercase tracking-[0.18em] text-stone-400">
+                        Texto de la nota
+                      </label>
+                      <button
+                        type="button"
+                        onClick={toggleBold}
+                        title="Negrita: seleccioná el texto y tocá acá"
+                        className="flex items-center gap-1 px-2.5 py-1 rounded-lg border border-stone-200 text-xs font-bold text-stone-600 hover:bg-stone-100 transition-colors"
+                      >
+                        <Bold size={12} /> Negrita
+                      </button>
+                    </div>
                     <textarea
-                      rows={4}
+                      ref={descRef}
+                      rows={12}
                       value={form.description}
                       onChange={e => set("description")(e.target.value)}
-                      placeholder="Un párrafo introductorio que resume de qué trata esta nota..."
-                      className={`${INPUT} resize-none`}
+                      onPaste={handleDescPaste}
+                      placeholder="Pegá el texto tal cual: se respetan los párrafos y las negritas."
+                      className={`${INPUT} resize-y`}
                     />
+                    <p className="text-[10px] text-stone-400 mt-1.5 leading-relaxed">
+                      Dejá una línea en blanco entre párrafos. Lo que está entre **dos asteriscos** se ve en negrita.
+                    </p>
                   </div>
 
                   {/* Fecha de expiración — visible solo para Tip del Finde */}
