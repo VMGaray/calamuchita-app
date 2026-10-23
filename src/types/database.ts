@@ -47,6 +47,7 @@ export interface Business {
   pueblo: string | null
   phone: string | null
   whatsapp: string | null       // ← nuevo
+  whatsapp_contacts: { name: string; phone: string }[]  // todos los WhatsApp; whatsapp = el primero
   instagram: string | null
   facebook: string | null
   logo_url: string | null

@@ -15,6 +15,8 @@ import { normalizeUrl } from "@/lib/normalizeUrl"
 import HorariosEditor, { HorarioDay, expandHorariosForSave, mergeHorariosFromDB, defaultHorarios } from "@/components/ui/HorariosEditor"
 import { ArrowLeft, Star } from "lucide-react"
 import QRMarketing from "@/components/admin/QRMarketing"
+import WhatsappContactsEditor from "@/components/ui/WhatsappContactsEditor"
+import { cleanWhatsappContacts, getWhatsappContacts, type WhatsappContact } from "@/lib/whatsapp"
 
 const sections: { value: BusinessSection; label: string }[] = [
   { value: "gastronomy", label: "Gastronomía" },
@@ -118,6 +120,7 @@ export default function AdminNegocioEdit({ id }: Props) {
   const [professionalType, setProfessionalType] = useState("")
   const [coordsInput, setCoordsInput] = useState("")
   const [selectedCategories, setSelectedCategories] = useState<string[]>([])
+  const [whatsapps, setWhatsapps] = useState<WhatsappContact[]>([])
 
   const [form, setForm] = useState({
     name: "",
@@ -131,7 +134,6 @@ export default function AdminNegocioEdit({ id }: Props) {
     phone: "",
     instagram: "",
     facebook: "",
-    whatsapp: "",
     offers_delivery: false,
     offers_takeaway: false,
     offers_dine_in: false,
@@ -164,6 +166,7 @@ export default function AdminNegocioEdit({ id }: Props) {
 
       if (business) {
         const addressParts = business.address?.split(",") || []
+        setWhatsapps(getWhatsappContacts(business))
         setForm({
           name: business.name || "",
           slug: business.slug || "",
@@ -176,7 +179,6 @@ export default function AdminNegocioEdit({ id }: Props) {
           phone: business.phone || "",
           instagram: business.instagram || "",
           facebook: business.facebook || "",
-          whatsapp: business.whatsapp || "",
           offers_delivery: business.offers_delivery || false,
           offers_takeaway: business.offers_takeaway || false,
           offers_dine_in: business.offers_dine_in || false,
@@ -273,7 +275,8 @@ export default function AdminNegocioEdit({ id }: Props) {
         phone: form.phone || null,
         instagram: form.instagram || null,
         facebook: form.facebook || null,
-        whatsapp: form.whatsapp || null,
+        whatsapp: cleanWhatsappContacts(whatsapps)[0]?.phone ?? null,
+        whatsapp_contacts: cleanWhatsappContacts(whatsapps),
         offers_delivery: form.offers_delivery,
         offers_takeaway: form.offers_takeaway,
         offers_dine_in: form.offers_dine_in,
@@ -516,12 +519,8 @@ export default function AdminNegocioEdit({ id }: Props) {
               <input type="tel" value={form.phone} onChange={(e) => handleChange("phone", e.target.value)}
                 className="w-full px-4 py-2.5 rounded-xl border border-stone-200 text-stone-800 text-sm outline-none focus:ring-2 focus:ring-primary-300" />
             </div>
-            <div>
-              <label className="block text-sm font-medium text-stone-700 mb-1">WhatsApp</label>
-              <input type="tel" value={form.whatsapp} onChange={(e) => handleChange("whatsapp", e.target.value)}
-                className="w-full px-4 py-2.5 rounded-xl border border-stone-200 text-stone-800 text-sm outline-none focus:ring-2 focus:ring-primary-300" />
-            </div>
           </div>
+          <WhatsappContactsEditor value={whatsapps} onChange={setWhatsapps} />
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-medium text-stone-700 mb-1">Instagram</label>

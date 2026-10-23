@@ -11,6 +11,7 @@ import {
 import { motion, AnimatePresence } from "framer-motion"
 import { createClient } from "@/lib/supabase/client"
 import { normalizeArgPhone } from "@/lib/phone"
+import { getWhatsappContacts } from "@/lib/whatsapp"
 import { normalizeUrl } from "@/lib/normalizeUrl"
 import { extractYoutubeId } from "@/lib/utils/youtube"
 import AnimateIn from "@/components/ui/AnimateIn"
@@ -98,10 +99,14 @@ export default function DirectorioDetalle({ business, section, promoGroup = null
   const recordLead = (type: string) =>
     createClient().from("business_leads").insert({ business_id: business.id, type }).then()
 
-  const waNum  = normalizeArgPhone(business.whatsapp || business.phone || "")
-  const waLink = waNum
-    ? `https://wa.me/${waNum}?text=${encodeURIComponent(`Hola! Te consulto desde Calamuchita App — ${business.name} 🌿`)}`
-    : null
+  // Un botón por WhatsApp cargado; sin WhatsApp, se usa el teléfono. Con más de uno, se muestra el nombre debajo.
+  const waContacts = getWhatsappContacts(business)
+  const waText     = encodeURIComponent(`Hola! Te consulto desde Calamuchita App — ${business.name} 🌿`)
+  const waButtons  = (waContacts.length ? waContacts : business.phone ? [{ name: "", phone: business.phone }] : [])
+    .map(c => ({ ...c, href: `https://wa.me/${normalizeArgPhone(c.phone)}?text=${waText}` }))
+    .filter(c => normalizeArgPhone(c.phone))
+  const waLink   = waButtons[0]?.href ?? null
+  const waMulti  = waButtons.length > 1
 
   const todayIdx  = new Date(new Date().toLocaleString("en-US", { timeZone: "America/Argentina/Buenos_Aires" })).getDay()
 
@@ -267,13 +272,16 @@ export default function DirectorioDetalle({ business, section, promoGroup = null
             {/* Botones — dentro de la columna izquierda en desktop */}
             {hasBottomActions && (
               <div className="flex flex-col gap-2 w-full mt-6">
-                {waLink && (
-                  <a href={waLink} target="_blank" rel="noopener noreferrer" onClick={() => recordLead("whatsapp")}
-                    className="flex items-center justify-center gap-2 w-full py-3 rounded-2xl text-sm font-semibold text-white hover:brightness-105 active:scale-95 transition-all"
-                    style={{ background: "#25D366" }}>
-                    <WaIcon size={16} /> WhatsApp
-                  </a>
-                )}
+                {waButtons.map((wa, i) => (
+                  <div key={i} className="w-full">
+                    <a href={wa.href} target="_blank" rel="noopener noreferrer" onClick={() => recordLead("whatsapp")}
+                      className="flex items-center justify-center gap-2 w-full py-3 rounded-2xl text-sm font-semibold text-white hover:brightness-105 active:scale-95 transition-all"
+                      style={{ background: "#25D366" }}>
+                      <WaIcon size={16} /> WhatsApp
+                    </a>
+                    {waMulti && wa.name && <p className="text-xs text-white/70 text-center mt-1">{wa.name}</p>}
+                  </div>
+                ))}
                 {business.phone && (
                   <a href={`tel:${business.phone}`} onClick={() => recordLead("phone")}
                     className="flex items-center justify-center gap-2 w-full py-3 rounded-2xl text-sm font-semibold border-2 bg-white hover:opacity-80 active:scale-95 transition-all"
@@ -339,8 +347,24 @@ export default function DirectorioDetalle({ business, section, promoGroup = null
           {/* ── Botones WhatsApp / Llamar / Llegar — mobile: fila horizontal; oculto en desktop ── */}
           {hasBottomActions && (
             <AnimateIn>
-              <div className="flex gap-3 max-w-lg mx-auto px-4 mt-4 md:hidden">
-                {waLink && (
+              <div className="max-w-lg mx-auto px-4 mt-4 md:hidden flex flex-col gap-3">
+              {waMulti && (
+                <div className="grid grid-cols-2 gap-3">
+                  {waButtons.map((wa, i) => (
+                    <div key={i}>
+                      <a href={wa.href} target="_blank" rel="noopener noreferrer" onClick={() => recordLead("whatsapp")}
+                        className="flex items-center justify-center gap-2 py-3.5 rounded-2xl font-bold text-sm text-white shadow-sm hover:brightness-105 active:scale-95 transition-all"
+                        style={{ background: "#25D366" }}>
+                        <WaIcon size={16} /> WhatsApp
+                      </a>
+                      {wa.name && <p className="text-xs text-center mt-1" style={{ color: "rgba(45,69,48,0.65)" }}>{wa.name}</p>}
+                    </div>
+                  ))}
+                </div>
+              )}
+              {(!waMulti && waLink || business.phone || business.address || (business.latitude && business.longitude)) && (
+              <div className="flex gap-3">
+                {!waMulti && waLink && (
                   <a href={waLink} target="_blank" rel="noopener noreferrer" onClick={() => recordLead("whatsapp")}
                     className="flex-1 flex items-center justify-center gap-2 py-3.5 rounded-2xl font-bold text-sm text-white shadow-sm hover:brightness-105 active:scale-95 transition-all"
                     style={{ background: "#25D366" }}>
@@ -373,6 +397,8 @@ export default function DirectorioDetalle({ business, section, promoGroup = null
                   </a>
                 )}
               </div>
+              )}
+              </div>
             </AnimateIn>
           )}
         </div>
@@ -394,7 +420,7 @@ export default function DirectorioDetalle({ business, section, promoGroup = null
             )}
 
             {/* Contacto */}
-            {(business.phone || business.whatsapp || instagramHandle || facebookUrl || websiteUrl || business.address) && (
+            {(business.phone || waContacts.length > 0 || instagramHandle || facebookUrl || websiteUrl || business.address) && (
               <div className={`${cardClass} min-h-[200px]`}>
                 <p className="text-xs font-semibold uppercase tracking-wider text-stone-400 mb-3">Contacto</p>
                 <div className="space-y-2.5">
@@ -404,6 +430,13 @@ export default function DirectorioDetalle({ business, section, promoGroup = null
                       {business.phone}
                     </a>
                   )}
+                  {waContacts.map((wa, i) => (
+                    <a key={i} href={`https://wa.me/${normalizeArgPhone(wa.phone)}?text=${waText}`} target="_blank" rel="noopener noreferrer" onClick={() => recordLead("whatsapp")}
+                      className="flex items-center gap-2 text-sm text-stone-600 hover:text-[#2D4530]">
+                      <WaIcon size={14} />
+                      <span>{wa.phone}{wa.name && <span className="text-stone-400"> · {wa.name}</span>}</span>
+                    </a>
+                  ))}
                   {instagramHandle && (
                     <a href={`https://instagram.com/${instagramHandle}`} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-sm text-stone-600 hover:text-[#2D4530]">
                       <AtSign size={14} />
