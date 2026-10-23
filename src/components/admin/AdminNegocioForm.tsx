@@ -12,6 +12,8 @@ import PdfUpload from "@/components/ui/PdfUpload"
 import { isValidYoutubeUrl } from "@/lib/utils/youtube"
 import { normalizeUrl } from "@/lib/normalizeUrl"
 import HorariosEditor, { HorarioDay, expandHorariosForSave, defaultHorarios } from "@/components/ui/HorariosEditor"
+import WhatsappContactsEditor from "@/components/ui/WhatsappContactsEditor"
+import { cleanWhatsappContacts, type WhatsappContact } from "@/lib/whatsapp"
 
 // Fotos de galería que se cargan en el alta (después se editan con GaleriaFotos, tope 8)
 const FOTOS_ALTA = 5
@@ -144,6 +146,7 @@ export default function AdminNegocioForm() {
   const [branches, setBranches] = useState<Array<{ address: string; pueblo: string }>>([])
   const [professionalType, setProfessionalType] = useState("")
   const [coordsInput, setCoordsInput] = useState("")
+  const [whatsapps, setWhatsapps] = useState<WhatsappContact[]>([])
 
   const [form, setForm] = useState({
     name: "",
@@ -155,7 +158,6 @@ export default function AdminNegocioForm() {
     address: "",
     pueblo: "",
     phone: "",
-    whatsapp: "",
     instagram: "",
     facebook: "",
     menu_link: "",
@@ -268,7 +270,8 @@ export default function AdminNegocioForm() {
       latitude: coords?.lat ?? null,
       longitude: coords?.lng ?? null,
       phone: form.phone || null,
-      whatsapp: form.whatsapp || null,
+      whatsapp: cleanWhatsappContacts(whatsapps)[0]?.phone ?? null,
+      whatsapp_contacts: cleanWhatsappContacts(whatsapps),
       instagram: form.instagram || null,
       facebook: form.facebook || null,
       menu_link: normalizeUrl(form.menu_link),
@@ -527,13 +530,8 @@ export default function AdminNegocioForm() {
                 placeholder="3546 123456"
                 className="w-full px-4 py-2.5 rounded-xl border border-stone-200 text-stone-800 text-sm outline-none focus:ring-2 focus:ring-primary-300" />
             </div>
-            <div>
-              <label className="block text-sm font-medium text-stone-700 mb-1">WhatsApp</label>
-              <input type="tel" value={form.whatsapp} onChange={e => handleChange("whatsapp", e.target.value)}
-                placeholder="3546 123456"
-                className="w-full px-4 py-2.5 rounded-xl border border-stone-200 text-stone-800 text-sm outline-none focus:ring-2 focus:ring-primary-300" />
-            </div>
           </div>
+          <WhatsappContactsEditor value={whatsapps} onChange={setWhatsapps} />
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             <div>
               <label className="block text-sm font-medium text-stone-700 mb-1">Instagram</label>
