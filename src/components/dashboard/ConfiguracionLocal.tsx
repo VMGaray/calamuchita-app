@@ -9,6 +9,8 @@ import { DIETARY_DISCLAIMER } from "@/lib/constants/dietary"
 import HorariosEditor, { HorarioDay, mergeHorariosFromDB, expandHorariosForSave } from "@/components/ui/HorariosEditor"
 import dynamic from "next/dynamic"
 import { LatLng, PUEBLOS } from "@/lib/geocoding"
+import WhatsappContactsEditor from "@/components/ui/WhatsappContactsEditor"
+import { cleanWhatsappContacts, getWhatsappContacts, type WhatsappContact } from "@/lib/whatsapp"
 
 // El mapa (mapbox-gl) pesa: se carga solo en el navegador y aparte del resto del formulario
 const UbicacionPicker = dynamic(() => import("@/components/dashboard/UbicacionPicker"), {
@@ -51,6 +53,7 @@ export default function ConfiguracionLocal() {
   const [businessId, setBusinessId] = useState<string | null>(null)
   const [horarios, setHorarios] = useState<HorarioDay[]>([])
   const [coords, setCoords] = useState<LatLng | null>(null)
+  const [whatsapps, setWhatsapps] = useState<WhatsappContact[]>([])
 
   const [form, setForm] = useState({
     name: "",
@@ -60,7 +63,6 @@ export default function ConfiguracionLocal() {
     address: "",
     pueblo: "",
     phone: "",
-    whatsapp: "",
     instagram: "",
     facebook: "",
     offers_delivery: false,
@@ -89,6 +91,7 @@ export default function ConfiguracionLocal() {
       if (business) {
         setBusinessId(business.id)
         const { street, pueblo } = splitAddress(business.address, business.pueblo)
+        setWhatsapps(getWhatsappContacts(business))
         setForm({
           name: business.name || "",
           slug: business.slug || "",
@@ -97,7 +100,6 @@ export default function ConfiguracionLocal() {
           address: street,
           pueblo,
           phone: business.phone || "",
-          whatsapp: business.whatsapp || "",
           instagram: business.instagram || "",
           facebook: business.facebook || "",
           offers_delivery: business.offers_delivery || false,
@@ -192,7 +194,8 @@ export default function ConfiguracionLocal() {
       latitude: coords?.lat ?? null,
       longitude: coords?.lng ?? null,
       phone: form.phone || null,
-      whatsapp: form.whatsapp || null,
+      whatsapp: cleanWhatsappContacts(whatsapps)[0]?.phone ?? null,
+      whatsapp_contacts: cleanWhatsappContacts(whatsapps),
       instagram: form.instagram || null,
       facebook: form.facebook || null,
       offers_delivery: form.offers_delivery,
@@ -311,17 +314,8 @@ export default function ConfiguracionLocal() {
                 className="w-full px-4 py-2.5 rounded-xl border border-stone-200 text-stone-800 text-sm outline-none focus:ring-2 focus:ring-primary-300"
               />
             </div>
-            <div>
-              <label className="block text-sm font-medium text-stone-700 mb-1">WhatsApp</label>
-              <input
-                type="tel"
-                value={form.whatsapp}
-                onChange={(e) => handleChange("whatsapp", e.target.value)}
-                placeholder="3546 123456"
-                className="w-full px-4 py-2.5 rounded-xl border border-stone-200 text-stone-800 text-sm outline-none focus:ring-2 focus:ring-primary-300"
-              />
-            </div>
           </div>
+          <WhatsappContactsEditor value={whatsapps} onChange={setWhatsapps} />
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-medium text-stone-700 mb-1">Instagram</label>

@@ -3,6 +3,7 @@ import Link from "next/link"
 import { ArrowLeft, CalendarDays } from "lucide-react"
 import { createClient } from "@/lib/supabase/server"
 import ImageLightbox from "@/components/ui/ImageLightbox"
+import { parseRichText, stripRichText } from "@/lib/richText"
 
 const TYPE_STYLES: Record<string, { bg: string; color: string }> = {
   "Entrevista":      { bg: "rgba(45,69,48,0.10)",   color: "#2D4530" },
@@ -29,7 +30,7 @@ export async function generateMetadata({ params }: Props) {
   if (!data) return {}
   return {
     title: `${data.title} | Identidad Calamuchitana`,
-    description: data.description ?? undefined,
+    description: data.description ? stripRichText(data.description) : undefined,
   }
 }
 
@@ -111,9 +112,17 @@ export default async function EditorialPostPage({ params }: Props) {
           <div
             className="bg-white rounded-3xl p-6 shadow-sm border border-stone-100"
           >
-            <p className="text-stone-700 text-base leading-relaxed whitespace-pre-wrap">
-              {post.description}
-            </p>
+            <div className="space-y-4 text-stone-700 text-base leading-relaxed">
+              {parseRichText(post.description).map((para, i) => (
+                <p key={i} className="whitespace-pre-wrap">
+                  {para.map((seg, j) =>
+                    seg.bold
+                      ? <strong key={j} className="font-bold text-stone-900">{seg.text}</strong>
+                      : seg.text
+                  )}
+                </p>
+              ))}
+            </div>
           </div>
         )}
 

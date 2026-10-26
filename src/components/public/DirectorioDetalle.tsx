@@ -6,17 +6,19 @@ import Image from "next/image"
 import {
   Phone, MapPin, CreditCard, AtSign, Globe,
   PawPrint, Truck, ShoppingBag, UtensilsCrossed, Star,
-  Wifi, Car, ChevronLeft, ChevronRight, Tag, Share2, X, Building2,
+  Wifi, Car, ChevronLeft, ChevronRight, X, Building2,
 } from "lucide-react"
 import { motion, AnimatePresence } from "framer-motion"
 import { createClient } from "@/lib/supabase/client"
 import { normalizeArgPhone } from "@/lib/phone"
+import { getWhatsappContacts } from "@/lib/whatsapp"
 import { normalizeUrl } from "@/lib/normalizeUrl"
 import { extractYoutubeId } from "@/lib/utils/youtube"
 import AnimateIn from "@/components/ui/AnimateIn"
 import BackButton from "@/components/ui/BackButton"
 import { businessProfileUrl } from "@/lib/utils/business"
 import { isOpenNow } from "@/lib/utils/horarios"
+import PromoCoupon, { type PromoGroup } from "@/components/public/PromoCoupon"
 
 function WaIcon({ size = 14 }: { size?: number }) {
   return (
@@ -54,14 +56,9 @@ function FeatureBadge({ icon, label }: { icon: React.ReactNode; label: string })
   )
 }
 
-interface Promotion {
-  id: string; title: string; description: string | null
-  discount_percentage: number | null; discount_label: string | null; valid_until: string | null
-}
+interface Props { business: any; section: string; promoGroup?: PromoGroup | null }
 
-interface Props { business: any; section: string; promotions?: Promotion[] }
-
-export default function DirectorioDetalle({ business, section, promotions = [] }: Props) {
+export default function DirectorioDetalle({ business, section, promoGroup = null }: Props) {
   const searchParams = useSearchParams()
   const from     = searchParams.get("from")
 
@@ -103,10 +100,14 @@ export default function DirectorioDetalle({ business, section, promotions = [] }
   const recordLead = (type: string) =>
     createClient().from("business_leads").insert({ business_id: business.id, type }).then()
 
-  const waNum  = normalizeArgPhone(business.whatsapp || business.phone || "")
-  const waLink = waNum
-    ? `https://wa.me/${waNum}?text=${encodeURIComponent(`Hola! Te consulto desde Calamuchita App — ${business.name} 🌿`)}`
-    : null
+  // Un botón por WhatsApp cargado; sin WhatsApp, se usa el teléfono. Con más de uno, se muestra el nombre debajo.
+  const waContacts = getWhatsappContacts(business)
+  const waText     = encodeURIComponent(`Hola! Te consulto desde Calamuchita App — ${business.name} 🌿`)
+  const waButtons  = (waContacts.length ? waContacts : business.phone ? [{ name: "", phone: business.phone }] : [])
+    .map(c => ({ ...c, href: `https://wa.me/${normalizeArgPhone(c.phone)}?text=${waText}` }))
+    .filter(c => normalizeArgPhone(c.phone))
+  const waLink   = waButtons[0]?.href ?? null
+  const waMulti  = waButtons.length > 1
 
   const todayIdx  = new Date(new Date().toLocaleString("en-US", { timeZone: "America/Argentina/Buenos_Aires" })).getDay()
 
@@ -259,13 +260,16 @@ export default function DirectorioDetalle({ business, section, promotions = [] }
             {/* Botones — dentro de la columna izquierda en desktop */}
             {hasBottomActions && (
               <div className="flex flex-col gap-2 w-full mt-6">
-                {waLink && (
-                  <a href={waLink} target="_blank" rel="noopener noreferrer" onClick={() => recordLead("whatsapp")}
-                    className="flex items-center justify-center gap-2 w-full py-3 rounded-2xl text-sm font-semibold text-white hover:brightness-105 active:scale-95 transition-all"
-                    style={{ background: "#25D366" }}>
-                    <WaIcon size={16} /> WhatsApp
-                  </a>
-                )}
+                {waButtons.map((wa, i) => (
+                  <div key={i} className="w-full">
+                    <a href={wa.href} target="_blank" rel="noopener noreferrer" onClick={() => recordLead("whatsapp")}
+                      className="flex items-center justify-center gap-2 w-full py-3 rounded-2xl text-sm font-semibold text-white hover:brightness-105 active:scale-95 transition-all"
+                      style={{ background: "#25D366" }}>
+                      <WaIcon size={16} /> WhatsApp
+                    </a>
+                    {waMulti && wa.name && <p className="text-xs text-white/70 text-center mt-1">{wa.name}</p>}
+                  </div>
+                ))}
                 {business.phone && (
                   <a href={`tel:${business.phone}`} onClick={() => recordLead("phone")}
                     className="flex items-center justify-center gap-2 w-full py-3 rounded-2xl text-sm font-semibold border-2 bg-white hover:opacity-80 active:scale-95 transition-all"
@@ -331,8 +335,24 @@ export default function DirectorioDetalle({ business, section, promotions = [] }
           {/* ── Botones WhatsApp / Llamar / Llegar — mobile: fila horizontal; oculto en desktop ── */}
           {hasBottomActions && (
             <AnimateIn>
-              <div className="flex gap-3 max-w-lg mx-auto px-4 mt-4 md:hidden">
-                {waLink && (
+              <div className="max-w-lg mx-auto px-4 mt-4 md:hidden flex flex-col gap-3">
+              {waMulti && (
+                <div className="grid grid-cols-2 gap-3">
+                  {waButtons.map((wa, i) => (
+                    <div key={i}>
+                      <a href={wa.href} target="_blank" rel="noopener noreferrer" onClick={() => recordLead("whatsapp")}
+                        className="flex items-center justify-center gap-2 py-3.5 rounded-2xl font-bold text-sm text-white shadow-sm hover:brightness-105 active:scale-95 transition-all"
+                        style={{ background: "#25D366" }}>
+                        <WaIcon size={16} /> WhatsApp
+                      </a>
+                      {wa.name && <p className="text-xs text-center mt-1" style={{ color: "rgba(45,69,48,0.65)" }}>{wa.name}</p>}
+                    </div>
+                  ))}
+                </div>
+              )}
+              {(!waMulti && waLink || business.phone || business.address || (business.latitude && business.longitude)) && (
+              <div className="flex gap-3">
+                {!waMulti && waLink && (
                   <a href={waLink} target="_blank" rel="noopener noreferrer" onClick={() => recordLead("whatsapp")}
                     className="flex-1 flex items-center justify-center gap-2 py-3.5 rounded-2xl font-bold text-sm text-white shadow-sm hover:brightness-105 active:scale-95 transition-all"
                     style={{ background: "#25D366" }}>
@@ -365,6 +385,8 @@ export default function DirectorioDetalle({ business, section, promotions = [] }
                   </a>
                 )}
               </div>
+              )}
+              </div>
             </AnimateIn>
           )}
         </div>
@@ -386,7 +408,7 @@ export default function DirectorioDetalle({ business, section, promotions = [] }
             )}
 
             {/* Contacto */}
-            {(business.phone || business.whatsapp || instagramHandle || facebookUrl || websiteUrl || business.address) && (
+            {(business.phone || waContacts.length > 0 || instagramHandle || facebookUrl || websiteUrl || business.address) && (
               <div className={`${cardClass} min-h-[200px]`}>
                 <p className="text-xs font-semibold uppercase tracking-wider text-stone-400 mb-3">Contacto</p>
                 <div className="space-y-2.5">
@@ -396,6 +418,13 @@ export default function DirectorioDetalle({ business, section, promotions = [] }
                       {business.phone}
                     </a>
                   )}
+                  {waContacts.map((wa, i) => (
+                    <a key={i} href={`https://wa.me/${normalizeArgPhone(wa.phone)}?text=${waText}`} target="_blank" rel="noopener noreferrer" onClick={() => recordLead("whatsapp")}
+                      className="flex items-center gap-2 text-sm text-stone-600 hover:text-[#2D4530]">
+                      <WaIcon size={14} />
+                      <span>{wa.phone}{wa.name && <span className="text-stone-400"> · {wa.name}</span>}</span>
+                    </a>
+                  ))}
                   {instagramHandle && (
                     <a href={`https://instagram.com/${instagramHandle}`} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-sm text-stone-600 hover:text-[#2D4530]">
                       <AtSign size={14} />
@@ -523,41 +552,9 @@ export default function DirectorioDetalle({ business, section, promotions = [] }
         )}
 
         {/* ── Promociones ── */}
-        {promotions.length > 0 && (
+        {promoGroup && (
           <AnimateIn>
-            <div className="flex flex-col gap-3">
-              {promotions.map(promo => {
-                const badge = promo.discount_label || (promo.discount_percentage ? `${promo.discount_percentage}% OFF` : "PROMO EXCLUSIVA")
-                const validDate = promo.valid_until
-                  ? new Date(promo.valid_until + "T12:00:00").toLocaleDateString("es-AR", { day: "numeric", month: "long", year: "numeric" })
-                  : null
-                const handleShare = async () => {
-                  const url  = `${window.location.origin}/directorio/${section}/${business.slug}`
-                  const text = `¡Mirá esta promo en Calamuchita App! ${business.name} tiene ${badge}. Entrá acá:`
-                  if (navigator.share) { await navigator.share({ title: "Calamuchita App", text, url }).catch(() => {}) }
-                  else { await navigator.clipboard.writeText(`${text} ${url}`) }
-                }
-                return (
-                  <div key={promo.id} className="rounded-2xl border border-[#2D4530]/40 overflow-hidden" style={{ background: "#F0F7F0" }}>
-                    <div className="px-6 py-4 flex items-center gap-3" style={{ background: "#2D4530" }}>
-                      <Tag size={16} className="text-yellow-400 shrink-0" />
-                      <span className="font-black text-xl tracking-tight text-yellow-400">{badge}</span>
-                      <span className="ml-auto text-xs font-semibold uppercase tracking-widest" style={{ color: "rgba(225,219,201,0.70)" }}>Promo activa</span>
-                    </div>
-                    <div className="px-6 py-5">
-                      <h3 className="font-bold text-base mb-2" style={{ color: "#2D4530" }}>{promo.title}</h3>
-                      {promo.description && <p className="text-sm leading-relaxed whitespace-pre-line" style={{ color: "rgba(45,69,48,0.75)" }}>{promo.description}</p>}
-                      <div className="flex items-center justify-between mt-4 pt-4 border-t border-[#2D4530]/10">
-                        {validDate && <span className="text-xs font-medium" style={{ color: "rgba(45,69,48,0.50)" }}>Válido hasta el <strong style={{ color: "#2D4530" }}>{validDate}</strong></span>}
-                        <button onClick={handleShare} className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold transition-opacity hover:opacity-70 ml-auto" style={{ background: "rgba(45,69,48,0.08)", color: "#2D4530" }}>
-                          <Share2 size={12} /> Compartir
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                )
-              })}
-            </div>
+            <PromoCoupon group={promoGroup} maxPromos={3} />
           </AnimateIn>
         )}
 

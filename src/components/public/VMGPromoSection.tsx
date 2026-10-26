@@ -30,7 +30,7 @@ const servicios = [
 const WA_MSG = encodeURIComponent(
   "Hola! Te contacto desde Calamuchita App por una consulta para VMG.Setup.Ai 👋"
 )
-const WA_URL = `https://wa.me/5491145311047?text=${WA_MSG}`
+const WA_URL = `https://wa.me/5493546547950?text=${WA_MSG}`
 
 export default function VMGPromoSection() {
   return (

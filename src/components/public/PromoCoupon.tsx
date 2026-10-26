@@ -2,31 +2,29 @@
 
 import type { CSSProperties } from "react"
 import Image from "next/image"
-import Link from "next/link"
-import { Share2, ArrowRight, Calendar } from "lucide-react"
+import PromoGroupBody from "@/components/public/PromoGroupBody"
 import {
   promoFontVariables,
   fontDisplay,
   fontBody,
   SECTION_BG,
   TEXT_MAIN,
-  TEXT_MUTED,
   BORDER,
   CATEGORY_COLORS,
   normalizeCategoria,
-  type Promo,
+  groupHeadline,
+  type PromoGroup,
 } from "@/lib/promos"
 
 // Todo lo que es dato/lógica puro (tipos, tokens, CATEGORY_COLORS, fuentes,
-// sectionToCategoria, buildPromoDiscount, formatValidUntil) vive en
+// sectionToCategoria, buildPromoDiscount, buildPromoGroup) vive en
 // @/lib/promos — ese módulo NO tiene "use client", así que page.tsx (Server
 // Component) puede importarlo y llamarlo directo durante el render en el
 // servidor. Re-exportamos todo acá para que los consumidores "use client"
-// (PromosExclusivas, NegocioDetalle) sigan importando de este archivo sin
-// cambios.
+// sigan importando de este archivo.
 export * from "@/lib/promos"
 
-// Exportados: reutilizados también por PromoAccordionCard (stack de la home).
+// Exportados: reutilizados también por PromoAccordionCard y PromoMasterDetail.
 export function getInitials(name: string): string {
   const parts = name.trim().split(/\s+/).filter(Boolean)
   if (parts.length === 0) return "?"
@@ -41,23 +39,6 @@ export function getDiscountSizeClass(text: string): string {
   if (len <= 7) return "text-3xl sm:text-4xl"
   if (len <= 11) return "text-2xl sm:text-3xl"
   return "text-lg sm:text-xl"
-}
-
-export function isExternalLink(href: string): boolean {
-  return /^https?:\/\//i.test(href)
-}
-
-export async function defaultShare(promo: Promo) {
-  if (typeof window === "undefined") return
-  const url = promo.link ?? window.location.href
-  const discount = promo.descuento_valor ?? promo.descuento_label ?? "una promo especial"
-  const text = `¡Mirá esta promo de ${promo.comercio} en Calamuchita App! ${discount}.`
-
-  if (navigator.share) {
-    await navigator.share({ title: "Calamuchita App", text, url }).catch(() => {})
-  } else if (navigator.clipboard) {
-    await navigator.clipboard.writeText(`${text} ${url}`).catch(() => {})
-  }
 }
 
 // ─────────────────────────────────────────────────────────────
@@ -82,30 +63,27 @@ function TopoLines() {
 }
 
 // ─────────────────────────────────────────────────────────────
-// Card individual (cupón) — compartida entre la sección de la home
-// y el perfil del negocio.
+// Cupón de un negocio con todas sus promos vigentes — detalle de
+// escritorio en el inicio y bloque de promos del perfil.
 // ─────────────────────────────────────────────────────────────
 
 export interface PromoCouponProps {
-  promo: Promo
-  /** Si no se pasa, usa Web Share API con fallback a portapapeles. */
-  onShare?: (promo: Promo) => void
+  group: PromoGroup
+  /** Cuántas promos mostrar antes de "Ver todas" (perfil: 3). */
+  maxPromos?: number
 }
 
-export default function PromoCoupon({ promo, onShare }: PromoCouponProps) {
-  const handleShare = onShare ?? defaultShare
-  const categoria = normalizeCategoria(promo.categoria)
+export default function PromoCoupon({ group, maxPromos }: PromoCouponProps) {
+  const categoria = normalizeCategoria(group.categoria)
   const { a, b } = CATEGORY_COLORS[categoria]
-
-  const bigLabel = promo.descuento_valor ?? promo.descuento_label ?? "Oferta especial"
-  const smallLabel = promo.descuento_valor ? promo.descuento_label : null
+  const { primary, secondary } = groupHeadline(group)
 
   const cardStyle = { "--a": a, "--b": b } as CSSProperties
 
   return (
     <article
       style={cardStyle}
-      className={`${promoFontVariables} group flex h-full flex-col overflow-hidden rounded-[22px] bg-white shadow-[0_4px_18px_rgba(12,42,32,0.08)] transition-all duration-300 ease-out hover:-translate-y-1.5 hover:shadow-[0_20px_44px_rgba(12,42,32,0.18)] motion-reduce:transition-none motion-reduce:hover:translate-y-0`}
+      className={`${promoFontVariables} flex h-full flex-col overflow-hidden rounded-[22px] bg-white shadow-[0_4px_18px_rgba(12,42,32,0.08)]`}
     >
       {/* Zona superior de color */}
       <div
@@ -115,43 +93,28 @@ export default function PromoCoupon({ promo, onShare }: PromoCouponProps) {
         <TopoLines />
 
         <div className="relative z-10 flex items-start justify-between gap-3">
-          {/* Logo / iniciales */}
           <div className="flex h-13 w-13 shrink-0 items-center justify-center overflow-hidden rounded-[15px] bg-white shadow-[0_4px_10px_rgba(0,0,0,0.18)]">
-            {promo.logo_url ? (
+            {group.logo_url ? (
               <div className="relative h-full w-full p-1.5">
-                <Image
-                  src={promo.logo_url}
-                  alt={`Logo de ${promo.comercio}`}
-                  fill
-                  sizes="52px"
-                  className="object-contain"
-                />
+                <Image src={group.logo_url} alt={`Logo de ${group.comercio}`} fill sizes="52px" className="object-contain" />
               </div>
             ) : (
-              <span
-                aria-hidden="true"
-                className="text-lg font-bold"
-                style={{ ...fontDisplay, color: "var(--a)" }}
-              >
-                {getInitials(promo.comercio)}
+              <span aria-hidden="true" className="text-lg font-bold" style={{ ...fontDisplay, color: "var(--a)" }}>
+                {getInitials(group.comercio)}
               </span>
             )}
           </div>
 
-          {/* Descuento */}
           <div className="min-w-0 text-right text-white">
             <p
-              className={`${getDiscountSizeClass(bigLabel)} font-extrabold leading-none [text-shadow:0_2px_10px_rgba(0,0,0,0.18)]`}
+              className={`${getDiscountSizeClass(primary)} font-extrabold leading-none [text-shadow:0_2px_10px_rgba(0,0,0,0.18)]`}
               style={fontDisplay}
             >
-              {bigLabel}
+              {primary}
             </p>
-            {smallLabel && (
-              <p
-                className="mt-1 text-[11px] font-bold uppercase tracking-wider text-white/85"
-                style={fontBody}
-              >
-                {smallLabel}
+            {secondary && (
+              <p className="mt-1 text-[11px] font-bold uppercase tracking-wider text-white/85" style={fontBody}>
+                {secondary}
               </p>
             )}
           </div>
@@ -160,97 +123,25 @@ export default function PromoCoupon({ promo, onShare }: PromoCouponProps) {
 
       {/* Perforación estilo cupón */}
       <div className="relative h-0">
-        <div
-          className="absolute inset-x-0 top-0 border-t-2 border-dashed"
-          style={{ borderColor: BORDER }}
-        />
-        <span
-          aria-hidden="true"
-          className="absolute left-0 top-0 h-5 w-5 -translate-x-1/2 -translate-y-1/2 rounded-full"
-          style={{ background: SECTION_BG }}
-        />
-        <span
-          aria-hidden="true"
-          className="absolute right-0 top-0 h-5 w-5 -translate-y-1/2 translate-x-1/2 rounded-full"
-          style={{ background: SECTION_BG }}
-        />
+        <div className="absolute inset-x-0 top-0 border-t-2 border-dashed" style={{ borderColor: BORDER }} />
+        <span aria-hidden="true" className="absolute left-0 top-0 h-5 w-5 -translate-x-1/2 -translate-y-1/2 rounded-full" style={{ background: SECTION_BG }} />
+        <span aria-hidden="true" className="absolute right-0 top-0 h-5 w-5 -translate-y-1/2 translate-x-1/2 rounded-full" style={{ background: SECTION_BG }} />
       </div>
 
       {/* Cuerpo */}
       <div className="flex flex-1 flex-col gap-3 px-5 py-5 sm:px-6">
         <span
           className="inline-flex w-fit items-center rounded-full px-2.5 py-1 text-[11px] font-bold uppercase tracking-wider"
-          style={{
-            ...fontBody,
-            color: "var(--a)",
-            background: "color-mix(in srgb, var(--a) 14%, white)",
-          }}
+          style={{ ...fontBody, color: "var(--a)", background: "color-mix(in srgb, var(--a) 14%, white)" }}
         >
           {CATEGORY_COLORS[categoria].label}
         </span>
 
-        <h3
-          className="text-[17px] font-bold leading-snug sm:text-lg"
-          style={{ ...fontDisplay, color: TEXT_MAIN }}
-        >
-          {promo.comercio}
+        <h3 className="text-[17px] font-bold leading-snug sm:text-lg" style={{ ...fontDisplay, color: TEXT_MAIN }}>
+          {group.comercio}
         </h3>
 
-        {promo.validez && (
-          <div className="flex items-center gap-1.5">
-            <Calendar size={14} style={{ color: TEXT_MUTED }} aria-hidden="true" />
-            <span className="text-[13px]" style={{ ...fontBody, color: TEXT_MUTED }}>
-              {promo.validez}
-            </span>
-          </div>
-        )}
-
-        {/* Footer */}
-        <div
-          className="mt-auto flex items-center justify-between gap-2 border-t pt-3"
-          style={{ borderColor: BORDER }}
-        >
-          <button
-            type="button"
-            onClick={() => handleShare(promo)}
-            className="inline-flex items-center gap-1.5 rounded-full px-3 py-2 text-[13px] font-semibold transition-colors hover:bg-black/5 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-(--a)"
-            style={{ ...fontBody, color: TEXT_MAIN }}
-          >
-            <Share2 size={14} aria-hidden="true" />
-            Compartir
-          </button>
-
-          {promo.link &&
-            (isExternalLink(promo.link) ? (
-              <a
-                href={promo.link}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="group/link inline-flex items-center gap-1 rounded-full px-2 py-2 text-[13px] font-semibold transition-opacity hover:opacity-80 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-(--a)"
-                style={{ ...fontBody, color: "var(--a)" }}
-              >
-                Ver promo
-                <ArrowRight
-                  size={14}
-                  aria-hidden="true"
-                  className="transition-transform duration-200 group-hover/link:translate-x-1 motion-reduce:transition-none motion-reduce:group-hover/link:translate-x-0"
-                />
-              </a>
-            ) : (
-              <Link
-                href={promo.link}
-                className="group/link inline-flex items-center gap-1 rounded-full px-2 py-2 text-[13px] font-semibold transition-opacity hover:opacity-80 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-(--a)"
-                style={{ ...fontBody, color: "var(--a)" }}
-              >
-                Ver promo
-                <ArrowRight
-                  size={14}
-                  aria-hidden="true"
-                  className="transition-transform duration-200 group-hover/link:translate-x-1 motion-reduce:transition-none motion-reduce:group-hover/link:translate-x-0"
-                />
-              </Link>
-            ))}
-        </div>
+        <PromoGroupBody group={group} maxPromos={maxPromos} />
       </div>
     </article>
   )

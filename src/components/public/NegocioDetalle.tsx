@@ -15,17 +15,12 @@ import { DIETARY_DISCLAIMER, dietaryOptionsFor } from "@/lib/constants/dietary"
 import { tableServiceLabel } from "@/lib/utils/tableService"
 import { createClient } from "@/lib/supabase/client"
 import { normalizeArgPhone } from "@/lib/phone"
+import { getWhatsappContacts } from "@/lib/whatsapp"
 import { normalizeUrl } from "@/lib/normalizeUrl"
 import { extractYoutubeId } from "@/lib/utils/youtube"
 import { hoyAR } from "@/lib/utils/fechas"
 import { isOpenNow } from "@/lib/utils/horarios"
-import PromoCoupon, {
-  promoFontVariables,
-  sectionToCategoria,
-  buildPromoDiscount,
-  formatValidUntil,
-  type Promo,
-} from "@/components/public/PromoCoupon"
+import PromoCoupon, { type PromoGroup } from "@/components/public/PromoCoupon"
 
 const DAY = ["Domingo", "Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado"]
 const GUEST_KEY = "calamuchita_app_guest"
@@ -71,14 +66,9 @@ function InfoRow({ icon, sublabel, label, href, external, onClick }: {
   return inner
 }
 
-interface Promotion {
-  id: string; title: string; description: string | null
-  discount_percentage: number | null; discount_label: string | null; valid_until: string | null
-}
+interface Props { business: any; promoGroup?: PromoGroup | null }
 
-interface Props { business: any; promotions?: Promotion[] }
-
-export default function NegocioDetalle({ business, promotions = [] }: Props) {
+export default function NegocioDetalle({ business, promoGroup = null }: Props) {
   const searchParams = useSearchParams()
   const from = searchParams.get("from")
   const cartaRef = useRef<HTMLDivElement>(null)
@@ -126,10 +116,15 @@ export default function NegocioDetalle({ business, promotions = [] }: Props) {
   const recordLead = (type: string) =>
     createClient().from("business_leads").insert({ business_id: business.id, type }).then()
 
-  const waNumber  = normalizeArgPhone(business.whatsapp || business.phone || "")
-  const waLink    = waNumber
-    ? `https://wa.me/${waNumber}?text=${encodeURIComponent(`Hola! Me contacto desde Calamuchita App por el negocio ${business.name}.`)}`
-    : null
+  // Pedidos y reservas van al primer WhatsApp; los botones de contacto, uno por cada número cargado
+  const waContacts = getWhatsappContacts(business)
+  const waNumber  = normalizeArgPhone(waContacts[0]?.phone || business.phone || "")
+  const waText    = encodeURIComponent(`Hola! Me contacto desde Calamuchita App por el negocio ${business.name}.`)
+  const waLink    = waNumber ? `https://wa.me/${waNumber}?text=${waText}` : null
+  const waButtons = (waContacts.length ? waContacts : business.phone ? [{ name: "", phone: business.phone }] : [])
+    .map(c => ({ ...c, href: `https://wa.me/${normalizeArgPhone(c.phone)}?text=${waText}` }))
+    .filter(c => normalizeArgPhone(c.phone))
+  const waMulti   = waButtons.length > 1
 
   const websiteUrl = normalizeUrl(business.website)
   const menuLinkUrl = normalizeUrl(business.menu_link)
@@ -390,14 +385,17 @@ export default function NegocioDetalle({ business, promotions = [] }: Props) {
           )}
 
           {/* ── Desktop: botones de acción ── */}
-          <div className="hidden md:flex gap-3">
-            {waLink && (
-              <a href={waLink} target="_blank" rel="noopener noreferrer" onClick={() => recordLead("whatsapp")}
-                className="flex-1 flex items-center justify-center gap-2 py-3.5 rounded-2xl font-bold text-sm text-white shadow-sm hover:brightness-105 transition-all"
-                style={{ background: "#25D366" }}>
-                <WaIcon size={16} /> WhatsApp
-              </a>
-            )}
+          <div className="hidden md:flex items-start gap-3">
+            {waButtons.map((wa, i) => (
+              <div key={i} className="flex-1">
+                <a href={wa.href} target="_blank" rel="noopener noreferrer" onClick={() => recordLead("whatsapp")}
+                  className="flex items-center justify-center gap-2 py-3.5 rounded-2xl font-bold text-sm text-white shadow-sm hover:brightness-105 transition-all"
+                  style={{ background: "#25D366" }}>
+                  <WaIcon size={16} /> WhatsApp
+                </a>
+                {waMulti && wa.name && <p className="text-xs text-center mt-1" style={{ color: "rgba(45,69,48,0.65)" }}>{wa.name}</p>}
+              </div>
+            ))}
             {mapsLink && (
               <a href={mapsLink} target="_blank" rel="noopener noreferrer"
                 className="flex-1 flex items-center justify-center gap-2 py-3.5 rounded-2xl font-bold text-sm shadow-sm hover:opacity-90 transition-all"
@@ -417,7 +415,10 @@ export default function NegocioDetalle({ business, promotions = [] }: Props) {
           {/* ── Datos de contacto ── */}
           <div className="bg-white/50 rounded-2xl px-4 py-1">
             {business.phone      && <InfoRow icon={<Phone size={14} style={{ color: "#2D4530" }} />}  sublabel="Teléfono"   label={business.phone}  onClick={() => recordLead("phone")}                 href={`tel:${business.phone}`} />}
-            {business.whatsapp && business.whatsapp !== business.phone && <InfoRow icon={<WaIcon size={14} />} sublabel="WhatsApp" label={business.whatsapp} href={waLink ?? undefined} external />}
+            {waContacts.map((wa, i) => (
+              <InfoRow key={i} icon={<WaIcon size={14} />} sublabel={wa.name ? `WhatsApp · ${wa.name}` : "WhatsApp"} label={wa.phone}
+                onClick={() => recordLead("whatsapp")} href={`https://wa.me/${normalizeArgPhone(wa.phone)}?text=${waText}`} external />
+            ))}
             {instagramHandle     && <InfoRow icon={<AtSign size={14} style={{ color: "#2D4530" }} />} sublabel="Instagram"  label={`@${instagramHandle}`}                            href={`https://instagram.com/${instagramHandle}`} external />}
             {facebookUrl         && <InfoRow icon={<FbIcon size={14} />}                              sublabel="Facebook"   label={facebookUrl.replace(/^https?:\/\//, "")}           href={facebookUrl} external />}
             {websiteUrl          && <InfoRow icon={<Globe size={14} style={{ color: "#2D4530" }} />}  sublabel="Web"        label={websiteUrl.replace(/^https?:\/\//, "")}            href={websiteUrl} external />}
@@ -458,29 +459,7 @@ export default function NegocioDetalle({ business, promotions = [] }: Props) {
           )}
 
           {/* ── Promociones ── */}
-          {promotions.length > 0 && (
-            <div className={`${promoFontVariables} flex flex-col gap-4`}>
-              {promotions.map(promo => {
-                const { descuento_valor, descuento_label } = buildPromoDiscount(
-                  promo.discount_percentage,
-                  promo.discount_label
-                )
-                const promoCoupon: Promo = {
-                  id: promo.id,
-                  comercio: business.name,
-                  categoria: sectionToCategoria(business.section),
-                  logo_url: business.logo_url ?? null,
-                  descuento_valor,
-                  descuento_label,
-                  validez: formatValidUntil(promo.valid_until),
-                  // Sin link: ya estamos en la página de este negocio, PromoCoupon
-                  // oculta el "Ver promo →" cuando promo.link es null.
-                  link: null,
-                }
-                return <PromoCoupon key={promo.id} promo={promoCoupon} />
-              })}
-            </div>
-          )}
+          {promoGroup && <PromoCoupon group={promoGroup} maxPromos={3} />}
 
           {/* ── Características de servicio (delivery / salón / take away) ── */}
           {(business.offers_delivery || business.offers_takeaway || business.offers_dine_in) && (
@@ -707,7 +686,7 @@ export default function NegocioDetalle({ business, promotions = [] }: Props) {
       ═══════════════════════════════════════════════════════════════ */}
       {hasBottomActions && (
         <div
-          className="md:hidden fixed bottom-0 left-0 right-0 z-[60] flex gap-2 px-4 pt-3 pb-6"
+          className="md:hidden fixed bottom-0 left-0 right-0 z-[60] flex items-start gap-2 px-4 pt-3 pb-6"
           style={{
             background: "rgba(255,255,255,0.88)",
             backdropFilter: "blur(16px)",
@@ -715,13 +694,16 @@ export default function NegocioDetalle({ business, promotions = [] }: Props) {
             borderTop: "1px solid rgba(45,69,48,0.09)",
           }}
         >
-          {waLink && (
-            <a href={waLink} target="_blank" rel="noopener noreferrer" onClick={() => recordLead("whatsapp")}
-              className="flex-1 flex items-center justify-center gap-1.5 py-3.5 rounded-2xl text-xs font-bold text-white shadow-sm active:scale-95 transition-transform"
-              style={{ background: "#25D366" }}>
-              <WaIcon size={15} /> WhatsApp
-            </a>
-          )}
+          {waButtons.map((wa, i) => (
+            <div key={i} className="flex-1 min-w-0">
+              <a href={wa.href} target="_blank" rel="noopener noreferrer" onClick={() => recordLead("whatsapp")}
+                className="flex items-center justify-center gap-1.5 py-3.5 rounded-2xl text-xs font-bold text-white shadow-sm active:scale-95 transition-transform"
+                style={{ background: "#25D366" }}>
+                <WaIcon size={15} /> WhatsApp
+              </a>
+              {waMulti && wa.name && <p className="text-[11px] text-center mt-1 truncate" style={{ color: "rgba(45,69,48,0.65)" }}>{wa.name}</p>}
+            </div>
+          ))}
           {business.phone && (
             <a href={`tel:${business.phone}`}
               className="flex-1 flex items-center justify-center gap-1.5 py-3.5 rounded-2xl text-xs font-bold border-2 bg-white active:scale-95 transition-transform"
