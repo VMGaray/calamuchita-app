@@ -1,8 +1,8 @@
-import Image from "next/image"
 import Link from "next/link"
 import { ArrowLeft } from "lucide-react"
 import { createClient } from "@/lib/supabase/server"
 import BackgroundManager from "@/components/public/BackgroundManager"
+import BusinessGridCard from "@/components/public/BusinessGridCard"
 
 const FALLBACK = "/valle.jpg"
 
@@ -67,28 +67,13 @@ export default async function DestacadosPage() {
                 : `/directorio/${biz.section}/${biz.slug}?from=/destacados`
 
               return (
-                <Link key={biz.id} href={href} className="group block">
-                  <div className="relative aspect-[4/3] rounded-3xl overflow-hidden bg-[#2D4530] shadow-md">
-                    <Image
-                      src={biz.cover_url || FALLBACK}
-                      alt={biz.name}
-                      fill
-                      className="object-contain group-hover:scale-105 transition-transform duration-500"
-                      sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent opacity-80" />
-
-                    {/* Info */}
-                    <div className="absolute bottom-4 left-4 right-4">
-                      <p className="text-yellow-500 text-[9px] font-bold uppercase tracking-[0.25em] mb-0.5">
-                        {SECTION_ES[biz.section] ?? biz.section}
-                      </p>
-                      <h3 className="text-white text-sm font-bold leading-tight group-hover:text-yellow-400 transition-colors line-clamp-2">
-                        {biz.name}
-                      </h3>
-                    </div>
-                  </div>
-                </Link>
+                <BusinessGridCard
+                  key={biz.id}
+                  href={href}
+                  name={biz.name}
+                  imageUrl={biz.cover_url || FALLBACK}
+                  eyebrow={SECTION_ES[biz.section] ?? biz.section}
+                />
               )
             })}
           </div>

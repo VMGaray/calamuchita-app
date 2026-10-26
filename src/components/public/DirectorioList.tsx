@@ -15,9 +15,8 @@ import {
   SERVICE_GROUPS, OTROS_SERVICIOS_SLUG, businessRubros, groupSlugsForRubros,
   findServiceGroup, serviceGroupForRubro,
 } from "@/lib/constants/categories"
-import { Phone, AtSign, MapPin, X, LayoutGrid, Check, ChevronLeft, ChevronRight, Star, Store } from "lucide-react"
-import Link from "next/link"
-import Image from "next/image"
+import { Phone, AtSign, MapPin, X, LayoutGrid, Check, ChevronLeft, Store } from "lucide-react"
+import BusinessGridCard from "@/components/public/BusinessGridCard"
 
 interface Business {
   id: string
@@ -187,25 +186,7 @@ export default function DirectorioList({ section, filters }: Props) {
   const [showCategories, setShowCategories] = useState(false)
   const [mounted, setMounted] = useState(false)
   const resultsRef = useRef<HTMLDivElement>(null)
-  const scrollRef = useRef<HTMLDivElement>(null)
   const isFirstRender = useRef(true)
-
-  const [atStart, setAtStart] = useState(true)
-  const [atEnd, setAtEnd] = useState(false)
-
-  const checkScroll = () => {
-    const el = scrollRef.current
-    if (!el) return
-    setAtStart(el.scrollLeft <= 4)
-    setAtEnd(el.scrollLeft >= el.scrollWidth - el.clientWidth - 4)
-  }
-
-  const scrollBy = (ref: React.RefObject<HTMLDivElement | null>, dir: "left" | "right") => {
-    const el = ref.current
-    if (!el) return
-    const cardWidth = el.clientWidth * 0.82 + 16
-    el.scrollBy({ left: dir === "left" ? -cardWidth : cardWidth, behavior: "smooth" })
-  }
 
   const isServices = section === "services"
   const activeCategory = filters.cat || ""
@@ -259,14 +240,6 @@ export default function DirectorioList({ section, filters }: Props) {
       ...rubroItems,
     ]
   }, [isServices, section, activeGroup, localBusinesses, activeCatLabel])
-
-  useEffect(() => {
-    const el = scrollRef.current
-    if (!el) return
-    checkScroll()
-    el.addEventListener("scroll", checkScroll, { passive: true })
-    return () => el.removeEventListener("scroll", checkScroll)
-  }, [businesses])
 
   useScrollLock(showPueblos || showCategories)
   useEffect(() => { setMounted(true) }, [])
@@ -595,148 +568,21 @@ export default function DirectorioList({ section, filters }: Props) {
               Mostrando {Math.min(visibleCount, businesses.length)} de {businesses.length} resultado{businesses.length !== 1 ? "s" : ""}
             </p>
 
-            {/* Carrusel en mobile, grilla en desktop */}
-            <div className="relative">
-              {businesses.length > 1 && (
-                <>
-                  <button
-                    onClick={() => scrollBy(scrollRef, "left")}
-                    className="md:hidden absolute left-0 top-1/2 -translate-y-1/2 z-10 w-8 h-8 flex items-center justify-center rounded-full transition-opacity duration-200"
-                    style={{ background: "rgba(45,69,48,0.85)", border: "1px solid rgba(163,177,138,0.4)", boxShadow: "0 2px 12px rgba(0,0,0,0.3)", opacity: atStart ? 0 : 1, pointerEvents: atStart ? "none" : "auto" }}
-                    aria-label="Anterior"
-                  >
-                    <ChevronLeft size={16} color="#E1DBC9" />
-                  </button>
-                  <button
-                    onClick={() => scrollBy(scrollRef, "right")}
-                    className="md:hidden absolute right-0 top-1/2 -translate-y-1/2 z-10 w-8 h-8 flex items-center justify-center rounded-full transition-opacity duration-200"
-                    style={{ background: "rgba(45,69,48,0.85)", border: "1px solid rgba(163,177,138,0.4)", boxShadow: "0 2px 12px rgba(0,0,0,0.3)", opacity: atEnd ? 0 : 1, pointerEvents: atEnd ? "none" : "auto" }}
-                    aria-label="Siguiente"
-                  >
-                    <ChevronRight size={16} color="#E1DBC9" />
-                  </button>
-                </>
-              )}
-            <div ref={scrollRef} className="flex gap-4 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden snap-x snap-mandatory -mx-4 px-4 pb-6 md:mx-0 md:px-0 md:grid md:grid-cols-2 lg:grid-cols-3 md:overflow-x-visible md:pb-0 md:gap-5">
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4">
               {businesses.slice(0, visibleCount).map((business, i) => (
-                <AnimateIn
-                  key={business.id}
-                  direction="up"
-                  delay={i * 0.05}
-                  className="w-[82vw] flex-shrink-0 snap-center md:w-auto"
-                >
-                  <Link
+                <AnimateIn key={business.id} direction="up" delay={Math.min(i, 8) * 0.04}>
+                  <BusinessGridCard
                     href={`/directorio/${section}/${business.slug}`}
-                    className="block rounded-2xl overflow-hidden shadow-sm transition-shadow hover:shadow-md"
-                    style={{ background: "#FFFFFF", border: "1px solid rgba(45,69,48,0.09)" }}
-                  >
-                    {/* ── Image area ── */}
-                    <div className="relative overflow-hidden aspect-[4/3] bg-stone-50">
-                      {(business.is_premium || business.is_featured_rubro) && (
-                        <div className="absolute top-2.5 left-2.5 z-10 flex flex-col items-start gap-1.5">
-                          {business.is_premium && (
-                            <div
-                              className="flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-tight"
-                              style={{ background: "#C9A44B", color: "#1a1a1a" }}
-                            >
-                              ★ Destacado
-                            </div>
-                          )}
-                          {business.is_featured_rubro && (
-                            <div
-                              className="flex items-center gap-1 px-2 py-1 rounded-full text-xs font-semibold"
-                              style={{ background: "#3b82f6", color: "white" }}
-                            >
-                              <Star size={10} fill="currentColor" />
-                              Destacado
-                            </div>
-                          )}
-                        </div>
-                      )}
-                      {business.cover_url ? (
-                        <Image
-                          src={business.cover_url}
-                          alt={business.name}
-                          fill
-                          className="object-contain"
-                          sizes="(max-width: 768px) 82vw, (max-width: 1024px) 50vw, 33vw"
-                          quality={70}
-                        />
-                      ) : business.logo_url ? (
-                        <div className="w-full h-full bg-white flex items-center justify-center p-5">
-                          <div className="relative w-full h-full">
-                            <Image
-                              src={business.logo_url}
-                              alt={business.name}
-                              fill
-                              className="object-contain"
-                              sizes="(max-width: 768px) 82vw, (max-width: 1024px) 50vw, 33vw"
-                              quality={80}
-                            />
-                          </div>
-                        </div>
-                      ) : (
-                        <div className="w-full h-full flex items-center justify-center"
-                          style={{ background: "#E1DBC9" }}>
-                          <div className="w-14 h-14 rounded-2xl flex items-center justify-center font-serif text-2xl font-bold"
-                            style={{ background: "#2D4530", color: "#E1DBC9" }}>
-                            {business.name[0]}
-                          </div>
-                        </div>
-                      )}
-                    </div>
-
-                    {/* ── Text area — cream background ── */}
-                    <div className="px-4 pt-3.5 pb-4" style={{ background: "#F5EFE3" }}>
-                      <h3 className="text-sm font-bold leading-snug mb-1.5 line-clamp-2"
-                        style={{ color: "#2D4530" }}>
-                        {business.name}
-                      </h3>
-
-                      {/* min-h-[24px] reserva la fila de badge aunque subcategory sea null */}
-                      <div className="min-h-[24px]">
-                        {badgeFor(business) && (
-                          <span
-                            className="inline-block text-[10px] font-semibold px-2 py-0.5 rounded-full mb-2 uppercase tracking-wide"
-                            style={{ background: "rgba(45,69,48,0.10)", color: "#2D4530" }}
-                          >
-                            {badgeFor(business)}
-                          </span>
-                        )}
-                      </div>
-
-                      {/* min-h-[32px] reserva espacio para descripción cuando es null */}
-                      <div className="min-h-[32px]">
-                        {business.description && (
-                          <p className="text-xs mb-2.5 leading-relaxed line-clamp-2"
-                            style={{ color: "rgba(45,69,48,0.60)" }}>
-                            {business.description}
-                          </p>
-                        )}
-                      </div>
-
-                      {/* separador condicional seguro: solo agrega coma si address existe */}
-                      {business.address && (
-                        <div className="flex items-center gap-1.5 text-xs mb-3"
-                          style={{ color: "rgba(45,69,48,0.50)" }}>
-                          <MapPin size={11} className="flex-shrink-0" />
-                          <span className="truncate">{business.address}</span>
-                        </div>
-                      )}
-
-                      <div
-                        className="flex items-center justify-between w-full px-3 py-2.5 rounded-xl text-xs font-semibold"
-                        style={{ background: "#2D4530", color: "#E1DBC9" }}
-                      >
-                        <span>Ver más</span>
-                        <ChevronRight size={13} />
-                      </div>
-                    </div>
-                  </Link>
+                    name={business.name}
+                    imageUrl={business.cover_url || business.logo_url}
+                    eyebrow={badgeFor(business)}
+                    isPremium={business.is_premium}
+                    isFeaturedRubro={business.is_featured_rubro}
+                    priority={i < 4}
+                  />
                 </AnimateIn>
               ))}
             </div>
-            </div>{/* /relative wrapper */}
 
             {/* ── Paginación: cargar más ── */}
             <div className="flex flex-col items-center mt-6">
