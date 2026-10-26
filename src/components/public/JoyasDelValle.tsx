@@ -196,15 +196,13 @@ export default function JoyasDelValle({ businesses }: { businesses: FeaturedBusi
           <h2 className="text-4xl sm:text-6xl md:text-9xl font-black tracking-tighter leading-none text-[#2D4530] mb-1 md:mb-3">
             DESTACADOS
           </h2>
-          <p className="text-[#2D4530] font-bold text-base md:text-xl uppercase tracking-[0.4em] border-l-4 border-[#C9A44B] pl-4 mb-4 md:mb-6">
-            Del Valle
-          </p>
+         
           <div className="flex justify-end items-end gap-4">
             <Link
               href="/destacados"
               className="group flex items-center gap-2 text-xs font-black text-[#2D4530] uppercase border-b-2 border-[#2D4530] pb-1 flex-shrink-0"
             >
-              Explorar <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform" />
+              Ver más <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform" />
             </Link>
           </div>
         </motion.div>
