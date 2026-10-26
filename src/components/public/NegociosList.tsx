@@ -2,20 +2,11 @@
 
 import { useState, useEffect, useRef } from "react"
 import AnimateIn from "@/components/ui/AnimateIn"
-import Card3D from "@/components/ui/Card3D"
 import { SkeletonBusinessGrid } from "@/components/ui/Skeleton"
 import { createClient } from "@/lib/supabase/client"
-import Link from "next/link"
-import Image from "next/image"
-import { ChevronLeft, ChevronRight, Star } from "lucide-react"
+import BusinessGridCard from "@/components/public/BusinessGridCard"
 import { isDietaryKey } from "@/lib/constants/dietary"
-
-type BusinessHour = {
-  day_of_week: number
-  opens_at: string
-  closes_at: string
-  is_closed: boolean
-}
+import { isOpenNow, type BusinessHour } from "@/lib/utils/horarios"
 
 interface Business {
   id: string
@@ -55,51 +46,13 @@ const categoryLabel: Record<string, string> = {
   other: "Gastronomía",
 }
 
-/**
- * Calcula si un negocio está abierto en este momento basándose en sus horarios.
- * Usa el campo manual `is_open` como fallback si no hay horarios configurados.
- */
-function calcIsOpen(hours: BusinessHour[], fallback: boolean): boolean {
-  if (!hours || hours.length === 0) return fallback
-  const now = new Date()
-  const day = now.getDay() // 0=Domingo … 6=Sábado
-  const hhmm = `${String(now.getHours()).padStart(2, "0")}:${String(now.getMinutes()).padStart(2, "0")}`
-  const today = hours.find(h => h.day_of_week === day)
-  if (!today || today.is_closed) return false
-  return hhmm >= today.opens_at.slice(0, 5) && hhmm <= today.closes_at.slice(0, 5)
-}
 
 export default function NegociosList({ params }: Props) {
   const [businesses, setBusinesses] = useState<Business[]>([])
   const [loading, setLoading] = useState(true)
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE)
-  const [atStart, setAtStart] = useState(true)
-  const [atEnd, setAtEnd] = useState(false)
   const resultsRef = useRef<HTMLDivElement>(null)
-  const scrollRef = useRef<HTMLDivElement>(null)
   const isFirstRender = useRef(true)
-
-  const checkScroll = () => {
-    const el = scrollRef.current
-    if (!el) return
-    setAtStart(el.scrollLeft <= 4)
-    setAtEnd(el.scrollLeft >= el.scrollWidth - el.clientWidth - 4)
-  }
-
-  useEffect(() => {
-    const el = scrollRef.current
-    if (!el) return
-    checkScroll()
-    el.addEventListener("scroll", checkScroll, { passive: true })
-    return () => el.removeEventListener("scroll", checkScroll)
-  }, [businesses])
-
-  const scrollBy = (dir: "left" | "right") => {
-    const el = scrollRef.current
-    if (!el) return
-    const cardWidth = el.clientWidth * 0.88 + 16
-    el.scrollBy({ left: dir === "left" ? -cardWidth : cardWidth, behavior: "smooth" })
-  }
 
   useEffect(() => {
     const fetchBusinesses = async () => {
@@ -126,9 +79,10 @@ export default function NegociosList({ params }: Props) {
         .order("name")
       let result = (data || []) as Business[]
 
-      // Filtro "Abierto ahora" calculado desde los horarios reales
+      // Filtro "Abierto ahora" calculado desde los horarios reales;
+      // sin horarios cargados, se respeta el tilde manual `is_open`
       if (params.abierto === "true") {
-        result = result.filter(b => calcIsOpen(b.business_hours, b.is_open))
+        result = result.filter(b => isOpenNow(b.business_hours) ?? b.is_open)
       }
 
       setBusinesses(result)
@@ -176,170 +130,26 @@ export default function NegociosList({ params }: Props) {
         Mostrando {visibleBusinesses.length} de {businesses.length} resultado{businesses.length !== 1 ? "s" : ""}
       </p>
 
-      {/* Wrapper relativo solo en mobile para posicionar las flechas */}
-      <div className="relative">
-        {businesses.length > 1 && (
-          <>
-            <button
-              onClick={() => scrollBy("left")}
-              className="md:hidden absolute left-0 top-[calc(50%-24px)] -translate-y-1/2 z-10 w-8 h-8 flex items-center justify-center rounded-full transition-opacity duration-200"
-              style={{
-                background: "rgba(45,69,48,0.85)",
-                border: "1px solid rgba(163,177,138,0.4)",
-                boxShadow: "0 2px 12px rgba(0,0,0,0.3)",
-                opacity: atStart ? 0 : 1,
-                pointerEvents: atStart ? "none" : "auto",
-              }}
-              aria-label="Anterior"
-            >
-              <ChevronLeft size={16} color="#E1DBC9" />
-            </button>
-            <button
-              onClick={() => scrollBy("right")}
-              className="md:hidden absolute right-0 top-[calc(50%-24px)] -translate-y-1/2 z-10 w-8 h-8 flex items-center justify-center rounded-full transition-opacity duration-200"
-              style={{
-                background: "rgba(45,69,48,0.85)",
-                border: "1px solid rgba(163,177,138,0.4)",
-                boxShadow: "0 2px 12px rgba(0,0,0,0.3)",
-                opacity: atEnd ? 0 : 1,
-                pointerEvents: atEnd ? "none" : "auto",
-              }}
-              aria-label="Siguiente"
-            >
-              <ChevronRight size={16} color="#E1DBC9" />
-            </button>
-          </>
-        )}
-
-      <div ref={scrollRef} className="flex gap-4 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden snap-x snap-mandatory -mx-4 px-4 pb-6 md:mx-0 md:px-0 md:grid md:grid-cols-2 lg:grid-cols-3 md:overflow-x-visible md:pb-0">
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4">
         {visibleBusinesses.map((biz, i) => {
-          const { id, name, slug, category, subcategory, address, cover_url, is_open, offers_delivery, offers_takeaway, description, business_hours, is_premium, is_featured_rubro } = biz
-          const isOpen = calcIsOpen(business_hours, is_open)
+          const { id, name, slug, category, subcategory, address, cover_url, logo_url, business_hours, is_premium, is_featured_rubro } = biz
+          const town = address?.split(",").pop()?.trim()
 
           return (
-            <AnimateIn key={id} direction="up" delay={i * 0.07} className="w-[88vw] flex-shrink-0 snap-center md:w-auto">
-              <Card3D>
-                <Link href={`/negocios/${slug}`} className="block h-full">
-                  <div
-                    className="rounded-2xl overflow-hidden h-full"
-                    style={{
-                      background: "rgba(255,255,255,0.10)",
-                      backdropFilter: "blur(16px)",
-                      WebkitBackdropFilter: "blur(16px)",
-                      border: "1px solid rgba(255,255,255,0.20)",
-                    }}
-                  >
-                    {/* Cover — aspect-video anti-CLS; shimmer debajo de la imagen durante la carga */}
-                    <div className="aspect-video relative bg-white/10">
-                      {/* shimmer: queda cubierto por la imagen una vez que carga */}
-                      <div className="absolute inset-0 animate-pulse bg-gradient-to-r from-white/0 via-white/[0.07] to-white/0" />
-
-                      {(is_premium || is_featured_rubro) && (
-                        <div className="absolute top-2.5 left-2.5 z-10 flex flex-col items-start gap-1.5">
-                          {is_premium && (
-                            <div
-                              className="flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-tight"
-                              style={{ background: "#C9A44B", color: "#1a1a1a" }}
-                            >
-                              ★ Destacado
-                            </div>
-                          )}
-                          {is_featured_rubro && (
-                            <div
-                              className="flex items-center gap-1 px-2 py-1 rounded-full text-xs font-semibold"
-                              style={{ background: "#3b82f6", color: "white" }}
-                            >
-                              <Star size={10} fill="currentColor" />
-                              Destacado
-                            </div>
-                          )}
-                        </div>
-                      )}
-
-                      {cover_url ? (
-                        <Image
-                          src={cover_url}
-                          alt={name}
-                          fill
-                          className="object-contain"
-                          sizes="(max-width: 768px) 88vw, (max-width: 1024px) 50vw, 33vw"
-                          quality={70}
-                          priority={i < 3}
-                        />
-                      ) : (
-                        <div className="absolute inset-0 flex items-center justify-center">
-                          <div
-                            className="w-16 h-16 rounded-full flex items-center justify-center font-serif text-xl"
-                            style={{ background: "rgba(255,255,255,0.12)", color: "rgba(255,255,255,0.50)" }}
-                          >
-                            {name[0]}
-                          </div>
-                        </div>
-                      )}
-
-                      {isOpen && (
-                        <span className="absolute top-3 right-3 z-10 text-xs font-medium px-2.5 py-1 rounded-full"
-                          style={{ background: "rgba(74,255,128,0.20)", color: "#6ee7a0" }}>
-                          Abierto
-                        </span>
-                      )}
-                    </div>
-
-                    {/* Info */}
-                    <div className="p-4">
-                      <h3 className="text-base font-medium mb-1" style={{ color: "#E1DBC9" }}>{name}</h3>
-                      <p className="text-xs mb-2" style={{ color: "rgba(225,219,201,0.65)" }}>
-                        {category ? categoryLabel[category] : subcategory || "Gastronomía"}
-                        {address && ` · ${address.split(",").pop()?.trim()}`}
-                      </p>
-                      {/* min-h-[40px] reserva espacio para la descripción aunque sea null (anti-CLS) */}
-                      <div className="min-h-[40px]">
-                        {description && (
-                          <p className="text-sm mb-3 leading-relaxed line-clamp-2" style={{ color: "rgba(225,219,201,0.75)" }}>
-                            {description}
-                          </p>
-                        )}
-                      </div>
-                      {/* min-h-[28px] evita que el card footer salte cuando badges están ausentes */}
-                      <div className="flex items-center gap-1.5 flex-wrap mb-3 min-h-[28px]">
-                        {!isOpen && (
-                          <span className="text-xs font-medium px-2 py-0.5 rounded-full"
-                            style={{ background: "rgba(255,255,255,0.10)", color: "rgba(225,219,201,0.50)" }}>
-                            Cerrado
-                          </span>
-                        )}
-                        {offers_delivery && (
-                          <span className="text-xs font-medium px-2 py-0.5 rounded-full"
-                            style={{ background: "rgba(255,255,255,0.15)", color: "rgba(225,219,201,0.85)" }}>
-                            Delivery
-                          </span>
-                        )}
-                        {offers_takeaway && (
-                          <span className="text-xs font-medium px-2 py-0.5 rounded-full"
-                            style={{ background: "rgba(255,255,255,0.15)", color: "rgba(225,219,201,0.85)" }}>
-                            Take Away
-                          </span>
-                        )}
-                      </div>
-                      <div
-                        className="flex items-center justify-between w-full px-3 py-2.5 rounded-xl text-xs font-semibold"
-                        style={{
-                          background: "rgba(45,69,48,0.55)",
-                          color: "#E1DBC9",
-                          border: "1px solid rgba(163,177,138,0.25)",
-                        }}
-                      >
-                        <span>Ver más</span>
-                        <ChevronRight size={13} />
-                      </div>
-                    </div>
-                  </div>
-                </Link>
-              </Card3D>
+            <AnimateIn key={id} direction="up" delay={Math.min(i, 8) * 0.04}>
+              <BusinessGridCard
+                href={`/negocios/${slug}`}
+                name={name}
+                imageUrl={cover_url || logo_url}
+                eyebrow={[category ? categoryLabel[category] : subcategory || "Gastronomía", town].filter(Boolean).join(" · ")}
+                isPremium={is_premium}
+                isFeaturedRubro={is_featured_rubro}
+                isOpen={isOpenNow(business_hours)}
+                priority={i < 4}
+              />
             </AnimateIn>
           )
         })}
-      </div>
       </div>
 
       {/* ── Paginación: cargar más ── */}

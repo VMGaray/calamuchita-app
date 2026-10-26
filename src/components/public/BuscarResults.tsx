@@ -7,6 +7,7 @@ import { Search, MapPin, ArrowLeft } from "lucide-react"
 import { normalizeArgPhone } from "@/lib/phone"
 import { useState } from "react"
 import { useRouter } from "next/navigation"
+import { isOpenNow, type BusinessHour } from "@/lib/utils/horarios"
 
 const sectionLabels: Record<string, string> = {
   gastronomy: "Gastronomía",
@@ -28,23 +29,6 @@ const sectionColors: Record<string, string> = {
   commerce:   "bg-brand-pine/10 text-brand-pine",
   events:     "bg-brand-earth/10 text-brand-earth",
   info:       "bg-brand-sand/50 text-brand-charcoal",
-}
-
-type BusinessHour = {
-  day_of_week: number
-  opens_at: string
-  closes_at: string
-  is_closed: boolean
-}
-
-function calcIsOpen(hours: BusinessHour[], fallback: boolean): boolean {
-  if (!hours || hours.length === 0) return fallback
-  const now = new Date()
-  const day = now.getDay()
-  const hhmm = `${String(now.getHours()).padStart(2, "0")}:${String(now.getMinutes()).padStart(2, "0")}`
-  const today = hours.find(h => h.day_of_week === day)
-  if (!today || today.is_closed) return false
-  return hhmm >= today.opens_at.slice(0, 5) && hhmm <= today.closes_at.slice(0, 5)
 }
 
 interface Business {
@@ -178,7 +162,7 @@ export default function BuscarResults({ query, results }: Props) {
         {results.length > 0 && (
           <div className="space-y-3">
             {results.map((business, i) => {
-              const isOpen = calcIsOpen(business.business_hours, business.is_open)
+              const isOpen = isOpenNow(business.business_hours)
 
               return (
                 <AnimateIn key={business.id} direction="up" delay={i * 0.04}>
@@ -208,9 +192,11 @@ export default function BuscarResults({ query, results }: Props) {
                           <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${sectionColors[business.section]}`}>
                             {sectionLabels[business.section]}
                           </span>
-                          {isOpen && (
-                            <span className="text-xs font-medium px-2 py-0.5 rounded-full bg-brand-pine/10 text-brand-pine">
-                              Abierto
+                          {isOpen !== null && (
+                            <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${
+                              isOpen ? "bg-brand-pine/10 text-brand-pine" : "bg-stone-100 text-stone-500"
+                            }`}>
+                              {isOpen ? "Abierto" : "Cerrado"}
                             </span>
                           )}
                         </div>
