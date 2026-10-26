@@ -10,7 +10,8 @@ interface Props {
   eyebrow?: string | null
   isPremium?: boolean
   isFeaturedRubro?: boolean
-  isOpen?: boolean
+  /** true = Abierto, false = Cerrado, null/undefined = sin horarios cargados (sin cartel) */
+  isOpen?: boolean | null
   priority?: boolean
 }
 
@@ -65,10 +66,12 @@ export default function BusinessGridCard({
           </div>
         )}
 
-        {isOpen && (
+        {isOpen != null && (
           <span className="absolute top-2 right-2 z-10 text-[10px] font-medium px-2 py-0.5 rounded-full"
-            style={{ background: "rgba(20,60,35,0.75)", color: "#6ee7a0" }}>
-            Abierto
+            style={isOpen
+              ? { background: "rgba(20,60,35,0.75)", color: "#6ee7a0" }
+              : { background: "rgba(0,0,0,0.55)", color: "rgba(225,219,201,0.75)" }}>
+            {isOpen ? "Abierto" : "Cerrado"}
           </span>
         )}
 

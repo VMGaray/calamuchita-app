@@ -6,13 +6,7 @@ import { SkeletonBusinessGrid } from "@/components/ui/Skeleton"
 import { createClient } from "@/lib/supabase/client"
 import BusinessGridCard from "@/components/public/BusinessGridCard"
 import { isDietaryKey } from "@/lib/constants/dietary"
-
-type BusinessHour = {
-  day_of_week: number
-  opens_at: string
-  closes_at: string
-  is_closed: boolean
-}
+import { isOpenNow, type BusinessHour } from "@/lib/utils/horarios"
 
 interface Business {
   id: string
@@ -52,19 +46,6 @@ const categoryLabel: Record<string, string> = {
   other: "Gastronomía",
 }
 
-/**
- * Calcula si un negocio está abierto en este momento basándose en sus horarios.
- * Usa el campo manual `is_open` como fallback si no hay horarios configurados.
- */
-function calcIsOpen(hours: BusinessHour[], fallback: boolean): boolean {
-  if (!hours || hours.length === 0) return fallback
-  const now = new Date()
-  const day = now.getDay() // 0=Domingo … 6=Sábado
-  const hhmm = `${String(now.getHours()).padStart(2, "0")}:${String(now.getMinutes()).padStart(2, "0")}`
-  const today = hours.find(h => h.day_of_week === day)
-  if (!today || today.is_closed) return false
-  return hhmm >= today.opens_at.slice(0, 5) && hhmm <= today.closes_at.slice(0, 5)
-}
 
 export default function NegociosList({ params }: Props) {
   const [businesses, setBusinesses] = useState<Business[]>([])
@@ -98,9 +79,10 @@ export default function NegociosList({ params }: Props) {
         .order("name")
       let result = (data || []) as Business[]
 
-      // Filtro "Abierto ahora" calculado desde los horarios reales
+      // Filtro "Abierto ahora" calculado desde los horarios reales;
+      // sin horarios cargados, se respeta el tilde manual `is_open`
       if (params.abierto === "true") {
-        result = result.filter(b => calcIsOpen(b.business_hours, b.is_open))
+        result = result.filter(b => isOpenNow(b.business_hours) ?? b.is_open)
       }
 
       setBusinesses(result)
@@ -150,7 +132,7 @@ export default function NegociosList({ params }: Props) {
 
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4">
         {visibleBusinesses.map((biz, i) => {
-          const { id, name, slug, category, subcategory, address, cover_url, logo_url, is_open, business_hours, is_premium, is_featured_rubro } = biz
+          const { id, name, slug, category, subcategory, address, cover_url, logo_url, business_hours, is_premium, is_featured_rubro } = biz
           const town = address?.split(",").pop()?.trim()
 
           return (
@@ -162,7 +144,7 @@ export default function NegociosList({ params }: Props) {
                 eyebrow={[category ? categoryLabel[category] : subcategory || "Gastronomía", town].filter(Boolean).join(" · ")}
                 isPremium={is_premium}
                 isFeaturedRubro={is_featured_rubro}
-                isOpen={calcIsOpen(business_hours, is_open)}
+                isOpen={isOpenNow(business_hours)}
                 priority={i < 4}
               />
             </AnimateIn>

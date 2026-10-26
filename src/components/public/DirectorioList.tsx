@@ -17,6 +17,7 @@ import {
 } from "@/lib/constants/categories"
 import { Phone, AtSign, MapPin, X, LayoutGrid, Check, ChevronLeft, Store } from "lucide-react"
 import BusinessGridCard from "@/components/public/BusinessGridCard"
+import { isOpenNow, type BusinessHour } from "@/lib/utils/horarios"
 
 interface Business {
   id: string
@@ -34,6 +35,7 @@ interface Business {
   is_premium: boolean
   is_featured_rubro: boolean
   medical_specialties: string[] | null
+  business_hours: BusinessHour[] | null
 }
 
 interface Props {
@@ -267,7 +269,7 @@ export default function DirectorioList({ section, filters }: Props) {
       const supabase = createClient()
       let query = supabase
         .from("businesses")
-        .select("id, name, slug, subcategory, categories, address, pueblo, phone, whatsapp, instagram, logo_url, cover_url, description, is_premium, is_featured_rubro, medical_specialties")
+        .select("id, name, slug, subcategory, categories, address, pueblo, phone, whatsapp, instagram, logo_url, cover_url, description, is_premium, is_featured_rubro, medical_specialties, business_hours(day_of_week, opens_at, closes_at, is_closed)")
         .eq("status", "active")
         // Sección principal o una de las secciones donde también aparece.
         // section viene de la URL: solo letras, para no alterar el filtro or().
@@ -578,6 +580,7 @@ export default function DirectorioList({ section, filters }: Props) {
                     eyebrow={badgeFor(business)}
                     isPremium={business.is_premium}
                     isFeaturedRubro={business.is_featured_rubro}
+                    isOpen={isOpenNow(business.business_hours)}
                     priority={i < 4}
                   />
                 </AnimateIn>

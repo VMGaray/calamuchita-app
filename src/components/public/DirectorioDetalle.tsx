@@ -16,6 +16,7 @@ import { extractYoutubeId } from "@/lib/utils/youtube"
 import AnimateIn from "@/components/ui/AnimateIn"
 import BackButton from "@/components/ui/BackButton"
 import { businessProfileUrl } from "@/lib/utils/business"
+import { isOpenNow } from "@/lib/utils/horarios"
 
 function WaIcon({ size = 14 }: { size?: number }) {
   return (
@@ -125,20 +126,7 @@ export default function DirectorioDetalle({ business, section, promotions = [] }
 
   const cardClass = "bg-white rounded-2xl border border-stone-100 p-4"
 
-  const calcIsOpenNow = () => {
-    if (!business.business_hours?.length) return null
-    const now = new Date()
-    const todayIdx = now.getDay()
-    const todayHours = business.business_hours.find((h: any) => h.day_of_week === todayIdx)
-    if (!todayHours || todayHours.is_closed) return false
-    const [openH, openM] = todayHours.opens_at.split(":").map(Number)
-    const [closeH, closeM] = todayHours.closes_at.split(":").map(Number)
-    const nowMinutes = now.getHours() * 60 + now.getMinutes()
-    const openMinutes = openH * 60 + openM
-    const closeMinutes = closeH * 60 + closeM
-    return nowMinutes >= openMinutes && nowMinutes < closeMinutes
-  }
-  const isOpenNow = calcIsOpenNow()
+  const isOpen = isOpenNow(business.business_hours)
 
   return (
     <div className="relative min-h-screen" style={{ background: "#F0EBE0" }}>
@@ -195,13 +183,13 @@ export default function DirectorioDetalle({ business, section, promotions = [] }
                 {business.subcategory}
               </p>
             )}
-            {isOpenNow !== null && (
+            {isOpen !== null && (
               <span className={`text-xs font-semibold px-3 py-1 rounded-full self-start ${
-                isOpenNow
+                isOpen
                   ? "bg-green-400/20 text-green-300 border border-green-400/40"
                   : "bg-white/10 text-white/60 border border-white/20"
               }`}>
-                {isOpenNow ? "● Abierto ahora" : "● Cerrado ahora"}
+                {isOpen ? "● Abierto ahora" : "● Cerrado ahora"}
               </span>
             )}
           </div>
@@ -258,13 +246,13 @@ export default function DirectorioDetalle({ business, section, promotions = [] }
             )}
 
             {/* Badge */}
-            {isOpenNow !== null && (
+            {isOpen !== null && (
               <span className={`text-xs font-semibold px-3 py-1 rounded-full ${
-                isOpenNow
+                isOpen
                   ? "bg-green-400/20 text-green-300 border border-green-400/40"
                   : "bg-white/10 text-white/60 border border-white/20"
               }`}>
-                {isOpenNow ? "● Abierto ahora" : "● Cerrado ahora"}
+                {isOpen ? "● Abierto ahora" : "● Cerrado ahora"}
               </span>
             )}
 

@@ -18,6 +18,7 @@ import { normalizeArgPhone } from "@/lib/phone"
 import { normalizeUrl } from "@/lib/normalizeUrl"
 import { extractYoutubeId } from "@/lib/utils/youtube"
 import { hoyAR } from "@/lib/utils/fechas"
+import { isOpenNow } from "@/lib/utils/horarios"
 import PromoCoupon, {
   promoFontVariables,
   sectionToCategoria,
@@ -68,16 +69,6 @@ function InfoRow({ icon, sublabel, label, href, external, onClick }: {
     <a href={href} target={external ? "_blank" : undefined} rel={external ? "noopener noreferrer" : undefined} onClick={onClick} className="block hover:opacity-70 transition-opacity">{inner}</a>
   )
   return inner
-}
-
-function calcIsOpenNow(hours: any[]): boolean {
-  if (!hours || hours.length === 0) return false
-  const arDate = new Date(new Date().toLocaleString("en-US", { timeZone: "America/Argentina/Buenos_Aires" }))
-  const day = arDate.getDay()
-  const hhmm = `${String(arDate.getHours()).padStart(2, "0")}:${String(arDate.getMinutes()).padStart(2, "0")}`
-  const todayShifts = hours.filter((h: any) => h.day_of_week === day && !h.is_closed)
-  if (todayShifts.length === 0) return false
-  return todayShifts.some((h: any) => hhmm >= h.opens_at.slice(0, 5) && hhmm < h.closes_at.slice(0, 5))
 }
 
 interface Promotion {
@@ -252,7 +243,7 @@ export default function NegocioDetalle({ business, promotions = [] }: Props) {
     other: "Gastronomía",
   }
   const categoryLabel = business.subcategory || CATEGORY_LABELS[business.category] || "Gastronomía"
-  const isOpen        = calcIsOpenNow(business.business_hours ?? [])
+  const isOpen        = isOpenNow(business.business_hours)
 
   const todayIdx = new Date(new Date().toLocaleString("en-US", { timeZone: "America/Argentina/Buenos_Aires" })).getDay()
   const hoursByDay = new Map<number, any[]>()
@@ -363,14 +354,16 @@ export default function NegocioDetalle({ business, promotions = [] }: Props) {
                 >
                   {categoryLabel}
                 </span>
-                <span
-                  className={`text-[10px] font-bold px-3 py-1 rounded-full flex items-center gap-1.5 ${
-                    isOpen ? "text-green-700 bg-green-50 border border-green-200" : "text-stone-500 bg-stone-100"
-                  }`}
-                >
-                  <span className={`w-1.5 h-1.5 rounded-full inline-block ${isOpen ? "bg-green-500" : "bg-stone-400"}`} />
-                  {isOpen ? "Abierto ahora" : "Cerrado"}
-                </span>
+                {isOpen !== null && (
+                  <span
+                    className={`text-[10px] font-bold px-3 py-1 rounded-full flex items-center gap-1.5 ${
+                      isOpen ? "text-green-700 bg-green-50 border border-green-200" : "text-stone-500 bg-stone-100"
+                    }`}
+                  >
+                    <span className={`w-1.5 h-1.5 rounded-full inline-block ${isOpen ? "bg-green-500" : "bg-stone-400"}`} />
+                    {isOpen ? "Abierto ahora" : "Cerrado"}
+                  </span>
+                )}
               </div>
             </div>
             {business.logo_url && (

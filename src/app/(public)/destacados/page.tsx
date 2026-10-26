@@ -3,6 +3,7 @@ import { ArrowLeft } from "lucide-react"
 import { createClient } from "@/lib/supabase/server"
 import BackgroundManager from "@/components/public/BackgroundManager"
 import BusinessGridCard from "@/components/public/BusinessGridCard"
+import { isOpenNow } from "@/lib/utils/horarios"
 
 const FALLBACK = "/valle.jpg"
 
@@ -28,7 +29,7 @@ export default async function DestacadosPage() {
 
   const { data } = await supabase
     .from("businesses")
-    .select("id, name, slug, cover_url, logo_url, subcategory, section")
+    .select("id, name, slug, cover_url, logo_url, subcategory, section, business_hours(day_of_week, opens_at, closes_at, is_closed)")
     .eq("status", "active")
     .eq("is_premium", true)
     .order("created_at", { ascending: false })
@@ -73,6 +74,7 @@ export default async function DestacadosPage() {
                   name={biz.name}
                   imageUrl={biz.cover_url || FALLBACK}
                   eyebrow={SECTION_ES[biz.section] ?? biz.section}
+                  isOpen={isOpenNow(biz.business_hours)}
                 />
               )
             })}
