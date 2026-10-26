@@ -10,13 +10,7 @@ import Image from "next/image"
 import { MapPin } from "lucide-react"
 import { calculateDistance } from "@/lib/utils/distance"
 import { useGeolocation } from "../../lib/hooks/useGeolocation"
-
-type BusinessHour = {
-  day_of_week: number
-  opens_at: string
-  closes_at: string
-  is_closed: boolean
-}
+import { isOpenNow, type BusinessHour } from "@/lib/utils/horarios"
 
 interface Business {
   id: string
@@ -34,20 +28,6 @@ interface Business {
   latitude: number | null
   longitude: number | null
   business_hours: BusinessHour[]
-}
-
-/**
- * Calcula si un negocio está abierto ahora según sus horarios configurados.
- * Usa is_open como fallback si no hay horarios.
- */
-function calcIsOpen(hours: BusinessHour[], fallback: boolean): boolean {
-  if (!hours || hours.length === 0) return fallback
-  const now = new Date()
-  const day = now.getDay()
-  const hhmm = `${String(now.getHours()).padStart(2, "0")}:${String(now.getMinutes()).padStart(2, "0")}`
-  const today = hours.find(h => h.day_of_week === day)
-  if (!today || today.is_closed) return false
-  return hhmm >= today.opens_at.slice(0, 5) && hhmm <= today.closes_at.slice(0, 5)
 }
 
 export default function BusinessesGrid() {
@@ -68,8 +48,8 @@ export default function BusinessesGrid() {
         .limit(20) // traemos más y filtramos cliente para mostrar 4 abiertos
 
       const all = (data || []) as Business[]
-      // Filtramos los que están abiertos ahora según sus horarios reales
-      const open = all.filter(b => calcIsOpen(b.business_hours, b.is_open)).slice(0, 4)
+      // Filtramos los que están abiertos ahora según sus horarios reales (sin horarios, el tilde manual is_open)
+      const open = all.filter(b => isOpenNow(b.business_hours) ?? b.is_open).slice(0, 4)
       setBusinesses(open)
       setLoading(false)
     }
