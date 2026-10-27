@@ -13,6 +13,11 @@ const withPWA = withPWAInit({
 })
 
 const nextConfig: NextConfig = {
+  experimental: {
+    // CSS en un <style> del <head> en vez de 4 <link> que bloquean el render (~20 KB con gzip).
+    // Conviene para visitas nuevas (los anuncios llevan a la home); el costo es no cachear el CSS aparte.
+    inlineCss: true,
+  },
   images: {
     remotePatterns: [
       {
@@ -26,10 +31,14 @@ const nextConfig: NextConfig = {
         pathname: "/**",
       },
     ],
-    minimumCacheTTL: 2592000,
-    formats: ["image/avif", "image/webp"],
+    // Vercel Image Optimization sigue desactivado (límite del plan agotado): el loader manda las
+    // imágenes de Supabase a su transformación y las de /public a variantes WebP pregeneradas.
+    loader: "custom",
+    loaderFile: "./src/lib/imageLoader.ts",
+    // Si se cambian, regenerar las variantes con scripts/generate-image-variants.mjs
+    deviceSizes: [640, 828, 1080, 1200, 1920],
+    imageSizes: [32, 48, 64, 96, 128, 256, 384],
     qualities: [70, 75, 80, 85, 90],
-    unoptimized: true,
   },
   async headers() {
     return [
@@ -42,6 +51,25 @@ const nextConfig: NextConfig = {
           { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
           { key: "Strict-Transport-Security", value: "max-age=31536000; includeSubDomains" },
           { key: "Permissions-Policy", value: "camera=(), microphone=(), payment=(), geolocation=(self)" },
+        ],
+      },
+      {
+        // Variantes de imágenes de /public: el nombre lleva el ancho, no cambian entre deploys
+        source: "/images/:path*",
+        headers: [
+          { key: "Cache-Control", value: "public, max-age=2592000, stale-while-revalidate=86400" },
+        ],
+      },
+      {
+        source: "/:file(valle.jpg|logo-qr.png|videoMenu.mp4)",
+        headers: [
+          { key: "Cache-Control", value: "public, max-age=2592000, stale-while-revalidate=86400" },
+        ],
+      },
+      {
+        source: "/icons/:path*",
+        headers: [
+          { key: "Cache-Control", value: "public, max-age=604800, stale-while-revalidate=86400" },
         ],
       },
       {

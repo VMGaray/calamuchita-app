@@ -90,7 +90,7 @@ export default function PromoAccordionCard({ group, index, isOpen, onToggle }: P
           <div className="flex h-11 w-11 shrink-0 items-center justify-center overflow-hidden rounded-[13px] bg-white/95 shadow-[0_3px_8px_rgba(0,0,0,0.18)]">
             {group.logo_url ? (
               <div className="relative h-full w-full p-1">
-                <Image src={group.logo_url} alt={`Logo de ${group.comercio}`} fill sizes="44px" className="object-contain" />
+                <Image src={group.logo_url} alt={`Logo de ${group.comercio}`} width={44} height={44} className="absolute inset-0 h-full w-full object-contain" />
               </div>
             ) : (
               <span aria-hidden="true" className="text-sm font-bold" style={{ ...fontDisplay, color: a }}>
@@ -117,7 +117,7 @@ export default function PromoAccordionCard({ group, index, isOpen, onToggle }: P
 
           {firstFlyer && (
             <div className="relative h-12 w-10 shrink-0 overflow-hidden rounded-lg bg-white/90 shadow-[0_3px_8px_rgba(0,0,0,0.18)]">
-              <Image src={firstFlyer.url} alt="" fill sizes="40px" className="object-contain" />
+              <Image src={firstFlyer.url} alt="" width={40} height={48} className="absolute inset-0 h-full w-full object-contain" />
             </div>
           )}
 

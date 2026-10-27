@@ -132,8 +132,13 @@ export default function CtaBusiness() {
       })
     }
 
+    // Solo anima mientras el canvas está en pantalla (es el último bloque de la home)
+    let visible = false
+    const observer = new IntersectionObserver(([entry]) => { visible = entry.isIntersecting })
+    observer.observe(canvas)
+
     const draw = () => {
-      if (!document.hidden) {
+      if (!document.hidden && visible) {
         const W = canvas.width
         const H = canvas.height
         ctx.clearRect(0, 0, W, H)
@@ -147,6 +152,7 @@ export default function CtaBusiness() {
     draw()
     return () => {
       cancelAnimationFrame(animId)
+      observer.disconnect()
       window.removeEventListener("resize", setSize)
     }
   }, [])
