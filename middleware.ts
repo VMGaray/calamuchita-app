@@ -43,5 +43,6 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ['/((?!_next/static|_next/image|favicon.ico).*)'],
+  // Sin archivos estáticos (imágenes, íconos, service worker): no necesitan sesión
+  matcher: ['/((?!_next/static|_next/image|favicon.ico|.*\\.(?:png|jpg|jpeg|webp|avif|svg|ico|mp4|js|json|txt|xml)$).*)'],
 }

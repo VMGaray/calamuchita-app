@@ -32,6 +32,14 @@ const SECTION_ES: Record<string, string> = {
 const CARD_W = 320
 const GAP = 32    // gap-8 = 2rem = 32px
 const SPEED = 80  // px per second
+// Tarjetas repetidas al final de cada fila para que el loop no muestre un hueco (cubre pantallas de hasta 2560px)
+const LOOP_EXTRA = Math.ceil(2560 / (CARD_W + GAP)) + 1
+
+/** La fila completa + las primeras LOOP_EXTRA tarjetas otra vez (antes eran 3 copias: ~540 KB de HTML). */
+function loopItems<T>(row: T[]): T[] {
+  if (row.length === 0) return []
+  return Array.from({ length: row.length + LOOP_EXTRA }, (_, i) => row[i % row.length])
+}
 
 function FeaturedCard({ biz }: { biz: FeaturedBusiness }) {
   return (
@@ -45,20 +53,17 @@ function FeaturedCard({ biz }: { biz: FeaturedBusiness }) {
         className="block w-full"
       >
         <div className="w-full aspect-[4/3] relative overflow-hidden rounded-[40px] bg-[#2D4530] shadow-2xl">
-          {/* Imagen con zoom lento — next/image fill preserva el ratio nativo */}
-          <motion.div
-            className="absolute inset-0"
-            animate={{ scale: [1, 1.1, 1] }}
-            transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
-          >
+          {/* Imagen con zoom lento — animación CSS (compositor), solo con mouse: en mobile
+              eran ~300 animaciones JS infinitas que trababan el hilo principal */}
+          <div className="absolute inset-0 jdv-slow-zoom">
             <Image
               src={biz.cover_url || FALLBACK}
               alt={biz.name}
-              fill
-              className="object-contain"
-              sizes="320px"
+              width={CARD_W}
+              height={CARD_W * 3 / 4}
+              className="absolute inset-0 h-full w-full object-contain"
             />
-          </motion.div>
+          </div>
 
           {/* Overlay */}
           <div className="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent opacity-80" />
@@ -172,8 +177,8 @@ export default function JoyasDelValle({ businesses }: { businesses: FeaturedBusi
 
   if (row1.length === 0 && row2.length === 0) return null
 
-  const items1 = [...row1, ...row1, ...row1]
-  const items2 = [...row2, ...row2, ...row2]
+  const items1 = loopItems(row1)
+  const items2 = loopItems(row2)
 
   return (
     <section

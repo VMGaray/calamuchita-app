@@ -1,6 +1,7 @@
 "use client"
 
 import { usePathname } from "next/navigation"
+import Image from "next/image"
 import Header from "@/components/shared/Header"
 import HeroSection from "@/components/public/HeroSection"
 import PublicNavBars from "@/components/public/PublicNavBars"
@@ -16,15 +17,18 @@ export default function PublicLayoutChrome({ children }: { children: React.React
     <div className="min-h-screen flex flex-col">
       {/* Fondo estático del Home */}
       {!isCategoryPage && (
-        <div className="absolute inset-0 z-0 h-[500px] pointer-events-none">
-          <div
-            className="absolute inset-0"
-            style={{
-              backgroundImage: "url('/valle.jpg')",
-              backgroundSize: "cover",
-              backgroundPosition: "center 40%",
-              backgroundRepeat: "no-repeat",
-            }}
+        <div className="absolute inset-0 z-0 h-[500px] pointer-events-none overflow-hidden">
+          {/* Es el LCP de la home: <img> con preload y prioridad alta (un background-image CSS se descubre tarde).
+              En mobile cubre 500px de alto → ~889px de ancho para una foto 16:9 */}
+          <Image
+            src="/valle.jpg"
+            alt=""
+            fill
+            preload
+            fetchPriority="high"
+            sizes="(max-width: 889px) 889px, 100vw"
+            className="object-cover"
+            style={{ objectPosition: "center 40%" }}
           />
           <div
             className="absolute inset-0"

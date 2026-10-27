@@ -4,11 +4,15 @@ import PulsoDelValle from "@/components/public/PulsoDelValle"
 import Novedades from "@/components/public/Novedades"
 import CtaBusiness from "@/components/public/CtaBusiness"
 import LocalidadSelectorWidget from "@/components/public/LocalidadSelectorWidget"
-import { createClient } from "@/lib/supabase/server"
+import { createPublicClient } from "@/lib/supabase/public"
 import type { Novedad } from "@/types/database"
 import { buildPromoGroup, PROMO_VALUE_COLUMNS, PROMO_FLYERS_EMBED, type PromoGroup, type PromotionRow } from "@/lib/promos"
 import { businessProfileUrl } from "@/lib/utils/business"
 import { hoyAR } from "@/lib/utils/fechas"
+
+// ISR: la home se sirve desde la caché de Vercel y se regenera como mucho cada 2 minutos.
+// Los datos son públicos (cliente sin cookies), así que es la misma para todos los visitantes.
+export const revalidate = 120
 
 const NOVEDADES_LIMIT = 5
 
@@ -63,7 +67,7 @@ export type EditorialPost = {
 }
 
 export default async function HomePage() {
-  const supabase = await createClient()
+  const supabase = createPublicClient()
   const today = hoyAR()
 
   const [

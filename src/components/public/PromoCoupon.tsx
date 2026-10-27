@@ -96,7 +96,7 @@ export default function PromoCoupon({ group, maxPromos }: PromoCouponProps) {
           <div className="flex h-13 w-13 shrink-0 items-center justify-center overflow-hidden rounded-[15px] bg-white shadow-[0_4px_10px_rgba(0,0,0,0.18)]">
             {group.logo_url ? (
               <div className="relative h-full w-full p-1.5">
-                <Image src={group.logo_url} alt={`Logo de ${group.comercio}`} fill sizes="52px" className="object-contain" />
+                <Image src={group.logo_url} alt={`Logo de ${group.comercio}`} width={52} height={52} className="absolute inset-0 h-full w-full object-contain" />
               </div>
             ) : (
               <span aria-hidden="true" className="text-lg font-bold" style={{ ...fontDisplay, color: "var(--a)" }}>

@@ -73,3 +73,13 @@ h1, h2, h3 {
   position: fixed !important;
   width: 100% !important;
 }
+/* Zoom lento de las tarjetas de Destacados: solo en dispositivos con mouse */
+@keyframes jdv-slow-zoom {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.1); }
+}
+@media (hover: hover) and (prefers-reduced-motion: no-preference) {
+  .jdv-slow-zoom {
+    animation: jdv-slow-zoom 20s linear infinite;
+  }
+}

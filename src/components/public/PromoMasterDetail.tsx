@@ -76,9 +76,9 @@ export default function PromoMasterDetail({ groups }: PromoMasterDetailProps) {
                       <Image
                         src={group.logo_url}
                         alt=""
-                        fill
-                        sizes="40px"
-                        className="object-contain"
+                        width={40}
+                        height={40}
+                        className="absolute inset-0 h-full w-full object-contain"
                       />
                     </div>
                   ) : (

@@ -1,13 +1,14 @@
 "use client"
 
-import { Suspense } from "react"
 import { motion } from "framer-motion"
 import { useRouter, usePathname } from "next/navigation"
 import { useState } from "react"
 import InteractiveText from "@/components/ui/InteractiveText"
 import MagneticButton from "@/components/ui/MagneticButton"
 
-function HeroSectionInner() {
+// Sin <Suspense>: con fallback={null} React mandaba el hero al final del HTML y,
+// hasta que llegaba, el contenido se pintaba arriba y después saltaba ~400px (CLS 0,5).
+export default function HeroSection() {
   const router = useRouter()
   const pathname = usePathname()
   const [query, setQuery] = useState("")
@@ -110,13 +111,5 @@ function HeroSectionInner() {
       </motion.div>
 
     </section>
-  )
-}
-
-export default function HeroSection() {
-  return (
-    <Suspense fallback={null}>
-      <HeroSectionInner />
-    </Suspense>
   )
 }
