@@ -132,7 +132,6 @@ export default function PulsoDelValle({ posts }: Props) {
                     className="object-cover object-top group-hover:scale-105 transition-transform duration-500"
                     sizes="(max-width: 768px) 72vw, 280px"
                     quality={75}
-                    priority={i < 2}
                   />
                 ) : (
                   <div className="absolute inset-0 flex items-center justify-center">

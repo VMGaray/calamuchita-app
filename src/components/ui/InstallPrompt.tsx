@@ -1,12 +1,12 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import { createClient } from '@/lib/supabase/client';
+import { loadSupabase } from '@/lib/supabase/lazy';
 import { isInstalledApp } from '@/lib/pwa';
 
 async function recordInstall() {
   try {
-    const supabase = createClient()
+    const supabase = await loadSupabase()
     const ua = navigator.userAgent
     const platform = /iPhone|iPad|iPod/.test(ua) ? 'iOS' : /Android/.test(ua) ? 'Android' : 'Desktop'
     await supabase.from('pwa_installs').insert({ user_agent: ua, platform })

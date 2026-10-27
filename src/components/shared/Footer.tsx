@@ -5,7 +5,7 @@ import Link from "next/link"
 import { motion } from "framer-motion"
 import { MapPin, UtensilsCrossed } from "lucide-react"
 import AnimateIn from "@/components/ui/AnimateIn"
-import { createClient } from "@/lib/supabase/client"
+import { loadSupabase } from "@/lib/supabase/lazy"
 import { isInstalledApp } from "@/lib/pwa"
 import { Playfair_Display } from "next/font/google"
 
@@ -13,6 +13,8 @@ const playfair = Playfair_Display({
   subsets: ["latin"],
   style: ["italic"],
   weight: ["400"],
+  // Solo se usa en el footer: sin <link rel="preload"> para no competir con la foto del hero
+  preload: false,
 })
 
 const FALLBACK_PUEBLOS = [
@@ -50,10 +52,8 @@ export default function Footer() {
   const [canInstall, setCanInstall] = useState(false)
 
   useEffect(() => {
-    createClient()
-      .from("localities")
-      .select("name")
-      .order("sort_order")
+    loadSupabase()
+      .then(supabase => supabase.from("localities").select("name").order("sort_order"))
       .then(({ data }) => {
         if (data && data.length > 0) setPueblos(data.map(l => l.name))
       })

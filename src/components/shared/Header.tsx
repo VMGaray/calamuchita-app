@@ -4,7 +4,7 @@ import Link from "next/link"
 import { MapPin, Map as MapIcon, CalendarDays } from "lucide-react"
 import { useState, useEffect } from "react"
 import { motion, AnimatePresence } from "framer-motion"
-import { createClient } from "@/lib/supabase/client"
+import { loadSupabase } from "@/lib/supabase/lazy"
 import { useRouter, usePathname } from "next/navigation"
 import ConfirmModal from "@/components/ui/ConfirmModal"
 
@@ -29,23 +29,31 @@ export default function Header() {
     || pathname.startsWith("/mapa")
 
   useEffect(() => {
-    const supabase = createClient()
-    supabase.auth.getUser().then(({ data: { user } }) => {
-      setUser(user)
-      if (user) {
-        supabase.from("profiles").select("*").eq("id", user.id).single()
-          .then(({ data }) => setProfile(data))
-      }
+    let cancelled = false
+    let unsubscribe: (() => void) | undefined
+    loadSupabase().then(supabase => {
+      if (cancelled) return
+      supabase.auth.getUser().then(({ data: { user } }) => {
+        setUser(user)
+        if (user) {
+          supabase.from("profiles").select("*").eq("id", user.id).single()
+            .then(({ data }) => setProfile(data))
+        }
+      })
+      const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+        setUser(session?.user ?? null)
+        if (!session?.user) setProfile(null)
+      })
+      unsubscribe = () => subscription.unsubscribe()
     })
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      setUser(session?.user ?? null)
-      if (!session?.user) setProfile(null)
-    })
-    return () => subscription.unsubscribe()
+    return () => {
+      cancelled = true
+      unsubscribe?.()
+    }
   }, [])
 
   const handleLogout = async () => {
-    const supabase = createClient()
+    const supabase = await loadSupabase()
     await supabase.auth.signOut()
     setMenuOpen(false)
     router.push("/")

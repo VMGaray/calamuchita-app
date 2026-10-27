@@ -28,6 +28,8 @@ export const bricolage = Bricolage_Grotesque({
   weight: ["600", "700", "800"],
   variable: "--font-promo-display",
   display: "swap",
+  // Las promos están bajo el pliegue: sin preload para no competir con la foto del hero
+  preload: false,
 })
 
 export const jakarta = Plus_Jakarta_Sans({
@@ -35,6 +37,7 @@ export const jakarta = Plus_Jakarta_Sans({
   weight: ["400", "500", "600", "700"],
   variable: "--font-promo-body",
   display: "swap",
+  preload: false,
 })
 
 /** Clases .variable de ambas fuentes, listas para poner en el contenedor que envuelve cualquier <PromoCoupon>. */

@@ -74,8 +74,10 @@ function FeaturedCard({ biz }: { biz: FeaturedBusiness }) {
       className="relative flex-shrink-0 group cursor-pointer"
       style={{ width: CARD_W }}
     >
+      {/* Sin prefetch: el carrusel se mueve solo y precargaría cada negocio que pasa por pantalla */}
       <Link
         href={biz.section === "gastronomy" ? `/negocios/${biz.slug}?from=/` : `/directorio/${biz.section}/${biz.slug}?from=/`}
+        prefetch={false}
         className="block w-full"
       >
         <div className="w-full aspect-[4/3] relative overflow-hidden rounded-[40px] bg-[#2D4530] shadow-2xl">
@@ -120,22 +122,27 @@ function FeaturedCard({ biz }: { biz: FeaturedBusiness }) {
   )
 }
 
-export default function JoyasDelValle({ businesses }: { businesses: FeaturedBusiness[] }) {
-  // El sorteo se hace en el navegador: la home está cacheada (ISR) y si se sorteara en el
-  // servidor todos los visitantes verían los mismos durante 2 minutos.
+export default function JoyasDelValle({ total }: { total: number }) {
+  // La lista llega aparte (/api/destacados, cacheada) y el sorteo se hace en el navegador:
+  // así los ~100 negocios no viajan en el HTML y cada visita ve otros, aunque la home esté cacheada (ISR).
   // Hasta entonces se muestran placeholders del mismo tamaño (sin saltos de layout).
   const [picked, setPicked] = useState<FeaturedBusiness[] | null>(null)
 
   useEffect(() => {
+    let cancelled = false
     const desktop = window.matchMedia("(min-width: 768px)").matches
-    // Intencional: el sorteo tiene que pasar después de hidratar (el HTML del servidor es igual para todos)
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    setPicked(randomSample(businesses, desktop ? COUNT_DESKTOP : COUNT_MOBILE))
-  }, [businesses])
+    fetch("/api/destacados")
+      .then(res => (res.ok ? res.json() : []))
+      .then((all: FeaturedBusiness[]) => {
+        if (!cancelled) setPicked(randomSample(all, desktop ? COUNT_DESKTOP : COUNT_MOBILE))
+      })
+      .catch(() => {})  // sin red quedan los placeholders
+    return () => { cancelled = true }
+  }, [])
 
   // Dos filas con la mitad cada una (fila 2 vacía si hay un solo destacado)
   const slots: (FeaturedBusiness | null)[] =
-    picked ?? Array(Math.min(businesses.length, COUNT_MOBILE)).fill(null)
+    picked ?? Array(Math.min(total, COUNT_MOBILE)).fill(null)
   const half = Math.ceil(slots.length / 2)
   const row1 = slots.slice(0, half)
   const row2 = slots.slice(half)
