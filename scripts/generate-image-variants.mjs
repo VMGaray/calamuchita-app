@@ -23,7 +23,7 @@ for (const { file, name } of SOURCES) {
     const out = path.join("public/images", `${name}-${w}.webp`)
     const info = await sharp(file)
       .resize({ width: Math.min(w, original) })
-      .webp({ quality: 70, effort: 6 })
+      .webp({ quality: 62, effort: 6 })
       .toFile(out)
     console.log(`${out}  ${info.width}x${info.height}  ${Math.round(info.size / 1024)} KB`)
   }

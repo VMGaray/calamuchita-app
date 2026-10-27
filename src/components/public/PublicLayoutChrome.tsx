@@ -19,14 +19,16 @@ export default function PublicLayoutChrome({ children }: { children: React.React
       {!isCategoryPage && (
         <div className="absolute inset-0 z-0 h-[500px] pointer-events-none overflow-hidden">
           {/* Es el LCP de la home: <img> con preload y prioridad alta (un background-image CSS se descubre tarde).
-              En mobile cubre 500px de alto → ~889px de ancho para una foto 16:9 */}
+              En mobile cubre 500px de alto (~889px de ancho para una foto 16:9), pero queda detrás del
+              degradé y del texto: declaramos 600px para que en celulares baje la de 1080px (~85 KB) y no la
+              de 1280px (~115 KB). En 4G lenta cada KB de la foto atrasa el LCP. */}
           <Image
             src="/valle.jpg"
             alt=""
             fill
             preload
             fetchPriority="high"
-            sizes="(max-width: 889px) 889px, 100vw"
+            sizes="(max-width: 889px) 600px, 100vw"
             className="object-cover"
             style={{ objectPosition: "center 40%" }}
           />

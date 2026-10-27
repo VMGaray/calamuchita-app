@@ -16,14 +16,6 @@ export const revalidate = 120
 
 const NOVEDADES_LIMIT = 5
 
-type FeaturedBusiness = {
-  id: string
-  name: string
-  slug: string
-  cover_url: string | null
-  section: string
-}
-
 type PromoBusiness = {
   id: string
   name: string
@@ -69,18 +61,17 @@ export default async function HomePage() {
   const today = hoyAR()
 
   const [
-    { data: featuredData },
+    { count: featuredCount },
     { data: promotionsData },
     { data: editorialData },
     { data: novedadesData },
   ] = await Promise.all([
+    // Solo la cantidad: el carrusel pide la lista a /api/destacados y sortea en el navegador
     supabase
       .from("businesses")
-      .select("id, name, slug, cover_url, section")
+      .select("id", { count: "exact", head: true })
       .eq("status", "active")
-      .eq("is_premium", true)
-      .order("created_at", { ascending: false })
-      .limit(100),
+      .eq("is_premium", true),
 
     supabase
       .from("promotions")
@@ -115,8 +106,7 @@ export default async function HomePage() {
       .limit(NOVEDADES_LIMIT + 1),
   ])
 
-  const featuredBusinesses: FeaturedBusiness[] =
-    (featuredData as FeaturedBusiness[] | null) ?? []
+  const featuredTotal = featuredCount ?? 0
   // Ya vienen ordenadas por vencimiento: cada negocio queda en el lugar de su promo más próxima a vencer
   const promoGroups = groupPromotionsByBusiness(
     (promotionsData as PromotionWithBusiness[] | null) ?? []
@@ -138,35 +128,35 @@ export default async function HomePage() {
         </div>
 
         {/* 2 — Destacados (sin padding: el carrusel ocupa todo el ancho) */}
-        {featuredBusinesses.length > 0 && (
+        {featuredTotal > 0 && (
           <div className="rounded-3xl border border-[#2D4530]/40 bg-[#E6EBE4] my-6 shadow-sm overflow-hidden">
-            <JoyasDelValle businesses={featuredBusinesses} />
+            <JoyasDelValle total={featuredTotal} />
           </div>
         )}
 
         {/* 3 — Promos exclusivas (cupones por categoría) */}
         {promoGroups.length > 0 && (
-          <div className="rounded-3xl border border-[#2D4530]/40 bg-[#EDF3EE] p-6 md:p-8 my-6 shadow-sm overflow-hidden">
+          <div className="below-fold rounded-3xl border border-[#2D4530]/40 bg-[#EDF3EE] p-6 md:p-8 my-6 shadow-sm overflow-hidden">
             <PromosExclusivas groups={promoGroups} />
           </div>
         )}
 
         {/* 4 — Novedades */}
         {novedades.length > 0 && (
-          <div className="rounded-3xl border border-[#2D4530]/40 bg-[#EEF0EA] p-6 md:p-8 my-6 shadow-sm overflow-hidden">
+          <div className="below-fold rounded-3xl border border-[#2D4530]/40 bg-[#EEF0EA] p-6 md:p-8 my-6 shadow-sm overflow-hidden">
             <Novedades novedades={novedades} hasMore={hasMoreNovedades} />
           </div>
         )}
 
         {/* 5 — Editorial */}
         {editorialPosts.length > 0 && (
-          <div className="rounded-3xl border border-[#2D4530]/40 bg-[#2D4530] p-6 md:p-8 my-6 shadow-sm overflow-hidden">
+          <div className="below-fold rounded-3xl border border-[#2D4530]/40 bg-[#2D4530] p-6 md:p-8 my-6 shadow-sm overflow-hidden">
             <PulsoDelValle posts={editorialPosts} />
           </div>
         )}
 
         {/* 6 — CTA suscripción */}
-        <div className="rounded-3xl border border-[#2D4530]/40 bg-[#FAF8F5] my-6 shadow-sm overflow-hidden">
+        <div className="below-fold rounded-3xl border border-[#2D4530]/40 bg-[#FAF8F5] my-6 shadow-sm overflow-hidden">
           <CtaBusiness />
         </div>
 

@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect } from 'react';
-import { createClient } from '@/lib/supabase/client';
+import { loadSupabase } from '@/lib/supabase/lazy';
 
 const DEVICE_KEY = 'calamuchita_device_id';
 const LAST_PING_KEY = 'calamuchita_last_ping';
@@ -61,9 +61,8 @@ export default function PwaTracker() {
         localStorage.setItem(DEVICE_KEY, deviceId);
       }
 
-      const supabase = createClient();
-      supabase
-        .rpc('track_pwa_device', { p_device_id: deviceId, p_platform: platform })
+      loadSupabase()
+        .then(supabase => supabase.rpc('track_pwa_device', { p_device_id: deviceId, p_platform: platform }))
         .then(({ error }) => {
           if (error) console.warn('[PwaTracker] track_pwa_device falló:', error.message);
           else localStorage.setItem(LAST_PING_KEY, String(Date.now()));

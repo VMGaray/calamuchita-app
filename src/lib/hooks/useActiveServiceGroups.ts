@@ -1,7 +1,7 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { createClient } from "@/lib/supabase/client"
+import { loadSupabase } from "@/lib/supabase/lazy"
 import { businessRubros, groupSlugsForRubros, OTROS_SERVICIOS_SLUG } from "@/lib/constants/categories"
 
 // Una sola consulta por carga de página, compartida entre todos los componentes
@@ -11,7 +11,7 @@ let cached: Promise<Set<string>> | null = null
 function fetchActiveGroupSlugs(): Promise<Set<string>> {
   if (!cached) {
     cached = (async () => {
-      const supabase = createClient()
+      const supabase = await loadSupabase()
       const { data } = await supabase
         .from("businesses")
         .select("categories, subcategory")
