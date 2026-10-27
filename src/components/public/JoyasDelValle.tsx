@@ -1,6 +1,6 @@
 "use client"
 
-import { useRef, useCallback, useEffect } from "react"
+import { useRef, useCallback, useEffect, useState } from "react"
 import { motion, useMotionValue, animate } from "framer-motion"
 import { ArrowRight, ChevronLeft, ChevronRight, Plus } from "lucide-react"
 import Image from "next/image"
@@ -11,7 +11,6 @@ type FeaturedBusiness = {
   name: string
   slug: string
   cover_url: string | null
-  subcategory: string | null
   section: string
 }
 
@@ -39,6 +38,33 @@ const LOOP_EXTRA = Math.ceil(2560 / (CARD_W + GAP)) + 1
 function loopItems<T>(row: T[]): T[] {
   if (row.length === 0) return []
   return Array.from({ length: row.length + LOOP_EXTRA }, (_, i) => row[i % row.length])
+}
+
+// Cuántos destacados se muestran por visita (el resto está en /destacados)
+const COUNT_MOBILE = 12
+const COUNT_DESKTOP = 24
+
+/**
+ * Elige n al azar y en orden aleatorio (Fisher–Yates parcial): cada negocio tiene la
+ * misma probabilidad de aparecer y en cualquier posición.
+ */
+function randomSample<T>(items: T[], n: number): T[] {
+  const a = [...items]
+  const k = Math.min(n, a.length)
+  for (let i = 0; i < k; i++) {
+    const j = i + Math.floor(Math.random() * (a.length - i))
+    ;[a[i], a[j]] = [a[j], a[i]]
+  }
+  return a.slice(0, k)
+}
+
+/** Mismo tamaño que la tarjeta: se muestra hasta que el navegador sortea los destacados. */
+function CardPlaceholder() {
+  return (
+    <div className="relative flex-shrink-0" style={{ width: CARD_W }} aria-hidden="true">
+      <div className="w-full aspect-[4/3] rounded-[40px] bg-[#2D4530]/80 shadow-2xl" />
+    </div>
+  )
 }
 
 function FeaturedCard({ biz }: { biz: FeaturedBusiness }) {
@@ -94,12 +120,25 @@ function FeaturedCard({ biz }: { biz: FeaturedBusiness }) {
   )
 }
 
-// Fila 1: gastronomía y servicios  |  Fila 2: resto de categorías
-const ROW1_SECTIONS = ["gastronomy", "services"]
-
 export default function JoyasDelValle({ businesses }: { businesses: FeaturedBusiness[] }) {
-  const row1 = businesses.filter(b => ROW1_SECTIONS.includes(b.section))
-  const row2 = businesses.filter(b => !ROW1_SECTIONS.includes(b.section))
+  // El sorteo se hace en el navegador: la home está cacheada (ISR) y si se sorteara en el
+  // servidor todos los visitantes verían los mismos durante 2 minutos.
+  // Hasta entonces se muestran placeholders del mismo tamaño (sin saltos de layout).
+  const [picked, setPicked] = useState<FeaturedBusiness[] | null>(null)
+
+  useEffect(() => {
+    const desktop = window.matchMedia("(min-width: 768px)").matches
+    // Intencional: el sorteo tiene que pasar después de hidratar (el HTML del servidor es igual para todos)
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setPicked(randomSample(businesses, desktop ? COUNT_DESKTOP : COUNT_MOBILE))
+  }, [businesses])
+
+  // Dos filas con la mitad cada una (fila 2 vacía si hay un solo destacado)
+  const slots: (FeaturedBusiness | null)[] =
+    picked ?? Array(Math.min(businesses.length, COUNT_MOBILE)).fill(null)
+  const half = Math.ceil(slots.length / 2)
+  const row1 = slots.slice(0, half)
+  const row2 = slots.slice(half)
 
   const SET_W1 = row1.length * (CARD_W + GAP)
   const SET_W2 = row2.length * (CARD_W + GAP)
@@ -213,7 +252,7 @@ export default function JoyasDelValle({ businesses }: { businesses: FeaturedBusi
         </motion.div>
       </div>
 
-      {/* Fila 1 — gastronomía + servicios, derecha → izquierda */}
+      {/* Fila 1 — derecha → izquierda */}
       {items1.length > 0 && (
         <div className="relative">
           <button
@@ -246,15 +285,16 @@ export default function JoyasDelValle({ businesses }: { businesses: FeaturedBusi
               className="flex"
               style={{ x: x1, gap: GAP, marginLeft: `calc(50% - ${CARD_W / 2}px)` }}
             >
-              {items1.map((biz, idx) => (
-                <FeaturedCard key={`r1-${biz.id}-${idx}`} biz={biz} />
-              ))}
+              {items1.map((biz, idx) => biz
+                ? <FeaturedCard key={`r1-${biz.id}-${idx}`} biz={biz} />
+                : <CardPlaceholder key={`r1-${idx}`} />
+              )}
             </motion.div>
           </div>
         </div>
       )}
 
-      {/* Fila 2 — comercios, salud, educación y más, izquierda → derecha */}
+      {/* Fila 2 — izquierda → derecha */}
       {items2.length > 0 && (
         <div className="relative">
           <button
@@ -287,11 +327,24 @@ export default function JoyasDelValle({ businesses }: { businesses: FeaturedBusi
               className="flex"
               style={{ x: x2, gap: GAP, marginLeft: `calc(50% - ${CARD_W / 2}px)` }}
             >
-              {items2.map((biz, idx) => (
-                <FeaturedCard key={`r2-${biz.id}-${idx}`} biz={biz} />
-              ))}
+              {items2.map((biz, idx) => biz
+                ? <FeaturedCard key={`r2-${biz.id}-${idx}`} biz={biz} />
+                : <CardPlaceholder key={`r2-${idx}`} />
+              )}
             </motion.div>
           </div>
+        </div>
+      )}
+
+      {/* Siempre visible: si apareciera solo cuando sobran destacados, en desktop (24) podría desaparecer y mover el layout */}
+      {slots.length > 0 && (
+        <div className="px-6 mt-2 flex justify-center">
+          <Link
+            href="/destacados"
+            className="inline-flex items-center gap-2 rounded-full bg-[#2D4530] px-6 py-3 text-sm font-semibold text-[#E1DBC9] shadow-sm hover:opacity-90 transition-opacity"
+          >
+            Ver todos los destacados <ArrowRight size={16} />
+          </Link>
         </div>
       )}
     </section>

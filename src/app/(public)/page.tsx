@@ -21,8 +21,6 @@ type FeaturedBusiness = {
   name: string
   slug: string
   cover_url: string | null
-  logo_url: string | null
-  subcategory: string | null
   section: string
 }
 
@@ -78,7 +76,7 @@ export default async function HomePage() {
   ] = await Promise.all([
     supabase
       .from("businesses")
-      .select("id, name, slug, cover_url, logo_url, subcategory, section")
+      .select("id, name, slug, cover_url, section")
       .eq("status", "active")
       .eq("is_premium", true)
       .order("created_at", { ascending: false })
