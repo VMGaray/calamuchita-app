@@ -26,6 +26,8 @@ export default function imageLoader({ src, width, quality }: LoaderProps): strin
     const url = new URL(src.replace(SUPABASE_OBJECT, SUPABASE_RENDER))
     url.searchParams.set("width", String(Math.min(width, SUPABASE_MAX_WIDTH)))
     url.searchParams.set("quality", String(quality ?? 70))
+    // Sin esto Supabase usa "cover": mantiene el alto original y recorta los costados
+    url.searchParams.set("resize", "contain")
     return url.toString()
   }
 
