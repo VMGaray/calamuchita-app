@@ -18,7 +18,7 @@ import {
   PartyPopper, ChefHat, Mic, Medal, Wind, Palette, Baby,
   Store, Salad, Shirt, Gem, MoreHorizontal,
   Clock3, Landmark, Lightbulb, Bus, Info,
-  Armchair, Dog, Smartphone, FlaskConical, Printer, Briefcase, Dumbbell, Timer, Tag, Wheat, Wine, Cog, Snowflake, CreditCard, Sofa, Target, FileText, Fence, Cake, Sun, PenTool, Brush, Frame, Pizza, Beef, Flower2, Footprints, Sprout, Gift, FireExtinguisher
+  Armchair, Dog, Smartphone, FlaskConical, Printer, Briefcase, Dumbbell, Timer, Tag, Wheat, Wine, Cog, Snowflake, CreditCard, Sofa, Target, FileText, Fence, Cake, Sun, PenTool, Brush, Frame, Pizza, Beef, Flower2, Footprints, Sprout, Gift, FireExtinguisher, PersonStanding
 } from "lucide-react"
 
 const categoryIcons: Record<string, any> = {
@@ -44,7 +44,7 @@ const categoryIcons: Record<string, any> = {
   "Handball": Users, "Fausball": Trophy,
   "Pádel": Activity, "Vóley": Users, "Tenis": Activity,
   "Natación": Waves, "Ciclismo": Bike,
-  "Trekking / Montaña": Mountain, "Yoga / Pilates": Sparkles, "Gimnasio": Dumbbell,
+  "Trekking / Montaña": Mountain, "Yoga": Sparkles, "Pilates": PersonStanding, "Pilates Clásico": PersonStanding, "Gimnasio": Dumbbell,
   "Artes marciales": Shield, "Running": Timer, "Escuela de Equitación": Activity,
   "Clínicas y Consultorios": Building, "Especialidades": Stethoscope, "Estética": Sparkles, "Farmacias": Pill,
   "Hospitales y Dispensarios": AlertCircle, "Laboratorios": FlaskConical, "Masajes": Hand,
