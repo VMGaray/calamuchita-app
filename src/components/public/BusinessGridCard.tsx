@@ -1,6 +1,5 @@
 import Image from "next/image"
 import Link from "next/link"
-import { Star } from "lucide-react"
 
 interface Props {
   href: string
@@ -20,7 +19,7 @@ interface Props {
  * Mismo formato que la página de Destacados del Valle.
  */
 export default function BusinessGridCard({
-  href, name, imageUrl, eyebrow, isPremium, isFeaturedRubro, isOpen, priority,
+  href, name, imageUrl, eyebrow, isOpen, priority,
 }: Props) {
   return (
     <Link href={href} className="group block">
@@ -43,28 +42,6 @@ export default function BusinessGridCard({
           </div>
         )}
         <div className="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent opacity-80" />
-
-        {(isPremium || isFeaturedRubro) && (
-          <div className="absolute top-2 left-2 z-10 flex flex-col items-start gap-1">
-            {isPremium && (
-              <div
-                className="flex items-center gap-1 px-2 py-0.5 rounded-full text-[9px] font-black uppercase tracking-tight"
-                style={{ background: "#C9A44B", color: "#1a1a1a" }}
-              >
-                ★ Destacado
-              </div>
-            )}
-            {isFeaturedRubro && (
-              <div
-                className="flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold"
-                style={{ background: "#3b82f6", color: "white" }}
-              >
-                <Star size={9} fill="currentColor" />
-                Destacado
-              </div>
-            )}
-          </div>
-        )}
 
         {isOpen != null && (
           <span className="absolute top-2 right-2 z-10 text-[10px] font-medium px-2 py-0.5 rounded-full"
