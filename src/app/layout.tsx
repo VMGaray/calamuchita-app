@@ -16,6 +16,7 @@ import ScrollToTop from "@/components/ui/ScrollToTop"
 import BackToTopButton from "@/components/ui/BackToTopButton"
 import InstallPrompt from "@/components/ui/InstallPrompt" // ✨ Importamos el cartel de instalación
 import PwaTracker from "@/components/PwaTracker"
+import MetaPixel from "@/components/MetaPixel"
 
 export const metadata: Metadata = {
   title: {
@@ -70,6 +71,9 @@ export default function RootLayout({
 
         {/* Cuenta dispositivos que usan la app instalada (1 ping cada 12 h) */}
         <PwaTracker />
+
+        {/* Meta Pixel (ID en NEXT_PUBLIC_META_PIXEL_ID) */}
+        <MetaPixel />
       </body>
     </html>
   )
