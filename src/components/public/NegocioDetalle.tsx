@@ -14,6 +14,7 @@ import { DietaryBadges } from "@/components/ui/DietaryTags"
 import { DIETARY_DISCLAIMER, dietaryOptionsFor } from "@/lib/constants/dietary"
 import { tableServiceLabel } from "@/lib/utils/tableService"
 import { createClient } from "@/lib/supabase/client"
+import { trackMeta } from "@/lib/metaPixel"
 import { normalizeArgPhone } from "@/lib/phone"
 import { getWhatsappContacts } from "@/lib/whatsapp"
 import { normalizeUrl } from "@/lib/normalizeUrl"
@@ -68,6 +69,16 @@ function InfoRow({ icon, sublabel, label, href, external, onClick }: {
 
 interface Props { business: any; promoGroup?: PromoGroup | null }
 
+// Datos del negocio que acompañan a los eventos del Meta Pixel
+function metaParams(business: { id: string | number; name: string; section: string }) {
+  return {
+    content_ids: [String(business.id)],
+    content_name: business.name,
+    content_category: business.section,
+    content_type: "product",
+  }
+}
+
 export default function NegocioDetalle({ business, promoGroup = null }: Props) {
   const searchParams = useSearchParams()
   const from = searchParams.get("from")
@@ -104,6 +115,7 @@ export default function NegocioDetalle({ business, promoGroup = null }: Props) {
 
   useEffect(() => {
     createClient().rpc("increment_view", { business_id: business.id }).then()
+    trackMeta("ViewContent", metaParams(business))
     try {
       const stored = localStorage.getItem(GUEST_KEY)
       if (stored) {
@@ -113,8 +125,12 @@ export default function NegocioDetalle({ business, promoGroup = null }: Props) {
     } catch (e) { console.warn("localStorage no disponible.", e) }
   }, [business.id])
 
-  const recordLead = (type: string) =>
+  // Contact se manda primero y en forma sincrónica: el onClick corre antes de que
+  // el navegador abra WhatsApp o el marcador, así el evento no se pierde.
+  const recordLead = (type: string) => {
+    if (type === "whatsapp" || type === "phone") trackMeta("Contact", { ...metaParams(business), contact_method: type })
     createClient().from("business_leads").insert({ business_id: business.id, type }).then()
+  }
 
   // Pedidos y reservas van al primer WhatsApp; los botones de contacto, uno por cada número cargado
   const waContacts = getWhatsappContacts(business)
@@ -705,7 +721,7 @@ export default function NegocioDetalle({ business, promoGroup = null }: Props) {
             </div>
           ))}
           {business.phone && (
-            <a href={`tel:${business.phone}`}
+            <a href={`tel:${business.phone}`} onClick={() => recordLead("phone")}
               className="flex-1 flex items-center justify-center gap-1.5 py-3.5 rounded-2xl text-xs font-bold border-2 bg-white active:scale-95 transition-transform"
               style={{ color: "#2D4530", borderColor: "#2D4530" }}>
               <Phone size={15} /> Llamar
