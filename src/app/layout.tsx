@@ -24,6 +24,9 @@ export const metadata: Metadata = {
   },
   description: "Todo el Valle de Calamuchita en un mismo lugar. Gastronomía, servicios, salud, turismo y más en Córdoba, Argentina.",
   manifest: "/manifest", // ✨ Vinculación clave para que Next.js asocie tu manifest.ts
+  verification: {
+    google: "5_UJoNOp14G-BH2DuKejcTe6_n2zkycU--qppBS1bfw",
+  },
   openGraph: {
     siteName: "Calamuchita App",
     locale: "es_AR",
