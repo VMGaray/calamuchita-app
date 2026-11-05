@@ -10,6 +10,7 @@ import {
 } from "lucide-react"
 import { motion, AnimatePresence } from "framer-motion"
 import { createClient } from "@/lib/supabase/client"
+import { trackMeta } from "@/lib/metaPixel"
 import { normalizeArgPhone } from "@/lib/phone"
 import { getWhatsappContacts } from "@/lib/whatsapp"
 import { normalizeUrl } from "@/lib/normalizeUrl"
@@ -58,6 +59,16 @@ function FeatureBadge({ icon, label }: { icon: React.ReactNode; label: string })
 
 interface Props { business: any; section: string; promoGroup?: PromoGroup | null }
 
+// Datos del negocio que acompañan a los eventos del Meta Pixel
+function metaParams(business: { id: string | number; name: string; section: string }) {
+  return {
+    content_ids: [String(business.id)],
+    content_name: business.name,
+    content_category: business.section,
+    content_type: "product",
+  }
+}
+
 export default function DirectorioDetalle({ business, section, promoGroup = null }: Props) {
   const searchParams = useSearchParams()
   const from     = searchParams.get("from")
@@ -95,10 +106,15 @@ export default function DirectorioDetalle({ business, section, promoGroup = null
 
   useEffect(() => {
     createClient().rpc("increment_view", { business_id: business.id }).then()
+    trackMeta("ViewContent", metaParams(business))
   }, [business.id])
 
-  const recordLead = (type: string) =>
+  // Contact se manda primero y en forma sincrónica: el onClick corre antes de que
+  // el navegador abra WhatsApp o el marcador, así el evento no se pierde.
+  const recordLead = (type: string) => {
+    if (type === "whatsapp" || type === "phone") trackMeta("Contact", { ...metaParams(business), contact_method: type })
     createClient().from("business_leads").insert({ business_id: business.id, type }).then()
+  }
 
   // Un botón por WhatsApp cargado; sin WhatsApp, se usa el teléfono. Con más de uno, se muestra el nombre debajo.
   const waContacts = getWhatsappContacts(business)

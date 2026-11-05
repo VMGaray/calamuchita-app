@@ -3,15 +3,16 @@
 import { useEffect, useRef } from 'react';
 import { usePathname } from 'next/navigation';
 import Script from 'next/script';
+import { trackMeta } from '@/lib/metaPixel';
 
 const PIXEL_ID = process.env.NEXT_PUBLIC_META_PIXEL_ID;
-
-type Fbq = (...args: unknown[]) => void;
 
 /**
  * Meta Pixel. El script base hace init + el primer PageView.
  * Como la navegación del App Router no recarga la página,
  * los cambios de ruta posteriores se registran acá a mano.
+ * Después del PageView inicial se vacía la cola de eventos que
+ * llegaron antes de que fbq existiera (ver lib/metaPixel.ts).
  */
 export default function MetaPixel() {
   const pathname = usePathname();
@@ -22,8 +23,7 @@ export default function MetaPixel() {
       isFirstRender.current = false;
       return; // el PageView inicial ya lo manda el script base
     }
-    const fbq = (window as unknown as { fbq?: Fbq }).fbq;
-    fbq?.('track', 'PageView');
+    trackMeta('PageView');
   }, [pathname]);
 
   if (!PIXEL_ID) return null;
@@ -42,6 +42,10 @@ export default function MetaPixel() {
           'https://connect.facebook.net/en_US/fbevents.js');
           fbq('init', '${PIXEL_ID}');
           fbq('track', 'PageView');
+          (window.__metaPixelQueue || []).forEach(function (e) {
+            if (e[1]) fbq('track', e[0], e[1]); else fbq('track', e[0]);
+          });
+          window.__metaPixelQueue = [];
         `}
       </Script>
       <noscript>
