@@ -1,10 +1,12 @@
 import MenusDelDiaCarousel from "@/components/public/MenusDelDiaCarousel"
+import { canonical } from "@/lib/seo"
 import BackgroundManager from "@/components/public/BackgroundManager"
 import CategoryPageHeader from "@/components/public/CategoryPageHeader"
 
 export const metadata = {
   title: "Menú del Día",
   description: "Los menús del día de los restaurantes y comedores del Valle de Calamuchita",
+  alternates: canonical("/menu-del-dia"),
 }
 
 export default function MenuDelDiaPage() {

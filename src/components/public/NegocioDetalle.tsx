@@ -1,6 +1,7 @@
 "use client"
 
 import { useEffect, useRef, useState } from "react"
+import { useNavOrigin } from "@/lib/navOrigin"
 import { useSearchParams, useRouter } from "next/navigation"
 import { motion, AnimatePresence } from "framer-motion"
 import {
@@ -81,7 +82,7 @@ function metaParams(business: { id: string | number; name: string; section: stri
 
 export default function NegocioDetalle({ business, promoGroup = null }: Props) {
   const searchParams = useSearchParams()
-  const from = searchParams.get("from")
+  const from = useNavOrigin(business.slug, searchParams.get("from"))
   const cartaRef = useRef<HTMLDivElement>(null)
 
   const [photoIdx,       setPhotoIdx]       = useState(0)

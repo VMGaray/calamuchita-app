@@ -17,8 +17,11 @@ import BackToTopButton from "@/components/ui/BackToTopButton"
 import InstallPrompt from "@/components/ui/InstallPrompt" // ✨ Importamos el cartel de instalación
 import PwaTracker from "@/components/PwaTracker"
 import MetaPixel from "@/components/MetaPixel"
+import { SITE_URL } from "@/lib/seo"
 
 export const metadata: Metadata = {
+  // Base para canonical y og:image absolutas (siempre con www)
+  metadataBase: new URL(SITE_URL),
   title: {
     template: "%s | Calamuchita App",
     default: "Calamuchita App",

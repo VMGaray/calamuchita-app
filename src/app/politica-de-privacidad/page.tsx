@@ -1,8 +1,10 @@
 import BackButton from "@/components/ui/BackButton";
+import { canonical } from "@/lib/seo"
 
 export const metadata = {
   title: "Política de Privacidad | Calamuchita App",
   description: "Política de privacidad y tratamiento de datos personales de Calamuchita App.",
+  alternates: canonical("/politica-de-privacidad"),
 };
 
 export default function PoliticaDePrivacidad() {

@@ -4,6 +4,7 @@ import DirectorioDetalle from "@/components/public/DirectorioDetalle"
 import { createClient } from "@/lib/supabase/server"
 import { notFound, redirect } from "next/navigation"
 import { businessProfileUrl } from "@/lib/utils/business"
+import { canonical } from "@/lib/seo"
 import { hoyAR } from "@/lib/utils/fechas"
 import { promoHeadline, buildPromoGroup, PROMO_VALUE_COLUMNS, PROMO_FLYERS_EMBED, type PromotionRow } from "@/lib/promos"
 
@@ -22,7 +23,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { data: business } = await supabase
     .from("businesses")
     .select(`
-      name, description, cover_url,
+      name, description, cover_url, section,
       promotions (${PROMO_VALUE_COLUMNS}, valid_until, is_active)
     `)
     .eq("slug", slug)
@@ -47,6 +48,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   return {
     title,
     description,
+    // Canonical a la sección principal, también cuando se entra por una sección extra
+    alternates: canonical(businessProfileUrl(business.section, slug)),
     openGraph: {
       title,
       description,

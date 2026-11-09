@@ -1,4 +1,5 @@
 import { notFound } from "next/navigation"
+import { canonical } from "@/lib/seo"
 import Link from "next/link"
 import { ArrowLeft, CalendarDays } from "lucide-react"
 import { createClient } from "@/lib/supabase/server"
@@ -31,6 +32,7 @@ export async function generateMetadata({ params }: Props) {
   return {
     title: `${data.title} | Identidad Calamuchitana`,
     description: data.description ? stripRichText(data.description) : undefined,
+    alternates: canonical(`/identidad-calamuchitana/${id}`),
   }
 }
 
