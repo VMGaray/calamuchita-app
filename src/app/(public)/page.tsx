@@ -1,4 +1,5 @@
 import JoyasDelValle from "@/components/public/JoyasDelValle"
+import { canonical } from "@/lib/seo"
 import PromosExclusivas from "@/components/public/PromosExclusivas"
 import PulsoDelValle from "@/components/public/PulsoDelValle"
 import Novedades from "@/components/public/Novedades"
@@ -55,6 +56,8 @@ export type EditorialPost = {
   expires_at: string | null
   created_at: string
 }
+
+export const metadata = { alternates: canonical("/") }
 
 export default async function HomePage() {
   const supabase = createPublicClient()

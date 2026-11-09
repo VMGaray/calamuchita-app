@@ -76,7 +76,7 @@ function FeaturedCard({ biz }: { biz: FeaturedBusiness }) {
     >
       {/* Sin prefetch: el carrusel se mueve solo y precargaría cada negocio que pasa por pantalla */}
       <Link
-        href={biz.section === "gastronomy" ? `/negocios/${biz.slug}?from=/` : `/directorio/${biz.section}/${biz.slug}?from=/`}
+        href={biz.section === "gastronomy" ? `/negocios/${biz.slug}` : `/directorio/${biz.section}/${biz.slug}`}
         prefetch={false}
         className="block w-full"
       >

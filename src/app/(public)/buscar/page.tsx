@@ -1,4 +1,5 @@
 import BuscarResults from "@/components/public/BuscarResults"
+import { canonical } from "@/lib/seo"
 import { createClient } from "@/lib/supabase/server"
 import { MASTER_CATEGORIES } from "@/lib/constants/categories"
 
@@ -12,6 +13,7 @@ export async function generateMetadata({ searchParams }: Props) {
   const { q } = await searchParams
   return {
     title: q ? `"${q}" — Búsqueda` : "Búsqueda",
+    alternates: canonical("/buscar"),
   }
 }
 

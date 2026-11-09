@@ -1,4 +1,5 @@
 import { Suspense } from "react"
+import { canonical } from "@/lib/seo"
 import InfoUtilPage from "@/components/public/InfoUtilPage"
 
 interface Props {
@@ -10,7 +11,7 @@ export async function generateMetadata({ searchParams }: Props) {
   const label = categoria
     ? categoria.charAt(0).toUpperCase() + categoria.slice(1)
     : "Info Útil"
-  return { title: `${label} — Valle de Calamuchita` }
+  return { title: `${label} — Valle de Calamuchita`, alternates: canonical("/info-util") }
 }
 
 export default async function InfoUtilRoute({ searchParams }: Props) {

@@ -1,8 +1,10 @@
 import BackButton from "@/components/ui/BackButton";
+import { canonical } from "@/lib/seo"
 
 export const metadata = {
   title: "Eliminar cuenta y datos | Calamuchita App",
   description: "Cómo solicitar la eliminación de tu cuenta y datos en Calamuchita App.",
+  alternates: canonical("/eliminar-cuenta"),
 };
 
 const DELETE_REQUEST_MAILTO = `mailto:vmg.setup.ai@gmail.com?subject=${encodeURIComponent(

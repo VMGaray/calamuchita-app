@@ -1,4 +1,5 @@
 import NegociosFilters from "@/components/public/NegociosFilters"
+import { canonical } from "@/lib/seo"
 import NegociosList from "@/components/public/NegociosList"
 import CategoryPageHeader from "@/components/public/CategoryPageHeader"
 import BackgroundManager from "@/components/public/BackgroundManager"
@@ -13,6 +14,9 @@ interface Props {
     dieta?: string
   }>
 }
+
+// Los filtros (?categoria=, ?q=, …) apuntan a /negocios sin query
+export const metadata = { alternates: canonical("/negocios") }
 
 export default async function NegociosPage({ searchParams }: Props) {
   const params = await searchParams

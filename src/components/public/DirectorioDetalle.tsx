@@ -1,6 +1,7 @@
 "use client"
 
 import { useEffect, useState } from "react"
+import { useNavOrigin } from "@/lib/navOrigin"
 import { useSearchParams } from "next/navigation"
 import Image from "next/image"
 import {
@@ -71,7 +72,7 @@ function metaParams(business: { id: string | number; name: string; section: stri
 
 export default function DirectorioDetalle({ business, section, promoGroup = null }: Props) {
   const searchParams = useSearchParams()
-  const from     = searchParams.get("from")
+  const from     = useNavOrigin(business.slug, searchParams.get("from"))
 
   const businessPhotoUrls = ((business.business_photos ?? []) as any[])
     .sort((a: any, b: any) => a.sort_order - b.sort_order)

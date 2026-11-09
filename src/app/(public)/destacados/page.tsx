@@ -4,6 +4,8 @@ import { createClient } from "@/lib/supabase/server"
 import BackgroundManager from "@/components/public/BackgroundManager"
 import BusinessGridCard from "@/components/public/BusinessGridCard"
 import { isOpenNow } from "@/lib/utils/horarios"
+import { canonical } from "@/lib/seo"
+import NavOriginScope from "@/components/ui/NavOriginScope"
 
 const FALLBACK = "/valle.jpg"
 
@@ -22,6 +24,7 @@ const SECTION_ES: Record<string, string> = {
 export const metadata = {
   title: "Destacados | Calamuchita App",
   description: "Los mejores negocios del Valle de Calamuchita",
+  alternates: canonical("/destacados"),
 }
 
 export default async function DestacadosPage() {
@@ -61,11 +64,12 @@ export default async function DestacadosPage() {
         {businesses.length === 0 ? (
           <p className="text-stone-400 text-sm">No hay negocios destacados por el momento.</p>
         ) : (
+          <NavOriginScope from="/destacados">
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
             {businesses.map(biz => {
               const href = biz.section === "gastronomy"
-                ? `/negocios/${biz.slug}?from=/destacados`
-                : `/directorio/${biz.section}/${biz.slug}?from=/destacados`
+                ? `/negocios/${biz.slug}`
+                : `/directorio/${biz.section}/${biz.slug}`
 
               return (
                 <BusinessGridCard
@@ -79,6 +83,7 @@ export default async function DestacadosPage() {
               )
             })}
           </div>
+          </NavOriginScope>
         )}
       </div>
     </BackgroundManager>

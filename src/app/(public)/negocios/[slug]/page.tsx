@@ -4,11 +4,12 @@ import NegocioDetalle from "@/components/public/NegocioDetalle"
 import { createClient } from "@/lib/supabase/server"
 import { notFound, redirect } from "next/navigation"
 import { hoyAR } from "@/lib/utils/fechas"
+import { canonical } from "@/lib/seo"
+import { businessProfileUrl } from "@/lib/utils/business"
 import { promoHeadline, buildPromoGroup, PROMO_VALUE_COLUMNS, PROMO_FLYERS_EMBED, type PromotionRow } from "@/lib/promos"
 
 interface Props {
   params: Promise<{ slug: string }>
-  searchParams: Promise<{ from?: string }>
 }
 
 const DEFAULT_IMAGE = "/valle.jpg"
@@ -22,7 +23,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { data: business } = await supabase
     .from("businesses")
     .select(`
-      name, description, cover_url,
+      name, description, cover_url, section,
       promotions (${PROMO_VALUE_COLUMNS}, valid_until, is_active)
     `)
     .eq("slug", slug)
@@ -47,6 +48,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   return {
     title,
     description,
+    alternates: canonical(businessProfileUrl(business.section, slug)),
     openGraph: {
       title,
       description,
@@ -64,7 +66,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   }
 }
 
-export default async function NegocioDetallePage({ params, searchParams }: Props) {
+export default async function NegocioDetallePage({ params }: Props) {
   const { slug } = await params
   const supabase = await createClient()
   const today = hoyAR()
@@ -94,9 +96,8 @@ export default async function NegocioDetallePage({ params, searchParams }: Props
   // o una promo del inicio) se redirige en el servidor, antes de renderizar: así la vista
   // se registra una sola vez y en el perfil correcto.
   if (business.section !== "gastronomy") {
-    const { from } = await searchParams
-    const qs = from ? `?from=${encodeURIComponent(from)}` : ""
-    redirect(`/directorio/${business.section}/${slug}${qs}`)
+    // Sin query: el origen ("volver a…") viaja en sessionStorage, no en la URL.
+    redirect(`/directorio/${business.section}/${slug}`)
   }
 
   const { data: promotionsData } = await supabase

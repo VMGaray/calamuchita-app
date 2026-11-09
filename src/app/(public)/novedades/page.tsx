@@ -1,4 +1,5 @@
 import Image from "next/image"
+import { canonical } from "@/lib/seo"
 import Link from "next/link"
 import { ArrowLeft, Sparkles } from "lucide-react"
 import { createClient } from "@/lib/supabase/server"
@@ -9,6 +10,7 @@ const ACCENT = "#6B7A5E"
 export const metadata = {
   title: "Novedades | Calamuchita App",
   description: "Avisos y novedades de corto plazo del Valle de Calamuchita",
+  alternates: canonical("/novedades"),
 }
 
 export default async function NovedadesPage() {

@@ -1,4 +1,5 @@
 import type { Metadata } from "next"
+import { canonical } from "@/lib/seo"
 import DirectorioList from "@/components/public/DirectorioList"
 import CategoryPageHeader from "@/components/public/CategoryPageHeader"
 import BackgroundManager from "@/components/public/BackgroundManager"
@@ -41,6 +42,8 @@ export async function generateMetadata({ params }: Pick<Props, "params">): Promi
   return {
     title,
     description,
+    // Los filtros (?cat=, ?pueblo=, …) apuntan a la sección sin query
+    alternates: canonical(`/directorio/${section}`),
     openGraph: {
       title: `${title} en el Valle de Calamuchita`,
       description,
