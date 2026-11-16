@@ -17,6 +17,7 @@ interface MenuDelDiaRow {
     name: string
     slug: string
     address: string | null
+    logo_url: string | null
     status: string
   } | null
   daily_menu_items: {
@@ -24,6 +25,7 @@ interface MenuDelDiaRow {
     name: string
     description: string | null
     price: number
+    image_url: string | null
   }[]
 }
 
@@ -35,12 +37,14 @@ interface MenuDelDia {
     name: string
     slug: string
     address: string | null
+    logo_url: string | null
   }
   items: {
     id: string
     name: string
     description: string | null
     price: number
+    image_url: string | null
   }[]
 }
 
@@ -96,13 +100,15 @@ export default function MenusDelDiaCarousel() {
             name,
             slug,
             address,
+            logo_url,
             status
           ),
           daily_menu_items (
             id,
             name,
             description,
-            price
+            price,
+            image_url
           )
         `)
         .eq("date", today)
@@ -128,6 +134,7 @@ export default function MenusDelDiaCarousel() {
             name: row.businesses!.name,
             slug: row.businesses!.slug,
             address: row.businesses!.address,
+            logo_url: row.businesses!.logo_url,
           },
           items: row.daily_menu_items,
         }))
@@ -390,40 +397,81 @@ export default function MenusDelDiaCarousel() {
                   <Link href={`/negocios/${menu.business.slug}`}>
                     <motion.div
                       whileHover={{ y: -15, scale: 1.03 }}
-                      className="bg-white h-full rounded-2xl shadow-[0_30px_70px_rgba(0,0,0,0.2)] border border-stone-100 overflow-hidden relative"
+                      className="h-full rounded-2xl shadow-[0_30px_70px_rgba(0,0,0,0.2)] overflow-hidden relative flex flex-col"
+                      style={{ background: "white" }}
                     >
-                      <div
-                        className="p-4 pt-9 text-center"
-                        style={{ background: gradients[i % gradients.length] }}
-                      >
-                        <p className="font-black text-white text-[11px] uppercase tracking-widest">
-                          {menu.business.name}
-                        </p>
-                        {menu.business.address && (
-                          <p className="text-white/50 text-[9px] uppercase tracking-widest mt-1">
-                            {menu.business.address}
-                          </p>
-                        )}
-                      </div>
-
-                      <div className="p-8 flex-1 flex flex-col justify-center space-y-7">
-                        {menu.items.map((item) => (
-                          <div key={item.id} className="text-center">
-                            <p className="text-base font-bold text-stone-900 leading-snug">
-                              {item.name}
-                            </p>
-                            {item.description && (
-                              <p className="text-xs text-stone-400 mt-1">{item.description}</p>
-                            )}
-                            <div className="h-px w-10 bg-brand-earth/20 mx-auto my-4" />
-                            <p className="text-lg font-black" style={{ color: "#5E4B3B" }}>
-                              ${item.price.toLocaleString("es-AR")}
-                            </p>
+                      {/* Foto del plato — ocupa el tercio superior */}
+                      <div className="relative w-full flex-shrink-0" style={{ height: "45%" }}>
+                        {menu.items[0]?.image_url ? (
+                          <img
+                            src={menu.items[0].image_url}
+                            alt={menu.items[0].name}
+                            className="w-full h-full object-cover"
+                          />
+                        ) : (
+                          <div
+                            className="w-full h-full flex items-center justify-center"
+                            style={{ background: gradients[i % gradients.length] }}
+                          >
+                            <span className="text-4xl opacity-40">🍽️</span>
                           </div>
-                        ))}
+                        )}
+                        {/* Degradé sobre la foto para que el nombre del local se lea */}
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
+
+                        {/* Logo del negocio — esquina superior izquierda */}
+                        {menu.business.logo_url && (
+                          <div className="absolute top-2 left-2 w-9 h-9 rounded-xl overflow-hidden border-2 border-white/80 shadow-md bg-white">
+                            <img
+                              src={menu.business.logo_url}
+                              alt={menu.business.name}
+                              className="w-full h-full object-cover"
+                            />
+                          </div>
+                        )}
+
+                        {/* Nombre del negocio sobre la foto */}
+                        <div className="absolute bottom-0 left-0 right-0 px-3 pb-2">
+                          <p className="font-black text-white text-[11px] uppercase tracking-widest leading-tight drop-shadow">
+                            {menu.business.name}
+                          </p>
+                          {menu.business.address && (
+                            <p className="text-white/60 text-[9px] uppercase tracking-widest mt-0.5 leading-tight">
+                              {menu.business.address}
+                            </p>
+                          )}
+                        </div>
                       </div>
 
-                      <div className="absolute bottom-5 left-0 right-0 text-center">
+                      {/* Contenido — platos y precio */}
+                      <div className="flex-1 flex flex-col justify-center px-5 py-4 space-y-3">
+                        {/* Muestra solo el primer plato; si hay más, indica cuántos */}
+                        {(() => {
+                          const first = menu.items[0]
+                          return (
+                            <div className="text-center">
+                              <p className="text-sm font-bold text-stone-900 leading-snug">
+                                {first.name}
+                              </p>
+                              {first.description && (
+                                <p className="text-xs text-stone-400 mt-1 leading-tight">{first.description}</p>
+                              )}
+                              <div className="h-px w-8 bg-brand-earth/20 mx-auto my-3" />
+                              <p className="text-lg font-black" style={{ color: "#5E4B3B" }}>
+                                ${first.price.toLocaleString("es-AR")}
+                              </p>
+                              {menu.items.length > 1 && (
+                                <p className="text-[10px] text-stone-400 mt-2 uppercase tracking-wider">
+                                  +{menu.items.length - 1} plato{menu.items.length > 2 ? "s" : ""} más
+                                </p>
+                              )}
+                            </div>
+                          )
+                        })()}
+                      </div>
+
+                      {/* CTA */}
+                      <div className="pb-4 text-center">
                         <span className="text-xs text-brand-pine font-bold tracking-widest uppercase bg-brand-sand/50 px-3 py-1 rounded-full">
                           Ver Detalle
                         </span>
