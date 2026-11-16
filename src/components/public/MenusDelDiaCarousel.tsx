@@ -203,23 +203,78 @@ export default function MenusDelDiaCarousel() {
           transition={{ duration: 0.6 }}
           className="md:col-span-2 relative flex justify-center md:justify-end"
         >
-          {/* will-change: transform aísla el video en su propia capa GPU */}
-          <div
-            className="relative w-48 h-48 sm:w-64 sm:h-64 md:w-80 md:h-80 rounded-full overflow-hidden shadow-[0_25px_60px_rgba(0,0,0,0.2)] border-4 md:border-8 border-white/50"
-            style={{ willChange: "transform" }}
-          >
-            <video
-              src="/videoMenu.mp4"
-              autoPlay
-              loop
-              muted
-              playsInline
-              preload="auto"
-              className="w-full h-full object-cover"
+          {/* Círculo 3D con anillo dorado giratorio */}
+          <div className="relative flex items-center justify-center w-48 h-48 sm:w-64 sm:h-64 md:w-80 md:h-80">
+
+            {/* Anillo dorado giratorio exterior */}
+            <div
+              className="absolute inset-0 rounded-full"
+              style={{
+                padding: "3px",
+                background: "conic-gradient(from 0deg, #C4A882, #E8D5B0, #C4A882, #8B6B3D, #C4A882)",
+                animation: "spin-ring 8s linear infinite",
+                willChange: "transform",
+              }}
+            >
+              <div className="w-full h-full rounded-full" style={{ background: "#D6CEBC" }} />
+            </div>
+
+            {/* Anillo interior, gira en sentido contrario */}
+            <div
+              className="absolute rounded-full"
+              style={{
+                inset: "8px",
+                padding: "2px",
+                background: "conic-gradient(from 180deg, transparent 60%, rgba(196,168,130,0.6) 80%, transparent 100%)",
+                animation: "spin-ring-reverse 12s linear infinite",
+                willChange: "transform",
+              }}
+            >
+              <div className="w-full h-full rounded-full" style={{ background: "#D6CEBC" }} />
+            </div>
+
+            {/* Foto */}
+            <div
+              className="absolute rounded-full overflow-hidden shadow-[0_20px_60px_rgba(0,0,0,0.3),inset_0_0_30px_rgba(0,0,0,0.1)]"
+              style={{ inset: "12px" }}
+            >
+              <img
+                src="/images/menu-hero.webp"
+                alt="Menú del día"
+                className="w-full h-full object-cover scale-110"
+                style={{ animation: "float-slow 6s ease-in-out infinite" }}
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-brand-pine/20 to-transparent pointer-events-none" />
+            </div>
+
+            {/* Brillo superior para efecto 3D */}
+            <div
+              className="absolute rounded-full pointer-events-none"
+              style={{
+                inset: "12px",
+                background: "radial-gradient(ellipse at 35% 25%, rgba(255,255,255,0.25) 0%, transparent 60%)",
+              }}
             />
-            <div className="absolute inset-0 bg-brand-pine/10 pointer-events-none" />
+
+            {/* Blur de fondo */}
+            <div className="absolute -z-10 top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[150%] h-[150%] bg-brand-earth/15 rounded-full blur-3xl" />
           </div>
-          <div className="absolute -z-10 top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[130%] h-[130%] bg-brand-earth/10 rounded-full blur-3xl" />
+
+          {/* Keyframes para las animaciones */}
+          <style>{`
+            @keyframes spin-ring {
+              from { transform: rotate(0deg); }
+              to   { transform: rotate(360deg); }
+            }
+            @keyframes spin-ring-reverse {
+              from { transform: rotate(0deg); }
+              to   { transform: rotate(-360deg); }
+            }
+            @keyframes float-slow {
+              0%, 100% { transform: scale(1.10) translateY(0px); }
+              50%       { transform: scale(1.10) translateY(-8px); }
+            }
+          `}</style>
         </motion.div>
       </div>
     </div>

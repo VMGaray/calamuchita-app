@@ -61,7 +61,7 @@ const nextConfig: NextConfig = {
         ],
       },
       {
-        source: "/:file(valle.jpg|logo-qr.png|videoMenu.mp4)",
+        source: "/:file(valle.jpg|logo-qr.png)",
         headers: [
           { key: "Cache-Control", value: "public, max-age=2592000, stale-while-revalidate=86400" },
         ],
