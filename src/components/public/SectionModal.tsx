@@ -235,17 +235,36 @@ function SectionModalInner({ section, onClose }: Props) {
                 <Link
                   href="/menu-del-dia"
                   onClick={onClose}
-                  className="flex items-center justify-between w-full mb-4 px-4 py-3 rounded-2xl border transition-all"
-                  style={{ background: "#2D4530", borderColor: "#2D4530", color: "#E1DBC9" }}
+                  className="flex items-center justify-between w-full mb-5 px-5 py-4 rounded-2xl transition-all hover:opacity-95 active:scale-[0.98]"
+                  style={{
+                    background: "linear-gradient(135deg, #2D4530 0%, #3d5e42 100%)",
+                    color: "#E1DBC9",
+                    boxShadow: "0 4px 20px rgba(45,69,48,0.35)",
+                  }}
                 >
-                  <div className="flex items-center gap-3">
-                    <Utensils size={18} />
+                  <div className="flex items-center gap-4">
+                    <div
+                      className="w-11 h-11 rounded-xl flex items-center justify-center flex-shrink-0"
+                      style={{ background: "rgba(225,219,201,0.15)" }}
+                    >
+                      <span className="text-2xl">🍽️</span>
+                    </div>
                     <div>
-                      <p className="text-sm font-bold leading-tight">Menú del Día</p>
-                      <p className="text-xs opacity-70">Ver los menús de hoy en el Valle</p>
+                      <p className="text-base font-black leading-tight">Menú del Día</p>
+                      <p className="text-xs mt-0.5" style={{ color: "rgba(225,219,201,0.65)" }}>
+                        Los platos de hoy en el Valle
+                      </p>
                     </div>
                   </div>
-                  <span className="text-lg opacity-60">→</span>
+                  <div className="flex flex-col items-end gap-0.5">
+                    <span
+                      className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full"
+                      style={{ background: "#C4A882", color: "#2D4530" }}
+                    >
+                      HOY
+                    </span>
+                    <span className="text-lg" style={{ color: "rgba(225,219,201,0.5)" }}>→</span>
+                  </div>
                 </Link>
               )}
               {renderGrid("grid-cols-2")}
@@ -273,17 +292,36 @@ function SectionModalInner({ section, onClose }: Props) {
                   <Link
                     href="/menu-del-dia"
                     onClick={onClose}
-                    className="flex items-center justify-between w-full mb-4 px-4 py-3 rounded-2xl border transition-all hover:opacity-90"
-                    style={{ background: "#2D4530", borderColor: "#2D4530", color: "#E1DBC9" }}
+                    className="flex items-center justify-between w-full mb-5 px-5 py-4 rounded-2xl transition-all hover:opacity-95 active:scale-[0.98]"
+                    style={{
+                      background: "linear-gradient(135deg, #2D4530 0%, #3d5e42 100%)",
+                      color: "#E1DBC9",
+                      boxShadow: "0 4px 20px rgba(45,69,48,0.35)",
+                    }}
                   >
-                    <div className="flex items-center gap-3">
-                      <Utensils size={18} />
+                    <div className="flex items-center gap-4">
+                      <div
+                        className="w-11 h-11 rounded-xl flex items-center justify-center flex-shrink-0"
+                        style={{ background: "rgba(225,219,201,0.15)" }}
+                      >
+                        <span className="text-2xl">🍽️</span>
+                      </div>
                       <div>
-                        <p className="text-sm font-bold leading-tight">Menú del Día</p>
-                        <p className="text-xs opacity-70">Ver los menús de hoy en el Valle</p>
+                        <p className="text-base font-black leading-tight">Menú del Día</p>
+                        <p className="text-xs mt-0.5" style={{ color: "rgba(225,219,201,0.65)" }}>
+                          Los platos de hoy en el Valle
+                        </p>
                       </div>
                     </div>
-                    <span className="text-lg opacity-60">→</span>
+                    <div className="flex flex-col items-end gap-0.5">
+                      <span
+                        className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full"
+                        style={{ background: "#C4A882", color: "#2D4530" }}
+                      >
+                        HOY
+                      </span>
+                      <span className="text-lg" style={{ color: "rgba(225,219,201,0.5)" }}>→</span>
+                    </div>
                   </Link>
                 )}
                 {renderGrid("grid-cols-2 md:grid-cols-3")}

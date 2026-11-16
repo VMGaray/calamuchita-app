@@ -222,6 +222,41 @@ export default function StickyCategoryBar({ stickyOffset = 0 }: Props) {
                             transition={{ type: "spring", stiffness: 350, damping: 32 }}
                             style={{ overflow: "hidden" }}
                           >
+                            {key === "gastronomy" && (
+                              <button
+                                onClick={() => handleSubcategory("/menu-del-dia")}
+                                className="flex items-center justify-between w-full mt-1 mb-2 px-4 py-3.5 rounded-2xl text-left transition-all active:scale-[0.98]"
+                                style={{
+                                  background: "linear-gradient(135deg, #2D4530 0%, #3d5e42 100%)",
+                                  color: "#E1DBC9",
+                                  boxShadow: "0 2px 8px rgba(45,69,48,0.25)",
+                                }}
+                              >
+                                <div className="flex items-center gap-3">
+                                  <div
+                                    className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0"
+                                    style={{ background: "rgba(225,219,201,0.15)" }}
+                                  >
+                                    <span className="text-xl">🍽️</span>
+                                  </div>
+                                  <div>
+                                    <p className="text-sm font-black leading-tight">Menú del Día</p>
+                                    <p className="text-[11px] mt-0.5" style={{ color: "rgba(225,219,201,0.65)" }}>
+                                      Los platos de hoy en el Valle
+                                    </p>
+                                  </div>
+                                </div>
+                                <div className="flex flex-col items-end gap-0.5">
+                                  <span
+                                    className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full"
+                                    style={{ background: "#C4A882", color: "#2D4530" }}
+                                  >
+                                    HOY
+                                  </span>
+                                  <span className="text-base" style={{ color: "rgba(225,219,201,0.5)" }}>→</span>
+                                </div>
+                              </button>
+                            )}
                             <div className="grid grid-cols-2 gap-2 pt-1 pb-4">
                               {subItemsFor(key).map(({ label: subLabel, href }) => (
                                 <button
