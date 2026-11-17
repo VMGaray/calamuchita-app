@@ -105,7 +105,17 @@ h1, h2, h3 {
 
 /* Secciones de la home bajo el pliegue: el navegador no hace layout ni pinta lo que está fuera de
    pantalla (ni pide sus fuentes) hasta que se acerca. "auto" recuerda el alto real una vez medido. */
+/* En mobile, difiere el render de secciones fuera del viewport.
+   En desktop se desactiva: pantallas grandes pueden tener todo
+   "fuera del viewport estimado" y el navegador nunca las pinta. */
 .below-fold {
   content-visibility: auto;
   contain-intrinsic-size: auto 600px;
+}
+
+@media (min-width: 768px) {
+  .below-fold {
+    content-visibility: visible;
+    contain-intrinsic-size: none;
+  }
 }
