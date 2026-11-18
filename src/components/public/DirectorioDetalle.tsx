@@ -113,7 +113,8 @@ export default function DirectorioDetalle({ business, section, promoGroup = null
   // el navegador abra WhatsApp o el marcador, así el evento no se pierde.
   const recordLead = (type: string) => {
     if (type === "whatsapp" || type === "phone") trackMeta("Contact", { ...metaParams(business), contact_method: type })
-    createClient().from("business_leads").insert({ business_id: business.id, type }).then()
+    createClient().from("business_leads").insert({ business_id: business.id, type })
+      .then(({ error }) => { if (error) console.warn("[recordLead] no se registró el contacto:", type, error.message) })
   }
 
   // Un botón por WhatsApp cargado; sin WhatsApp, se usa el teléfono. Con más de uno, se muestra el nombre debajo.
