@@ -108,6 +108,9 @@ export default function PwaStatsCard() {
       <p className="mt-3 text-xs text-stone-400">
         Cuenta dispositivos que abren la app instalada. Empezó a medir el día que se activó.
       </p>
+      <p className="mt-1 text-xs text-stone-400">
+        Android (Play Store) incluye visitas desde Instagram/Facebook anteriores al 18/11/2026.
+      </p>
     </section>
   );
 }
