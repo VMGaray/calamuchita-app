@@ -130,7 +130,8 @@ export default function NegocioDetalle({ business, promoGroup = null }: Props) {
   // el navegador abra WhatsApp o el marcador, así el evento no se pierde.
   const recordLead = (type: string) => {
     if (type === "whatsapp" || type === "phone") trackMeta("Contact", { ...metaParams(business), contact_method: type })
-    createClient().from("business_leads").insert({ business_id: business.id, type }).then()
+    createClient().from("business_leads").insert({ business_id: business.id, type })
+      .then(({ error }) => { if (error) console.warn("[recordLead] no se registró el contacto:", type, error.message) })
   }
 
   // Pedidos y reservas van al primer WhatsApp; los botones de contacto, uno por cada número cargado
