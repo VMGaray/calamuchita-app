@@ -13,6 +13,10 @@ type Stats = {
   active_7d: number;
   active_30d: number;
   new_7d: number;
+  // Navegadores internos de Instagram/Facebook: no cuentan en total ni activos
+  inapp_instagram?: number;
+  inapp_facebook?: number;
+  inapp_7d?: number;
 };
 
 export default function PwaStatsCard() {
@@ -41,6 +45,10 @@ export default function PwaStatsCard() {
     { label: 'Android (Play Store)', value: stats.android_app },
     { label: 'Computadora', value: stats.desktop },
   ];
+
+  const inappInstagram = Number(stats.inapp_instagram) || 0;
+  const inappFacebook = Number(stats.inapp_facebook) || 0;
+  const inappTotal = inappInstagram + inappFacebook;
 
   return (
     <section className="rounded-2xl border border-stone-200 bg-white p-6">
@@ -83,8 +91,25 @@ export default function PwaStatsCard() {
           </div>
         ))}
       </div>
+      <div className="mt-3 rounded-xl border p-4" style={{ background: '#fafaf9', borderColor: '#f5f5f4' }}>
+        <p className="mb-1 text-[10px] uppercase tracking-wider" style={{ color: '#a8a29e' }}>
+          Navegador de Instagram/Facebook
+        </p>
+        <p className="font-serif text-2xl tabular-nums" style={{ color: '#292524' }}>
+          <AnimatedCounter to={inappTotal} />
+        </p>
+        <p className="mt-1 text-xs text-stone-500">
+          Instagram {inappInstagram} · Facebook {inappFacebook} · {Number(stats.inapp_7d) || 0} en los últimos 7 días
+        </p>
+        <p className="mt-1 text-xs text-stone-400">
+          Visitas desde redes o anuncios, abiertas dentro de Instagram o Facebook. No se suman a las personas que usan la app.
+        </p>
+      </div>
       <p className="mt-3 text-xs text-stone-400">
         Cuenta dispositivos que abren la app instalada. Empezó a medir el día que se activó.
+      </p>
+      <p className="mt-1 text-xs text-stone-400">
+        Android (Play Store) incluye visitas desde Instagram/Facebook anteriores al 18/11/2026.
       </p>
     </section>
   );

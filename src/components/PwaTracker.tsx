@@ -7,7 +7,17 @@ const DEVICE_KEY = 'calamuchita_device_id';
 const LAST_PING_KEY = 'calamuchita_last_ping';
 const PING_EVERY_MS = 12 * 60 * 60 * 1000; // 1 registro cada 12 h por dispositivo
 
-type Platform = 'ios' | 'android' | 'android-app' | 'desktop';
+type Platform =
+  | 'ios'
+  | 'android'
+  | 'android-app'
+  | 'desktop'
+  | 'inapp-instagram'
+  | 'inapp-facebook';
+
+// Marca que la app de Play Store (Capacitor) agrega al user agent vía
+// `appendUserAgent` en capacitor.config.json del proyecto calamuchita-webview.
+const APP_UA_MARK = /\bCalamuchitaApp\b/;
 
 function isIOS(ua: string): boolean {
   // iPadOS 13+ se presenta como Mac: se distingue por la pantalla táctil
@@ -26,7 +36,16 @@ function detectPlatform(): Platform | null {
   // iOS primero: abierta desde la pantalla de inicio cuenta como app instalada
   if (isIOS(ua)) return isStandalone ? 'ios' : null;
 
-  // App de Play Store (WebView con Capacitor)
+  // App de Play Store con la marca propia en el user agent: señal definitiva
+  if (APP_UA_MARK.test(ua)) return 'android-app';
+
+  // Navegadores internos de redes (también son WebViews con "wv"): van antes
+  // de la regla de abajo para no contarlos como app de Play Store.
+  if (/Instagram/.test(ua)) return 'inapp-instagram';
+  if (/FBAN|FBAV|FB_IAB|FB4A|Messenger/.test(ua)) return 'inapp-facebook';
+
+  // App de Play Store (WebView con Capacitor). El "wv" queda como respaldo
+  // para builds anteriores a la marca CalamuchitaApp.
   if (w.Capacitor?.isNativePlatform?.() || /\bwv\b/.test(ua)) return 'android-app';
 
   if (!isStandalone) return null; // navegador común: no se cuenta
