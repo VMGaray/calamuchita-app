@@ -39,7 +39,7 @@ export default function PublicLayoutChrome({ children }: { children: React.React
         </div>
       )}
 
-      <header className="relative z-[100]">
+      <header className="pointer-events-none relative z-[100]">
         <Header />
         {!isCategoryPage && !isSearchPage && <HeroSection />}
       </header>
