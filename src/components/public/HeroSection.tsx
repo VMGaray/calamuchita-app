@@ -28,14 +28,14 @@ export default function HeroSection() {
   }
 
   return (
-    <section className="relative px-4 pt-6 md:pt-8 pb-28 md:pb-20 text-center overflow-hidden min-h-[300px] md:min-h-[480px]" style={{ contain: "layout style" }}>
+    <section className="pointer-events-none relative px-4 pt-6 md:pt-8 pb-28 md:pb-20 text-center overflow-hidden min-h-[300px] md:min-h-[480px]" style={{ contain: "layout style" }}>
 
       {/* Las entradas son animaciones CSS (globals.css): arrancan con el primer paint. Con framer-motion
           el texto venía con opacity:0 en el HTML y no se veía hasta que hidrataba el JS (segundos en 4G). */}
 
       {/* Eyebrow */}
       <span
-        className="hero-in-down relative z-10 inline-block text-xs font-medium tracking-widest uppercase px-4 py-1.5 rounded-full mb-4"
+        className="hero-in-down pointer-events-auto relative z-10 inline-block text-xs font-medium tracking-widest uppercase px-4 py-1.5 rounded-full mb-4"
         style={{
           background: "rgba(0,0,0,0.22)",
           border: "1px solid rgba(255,255,255,0.3)",
@@ -49,7 +49,7 @@ export default function HeroSection() {
 
       {/* Title */}
       <h1
-        className="relative z-10 font-serif text-4xl md:text-6xl lg:text-7xl leading-tight mb-3"
+        className="pointer-events-auto relative z-10 font-serif text-4xl md:text-6xl lg:text-7xl leading-tight mb-3"
         style={{ color: "rgba(255,255,255,0.97)", textShadow: "0 2px 16px rgba(0,0,0,0.5), 0 1px 4px rgba(0,0,0,0.3)" }}
       >
         <div className="hero-in" style={{ animationDuration: "0.3s", animationDelay: "0.3s" }}>
@@ -62,7 +62,7 @@ export default function HeroSection() {
 
       {/* Subtitle */}
       <p
-        className="hero-in relative z-10 text-sm md:text-base max-w-lg mx-auto mb-4 leading-relaxed px-4 md:px-5 py-2 md:py-2.5 rounded-2xl"
+        className="hero-in pointer-events-auto relative z-10 text-sm md:text-base max-w-lg mx-auto mb-4 leading-relaxed px-4 md:px-5 py-2 md:py-2.5 rounded-2xl"
         style={{
           color: "rgba(255,255,255,0.95)",
           background: "rgba(0,0,0,0.25)",
@@ -78,7 +78,7 @@ export default function HeroSection() {
 
       {/* Search — h-14 reserves space before JS hydrates; opacity-only animation avoids y-transform layout shift */}
       <div
-        className="hero-in relative z-10 flex items-center max-w-lg mx-auto rounded-2xl overflow-hidden h-14"
+        className="hero-in pointer-events-auto relative z-10 flex items-center max-w-lg mx-auto rounded-2xl overflow-hidden h-14"
         style={{
           background: "rgba(255,255,255,0.7)",
           backdropFilter: "blur(16px)",
