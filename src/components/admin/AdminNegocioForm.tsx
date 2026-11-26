@@ -6,6 +6,7 @@ import { createClient } from "@/lib/supabase/client"
 import { BusinessSection, BusinessCategory } from "@/types/database"
 import { MASTER_CATEGORIES } from "@/lib/constants/categories"
 import RubrosSelector from "@/components/admin/RubrosSelector"
+import EspecialidadesCoberturas from "@/components/admin/EspecialidadesCoberturas"
 import SeccionesExtra, { limpiarSeccionesExtra, rubroPrincipal, rubrosDeSeccion } from "@/components/admin/SeccionesExtra"
 import ImageUpload from "@/components/ui/ImageUpload"
 import PdfUpload from "@/components/ui/PdfUpload"
@@ -59,17 +60,6 @@ const subcategoryOptions: Record<string, string[]> = {
   events:    ["Culturales", "Deportivos", "Festivales", "Gastronómicos", "Infantiles", "Música", "Otro"],
   info:      ["Cooperativas", "Emergencias", "Farmacias", "Municipalidad", "Transporte", "Turismo oficial", "Otro"],
 }
-
-const COBERTURAS = [
-  "APROSS", "IOMA", "OSDE", "PAMI", "Swiss Medical",
-  "Medifé", "Galeno", "Sancor Salud", "Omint", "Particular",
-]
-
-const ESPECIALIDADES_SUGERIDAS = [
-  "Cardiología", "Clínica médica", "Dermatología", "Fonoaudiología",
-  "Ginecología", "Kinesiología", "Neurología", "Nutrición", "Nutricionista",
-  "Odontología", "Oftalmología", "Osteopatía", "Pediatría", "Psicopedagogía", "Psicología", "Traumatología",
-]
 
 const pueblos = [
   "Villa General Belgrano", "Los Reartes", "Santa Rosa de Calamuchita",
@@ -728,65 +718,11 @@ export default function AdminNegocioForm() {
               />
             </div>
 
-            <div>
-              <label className="block text-sm font-medium text-stone-700 mb-2">Especialidades</label>
-              <div className="flex gap-2 flex-wrap mb-3">
-                {ESPECIALIDADES_SUGERIDAS.map(esp => (
-                  <button
-                    key={esp}
-                    onClick={() => toggleHealthArray("medical_specialties", esp)}
-                    className={`py-1.5 px-3 rounded-xl text-xs font-medium border transition-colors ${
-                      form.medical_specialties.includes(esp)
-                        ? "bg-primary-500 text-white border-primary-500"
-                        : "bg-white text-stone-600 border-stone-200 hover:border-primary-300"
-                    }`}
-                  >
-                    {esp}
-                  </button>
-                ))}
-              </div>
-              <input
-                type="text"
-                placeholder="Escribí una especialidad y presioná Enter..."
-                className="w-full px-4 py-2.5 rounded-xl border border-stone-200 text-stone-800 text-sm outline-none focus:ring-2 focus:ring-primary-300"
-                onKeyDown={e => {
-                  if (e.key === "Enter" && e.currentTarget.value.trim()) {
-                    toggleHealthArray("medical_specialties", e.currentTarget.value.trim())
-                    e.currentTarget.value = ""
-                    e.preventDefault()
-                  }
-                }}
-              />
-              {form.medical_specialties.length > 0 && (
-                <div className="flex gap-2 flex-wrap mt-2">
-                  {form.medical_specialties.map(esp => (
-                    <span key={esp} className="flex items-center gap-1 py-1 px-2.5 rounded-full text-xs bg-primary-50 text-primary-600 border border-primary-100">
-                      {esp}
-                      <button onClick={() => toggleHealthArray("medical_specialties", esp)} className="hover:text-red-400 ml-0.5 leading-none">×</button>
-                    </span>
-                  ))}
-                </div>
-              )}
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-stone-700 mb-2">Coberturas aceptadas</label>
-              <div className="flex gap-2 flex-wrap">
-                {COBERTURAS.map(cob => (
-                  <button
-                    key={cob}
-                    onClick={() => toggleHealthArray("health_coverages", cob)}
-                    className={`py-1.5 px-3 rounded-xl text-xs font-medium border transition-colors ${
-                      form.health_coverages.includes(cob)
-                        ? "bg-primary-500 text-white border-primary-500"
-                        : "bg-white text-stone-600 border-stone-200 hover:border-primary-300"
-                    }`}
-                  >
-                    {cob}
-                  </button>
-                ))}
-              </div>
-            </div>
+            <EspecialidadesCoberturas
+              specialties={form.medical_specialties}
+              coverages={form.health_coverages}
+              onToggle={toggleHealthArray}
+            />
 
             {/* Guardia y turnos */}
             <div className="pt-2 border-t border-stone-100 space-y-4">

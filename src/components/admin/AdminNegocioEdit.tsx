@@ -6,6 +6,7 @@ import { createClient } from "@/lib/supabase/client"
 import { BusinessSection, BusinessCategory } from "@/types/database"
 import { MASTER_CATEGORIES } from "@/lib/constants/categories"
 import RubrosSelector from "@/components/admin/RubrosSelector"
+import EspecialidadesCoberturas from "@/components/admin/EspecialidadesCoberturas"
 import SeccionesExtra, { limpiarSeccionesExtra, rubroPrincipal, rubrosDeSeccion } from "@/components/admin/SeccionesExtra"
 import ImageUpload from "@/components/ui/ImageUpload"
 import PdfUpload from "@/components/ui/PdfUpload"
@@ -148,6 +149,9 @@ export default function AdminNegocioEdit({ id }: Props) {
     payment_methods: [] as string[],
     is_premium: false,
     is_featured_rubro: false,
+    doctor_name: "",
+    medical_specialties: [] as string[],
+    health_coverages: [] as string[],
     has_24h_guard: false,
     appointment_system: "",
     group_name: "",
@@ -193,6 +197,9 @@ export default function AdminNegocioEdit({ id }: Props) {
           payment_methods: business.payment_methods || [],
           is_premium: business.is_premium || false,
           is_featured_rubro: business.is_featured_rubro || false,
+          doctor_name: business.doctor_name || "",
+          medical_specialties: business.medical_specialties || [],
+          health_coverages: business.health_coverages || [],
           has_24h_guard: business.has_24h_guard || false,
           appointment_system: business.appointment_system || "",
           group_name: business.group_name || "",
@@ -225,6 +232,15 @@ export default function AdminNegocioEdit({ id }: Props) {
     }
     fetch()
   }, [id])
+
+  const toggleHealthArray = (field: "medical_specialties" | "health_coverages", value: string) => {
+    setForm(prev => ({
+      ...prev,
+      [field]: prev[field].includes(value)
+        ? prev[field].filter(v => v !== value)
+        : [...prev[field], value],
+    }))
+  }
 
   const handleChange = (field: string, value: any) => {
     setForm(prev => ({ ...prev, [field]: value }))
@@ -291,6 +307,9 @@ export default function AdminNegocioEdit({ id }: Props) {
         payment_methods: form.payment_methods,
         is_premium: form.is_premium,
         is_featured_rubro: form.is_featured_rubro,
+        doctor_name: inSection("health") ? form.doctor_name || null : null,
+        medical_specialties: inSection("health") ? form.medical_specialties : [],
+        health_coverages: inSection("health") ? form.health_coverages : [],
         has_24h_guard: inSection("health") ? form.has_24h_guard : false,
         appointment_system: inSection("health") ? form.appointment_system || null : null,
         group_name: form.group_name || null,
@@ -842,10 +861,24 @@ export default function AdminNegocioEdit({ id }: Props) {
           </div>
         </div>
 
-        {/* Salud — guardia y turnos */}
+        {/* Salud — campos específicos */}
         {inSection("health") && (
-          <div className="bg-white rounded-2xl border border-stone-200 p-6 space-y-4">
-            <h2 className="text-sm font-medium text-stone-700">Guardia y turnos</h2>
+          <div className="bg-white rounded-2xl border border-stone-200 p-6 space-y-5">
+            <h2 className="text-sm font-medium text-stone-700">Información de salud</h2>
+            <div>
+              <label className="block text-sm font-medium text-stone-700 mb-1">
+                Nombre del profesional <span className="text-stone-400 font-normal">(opcional)</span>
+              </label>
+              <input type="text" value={form.doctor_name}
+                onChange={e => handleChange("doctor_name", e.target.value)}
+                placeholder="Dr./Dra. Nombre Apellido"
+                className="w-full px-4 py-2.5 rounded-xl border border-stone-200 text-stone-800 text-sm outline-none focus:ring-2 focus:ring-primary-300" />
+            </div>
+            <EspecialidadesCoberturas
+              specialties={form.medical_specialties}
+              coverages={form.health_coverages}
+              onToggle={toggleHealthArray}
+            />
             <label className="flex items-center gap-3 cursor-pointer">
               <input type="checkbox" checked={form.has_24h_guard}
                 onChange={e => handleChange("has_24h_guard", e.target.checked)}
