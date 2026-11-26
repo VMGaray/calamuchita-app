@@ -2,6 +2,7 @@ import BuscarResults from "@/components/public/BuscarResults"
 import { canonical } from "@/lib/seo"
 import { createClient } from "@/lib/supabase/server"
 import { MASTER_CATEGORIES } from "@/lib/constants/categories"
+import { ESPECIALIDADES } from "@/lib/constants/salud"
 
 export const dynamic = "force-dynamic"
 
@@ -177,51 +178,51 @@ function findMatchingSubcategories(q: string): string[] {
   return [...new Set([...fromSynonyms, ...fromLabels])]
 }
 
-// ── Sinónimos → specialty_group del JSONB professionals ────────────────────
-// Los grupos deben coincidir exactamente con los valores guardados en la DB.
+// ── Búsqueda por especialidad (businesses.medical_specialties) ─────────────
+// Los valores deben coincidir exactamente con los guardados en la DB: los de
+// ESPECIALIDADES (lo que se marca en el formulario) más los grupos que usaban
+// las fichas cargadas antes de esa lista, para que sigan apareciendo.
+const LEGACY_SPECIALTY_GROUPS = [
+  "Kinesiología / Fisioterapia", "Cosmiatría", "Medicina", "Reflexología",
+  "Laboratorio", "Farmacia", "Clínica médica", "Nutricionista",
+]
+
+// Términos que no comparten raíz con el nombre de la especialidad.
 const SPECIALTY_SYNONYMS: Record<string, string[]> = {
-  nutricionista:   ["Nutrición"],
-  nutricion:       ["Nutrición"],
-  psicologo:       ["Psicología"],
-  psicologa:       ["Psicología"],
-  psicologia:      ["Psicología"],
-  kinesiologo:     ["Kinesiología / Fisioterapia"],
-  kinesiologia:    ["Kinesiología / Fisioterapia"],
-  fisioterapeuta:  ["Kinesiología / Fisioterapia"],
-  fisioterapia:    ["Kinesiología / Fisioterapia"],
-  fonoaudiologo:   ["Fonoaudiología"],
-  fonoaudiologia:  ["Fonoaudiología"],
-  cosmiatra:       ["Cosmiatría"],
-  cosmetologa:     ["Cosmiatría"],
-  odontologo:      ["Odontología"],
-  odontologia:     ["Odontología"],
-  dentista:        ["Odontología"],
-  medico:          ["Medicina"],
-  medicina:        ["Medicina"],
-  clinico:         ["Medicina"],
-  clinica:         ["Medicina"],
-  pediatra:        ["Pediatría"],
-  pediatria:       ["Pediatría"],
-  reflexologo:     ["Reflexología"],
-  reflexologia:    ["Reflexología"],
-  osteopata:       ["Osteopatía"],
-  osteopatia:      ["Osteopatía"],
+  dentista:       ["Odontología"],
+  fisioterapeuta: ["Kinesiología", "Kinesiología / Fisioterapia"],
+  fisioterapia:   ["Kinesiología", "Kinesiología / Fisioterapia"],
+  cosmetologa:    ["Estética", "Cosmiatría"],
+  cosmiatra:      ["Estética", "Cosmiatría"],
+  medico:         ["Clínica Médica", "Medicina General", "Medicina"],
+  medica:         ["Clínica Médica", "Medicina General", "Medicina"],
+  clinico:        ["Clínica Médica", "Medicina General", "Medicina"],
+  oculista:       ["Oftalmología"],
+  neumologo:      ["Neumonología"],
+  neumologia:     ["Neumonología"],
+  quiropractico:  ["Quiropraxia"],
+  quiropractica:  ["Quiropraxia"],
+  ecografia:      ["Diagnóstico por Imágenes"],
+  radiologia:     ["Diagnóstico por Imágenes"],
+  rayos:          ["Diagnóstico por Imágenes"],
+  tomografia:     ["Diagnóstico por Imágenes"],
 }
 
-const ALL_SPECIALTY_GROUPS = [
-  "Nutrición", "Psicología", "Kinesiología / Fisioterapia", "Fonoaudiología",
-  "Cosmiatría", "Odontología", "Medicina", "Pediatría", "Reflexología", "Osteopatía",
-  "Laboratorio", "Farmacia", "Otros",
-]
+// "cardiólogo" → "cardiolog", que matchea "Cardiología"; "pediatra" → "pediatr".
+function stem(s: string) {
+  return s.replace(/(ista|ia|os|as|es|o|a)$/, "")
+}
 
 function findMatchingSpecialtyGroups(q: string): string[] {
   const nq = normalizeStr(q)
+  if (nq.length < 3) return []
+  const sq = stem(nq)
   const fromSynonyms = SPECIALTY_SYNONYMS[nq] ?? []
-  const fromGroups = ALL_SPECIALTY_GROUPS.filter(g => {
+  const fromNames = [...ESPECIALIDADES, ...LEGACY_SPECIALTY_GROUPS].filter(g => {
     const ng = normalizeStr(g)
-    return ng.includes(nq) || nq.includes(ng)
+    return ng.includes(nq) || nq.includes(ng) || (sq.length >= 4 && ng.includes(sq))
   })
-  return [...new Set([...fromSynonyms, ...fromGroups])]
+  return [...new Set([...fromSynonyms, ...fromNames])]
 }
 
 export interface SearchResult {
