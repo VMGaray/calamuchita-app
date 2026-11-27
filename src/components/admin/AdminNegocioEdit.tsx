@@ -6,6 +6,8 @@ import { createClient } from "@/lib/supabase/client"
 import { BusinessSection, BusinessCategory } from "@/types/database"
 import { MASTER_CATEGORIES } from "@/lib/constants/categories"
 import RubrosSelector from "@/components/admin/RubrosSelector"
+import SucursalesEditor from "@/components/admin/SucursalesEditor"
+import { cleanBranches, readBranches, type Branch } from "@/lib/branches"
 import EspecialidadesCoberturas from "@/components/admin/EspecialidadesCoberturas"
 import SeccionesExtra, { limpiarSeccionesExtra, rubroPrincipal, rubrosDeSeccion } from "@/components/admin/SeccionesExtra"
 import ImageUpload from "@/components/ui/ImageUpload"
@@ -117,7 +119,7 @@ export default function AdminNegocioEdit({ id }: Props) {
   const [error, setError] = useState<string | null>(null)
   const [success, setSuccess] = useState(false)
   const [horarios, setHorarios] = useState<HorarioDay[]>(defaultHorarios)
-  const [branches, setBranches] = useState<Array<{ address: string; pueblo: string }>>([])
+  const [branches, setBranches] = useState<Branch[]>([])
   const [professionalType, setProfessionalType] = useState("")
   const [coordsInput, setCoordsInput] = useState("")
   const [selectedCategories, setSelectedCategories] = useState<string[]>([])
@@ -205,7 +207,7 @@ export default function AdminNegocioEdit({ id }: Props) {
           group_name: business.group_name || "",
           group_id: business.group_id || "",
         })
-        setBranches(business.branches || [])
+        setBranches(readBranches(business.branches))
         const cats: string[] = business.categories || []
         const profType = cats.find((c: string) => PROFESIONALES_OPTIONS.includes(c)) || ""
         setProfessionalType(profType)
@@ -327,7 +329,7 @@ export default function AdminNegocioEdit({ id }: Props) {
     }
 
     // Guardar sucursales (requiere columna `branches jsonb default '[]'` en businesses)
-    await supabase.from("businesses").update({ branches }).eq("id", id)
+    await supabase.from("businesses").update({ branches: cleanBranches(branches) }).eq("id", id)
 
     // La galería (business_photos) se guarda al instante desde <GaleriaFotos>
 
@@ -598,52 +600,7 @@ export default function AdminNegocioEdit({ id }: Props) {
           </div>
 
           {/* Sucursales */}
-          <div>
-            <div className="flex items-center justify-between mb-2">
-              <label className="text-sm font-medium text-stone-700">Sucursales <span className="text-stone-400 font-normal">(domicilios adicionales)</span></label>
-              <button
-                type="button"
-                onClick={() => setBranches(prev => [...prev, { address: "", pueblo: "" }])}
-                className="text-xs font-medium px-3 py-1.5 rounded-xl border border-primary-300 text-primary-600 hover:bg-primary-50 transition-colors"
-              >
-                + Agregar sucursal
-              </button>
-            </div>
-            {branches.length === 0 && (
-              <p className="text-xs text-stone-400">Sin sucursales — una sola dirección.</p>
-            )}
-            <div className="space-y-3">
-              {branches.map((branch, i) => (
-                <div key={i} className="p-3 rounded-xl border border-stone-200 bg-stone-50 space-y-2">
-                  <div className="flex items-center justify-between">
-                    <span className="text-xs font-semibold text-stone-600">Sucursal {i + 1}</span>
-                    <button
-                      type="button"
-                      onClick={() => setBranches(prev => prev.filter((_, idx) => idx !== i))}
-                      className="text-xs text-red-400 hover:text-red-500"
-                    >
-                      Eliminar
-                    </button>
-                  </div>
-                  <select
-                    value={branch.pueblo}
-                    onChange={e => setBranches(prev => prev.map((b, idx) => idx === i ? { ...b, pueblo: e.target.value } : b))}
-                    className="w-full px-3 py-2 rounded-lg border border-stone-200 text-stone-800 text-sm outline-none focus:ring-2 focus:ring-primary-300 bg-white"
-                  >
-                    <option value="">Seleccioná un pueblo</option>
-                    {pueblos.map(p => <option key={p} value={p}>{p}</option>)}
-                  </select>
-                  <input
-                    type="text"
-                    value={branch.address}
-                    onChange={e => setBranches(prev => prev.map((b, idx) => idx === i ? { ...b, address: e.target.value } : b))}
-                    placeholder="Calle y número"
-                    className="w-full px-3 py-2 rounded-lg border border-stone-200 text-stone-800 text-sm outline-none focus:ring-2 focus:ring-primary-300"
-                  />
-                </div>
-              ))}
-            </div>
-          </div>
+          <SucursalesEditor value={branches} onChange={setBranches} pueblos={pueblos} />
         </div>
         <div>
          <label className="block text-sm font-medium text-stone-700 mb-1">Sitio web</label>

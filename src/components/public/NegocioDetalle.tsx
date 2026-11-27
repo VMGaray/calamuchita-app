@@ -22,6 +22,7 @@ import { normalizeUrl } from "@/lib/normalizeUrl"
 import { extractYoutubeId } from "@/lib/utils/youtube"
 import { hoyAR } from "@/lib/utils/fechas"
 import { isOpenNow } from "@/lib/utils/horarios"
+import Sucursales from "@/components/public/Sucursales"
 import PromoCoupon, { type PromoGroup } from "@/components/public/PromoCoupon"
 
 const DAY = ["Domingo", "Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado"]
@@ -452,6 +453,9 @@ export default function NegocioDetalle({ business, promoGroup = null }: Props) {
             {websiteUrl          && <InfoRow icon={<Globe size={14} style={{ color: "#2D4530" }} />}  sublabel="Web"        label={websiteUrl.replace(/^https?:\/\//, "")}            href={websiteUrl} external />}
             {business.address    && <InfoRow icon={<MapPin size={14} style={{ color: "#2D4530" }} />} sublabel="Dirección"  label={business.address} />}
           </div>
+
+          {/* ── Sucursales ── */}
+          <Sucursales branches={business.branches} waText={waText} onLead={recordLead} className="bg-white/50 rounded-2xl p-4" />
 
           {/* ── Horarios ── */}
           {hoursByDay.size > 0 && (

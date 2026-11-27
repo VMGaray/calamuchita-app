@@ -20,6 +20,7 @@ import AnimateIn from "@/components/ui/AnimateIn"
 import BackButton from "@/components/ui/BackButton"
 import { businessProfileUrl } from "@/lib/utils/business"
 import { isOpenNow } from "@/lib/utils/horarios"
+import Sucursales from "@/components/public/Sucursales"
 import PromoCoupon, { type PromoGroup } from "@/components/public/PromoCoupon"
 
 function WaIcon({ size = 14 }: { size?: number }) {
@@ -482,6 +483,9 @@ export default function DirectorioDetalle({ business, section, promoGroup = null
             )}
           </div>
         </AnimateIn>
+
+        {/* Sucursales */}
+        <Sucursales branches={business.branches} waText={waText} onLead={recordLead} className={cardClass} />
 
         {/* ═══════════════════════════════════════════════════════════
             CARRUSEL DE FOTOS (cover_url + business_photos)
